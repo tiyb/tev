@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="Photo"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/postviewer.css}"/>
+</head>
+<body>
+
+<div class="contentContainer">
+<p th:each="photo : ${photos}">
+	<img th:src="'/viewerMedia/' + ${photo}" />
+</p>
+<div id="regularContentContainer" th:utext="${caption}"></div>
+</div>
+<div id="tagContainer" th:text="${tags}"></div>
+
+</body>
+</html>

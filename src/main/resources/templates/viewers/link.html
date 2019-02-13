@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="${link.text}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/postviewer.css}"/>
+</head>
+<body>
+
+<div class="contentContainer">
+<h1 th:text="${link.text}"></h1>
+<h2><a th:href="${link.url}" target="_blank">LINK</a></h2>
+<div id="regularContentContainer" th:utext="${link.description}"></div>
+</div>
+<div id="tagContainer" th:text="${tags}"></div>
+
+</body>
+</html>

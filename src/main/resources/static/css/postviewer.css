@@ -1,0 +1,55 @@
+@charset "UTF-8";
+
+body {
+	background-color: #001935;
+	font-family: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
+}
+
+.contentContainer {
+	background-color: #FFFFFF;
+	margin-top: 25px;
+	margin-left: 50px;
+	margin-right: 50px;
+	margin-bottom: 15px;
+	
+	padding-top: 15px;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-bottom: 15px;
+}
+
+h1 {
+	font-family: Gibson,Helvetica Neue,HelveticaNeue,Helvetica,Arial,sans-serif;
+	font-size: 20px;
+	font-weight: 700;
+}
+
+h2 {
+	font-family: Gibson,Helvetica Neue,HelveticaNeue,Helvetica,Arial,sans-serif;
+	font-size: 16px;
+	font-weight: 700;
+}
+
+.regularContentContainer {
+	font-familiy: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	font-weight: 400;
+}
+
+#tagContainer {
+	background-color: rgba(255, 255, 255, 0.05);
+	color: rgba(255, 255, 255, 0.46);
+	font-family: ""Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
+	font-size: 12px;
+	font-weight: 400;
+	
+	margin-top: 15px;
+	margin-left: 50px;
+	margin-right: 50px;
+	margin-bottom: 25px;
+	
+	padding-top: 15px;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-bottom: 15px;
+}

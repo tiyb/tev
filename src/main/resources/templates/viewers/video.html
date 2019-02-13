@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Video</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/postviewer.css}"/>
+</head>
+<body>
+
+<div class="contentContainer">
+<video controls="true" autoplay="false" preload="none" th:height="${video.height}" th:width="${video.width}">
+	<source th:src="'/viewerVideo/' +  ${video.postId} + '.' + ${video.extension}" th:type="${video.contentType}" />
+</video>
+<div id="regularContentContainer" th:utext="${video.videoCaption}"></div>
+</div>
+<div id="tagContainer" th:text="${tags}"></div>
+
+</body>
+</html>

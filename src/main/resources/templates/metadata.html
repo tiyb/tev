@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Metadata</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" type="text/css"
+          href="webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/datatables.min.css}"/>
+</head>
+<body>
+
+<div id="header"></div>
+
+<div class="container">
+
+    <div class="starter-template">
+    	<h1>Application Metadata</h1>
+    	<table class="display">
+    		<tr>
+    			<th>Base Media Path</th>
+    			<td><input type="text" id="baseMediaPath"></input></td>
+    		</tr>
+    	</table>
+    	<input id="submitButton" type="submit" value="Update"></input>
+    	
+    	<form method="POST" enctype="multipart/form-data" action="/postDataUpload">
+    		<table class="display">
+    			<tr><td>File to upload:</td><td><input type="file" name="file" /></td></tr>
+				<tr><td></td><td><input type="submit" value="Upload" /></td></tr>
+    		</table>
+    	</form>
+    </div>
+
+</div>
+
+<div id="footer" class="container"></div>
+
+<script type="text/javascript"
+        src="webjars/jquery/3.3.1/jquery.min.js"></script>
+
+<script type="text/javascript" th:src="@{/js/datatables.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/js/metadata.js}"></script>
+
+</body>
+</html>
