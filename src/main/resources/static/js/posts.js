@@ -89,7 +89,7 @@ $(document).ready(function() {
 				"data": "isRead",
 				"render": function(data, type, row, meta) {
 					if(data) {
-						return $.i18n.prop('index_read');
+						return "<button>Mark Unread</button>";
 					} else {
 						return $.i18n.prop('index_unread');
 					}
@@ -99,7 +99,7 @@ $(document).ready(function() {
 		"initComplete": function() {
 			$('#postTable tbody').on('click', 'tr', function () {
 				var postID = $(this).children('td:first-child').text();
-				$(this).children('td:last-child').text($.i18n.prop('index_read'));
+				$(this).children('td:last-child').html("<button>Mark Unread</button>");
 				postTable.draw();
 				$.ajax({
 					url: "/api/posts/" + postID + "/markRead",
@@ -114,6 +114,18 @@ $(document).ready(function() {
 			});
 			sortTable();
 		}
+	});
+	
+	$('#postTable tbody').on('click', 'button', function() {
+		var data = postTable.row( $(this).parents('tr') ).data();
+		var postID = data.id;
+		$.ajax({
+			url: "/api/posts/" + postID + "/markUnread",
+			type: "PUT"
+		});
+		$(this).parents('tr').children('td:last-child').text($.i18n.prop('index_unread'));
+		postTable.draw();
+		return false;
 	});
 	
 	$('#postTable thead tr').clone(true).appendTo('#postTable thead');
