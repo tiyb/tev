@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Metadata</title>
+    <title th:text="#{metadata.title}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
     <link rel="stylesheet" type="text/css"
@@ -17,36 +17,36 @@
 <div class="container">
 
     <div class="starter-template">
-    	<h1>Application Metadata</h1>
-    	<h2>Base Information</h2>
-    	<p>Use these values to control how the application displays posts.</p>
+    	<h1 th:text="#{metadata.title}"></h1>
+    	<h2 th:text="#{metadata.viewSettings}"></h2>
+    	<p th:text="#{metadata.explanatoryText}"></p>
     	
     	<table class="display" id="settingsTable"> 
     		<tr>
-    			<th>Base Media Path</th>
+    			<th th:text="#{metadata.baseMediaPath}"></th>
     			<td><input type="text" id="baseMediaPath"></input></td>
     		</tr>
     		<tr>
-    			<th>Filter</th>
+    			<th th:text="#{metadata.filter}"></th>
     			<td><select id="filterDropdown"></select></td>
     		</tr>
     		<tr>
-    			<th>Sort By...</th>
+    			<th th:text="#{metadata.sortColumn}"></th>
     			<td><select id="sortByDropdown"></select></td>
     		</tr>
     		<tr>
-    			<th>Sort...</th>
+    			<th th:text="#{metadata.sortOrder}"></th>
     			<td><select id="sortOrderDropdown"></select></td>
     		</tr>
     	</table>
-    	<input id="submitButton" type="submit" value="Update"></input>
+    	<input id="submitButton" type="submit" th:value="#{metadata.submitButton}"></input>
     	
-    	<h2>Upload XML</h2>
-    	<p>Use this function to upload a new XML export from Tumblr. Be warned that this will overwrite any data that's already in the application.</p>
+    	<h2 th:text="#{metadata.uploadTitle}"></h2>
+    	<p th:text="#{metadata.uploadExplanatoryText}"></p>
     	<form method="POST" enctype="multipart/form-data" action="/postDataUpload">
     		<table class="display">
-    			<tr><td>File to upload:</td><td><input type="file" name="file" /></td></tr>
-				<tr><td></td><td><input type="submit" value="Upload" /></td></tr>
+    			<tr><td th:text="#{metadata.uploadFile}"></td><td><input type="file" name="file" /></td></tr>
+				<tr><td></td><td><input type="submit" th:value="#{metadata.uploadSubmitButton}" /></td></tr>
     		</table>
     	</form>
     </div>

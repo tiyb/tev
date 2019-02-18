@@ -1,6 +1,12 @@
 var typesMap;
 var metadata;
 
+$.i18n.properties({
+	name: 'messages',
+	path: 'js/i18n/',
+	mode: 'both'
+});
+
 $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
 	var filterVal = metadata.filter;
 	if(filterVal == null || filterVal == "") {
@@ -11,11 +17,11 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
 		return true;
 	}
 	
-	if(filterVal == "Filter Read Posts" && data[4] == "Unread") {
+	if(filterVal == "Filter Read" && data[4] == $.i18n.prop('index_unread')) {
 		return true;
 	}
 	
-	if(filterVal == "Filter Unread Posts" && data[4] == "Read") {
+	if(filterVal == "Filter Unread" && data[4] == $.i18n.prop('index_read')) {
 		return true;
 	}
 	
@@ -44,8 +50,26 @@ $(document).ready(function() {
 	
 	var postTable = $('#postTable').DataTable( {
 		"language": {
-			"emptyTable": "No posts in the database"
-		},
+			"emptyTable": 	  $.i18n.prop('index_posttable_emptytable'),
+		    "info":           $.i18n.prop('index_posttable_info'),
+		    "infoEmpty":      $.i18n.prop('index_posttable_infoempty'),
+		    "infoFiltered":   $.i18n.prop('index_posttable_infofiltered'),
+		    "lengthMenu":     $.i18n.prop('index_posttable_lengthmenu'),
+		    "loadingRecords": $.i18n.prop('index_posttable_loadingrecords'),
+		    "processing":     $.i18n.prop('index_posttable_processing'),
+		    "search":         $.i18n.prop('index_posttable_search'),
+		    "zeroRecords":    $.i18n.prop('index_posttable_zerorecords'),
+		    "paginate": {
+		        "first":      $.i18n.prop('index_posttable_paginate_first'),
+		        "last":       $.i18n.prop('index_posttable_paginate_last'),
+		        "next":       $.i18n.prop('index_posttable_paginate_next'),
+		        "previous":   $.i18n.prop('index_posttable_paginate_previous')
+		    },
+		    "aria": {
+		        "sortAscending":  $.i18n.prop('index_posttable_aria_sortasc'),
+		        "sortDescending": $.i18n.prop('index_posttable_aria_sortdesc')
+		    }		
+	    },
 		"orderCellsTop": true,
 		"ajax": {
 			"url": "api/posts",
@@ -65,9 +89,9 @@ $(document).ready(function() {
 				"data": "isRead",
 				"render": function(data, type, row, meta) {
 					if(data) {
-						return "Read";
+						return $.i18n.prop('index_read');
 					} else {
-						return "Unread";
+						return $.i18n.prop('index_unread');
 					}
 				}
 			}
@@ -75,7 +99,7 @@ $(document).ready(function() {
 		"initComplete": function() {
 			$('#postTable tbody').on('click', 'tr', function () {
 				var postID = $(this).children('td:first-child').text();
-				$(this).children('td:last-child').text("Read");
+				$(this).children('td:last-child').text($.i18n.prop('index_read'));
 				postTable.draw();
 				$.ajax({
 					url: "/api/posts/" + postID + "/markRead",
@@ -95,7 +119,7 @@ $(document).ready(function() {
 	$('#postTable thead tr').clone(true).appendTo('#postTable thead');
 	$('#postTable thead tr:eq(1) th').each(function(i) {
 		var title = $(this).text();
-		$(this).html('<input type="text" placeholder="Search '+title+'" />');
+		$(this).html('<input type="text" placeholder="' + $.i18n.prop('index_search') + title + '" />');
 		
 		$('input', this).on('keyup change', function() {
 			if(postTable.column(i).search() !== this.value) {
@@ -109,9 +133,9 @@ $(document).ready(function() {
 	
 	$('input[type=radio][name=filterRead]').change(function() {
 		if(this.id == "filterRead") {
-			metadata.filter = "Filter Read Posts";
+			metadata.filter = "Filter Read";
 		} else if (this.id == "filterUnread") {
-			metadata.filter = "Filter Unread Posts";
+			metadata.filter = "Filter Unread";
 		} else if(this.id == "filterNoValues") {
 			metadata.filter = "Do not Filter";
 		}
@@ -196,7 +220,7 @@ function updateMDAPI() {
 		data: JSON.stringify(metadata),
 		contentType: 'application/json',
 		error: function(xhr, textStatus, errorThrown) {
-			alert("error submitting data");
+			alert($.i18n.prop('index_errorsubmittingdata'));
 		}
 	});	
 }

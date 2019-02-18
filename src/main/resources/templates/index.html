@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Index</title>
+    <title th:text="#{main.title}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
     <link rel="stylesheet" type="text/css"
@@ -19,27 +19,27 @@
     <div class="starter-template">
     	<div id="radioContainer">
     		Show: 
-    		<input type="radio" name="filterRead" id="filterUnread">Read</input> 
-    		<input type="radio" name="filterRead" id="filterRead">Unread</input> 
-    		<input type="radio" name="filterRead" id="filterNoValues" checked="checked">Everything</input>
+    		<input type="radio" name="filterRead" id="filterUnread" th:text="#{main.radios.read}"></input> 
+    		<input type="radio" name="filterRead" id="filterRead" th:text="#{main.radios.unread}"></input> 
+    		<input type="radio" name="filterRead" id="filterNoValues" checked="checked" th:text="#{main.radios.showAll}"></input>
    		</div>
 		<table id="postTable" class="display">
 			<thead>
 				<tr>
-					<th>ID</th>
-					<th>Type</th>
-					<th>Slug</th>
-					<th>Date</th>
-					<th>Read?</th>
+					<th th:text="#{main.postTable.idColumn}"></th>
+					<th th:text="#{main.postTable.typeColumn}"></th>
+					<th th:text="#{main.postTable.slugColumn}"></th>
+					<th th:text="#{main.postTable.dateColumn}"></th>
+					<th th:text="#{main.postTable.isReadColumn}"></th>
 				</tr>
 			</thead>
 			<tfoot>
 				<tr>
-					<th>ID</th>
-					<th>Type</th>
-					<th>Slug</th>
-					<th>Date</th>
-					<th>Read?</th>
+					<th th:text="#{main.postTable.idColumn}"></th>
+					<th th:text="#{main.postTable.typeColumn}"></th>
+					<th th:text="#{main.postTable.slugColumn}"></th>
+					<th th:text="#{main.postTable.dateColumn}"></th>
+					<th th:text="#{main.postTable.isReadColumn}"></th>
 				</tr>
 			</tfoot>
 		</table>
@@ -51,6 +51,9 @@
 
 <script type="text/javascript"
         src="webjars/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" 
+        src="webjars/jquery-i18n-properties/1.10.2/jquery.i18n.properties.min.js"></script>
+
 
 <script type="text/javascript" th:src="@{/js/datatables.min.js}"></script>
 

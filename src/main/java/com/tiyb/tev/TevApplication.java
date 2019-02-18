@@ -69,5 +69,5 @@ public class TevApplication {
 	public DataSource primaryDataSource() {
 		return DataSourceBuilder.create().username("sa").password("").url("jdbc:hsqldb:file:hsql/tev.db")
 				.driverClassName("org.hsqldb.jdbc.JDBCDriver").build();
-	}
+	}	
 }
