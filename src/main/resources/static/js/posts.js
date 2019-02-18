@@ -17,11 +17,11 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
 		return true;
 	}
 	
-	if(filterVal == "Filter Read" && data[4] == $.i18n.prop('index_unread')) {
+	if(filterVal == "Filter Read Posts" && data[4] == $.i18n.prop('index_unread')) {
 		return true;
 	}
 	
-	if(filterVal == "Filter Unread" && data[4] == $.i18n.prop('index_read')) {
+	if(filterVal == "Filter Unread Posts" && data[4] != $.i18n.prop('index_unread')) {
 		return true;
 	}
 	
@@ -46,6 +46,14 @@ $(document).ready(function() {
 		dataSrc: ""
 	}).then(function(data) {
 		metadata = data;
+		
+		if(metadata.filter == "Filter Read Posts") {
+			$("#filterRead").prop('checked', true);
+		} else if(metadata.filter == "Filter Unread Posts") {
+			$("#filterUnread").prop('checked', true);
+		} else {
+			$("#filterNoValues").prop('checked', true);
+		}
 	});
 	
 	var postTable = $('#postTable').DataTable( {
@@ -145,18 +153,16 @@ $(document).ready(function() {
 	
 	$('input[type=radio][name=filterRead]').change(function() {
 		if(this.id == "filterRead") {
-			metadata.filter = "Filter Read";
+			metadata.filter = "Filter Read Posts";
 		} else if (this.id == "filterUnread") {
-			metadata.filter = "Filter Unread";
+			metadata.filter = "Filter Unread Posts";
 		} else if(this.id == "filterNoValues") {
 			metadata.filter = "Do not Filter";
 		}
 		
 		postTable.draw();
 		updateMDAPI();
-	});
-	
-	$("input[type=radio][value=filterNoValues]").prop('checked', true);
+	});	
 });
 
 function sortTable() {
