@@ -24,6 +24,7 @@ import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
 import com.tiyb.tev.datamodel.Type;
 import com.tiyb.tev.datamodel.Video;
+import com.tiyb.tev.datamodel.helpers.StaticListData;
 import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.repository.AnswerRepository;
 import com.tiyb.tev.repository.LinkRepository;
@@ -687,8 +688,32 @@ public class TEVRestController {
 		if (list.size() > 0) {
 			return list.get(0);
 		} else {
-			return new Metadata();
+			Metadata md = Metadata.newDefaultMetadata();
+			return md;
 		}
+	}
+	
+	/**
+	 * GET to return static data used to populate drop-down lists, for the user to
+	 * set things like preferred sort order, filters, etc.
+	 * 
+	 * @return object containing the different lists of strings available
+	 */
+	@GetMapping("/metadata/staticListData")
+	public StaticListData getStaticListData() {
+		StaticListData sld = new StaticListData();
+
+		for (String s : Metadata.FILTER_TYPES) {
+			sld.getFilterTypes().add(s);
+		}
+		for (String s : Metadata.SORT_COLUMNS) {
+			sld.getSortColumns().add(s);
+		}
+		for (String s : Metadata.SORT_ORDERS) {
+			sld.getSortOrders().add(s);
+		}
+
+		return sld;
 	}
 
 	/**
@@ -712,6 +737,9 @@ public class TEVRestController {
 		}
 
 		md.setBaseMediaPath(metadataDetails.getBaseMediaPath());
+		md.setFilter(metadataDetails.getFilter());
+		md.setSortColumn(metadataDetails.getSortColumn());
+		md.setSortOrder(metadataDetails.getSortOrder());
 		Metadata returnValue = metadataRepo.save(md);
 
 		return returnValue;

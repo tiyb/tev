@@ -7,7 +7,6 @@
  * <pre>
  * web
  *  - / or /index:     the main page for the website
- *  - /typesView:      A page that lists the various "types" in the system
  *  - /metadata:       A config page where the XML can be uploaded, and 
  *                     other configurations made
  *  - /postDataUpload: For uploading the Tumblr XML

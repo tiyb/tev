@@ -62,20 +62,6 @@ public class TEVUIController {
 	}
 
 	/**
-	 * Returns a page listing all of the post types in the system, at /typesView.
-	 * 
-	 * <b>This will eventually be removed.</b>
-	 * 
-	 * @param model not used
-	 * @return name of the template to be used to render the page
-	 */
-	@RequestMapping(value = { "/typesView" }, method = RequestMethod.GET)
-	public String types(Model model) {
-
-		return "temp";
-	}
-
-	/**
 	 * Returns the a page for maintaining the application's metadata, at /metadata
 	 * 
 	 * @param model not used

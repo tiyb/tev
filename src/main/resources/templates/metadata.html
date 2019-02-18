@@ -18,14 +18,31 @@
 
     <div class="starter-template">
     	<h1>Application Metadata</h1>
-    	<table class="display">
+    	<h2>Base Information</h2>
+    	<p>Use these values to control how the application displays posts.</p>
+    	
+    	<table class="display" id="settingsTable"> 
     		<tr>
     			<th>Base Media Path</th>
     			<td><input type="text" id="baseMediaPath"></input></td>
     		</tr>
+    		<tr>
+    			<th>Filter</th>
+    			<td><select id="filterDropdown"></select></td>
+    		</tr>
+    		<tr>
+    			<th>Sort By...</th>
+    			<td><select id="sortByDropdown"></select></td>
+    		</tr>
+    		<tr>
+    			<th>Sort...</th>
+    			<td><select id="sortOrderDropdown"></select></td>
+    		</tr>
     	</table>
     	<input id="submitButton" type="submit" value="Update"></input>
     	
+    	<h2>Upload XML</h2>
+    	<p>Use this function to upload a new XML export from Tumblr. Be warned that this will overwrite any data that's already in the application.</p>
     	<form method="POST" enctype="multipart/form-data" action="/postDataUpload">
     		<table class="display">
     			<tr><td>File to upload:</td><td><input type="file" name="file" /></td></tr>

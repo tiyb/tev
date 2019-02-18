@@ -1,55 +1,51 @@
 var typesMap;
-var tableReadFilter = "no filter";
+var metadata;
 
 $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
-	if(tableReadFilter == "no filter") {
+	var filterVal = metadata.filter;
+	if(filterVal == null || filterVal == "") {
+		filterVal = "Do not Filter";
+	}
+	
+	if(filterVal == "Do not Filter") {
 		return true;
 	}
 	
-	if(tableReadFilter == "true" && data[5] == "Read") {
+	if(filterVal == "Filter Read Posts" && data[4] == "Unread") {
 		return true;
 	}
 	
-	if(tableReadFilter == "false" && data[5] == "Unread") {
+	if(filterVal == "Filter Unread Posts" && data[4] == "Read") {
 		return true;
 	}
 	
 	return false;
-}
-);
+});
 
 $(document).ready(function() {
 	$('#header').load("/header");
 	$('#footer').load("/footer");
 	
 	$.ajax({
-		url: "/api/types"
+		url: "/api/types",
+		dataSrc: ""
 	}).then(function(data) {
 		typesMap = new Map();
 		
 		data.forEach(element => typesMap.set(element.id, element.type));
 	});
 	
-	$('#postTable thead tr').clone(true).appendTo('#postTable thead');
-	$('#postTable thead tr:eq(1) th').each(function(i) {
-		var title = $(this).text();
-		$(this).html('<input type="text" placeholder="Search '+title+'" />');
-		
-		$('input', this).on('keyup change', function() {
-			if(postTable.column(i).search() !== this.value) {
-				postTable
-					.column(i)
-					.search(this.value)
-					.draw();
-			}
-		});
+	$.ajax({
+		url: "/api/metadata",
+		dataSrc: ""
+	}).then(function(data) {
+		metadata = data;
 	});
 	
 	var postTable = $('#postTable').DataTable( {
 		"language": {
 			"emptyTable": "No posts in the database"
 		},
-		"order": [[0, 'asc']],
 		"orderCellsTop": true,
 		"ajax": {
 			"url": "api/posts",
@@ -86,28 +82,124 @@ $(document).ready(function() {
 					type: "PUT"
 				});
 				window.open("/postViewer?id=" + postID, "_blank", "menubar=no,status=no,toolbar=no,height=700,width=1000");
-			})
+			});
+			$('#postTable').on('order.dt', function() {
+				var dataTable = $('#postTable').DataTable();
+				var order = dataTable.order();
+				updateSortOrderInMD(order[0][0], order[0][1]);
+			});
+			sortTable();
 		}
+	});
+	
+	$('#postTable thead tr').clone(true).appendTo('#postTable thead');
+	$('#postTable thead tr:eq(1) th').each(function(i) {
+		var title = $(this).text();
+		$(this).html('<input type="text" placeholder="Search '+title+'" />');
+		
+		$('input', this).on('keyup change', function() {
+			if(postTable.column(i).search() !== this.value) {
+				postTable
+					.column(i)
+					.search(this.value)
+					.draw();
+			}
+		});
 	});
 	
 	$('input[type=radio][name=filterRead]').change(function() {
-		if(this.id == "filterTrueValues") {
-			tableReadFilter = "true";
-		} else if (this.id == "filterFalseValues") {
-			tableReadFilter = "false";
+		if(this.id == "filterRead") {
+			metadata.filter = "Filter Read Posts";
+		} else if (this.id == "filterUnread") {
+			metadata.filter = "Filter Unread Posts";
 		} else if(this.id == "filterNoValues") {
-			tableReadFilter = "no filter";
+			metadata.filter = "Do not Filter";
 		}
 		
 		postTable.draw();
+		updateMDAPI();
 	});
 	
-//	$('#postTable tbody').on('click', 'tr', function() {
-//		var data = postTable.row(this).data();
-//		alert(data[1]);
-//	});
-	
+	$("input[type=radio][value=filterNoValues]").prop('checked', true);
 });
+
+function sortTable() {
+	postTable = $('#postTable').DataTable();
+	
+	var sortOrder;
+	var sortColumn;
+	
+	if(metadata.sortOrder == "Ascending") {
+		sortOrder = "asc";
+	} else {
+		sortOrder = "desc";
+	}
+	
+	switch(metadata.sortColumn) {
+	case "ID":
+		sortColumn = 0;
+		break;
+	case "Type":
+		sortColumn = 1;
+		break;
+	case "Slug":
+		sortColumn = 2;
+		break;
+	case "Date":
+		sortColumn = 3;
+		break;
+	case "Is Read":
+		sortColumn = 4;
+		break;
+	default:
+		sortColumn = 0;
+	}
+	
+	postTable.order([sortColumn, sortOrder]).draw();
+}
+
+function updateSortOrderInMD(column, order) {
+	switch(column) {
+	case 0:
+		metadata.sortColumn = "ID";
+		break;
+	case 1:
+		metadata.sortColumn = "Type";
+		break;
+	case 2:
+		metadata.sortColumn = "Slug";
+		break;
+	case 3:
+		metadata.sortColumn = "Date";
+		break;
+	case 4:
+		metadata.sortColumn = "Is Read";
+		break;
+	default:
+		metadata.sortColumn = "ID";
+		break;
+	}
+	
+	if(order == "asc") {
+		metadata.sortOrder = "Ascending";
+	} else {
+		metadata.sortOrder = "Descending";
+	}
+	
+	updateMDAPI();
+}
+
+function updateMDAPI() {
+	$.ajax({
+		url: '/api/metadata',
+		type: 'PUT',
+		data: JSON.stringify(metadata),
+		contentType: 'application/json',
+		error: function(xhr, textStatus, errorThrown) {
+			alert("error submitting data");
+		}
+	});	
+}
 
 function getTypeFromID(typeID) {
 	return typesMap.get(typeID);

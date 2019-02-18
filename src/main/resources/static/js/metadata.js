@@ -1,22 +1,51 @@
+var metadataObject;
+
 $(document).ready(function () {
 	$('#header').load("/header");
 	$('#footer').load("/footer");
 	
 	$.ajax({
-		url: "/api/metadata"
+		url: "/api/metadata/staticListData",
+		method: "GET",
+		data: ""
 	}).then(function(data) {
-		$('#baseMediaPath').val(data.baseMediaPath);
+		$.each(data.sortOrders, function(i, obj) {
+			var divData = "<option value='" + obj + "'>" + obj + "</option>";
+			$(divData).appendTo('#sortOrderDropdown');
+		});
+		$.each(data.sortColumns, function(i, obj) {
+			var divData = "<option value='" + obj + "'>" + obj + "</option>";
+			$(divData).appendTo('#sortByDropdown');
+		});
+		$.each(data.filterTypes, function(i, obj) {
+			var divData = "<option value='" + obj + "'>" + obj + "</option>";
+			$(divData).appendTo('#filterDropdown');
+		});
+		
+		$.ajax({
+			url: "/api/metadata",
+			data: ""
+		}).then(function(data) {
+			metadataObject = data;
+			$('#baseMediaPath').val(metadataObject.baseMediaPath);
+			$('#sortOrderDropdown').val(metadataObject.sortOrder);
+			$('#sortByDropdown').val(metadataObject.sortColumn);
+			$('#filterDropdown').val(metadataObject.filter);
+		});
+				
 	});
 	
 	$('#submitButton').click(function() {
 		var dataObject = new Object();
-		dataObject.id = 1;
-		dataObject.baseMediaPath = $('#baseMediaPath').val();
+		metadataObject.baseMediaPath = $('#baseMediaPath').val();
+		metadataObject.sortOrder = $('#sortOrderDropdown').val();
+		metadataObject.sortColumn = $('#sortByDropdown').val();
+		metadataObject.filter = $('#filterDropdown').val();
 		
 		$.ajax({
 			url: '/api/metadata',
 			type: 'PUT',
-			data: JSON.stringify(dataObject),
+			data: JSON.stringify(metadataObject),
 			contentType: 'application/json',
 			success: function(data, textStatus, xhr) {
 				alert("data successfully submitted");
