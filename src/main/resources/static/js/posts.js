@@ -89,7 +89,7 @@ $(document).ready(function() {
 				"data": "isRead",
 				"render": function(data, type, row, meta) {
 					if(data) {
-						return "<button>Mark Unread</button>";
+						return "<button>" + $.i18n.prop('index_posttable_markUnreadButton') + "</button>";
 					} else {
 						return $.i18n.prop('index_unread');
 					}
@@ -99,7 +99,7 @@ $(document).ready(function() {
 		"initComplete": function() {
 			$('#postTable tbody').on('click', 'tr', function () {
 				var postID = $(this).children('td:first-child').text();
-				$(this).children('td:last-child').html("<button>Mark Unread</button>");
+				$(this).children('td:last-child').html("<button>" + $.i18n.prop('index_posttable_markUnreadButton') + "</button>");
 				postTable.draw();
 				$.ajax({
 					url: "/api/posts/" + postID + "/markRead",
