@@ -169,6 +169,23 @@ public class TEVRestController {
 
 		return post;
 	}
+	
+	/**
+	 * PUT API to mark a post as a favourite
+	 * 
+	 * @param postId The ID of the post to be marked as a favourite
+	 * @return The modified Post
+	 */
+	@PutMapping("/posts/{id}/markFavourite")
+	public Post markPostFavourite(@PathVariable(value = "id") Long postId) {
+		Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
+
+		post.setIsFavourite(true);
+
+		post = postRepo.save(post);
+
+		return post;
+	}
 
 	/**
 	 * PUT API for marking a post unread
@@ -181,6 +198,23 @@ public class TEVRestController {
 		Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
 
 		post.setIsRead(false);
+
+		post = postRepo.save(post);
+
+		return post;
+	}
+
+	/**
+	 * PUT API for marking a post as not a favourite
+	 * 
+	 * @param postId The ID of the post to be marked as not a favourite
+	 * @return The modified Post
+	 */
+	@PutMapping("/posts/{id}/markNonFavourite")
+	public Post markPostNonFavourite(@PathVariable(value = "id") Long postId) {
+		Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
+
+		post.setIsFavourite(false);
 
 		post = postRepo.save(post);
 
@@ -720,6 +754,9 @@ public class TEVRestController {
 		}
 		for (String s : Metadata.SORT_ORDERS) {
 			sld.getSortOrders().add(s);
+		}
+		for(String s : Metadata.FAV_FILTERS) {
+			sld.getFavFilters().add(s);
 		}
 
 		return sld;

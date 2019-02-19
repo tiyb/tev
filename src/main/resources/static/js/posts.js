@@ -9,20 +9,43 @@ $.i18n.properties({
 
 $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
 	var filterVal = metadata.filter;
+	var favFilterVal = metadata.favFilter;
+	
 	if(filterVal == null || filterVal == "") {
 		filterVal = "Do not Filter";
 	}
+	if(favFilterVal == null || favFilterVal == "") {
+		favFilterVal = "Show Everything";
+	}
 	
 	if(filterVal == "Do not Filter") {
-		return true;
+		if(favFilterVal == "Show Everything") {
+			return true;
+		} else if (favFilterVal == "Show Favourites" && data[4] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+			return true
+		} else if(favFilterVal == "Show Non Favourites" && data[4] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+			return true;
+		}
 	}
 	
-	if(filterVal == "Filter Read Posts" && data[4] == $.i18n.prop('index_unread')) {
-		return true;
+	if(filterVal == "Filter Read Posts" && data[5] == $.i18n.prop('index_posttable_isNotreadIndicatorCLEAN')) {
+		if(favFilterVal == "Show Everything") {
+			return true;
+		} else if (favFilterVal == "Show Favourites" && data[4] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+			return true
+		} else if(favFilterVal == "Show Non Favourites" && data[4] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+			return true;
+		}
 	}
 	
-	if(filterVal == "Filter Unread Posts" && data[4] != $.i18n.prop('index_unread')) {
-		return true;
+	if(filterVal == "Filter Unread Posts" && data[5] == $.i18n.prop('index_posttable_isReadIndicatorCLEAN')) {
+		if(favFilterVal == "Show Everything") {
+			return true;
+		} else if (favFilterVal == "Show Favourites" && data[4] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+			return true
+		} else if(favFilterVal == "Show Non Favourites" && data[4] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+			return true;
+		}
 	}
 	
 	return false;
@@ -54,6 +77,14 @@ $(document).ready(function() {
 		} else {
 			$("#filterNoValues").prop('checked', true);
 		}
+		
+		if(metadata.favFilter == "Show Favourites") {
+			$('$showFavourites').prop('checked', true);
+		} else if(metadata.favFilter == "Show Non Favourites") {
+			$('#showNonFavourites').prop('checked', true);
+		} else {
+			$('#showAll').prop('checked', true);
+		}
 	});
 	
 	var postTable = $('#postTable').DataTable( {
@@ -84,30 +115,52 @@ $(document).ready(function() {
 			"dataSrc": ""
 		},
 		"columns": [
-			{"data": "id"},
+			{
+				"data": "id",
+				"title": $.i18n.prop('index_posttableheadings_id')
+			},
 			{
 				"data": "type",
 				"render": function(data, type, row, meta) {
 					return getTypeFromID(data);
-				}
+				},
+				"title": $.i18n.prop('index_posttableheadings_type')
 			},
-			{"data": "slug"},
-			{"data": "date"},
+			{
+				"data": "slug",
+				"title": $.i18n.prop('index_posttableheadings_slug')
+			},
+			{
+				"data": "date",
+				"title": $.i18n.prop('index_posttableheadings_date')
+			},
+			{
+				"data": "isFavourite",
+				"render": function(data, type, row, meta) {
+					if(data) {
+						return $.i18n.prop('index_posttable_isFavourite');
+					} else {
+						return $.i18n.prop('index_posttable_isNotFavourite');;
+					}
+				},
+				"title": $.i18n.prop('index_posttableheadings_favourite')
+			},
 			{
 				"data": "isRead",
 				"render": function(data, type, row, meta) {
 					if(data) {
-						return "<button>" + $.i18n.prop('index_posttable_markUnreadButton') + "</button>";
+						return $.i18n.prop('index_posttable_isReadIndicator');
 					} else {
-						return $.i18n.prop('index_unread');
+						return $.i18n.prop('index_posttable_isNotreadIndicator');
 					}
-				}
+				},
+				"title": $.i18n.prop('index_posttableheadings_read')
 			}
 		],
 		"initComplete": function() {
 			$('#postTable tbody').on('click', 'tr', function () {
 				var postID = $(this).children('td:first-child').text();
-				$(this).children('td:last-child').html("<button>" + $.i18n.prop('index_posttable_markUnreadButton') + "</button>");
+				$(this).children('td:last-child').html($.i18n.prop('index_posttable_isReadIndicator'));
 				postTable.draw();
 				$.ajax({
 					url: "/api/posts/" + postID + "/markRead",
@@ -124,31 +177,59 @@ $(document).ready(function() {
 		}
 	});
 	
-	$('#postTable tbody').on('click', 'button', function() {
+	$('#postTable tbody').on('click', 'div[class=readSpan]', function() {
 		var data = postTable.row( $(this).parents('tr') ).data();
 		var postID = data.id;
 		$.ajax({
 			url: "/api/posts/" + postID + "/markUnread",
 			type: "PUT"
 		});
-		$(this).parents('tr').children('td:last-child').text($.i18n.prop('index_unread'));
+		$(this).parents('tr').children('td:last-child').html($.i18n.prop('index_posttable_isNotreadIndicator'));
+		postTable.draw();
+		return false;
+	});
+	
+	$('#postTable tbody').on('click', 'div[class=notFavSpan]', function() {
+		var data = postTable.row($(this).parents('tr')).data();
+		var postID = data.id;
+		$.ajax({
+			url: "/api/posts/" + postID + "/markFavourite",
+			type: "PUT"
+		});
+		$(this).parents('tr').children('td:nth-child(5)').html($.i18n.prop('index_posttable_isFavourite'));
+		postTable.draw();
+		return false;
+	});
+	
+	$('#postTable tbody').on('click', 'div[class=favSpan]', function() {
+		var data = postTable.row($(this).parents('tr')).data();
+		var postID = data.id;
+		$.ajax({
+			url: "/api/posts/" + postID + "/markNonFavourite",
+			type: "PUT"
+		});
+		$(this).parents('tr').children('td:nth-child(5)').html($.i18n.prop('index_posttable_isNotFavourite'));
 		postTable.draw();
 		return false;
 	});
 	
 	$('#postTable thead tr').clone(true).appendTo('#postTable thead');
 	$('#postTable thead tr:eq(1) th').each(function(i) {
-		var title = $(this).text();
-		$(this).html('<input type="text" placeholder="' + $.i18n.prop('index_search') + title + '" />');
-		
-		$('input', this).on('keyup change', function() {
-			if(postTable.column(i).search() !== this.value) {
-				postTable
-					.column(i)
-					.search(this.value)
-					.draw();
-			}
-		});
+		if(i < 4) {
+			var title = $(this).text();
+			$(this).html('<input type="text" placeholder="' + $.i18n.prop('index_search') + title + '" />');
+			
+			$('input', this).on('keyup change', function() {
+				if(postTable.column(i).search() !== this.value) {
+					postTable
+						.column(i)
+						.search(this.value)
+						.draw();
+				}
+			});
+		} else {
+			$(this).text('');
+		}
 	});
 	
 	$('input[type=radio][name=filterRead]').change(function() {
@@ -163,6 +244,19 @@ $(document).ready(function() {
 		postTable.draw();
 		updateMDAPI();
 	});	
+	
+	$('input[type=radio][name=showFavs]').change(function() {
+		if(this.id == "showFavourites") {
+			metadata.favFilter = "Show Favourites";
+		} else if (this.id == "showNonFavourites") {
+			metadata.favFilter = "Show Non Favourites";
+		} else if (this.id == "showAll") {
+			metadata.favFilter = "Show Everything";
+		}
+		
+		postTable.draw();
+		updateMDAPI();
+	});
 });
 
 function sortTable() {
@@ -190,8 +284,11 @@ function sortTable() {
 	case "Date":
 		sortColumn = 3;
 		break;
-	case "Is Read":
+	case "Is Favourite":
 		sortColumn = 4;
+		break;
+	case "Is Read":
+		sortColumn = 5;
 		break;
 	default:
 		sortColumn = 0;
@@ -215,6 +312,9 @@ function updateSortOrderInMD(column, order) {
 		metadata.sortColumn = "Date";
 		break;
 	case 4:
+		metadata.sortColumn = "Is Favourite";
+		break;
+	case 5:
 		metadata.sortColumn = "Is Read";
 		break;
 	default:

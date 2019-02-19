@@ -13,3 +13,36 @@
 #conversationWordCloudContainer {
 	width:100%;
 }
+
+.favSpan {
+	width: 90%;
+	margin-left: 5%;
+	margin-right: 5%;
+	text-align: center;
+	color: blue;
+	cursor: pointer;
+}
+
+.notFavSpan {
+	width: 90%;
+	margin-left: 5%;
+	margin-right: 5%;
+	text-align: center;
+	cursor: pointer;
+}
+
+.readSpan {
+	width: 90%;
+	margin-left: 5%;
+	margin-right: 5%;
+	text-align: center;
+	color: blue;
+	cursor: pointer;
+}
+
+.notreadSpan {
+	width: 90%;
+	margin-left: 5%;
+	margin-right: 5%;
+	text-align: center;
+}

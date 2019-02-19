@@ -42,6 +42,7 @@ public class Post implements Serializable {
 	@Lob
 	@Column(name="tags", length=50000)
 	private String tags = "";
+	private Boolean isFavourite = false;
 
 	@Override
 	public String toString() {
@@ -120,6 +121,11 @@ public class Post implements Serializable {
 		if (tags != null) {
 			builder.append("tags=");
 			builder.append(tags);
+			builder.append(", ");
+		}
+		if (isFavourite != null) {
+			builder.append("isFavourite=");
+			builder.append(isFavourite);
 		}
 		builder.append("]");
 		return builder.toString();
@@ -243,5 +249,13 @@ public class Post implements Serializable {
 
 	public void setTags(String tags) {
 		this.tags = tags;
+	}
+
+	public Boolean getIsFavourite() {
+		return isFavourite;
+	}
+
+	public void setIsFavourite(Boolean isFavourite) {
+		this.isFavourite = isFavourite;
 	}
 }

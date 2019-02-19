@@ -22,6 +22,10 @@
     		<input type="radio" name="filterRead" id="filterUnread" th:text="#{main.radios.read}"></input> 
     		<input type="radio" name="filterRead" id="filterRead" th:text="#{main.radios.unread}"></input> 
     		<input type="radio" name="filterRead" id="filterNoValues" th:text="#{main.radios.showAll}"></input>
+    		<br />
+    		<input type="radio" name="showFavs" id="showFavourites" th:text="#{main.radios.showFavourites}"></input>
+    		<input type="radio" name="showFavs" id="showNonFavourites" th:text="#{main.radios.showNonFavourites}"></input>
+    		<input type="radio" name="showFavs" id="showAll" th:text="#{main.radios.showAllFavs}"></input>
    		</div>
 		<table id="postTable" class="display">
 			<thead>
@@ -30,6 +34,7 @@
 					<th th:text="#{main.postTable.typeColumn}"></th>
 					<th th:text="#{main.postTable.slugColumn}"></th>
 					<th th:text="#{main.postTable.dateColumn}"></th>
+					<th th:text="#{main.postTable.favouritecolumn}"></th>
 					<th th:text="#{main.postTable.isReadColumn}"></th>
 				</tr>
 			</thead>
@@ -39,6 +44,7 @@
 					<th th:text="#{main.postTable.typeColumn}"></th>
 					<th th:text="#{main.postTable.slugColumn}"></th>
 					<th th:text="#{main.postTable.dateColumn}"></th>
+					<th th:text="#{main.postTable.favouritecolumn}"></th>
 					<th th:text="#{main.postTable.isReadColumn}"></th>
 				</tr>
 			</tfoot>

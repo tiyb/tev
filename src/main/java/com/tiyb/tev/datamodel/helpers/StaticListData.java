@@ -18,6 +18,7 @@ public class StaticListData implements Serializable {
 	private List<String> filterTypes = new ArrayList<String>();
 	private List<String> sortColumns = new ArrayList<String>();
 	private List<String> sortOrders = new ArrayList<String>();
+	private List<String> favFilters = new ArrayList<String>();
 
 	public List<String> getFilterTypes() {
 		return filterTypes;
@@ -41,5 +42,13 @@ public class StaticListData implements Serializable {
 
 	public void setSortOrders(List<String> sortOrders) {
 		this.sortOrders = sortOrders;
+	}
+
+	public List<String> getFavFilters() {
+		return favFilters;
+	}
+
+	public void setFavFilters(List<String> favFilters) {
+		this.favFilters = favFilters;
 	}
 }

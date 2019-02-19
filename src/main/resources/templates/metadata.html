@@ -42,6 +42,10 @@
 								<th th:text="#{metadata.sortOrder}"></th>
 								<td><select id="sortOrderDropdown"></select></td>
 							</tr>
+							<tr>
+								<th th:text="#{metadata.showFavs}"></th>
+								<td><select id="favsDropdown"></select></td>
+							</tr>
 						</table>
 
 					</td>
@@ -109,6 +113,8 @@
 	<div id="footer" class="container"></div>
 
 	<script type="text/javascript" src="webjars/jquery/3.3.1/jquery.min.js"></script>
+	<script type="text/javascript" 
+        src="webjars/jquery-i18n-properties/1.10.2/jquery.i18n.properties.min.js"></script>
 
 	<script type="text/javascript" th:src="@{/js/datatables.min.js}"></script>
 

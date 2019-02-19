@@ -45,12 +45,20 @@ public class Metadata implements Serializable {
 	/**
 	 * Static constant list of the different columns by which data can be sorted
 	 */
-	public static final List<String> SORT_COLUMNS = Arrays.asList("ID", "Type", "Slug", "Date", "Is Read");
+	public static final List<String> SORT_COLUMNS = Arrays.asList("ID", "Type", "Slug", "Date", "Is Read",
+			"Is Favourite");
 	/**
 	 * Static constant list of the different ways data can be sorted (ascending or
 	 * descending)
 	 */
 	public static final List<String> SORT_ORDERS = Arrays.asList("Ascending", "Descending");
+
+	/**
+	 * Static constant list of the different filters that can be applied to
+	 * favourited posts
+	 */
+	public static final List<String> FAV_FILTERS = Arrays.asList("Show Favourites", "Show Non Favourites",
+			"Show Everything");
 
 	@Id
 	private Integer id;
@@ -60,6 +68,7 @@ public class Metadata implements Serializable {
 	private String filter;
 	private String mainTumblrUser;
 	private String mainTumblrUserAvatarUrl;
+	private String favFilter;
 
 	/**
 	 * Helper function to generate a new Metadata object, with some defaults filled
@@ -74,13 +83,11 @@ public class Metadata implements Serializable {
 		md.setFilter(FILTER_TYPES.get(2));
 		md.setSortColumn(SORT_COLUMNS.get(0));
 		md.setSortOrder(SORT_ORDERS.get(1));
+		md.setFavFilter(FAV_FILTERS.get(2));
 
 		return md;
 	}
 
-	/**
-	 * Helper method to generate a string version of the object
-	 */
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -118,6 +125,11 @@ public class Metadata implements Serializable {
 		if (mainTumblrUserAvatarUrl != null) {
 			builder.append("mainTumblrUserAvatarUrl=");
 			builder.append(mainTumblrUserAvatarUrl);
+			builder.append(", ");
+		}
+		if (favFilter != null) {
+			builder.append("favFilter=");
+			builder.append(favFilter);
 		}
 		builder.append("]");
 		return builder.toString();
@@ -177,6 +189,14 @@ public class Metadata implements Serializable {
 
 	public void setMainTumblrUserAvatarUrl(String mainTumblrUserAvatarUrl) {
 		this.mainTumblrUserAvatarUrl = mainTumblrUserAvatarUrl;
+	}
+
+	public String getFavFilter() {
+		return favFilter;
+	}
+
+	public void setFavFilter(String favFilter) {
+		this.favFilter = favFilter;
 	}
 
 }
