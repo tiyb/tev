@@ -8,9 +8,10 @@ body {
 .contentContainer {
 	background-color: #FFFFFF;
 	margin-top: 25px;
-	margin-left: 50px;
-	margin-right: 50px;
+	margin-left: 5%;
+	margin-right: 5%;
 	margin-bottom: 15px;
+	width: 90%;
 	
 	padding-top: 15px;
 	padding-left: 15px;
@@ -55,38 +56,34 @@ h2 {
 }
 
 #messagesTable {
-	width: 70%;
-	margin-left: auto;
-	margin-right: auto;
+	margin-left: 5%;
+	margin-right: 5%;
+	width: 90%;
 }
 
-.message-received {
+#messagesTable tr td {
+}
+
+#messagesTable tr td .message-received {
 	border-radius: 15px 50px;
 	background: rgba(0, 25, 53, 0.05); 
+	color: rgb(0, 25, 53);
 	padding: 5px;
 	display: inline-block;
-	font-familiy: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
+	font-family: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
 	font-size: 14px;
 	font-weight: 400;
-	width: 100%;
+	width: 85%;
 	text-align: left;
 }
-.message-sent {
+#messagesTable tr td .message-sent {
 	border-radius: 50px 15px;
-	background: rgba(0, 25, 53, 0.05); 
+	background: rgba(0, 25, 53, 0.1); 
 	padding: 5px;
 	display: inline-block;
-	font-familiy: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
+	font-family: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
 	font-size: 14px;
 	font-weight: 400;
-	width: 100%;
+	width: 85%;
 	text-align: right;
-}
-
-.received-post table tr td div {
-	
-}
-
-.sent-post table tr td div {
-	
 }

@@ -17,7 +17,7 @@
 		<div th:if="${message.received}" class="message-received">
 		<table th:if="${message.received}" width="100%"><tr>
 			<td width="5%"><img th:src="${conversation.participantAvatarUrl}" height="30px" width="30px" /></td>
-			<td>
+			<td width="auto">
 				<div th:text="${#dates.format(message.timestamp * 1000, 'MMM dd, yyyy, HH:mm')}"></div>
 				<div th:text="${message.message}"></div>
 			</td>
@@ -25,7 +25,7 @@
 		</div>
 		<div th:unless="${message.received}" class="message-sent">
 		<table th:unless="${message.received}" width="100%"><tr>
-			<td>
+			<td width="auto">
 				<div th:text="${#dates.format(message.timestamp * 1000, 'MMM dd, yyyy, HH:mm')}"></div>
 				<div th:text="${message.message}"></div>
 			</td>
