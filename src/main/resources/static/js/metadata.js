@@ -31,6 +31,8 @@ $(document).ready(function () {
 			$('#sortOrderDropdown').val(metadataObject.sortOrder);
 			$('#sortByDropdown').val(metadataObject.sortColumn);
 			$('#filterDropdown').val(metadataObject.filter);
+			$('#mainUser').val(metadataObject.mainTumblrUser);
+			$('#mainUserAvatarUrl').val(metadataObject.mainTumblrUserAvatarUrl);
 		});
 				
 	});
@@ -38,6 +40,8 @@ $(document).ready(function () {
 	$('#submitButton').click(function() {
 		var dataObject = new Object();
 		metadataObject.baseMediaPath = $('#baseMediaPath').val();
+		metadataObject.mainTumblrUser = $('#mainUser').val();
+		metadataObject.mainTumblrUserAvatarUrl = $('#mainUserAvatarUrl').val();
 		metadataObject.sortOrder = $('#sortOrderDropdown').val();
 		metadataObject.sortColumn = $('#sortByDropdown').val();
 		metadataObject.filter = $('#filterDropdown').val();

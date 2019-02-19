@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="#{conversations.title}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" type="text/css"
+          href="webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/jqcloud.min.css}"/>
+</head>
+<body>
+
+<div id="header"></div>
+
+<div class="container">
+<h1 th:text="#{conversations.title}"></h1>
+<p th:text="#{conversations.explanatoryText(${metadata.mainTumblrUser})}"></p>
+
+<div id="conversationWordCloudContainer"></div>
+</div>
+
+<div id="footer" class="container"></div>
+
+<script type="text/javascript"
+        src="webjars/jquery/3.3.1/jquery.min.js"></script>
+
+<script type="text/javascript" th:src="@{/js/jqcloud.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/js/datatables.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/js/conversations.js}"></script>
+
+</body>
+</html>

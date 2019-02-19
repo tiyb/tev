@@ -25,7 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.tiyb.tev.datamodel.Answer;
+import com.tiyb.tev.datamodel.Conversation;
+import com.tiyb.tev.datamodel.ConversationMessage;
 import com.tiyb.tev.datamodel.Link;
+import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.Photo;
 import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
@@ -36,6 +39,7 @@ import com.tiyb.tev.exception.InvalidTypeException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.exception.XMLParsingException;
 import com.tiyb.tev.xml.BlogXmlReader;
+import com.tiyb.tev.xml.ConversationXmlReader;
 
 /**
  * Controller for all UI (HTML pages / jQuery-enabled) for the TEV application.
@@ -46,10 +50,10 @@ import com.tiyb.tev.xml.BlogXmlReader;
  */
 @Controller
 public class TEVUIController {
-	
+
 	@Autowired
 	private TEVRestController restController;
-	
+
 	/**
 	 * Returns the main (or index) page, at either / or /index
 	 * 
@@ -59,6 +63,23 @@ public class TEVUIController {
 	@RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
 	public String index(Model model) {
 		return "index";
+	}
+
+	/**
+	 * Returns the page for showing a list of message conversations, at
+	 * /conversations
+	 * 
+	 * @param model not used
+	 * @return name of the template to be used to render the page
+	 */
+	@RequestMapping(value = { "/conversations" }, method = RequestMethod.GET)
+	public String conversations(Model model) {
+		Metadata md = restController.getMetadata();
+		model.addAttribute("metadata", md);
+		List<Conversation> conversations = restController.getAllConversations();
+		model.addAttribute("conversations", conversations);
+
+		return "conversations";
 	}
 
 	/**
@@ -88,39 +109,62 @@ public class TEVUIController {
 		} catch (XMLParsingException | IOException e) {
 			throw new XMLParsingException();
 		}
-		
-		if(tsc == null) {
+
+		if (tsc == null) {
 			throw new XMLParsingException();
 		}
-		
+
 		restController.deleteAllRegulars();
 		restController.deleteAllAnswers();
 		restController.deleteAllLinks();
 		restController.deleteAllPhotos();
 		restController.deleteAllVideos();
 		restController.deleteAllPosts();
-		for(Post post : tsc.getPosts()) {
+		for (Post post : tsc.getPosts()) {
 			restController.createPost(post);
 		}
-		for(Regular regular : tsc.getRegulars()) {
+		for (Regular regular : tsc.getRegulars()) {
 			restController.createRegular(regular.getPostId(), regular);
 		}
-		for(Answer answer : tsc.getAnswers()) {
+		for (Answer answer : tsc.getAnswers()) {
 			restController.createAnswer(answer.getPostId(), answer);
 		}
-		for(Link link : tsc.getLinks()) {
+		for (Link link : tsc.getLinks()) {
 			restController.createLink(link.getPostId(), link);
 		}
-		for(Photo photo : tsc.getPhotos()) {
+		for (Photo photo : tsc.getPhotos()) {
 			restController.createPhoto(photo);
 		}
-		for(Video video : tsc.getVideos()) {
+		for (Video video : tsc.getVideos()) {
 			restController.createVideo(video.getPostId(), video);
 		}
-		
-		return "redirect:/metadata";
+
+		return "redirect:/index";
 	}
-	
+
+	/**
+	 * Handles file uploads for reading in Tumblr messaging extract
+	 * 
+	 * @param file               the XML file to be parsed
+	 * @param redirectAttributes not used
+	 * @return The page to which the application should be redirected after upload
+	 */
+	@PostMapping("/conversationDataUpload")
+	public String handleConversationFileUpload(@RequestParam("file") MultipartFile file,
+			RedirectAttributes redirectAttributes) {
+		
+		restController.deleteAllConvoMsgs();
+		restController.deleteAllConversations();
+
+		try {
+			ConversationXmlReader.parseDocument(file.getInputStream(), restController);
+		} catch (XMLParsingException | IOException e) {
+			throw new XMLParsingException();
+		}
+
+		return "redirect:/conversations";
+	}
+
 	/**
 	 * This request is used to populate the viewer. It first determines the correct
 	 * viewer to show (Regular, Photo, etc.), then returns the correct template to
@@ -133,25 +177,25 @@ public class TEVUIController {
 	 *               in the HTML template
 	 * @return The name of the template to use for rendering the output
 	 */
-	@RequestMapping(value = {"/postViewer"}, method = RequestMethod.GET)
+	@RequestMapping(value = { "/postViewer" }, method = RequestMethod.GET)
 	public String showViewer(@RequestParam("id") Long postID, Model model) {
 		Post post = restController.getPostById(postID);
 		model.addAttribute("tags", post.getTags());
 		List<Type> availableTypes = restController.getAllTypes();
 		String postType = "";
-		
-		for(Type type : availableTypes) {
-			if(type.getId().equals(post.getType())) {
+
+		for (Type type : availableTypes) {
+			if (type.getId().equals(post.getType())) {
 				postType = type.getType();
 				break;
 			}
 		}
-		
-		if(postType == "") {
+
+		if (postType == "") {
 			throw new InvalidTypeException();
 		}
-		
-		switch(postType) {
+
+		switch (postType) {
 		case "regular":
 			Regular reg = restController.getRegularById(postID);
 			model.addAttribute("regular", reg);
@@ -167,7 +211,7 @@ public class TEVUIController {
 		case "photo":
 			List<String> images = new ArrayList<String>();
 			List<Photo> photos = restController.getPhotoById(postID);
-			for(int i = 0; i < photos.size(); i++) {
+			for (int i = 0; i < photos.size(); i++) {
 				Photo photo = photos.get(i);
 				String ext = photo.getUrl1280().substring(photo.getUrl1280().lastIndexOf('.'));
 				images.add(postID + "_" + i + ext);
@@ -180,10 +224,29 @@ public class TEVUIController {
 			model.addAttribute("video", vid);
 			return "viewers/video";
 		}
-		
+
 		return "viewers/" + postType;
 	}
 	
+	/**
+	 * Request used to populate conversation viewer
+	 * 
+	 * @param participantName Name of the conversation
+	 * @param model           Populated with information from this conversation
+	 * @return Name of the viewer to load
+	 */
+	@RequestMapping(value = {"/conversationViewer"}, method = RequestMethod.GET)
+	public String showConversationViewer(@RequestParam("participant") String participantName, Model model) {
+		Metadata md = restController.getMetadata();
+		model.addAttribute("metadata", md);
+		Conversation convo = restController.getConversationByParticipant(participantName);
+		model.addAttribute("conversation", convo);
+		List<ConversationMessage> messages = restController.getConvoMsgByConvoID(convo.getId());
+		model.addAttribute("messages", messages);
+		
+		return "viewers/conversation";
+	}
+
 	/**
 	 * Returns a binary image, for use in the viewer. HTML pages can't directly
 	 * access local images or videos, so this has to be done via the "server."
@@ -228,7 +291,7 @@ public class TEVUIController {
 			FileInputStream in = new FileInputStream(file);
 			OutputStream out = response.getOutputStream();
 			byte[] buf = new byte[1024];
-			//int len = 0;
+			// int len = 0;
 			while (in.read(buf) >= 0) {
 				out.write(buf);
 			}

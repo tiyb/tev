@@ -14,9 +14,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tiyb.tev.datamodel.Answer;
+import com.tiyb.tev.datamodel.Conversation;
+import com.tiyb.tev.datamodel.ConversationMessage;
 import com.tiyb.tev.datamodel.Link;
 import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.Photo;
@@ -27,6 +30,8 @@ import com.tiyb.tev.datamodel.Video;
 import com.tiyb.tev.datamodel.helpers.StaticListData;
 import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.repository.AnswerRepository;
+import com.tiyb.tev.repository.ConversationMessageRepository;
+import com.tiyb.tev.repository.ConversationRepository;
 import com.tiyb.tev.repository.LinkRepository;
 import com.tiyb.tev.repository.MetadataRepository;
 import com.tiyb.tev.repository.PhotoRepository;
@@ -81,6 +86,10 @@ public class TEVRestController {
 	VideoRepository videoRepo;
 	@Autowired
 	MetadataRepository metadataRepo;
+	@Autowired
+	ConversationRepository conversationRepo;
+	@Autowired
+	ConversationMessageRepository convoMsgRepo;
 
 	/**
 	 * GET request for listing all posts
@@ -637,39 +646,39 @@ public class TEVRestController {
 	@GetMapping("/types")
 	public List<Type> getAllTypes() {
 		List<Type> types = typeRepo.findAll();
-		
-		if(types.size() == 0) {
+
+		if (types.size() == 0) {
 			Type type1 = new Type();
-			type1.setId((long)1);
+			type1.setId((long) 1);
 			type1.setType("answer");
 			typeRepo.save(type1);
 			types.add(type1);
-			
+
 			Type type2 = new Type();
-			type2.setId((long)2);
+			type2.setId((long) 2);
 			type2.setType("link");
 			typeRepo.save(type2);
 			types.add(type2);
-			
+
 			Type type3 = new Type();
-			type3.setId((long)3);
+			type3.setId((long) 3);
 			type3.setType("photo");
 			typeRepo.save(type3);
 			types.add(type3);
-			
+
 			Type type4 = new Type();
-			type4.setId((long)4);
+			type4.setId((long) 4);
 			type4.setType("regular");
 			typeRepo.save(type4);
 			types.add(type4);
-			
+
 			Type type5 = new Type();
-			type5.setId((long)5);
+			type5.setId((long) 5);
 			type5.setType("video");
 			typeRepo.save(type5);
 			types.add(type5);
 		}
-		
+
 		return types;
 	}
 
@@ -692,7 +701,7 @@ public class TEVRestController {
 			return md;
 		}
 	}
-	
+
 	/**
 	 * GET to return static data used to populate drop-down lists, for the user to
 	 * set things like preferred sort order, filters, etc.
@@ -740,9 +749,188 @@ public class TEVRestController {
 		md.setFilter(metadataDetails.getFilter());
 		md.setSortColumn(metadataDetails.getSortColumn());
 		md.setSortOrder(metadataDetails.getSortOrder());
+		md.setMainTumblrUser(metadataDetails.getMainTumblrUser());
+		md.setMainTumblrUserAvatarUrl(metadataDetails.getMainTumblrUserAvatarUrl());
 		Metadata returnValue = metadataRepo.save(md);
 
 		return returnValue;
+	}
+
+	/**
+	 * GET request for listing all conversations
+	 * 
+	 * @return <code>List</code> of all conversations in the database
+	 */
+	@GetMapping("/conversations")
+	public List<Conversation> getAllConversations() {
+		return conversationRepo.findAll();
+	}
+
+	/**
+	 * GET to return a single conversation, by ID
+	 * 
+	 * @param conversationID the conversation ID
+	 * @return The Conversation details
+	 */
+	@GetMapping("/conversations/{id}")
+	public Conversation getConversationById(@PathVariable(value = "id") Long conversationID) {
+		return conversationRepo.findById(conversationID)
+				.orElseThrow(() -> new ResourceNotFoundException("Conversation", "id", conversationID));
+	}
+	
+	/**
+	 * GET to return a single conversation, by participant name
+	 * 
+	 * @param participantName Name of the participant
+	 * @return Single Conversation
+	 */
+	@GetMapping("/conversation")
+	public Conversation getConversationByParticipant(@RequestParam("participant") String participantName) {
+		return conversationRepo.findByParticipant(participantName);
+	}
+
+	/**
+	 * POST request to submit a conversation into the system
+	 * 
+	 * @param conversation The conversation object (in JSON format) to be saved into
+	 *                     the database
+	 * @return The same object that was saved (including the generated ID)
+	 */
+	@PostMapping("/conversations")
+	public Conversation createConversation(@Valid @RequestBody Conversation conversation) {
+		return conversationRepo.save(conversation);
+	}
+
+	/**
+	 * PUT to update a conversation
+	 * 
+	 * @param conversationId ID of the convo to be updated
+	 * @param convoDetails   Details to be inserted into the DB
+	 * @return The updated Conversation details
+	 */
+	@PutMapping("/conversations/{id}")
+	public Conversation updateConversation(@PathVariable(value = "id") Long conversationId,
+			@RequestBody Conversation convoDetails) {
+		Conversation convo = conversationRepo.findById(conversationId)
+				.orElseThrow(() -> new ResourceNotFoundException("Conversation", "id", conversationId));
+
+		convo.setParticipant(convoDetails.getParticipant());
+		convo.setParticipantAvatarUrl(convoDetails.getParticipantAvatarUrl());
+
+		Conversation updatedConvo = conversationRepo.save(convo);
+
+		return updatedConvo;
+	}
+
+	/**
+	 * DEL to delete a single conversation, by ID
+	 * 
+	 * @param convoId ID of convo to be deleted
+	 * @return <code>ResponseEntity</code> with the response details
+	 */
+	@DeleteMapping("/conversations/{id}")
+	public ResponseEntity<?> deleteConversation(@PathVariable(value = "id") Long convoId) {
+		Conversation convo = conversationRepo.findById(convoId)
+				.orElseThrow(() -> new ResourceNotFoundException("Conversation", "id", convoId));
+
+		conversationRepo.delete(convo);
+
+		return ResponseEntity.ok().build();
+	}
+
+	/**
+	 * DEL to delete all conversations in the DB
+	 * 
+	 * @return <code>ResponseEntity</code> with the response details
+	 */
+	@DeleteMapping("/conversations")
+	public ResponseEntity<?> deleteAllConversations() {
+		conversationRepo.deleteAll();
+
+		return ResponseEntity.ok().build();
+	}
+
+	/**
+	 * GET request for listing all messages (regardless of conversation)
+	 * 
+	 * @return list of all messages in the database
+	 */
+	@GetMapping("/conversations/messages")
+	public List<ConversationMessage> getAllConversationMessages() {
+		return convoMsgRepo.findAll();
+	}
+
+	/**
+	 * POST request to submit a new conversation message into the system
+	 * 
+	 * @param convoMsg The data to be submitted
+	 * @return The object that was just submitted (with ID)
+	 */
+	@PostMapping("/conversations/messages")
+	public ConversationMessage createConvoMessage(@Valid @RequestBody ConversationMessage convoMsg) {
+		return convoMsgRepo.save(convoMsg);
+	}
+
+	/**
+	 * GET to return all messages for a particular conversation
+	 * 
+	 * @param convoId The conversation ID
+	 * @return The list of messages
+	 */
+	@GetMapping("/conversations/{id}/messages")
+	public List<ConversationMessage> getConvoMsgByConvoID(@PathVariable(value = "id") Long convoId) {
+		return convoMsgRepo.findByConversationIdOrderByTimestamp(convoId);
+	}
+
+	/**
+	 * PUT to update a conversation message
+	 * 
+	 * @param msgId    The ID of the message to be updated
+	 * @param convoMsg The updated data
+	 * @return The same data that was just submitted
+	 */
+	@PutMapping("/conversations/messages/{id}")
+	public ConversationMessage updateConvoMsg(@PathVariable(value = "id") Long msgId,
+			@RequestBody ConversationMessage convoMsg) {
+		ConversationMessage cm = convoMsgRepo.findById(msgId)
+				.orElseThrow(() -> new ResourceNotFoundException("ConversationMessage", "id", msgId));
+
+		cm.setConversationId(convoMsg.getConversationId());
+		cm.setMessage(convoMsg.getMessage());
+		cm.setReceived(convoMsg.getReceived());
+		cm.setType(convoMsg.getType());
+
+		ConversationMessage updatedCM = convoMsgRepo.save(cm);
+
+		return updatedCM;
+	}
+
+	/**
+	 * DEL to delete all conversation messages in the DB
+	 * 
+	 * @return <code>ResponseEntity</code> with the response details
+	 */
+	@DeleteMapping("/conversations/messages")
+	public ResponseEntity<?> deleteAllConvoMsgs() {
+		convoMsgRepo.deleteAll();
+
+		return ResponseEntity.ok().build();
+	}
+
+	/**
+	 * DEL to delete a single conversation message, by ID
+	 * 
+	 * @param msgId ID of the message to be deleted
+	 * @return <code>ResponseEntity</code> with the response details
+	 */
+	@DeleteMapping("/conversations/messages/{id}")
+	public ResponseEntity<?> deleteConversationMessage(@PathVariable(name = "id") Long msgId) {
+		ConversationMessage cm = convoMsgRepo.findById(msgId)
+				.orElseThrow(() -> new ResourceNotFoundException("ConversationMessage", "id", msgId));
+
+		convoMsgRepo.delete(cm);
+
+		return ResponseEntity.ok().build();
 	}
 
 }

@@ -15,7 +15,6 @@ import com.tiyb.tev.datamodel.Video;
  * model.
  * 
  * @author tiyb
- * @apiviz.landmark
  * @apiviz.uses com.tiyb.tev.datamodel.Post
  * @apiviz.uses com.tiyb.tev.datamodel.Answer
  * @apiviz.uses com.tiyb.tev.datamodel.Link

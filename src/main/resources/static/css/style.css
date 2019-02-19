@@ -1,3 +1,15 @@
 #settingsTable th, td {
 	padding: 10px;
 }
+
+#mainSettingsTable td {
+	vertical-align: top;
+}
+
+#submitButtonTD {
+	text-align: center;
+}
+
+#conversationWordCloudContainer {
+	width:100%;
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="${conversation.participant}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/postviewer.css}"/>
+</head>
+<body>
+
+<div class="contentContainer">
+<h1 th:utext="'Conversation with ' + ${conversation.participant}"></h1>
+<table id="messagesTable">
+<tr th:each="message: ${messages}">
+	<td>
+		<div th:if="${message.received}" class="message-received">
+		<table th:if="${message.received}" width="100%"><tr>
+			<td width="5%"><img th:src="${conversation.participantAvatarUrl}" height="30px" width="30px" /></td>
+			<td>
+				<div th:text="${#dates.format(message.timestamp * 1000, 'MMM dd, yyyy, HH:mm')}"></div>
+				<div th:text="${message.message}"></div>
+			</td>
+		</tr></table>
+		</div>
+		<div th:unless="${message.received}" class="message-sent">
+		<table th:unless="${message.received}" width="100%"><tr>
+			<td>
+				<div th:text="${#dates.format(message.timestamp * 1000, 'MMM dd, yyyy, HH:mm')}"></div>
+				<div th:text="${message.message}"></div>
+			</td>
+			<td width="5%"><img th:src="${metadata.mainTumblrUserAvatarUrl}" height="30px" width="30px"  /></td>
+		</tr></table>
+		</div> 
+	</td>
+</tr>
+</table>
+</div>
+
+</body>
+</html>

@@ -58,6 +58,8 @@ public class Metadata implements Serializable {
 	private String sortColumn;
 	private String sortOrder;
 	private String filter;
+	private String mainTumblrUser;
+	private String mainTumblrUserAvatarUrl;
 
 	/**
 	 * Helper function to generate a new Metadata object, with some defaults filled
@@ -76,6 +78,9 @@ public class Metadata implements Serializable {
 		return md;
 	}
 
+	/**
+	 * Helper method to generate a string version of the object
+	 */
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -103,6 +108,16 @@ public class Metadata implements Serializable {
 		if (filter != null) {
 			builder.append("filter=");
 			builder.append(filter);
+			builder.append(", ");
+		}
+		if (mainTumblrUser != null) {
+			builder.append("mainTumblrUser=");
+			builder.append(mainTumblrUser);
+			builder.append(", ");
+		}
+		if (mainTumblrUserAvatarUrl != null) {
+			builder.append("mainTumblrUserAvatarUrl=");
+			builder.append(mainTumblrUserAvatarUrl);
 		}
 		builder.append("]");
 		return builder.toString();
@@ -146,6 +161,22 @@ public class Metadata implements Serializable {
 
 	public void setFilter(String filter) {
 		this.filter = filter;
+	}
+
+	public String getMainTumblrUser() {
+		return mainTumblrUser;
+	}
+
+	public void setMainTumblrUser(String mainTumblrUser) {
+		this.mainTumblrUser = mainTumblrUser;
+	}
+
+	public String getMainTumblrUserAvatarUrl() {
+		return mainTumblrUserAvatarUrl;
+	}
+
+	public void setMainTumblrUserAvatarUrl(String mainTumblrUserAvatarUrl) {
+		this.mainTumblrUserAvatarUrl = mainTumblrUserAvatarUrl;
 	}
 
 }

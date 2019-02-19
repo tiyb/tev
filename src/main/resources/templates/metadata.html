@@ -2,65 +2,117 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title th:text="#{metadata.title}"></title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title th:text="#{metadata.title}"></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-    <link rel="stylesheet" type="text/css"
-          href="webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/datatables.min.css}"/>
+<link rel="stylesheet" type="text/css"
+	href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+<link rel="stylesheet" type="text/css"
+	th:href="@{/css/datatables.min.css}" />
 </head>
 <body>
 
-<div id="header"></div>
+	<div id="header"></div>
 
-<div class="container">
+	<div class="container">
 
-    <div class="starter-template">
-    	<h1 th:text="#{metadata.title}"></h1>
-    	<h2 th:text="#{metadata.viewSettings}"></h2>
-    	<p th:text="#{metadata.explanatoryText}"></p>
-    	
-    	<table class="display" id="settingsTable"> 
-    		<tr>
-    			<th th:text="#{metadata.baseMediaPath}"></th>
-    			<td><input type="text" id="baseMediaPath"></input></td>
-    		</tr>
-    		<tr>
-    			<th th:text="#{metadata.filter}"></th>
-    			<td><select id="filterDropdown"></select></td>
-    		</tr>
-    		<tr>
-    			<th th:text="#{metadata.sortColumn}"></th>
-    			<td><select id="sortByDropdown"></select></td>
-    		</tr>
-    		<tr>
-    			<th th:text="#{metadata.sortOrder}"></th>
-    			<td><select id="sortOrderDropdown"></select></td>
-    		</tr>
-    	</table>
-    	<input id="submitButton" type="submit" th:value="#{metadata.submitButton}"></input>
-    	
-    	<h2 th:text="#{metadata.uploadTitle}"></h2>
-    	<p th:text="#{metadata.uploadExplanatoryText}"></p>
-    	<form method="POST" enctype="multipart/form-data" action="/postDataUpload">
-    		<table class="display">
-    			<tr><td th:text="#{metadata.uploadFile}"></td><td><input type="file" name="file" /></td></tr>
-				<tr><td></td><td><input type="submit" th:value="#{metadata.uploadSubmitButton}" /></td></tr>
-    		</table>
-    	</form>
-    </div>
+		<div class="starter-template">
+			<h1 th:text="#{metadata.title}"></h1>
+			<table id="mainSettingsTable">
+				<tr>
+					<td id="postSettings">
+						<h2 th:text="#{metadata.viewSettings}"></h2>
+						<p th:text="#{metadata.explanatoryText}"></p>
 
-</div>
+						<table class="display" id="settingsTable">
+							<tr>
+								<th th:text="#{metadata.baseMediaPath}"></th>
+								<td><input type="text" id="baseMediaPath"></input></td>
+							</tr>
+							<tr>
+								<th th:text="#{metadata.filter}"></th>
+								<td><select id="filterDropdown"></select></td>
+							</tr>
+							<tr>
+								<th th:text="#{metadata.sortColumn}"></th>
+								<td><select id="sortByDropdown"></select></td>
+							</tr>
+							<tr>
+								<th th:text="#{metadata.sortOrder}"></th>
+								<td><select id="sortOrderDropdown"></select></td>
+							</tr>
+						</table>
 
-<div id="footer" class="container"></div>
+					</td>
+					<td id="conversationSettings">
+						<h2 th:text="#{metadata.conversationTitle}"></h2>
+						<p th:text="#{metadata.conversationExplanatoryText}"></p>
 
-<script type="text/javascript"
-        src="webjars/jquery/3.3.1/jquery.min.js"></script>
+						<table class="display" id="conversationsTable">
+							<tr>
+								<th th:text="#{metadata.mainTumblrUser}"></th>
+								<td><input type="text" id="mainUser"></input></td>
+							</tr>
+							<tr>
+								<th th:text="#{metadata.mainTumblrUserAvatar}"></th>
+								<td><input type="text" id="mainUserAvatarUrl"></input></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" id="submitButtonTD"><input id="submitButton" type="submit"
+						th:value="#{metadata.submitButton}"></input></td>
+				</tr>
+				<tr>
+					<td>
+						<h2 th:text="#{metadata.uploadTitle}"></h2>
+						<p th:text="#{metadata.uploadExplanatoryText}"></p>
+						<form method="POST" enctype="multipart/form-data"
+							action="/postDataUpload">
+							<table class="display">
+								<tr>
+									<td th:text="#{metadata.uploadFile}"></td>
+									<td><input type="file" name="file" /></td>
+								</tr>
+								<tr>
+									<td></td>
+									<td><input type="submit"
+										th:value="#{metadata.uploadSubmitButton}" /></td>
+								</tr>
+							</table>
+						</form>
+					</td>
+					<td>
+						<h2 th:text="#{metadata.uploadConversationTitle}"></h2>
+						<p th:text="#{metadata.uploadConvoExplanatoryText}"></p>
+						<form method="POST" enctype="multipart/form-data" action="/conversationDataUpload">
+							<table class="display">
+								<tr>
+									<td th:text="#{metadata.uploadConversationFile}"></td>
+									<td><input type="file" name="file"/></td>
+								</tr>
+								<tr>
+									<td></td>
+									<td><input type="submit" th:value="#{metadata.uploadConversationSubmitButton}"/></td>
+								</tr>
+							</table>
+						</form>
+					</td>
+				</tr>
+			</table>
+		</div>
 
-<script type="text/javascript" th:src="@{/js/datatables.min.js}"></script>
+	</div>
 
-<script type="text/javascript" th:src="@{/js/metadata.js}"></script>
+	<div id="footer" class="container"></div>
+
+	<script type="text/javascript" src="webjars/jquery/3.3.1/jquery.min.js"></script>
+
+	<script type="text/javascript" th:src="@{/js/datatables.min.js}"></script>
+
+	<script type="text/javascript" th:src="@{/js/metadata.js}"></script>
 
 </body>
 </html>
