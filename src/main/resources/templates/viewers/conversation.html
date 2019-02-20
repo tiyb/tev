@@ -19,7 +19,11 @@
 			<td width="5%"><img th:src="${conversation.participantAvatarUrl}" height="30px" width="30px" /></td>
 			<td width="auto">
 				<div th:text="${#dates.format(message.timestamp * 1000, 'MMM dd, yyyy, HH:mm')}"></div>
-				<div th:text="${message.message}"></div>
+				<div th:switch="${message.type}">
+					<p th:case="'POSTREF'"><a th:href="${message.message}" th:text="${message.message}" target="_blank"></a></p>
+					<p th:case="'IMAGE'"><img th:src="${message.message}"></p>
+					<p th:case="*" th:text="${message.message}"></p>
+				</div>
 			</td>
 		</tr></table>
 		</div>

@@ -24,7 +24,10 @@ import com.tiyb.tev.exception.XMLParsingException;
  * This class is responsible for reading in an XML export from Tumblr containing
  * conversations. The XML generated from Tumblr for conversations is better
  * structured than that for posts, so less strange logic is required here than
- * is required in {@link com.tiyb.tev.xml.BlogXmlReader}.}
+ * is required in {@link com.tiyb.tev.xml.BlogXmlReader}.} The only interesting
+ * caveat is that message[@type=IMAGE] has a child element, for the photo's URL,
+ * whereas other messages just have the text of the message in the "message"
+ * element itself.
  * 
  * @author tiyb
  * @apiviz.landmark
@@ -89,9 +92,9 @@ public class ConversationXmlReader {
 						conversation.setParticipant(participant.getName());
 						conversation.setParticipantAvatarUrl(participant.getAvatarUrl());
 						conversation.setNumMessages(messages.size());
-						
+
 						conversation = restController.createConversation(conversation);
-						for(ConversationMessage msg : messages) {
+						for (ConversationMessage msg : messages) {
 							msg.setConversationId(conversation.getId());
 							restController.createConvoMessage(msg);
 						}
@@ -128,7 +131,11 @@ public class ConversationXmlReader {
 				if (se.getName().getLocalPart().equals("message")) {
 					ConversationMessage currentMessage = new ConversationMessage();
 					readMessageAttributes(se, currentMessage, tumblrUser);
-					currentMessage.setMessage(readCharacters(reader));
+					if (currentMessage.getType().equals("IMAGE")) {
+						currentMessage.setMessage(readImageMessage(reader));
+					} else {
+						currentMessage.setMessage(readCharacters(reader));
+					}
 					messages.add(currentMessage);
 				}
 			} else if (event.isEndElement()) {
@@ -136,6 +143,41 @@ public class ConversationXmlReader {
 
 				if (ee.getName().getLocalPart().equals("conversation")) {
 					return messages;
+				}
+			}
+		}
+
+		throw new XMLStreamException(END_OF_FILE_MESSAGE);
+	}
+
+	/**
+	 * This helper method reads in message content for IMAGE messages. The structure
+	 * of an IMAGE is different from other messages; typically, the message contents
+	 * are simply the child text of the "message" element, but when the type is
+	 * IMAGE, there is a child "photo-url" element as well. The "photo-url" also has
+	 * a max-width attribute, but this app ignores it
+	 * 
+	 * @param reader The event reader containing the XML document
+	 * @return String for the message content - i.e., the photo's URL
+	 * @throws XMLStreamException
+	 */
+	private static String readImageMessage(XMLEventReader reader) throws XMLStreamException {
+		String imageMessage = "";
+
+		while (reader.hasNext()) {
+			XMLEvent event = reader.nextEvent();
+
+			if (event.isStartElement()) {
+				StartElement se = event.asStartElement();
+
+				if (se.getName().getLocalPart().equals("photo-url")) {
+					imageMessage = readCharacters(reader);
+				}
+			} else if (event.isEndElement()) {
+				EndElement ee = event.asEndElement();
+
+				if (ee.getName().getLocalPart().equals("message")) {
+					return imageMessage;
 				}
 			}
 		}
@@ -205,10 +247,10 @@ public class ConversationXmlReader {
 				if (se.getName().getLocalPart().equals("participant")) {
 					@SuppressWarnings("unchecked")
 					Iterator<Attribute> atts = se.getAttributes();
-					while(atts.hasNext()) {
+					while (atts.hasNext()) {
 						Attribute att = atts.next();
 						String attName = att.getName().getLocalPart();
-						if(attName == "avatar_url") {
+						if (attName == "avatar_url") {
 							participantAvatar = att.getValue();
 							break;
 						}
@@ -242,10 +284,10 @@ public class ConversationXmlReader {
 	 */
 	private static String fixName(String participantName) {
 		int postfix = participantName.indexOf("-deactivated");
-		if(postfix == -1) {
+		if (postfix == -1) {
 			return participantName;
 		}
-		
+
 		participantName = participantName.substring(0, postfix);
 		return participantName;
 	}
