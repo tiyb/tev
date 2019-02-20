@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -180,7 +181,7 @@ public class TEVUIController {
 	@RequestMapping(value = { "/postViewer" }, method = RequestMethod.GET)
 	public String showViewer(@RequestParam("id") Long postID, Model model) {
 		Post post = restController.getPostById(postID);
-		model.addAttribute("tags", post.getTags());
+		model.addAttribute("tags", pullOutTagValues(post.getTags()));
 		List<Type> availableTypes = restController.getAllTypes();
 		String postType = "";
 
@@ -322,5 +323,29 @@ public class TEVUIController {
 	@RequestMapping(value = { "/header" }, method = RequestMethod.GET)
 	public String header(Model model) {
 		return "header";
+	}
+	
+	/**
+	 * Helper method that pulls out the tags into spans. This kind of ties
+	 * processing together with UI, but... whatever.
+	 * 
+	 * @param csvTags String containing the hashtags, separated by commas
+	 * @return String, containing HTML span tags containing the hashtags
+	 */
+	private String pullOutTagValues(String csvTags) {
+		if (csvTags == null || csvTags.equals("")) {
+			return csvTags;
+		}
+
+		List<String> items = Arrays.asList(csvTags.split("\\s*,\\s*"));
+		StringBuilder builder = new StringBuilder();
+
+		for (String s : items) {
+			builder.append("<span class='hashtagspan'>");
+			builder.append(s);
+			builder.append("</span>&nbsp;&nbsp;&nbsp;&nbsp;");
+		}
+
+		return builder.toString();
 	}
 }

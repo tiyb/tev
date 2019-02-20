@@ -46,7 +46,7 @@ public class Metadata implements Serializable {
 	 * Static constant list of the different columns by which data can be sorted
 	 */
 	public static final List<String> SORT_COLUMNS = Arrays.asList("ID", "Type", "Slug", "Date", "Is Read",
-			"Is Favourite");
+			"Is Favourite", "Hashtags");
 	/**
 	 * Static constant list of the different ways data can be sorted (ascending or
 	 * descending)

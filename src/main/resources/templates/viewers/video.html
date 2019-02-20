@@ -15,7 +15,11 @@
 </video>
 <div id="regularContentContainer" th:utext="${video.videoCaption}"></div>
 </div>
-<div id="tagContainer" th:text="${tags}"></div>
+<div id="tagContainer" th:utext="${tags}"></div>
+<script type="text/javascript"
+        src="webjars/jquery/3.3.1/jquery.min.js"></script>
+
+<script type="text/javascript" th:src="@{/js/taghandler.js}"></script>
 
 </body>
 </html>

@@ -21,29 +21,29 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
 	if(filterVal == "Do not Filter") {
 		if(favFilterVal == "Show Everything") {
 			return true;
-		} else if (favFilterVal == "Show Favourites" && data[4] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+		} else if (favFilterVal == "Show Favourites" && data[5] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
 			return true
-		} else if(favFilterVal == "Show Non Favourites" && data[4] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+		} else if(favFilterVal == "Show Non Favourites" && data[5] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
 			return true;
 		}
 	}
 	
-	if(filterVal == "Filter Read Posts" && data[5] == $.i18n.prop('index_posttable_isNotreadIndicatorCLEAN')) {
+	if(filterVal == "Filter Read Posts" && data[6] == $.i18n.prop('index_posttable_isNotreadIndicatorCLEAN')) {
 		if(favFilterVal == "Show Everything") {
 			return true;
-		} else if (favFilterVal == "Show Favourites" && data[4] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+		} else if (favFilterVal == "Show Favourites" && data[5] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
 			return true
-		} else if(favFilterVal == "Show Non Favourites" && data[4] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+		} else if(favFilterVal == "Show Non Favourites" && data[5] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
 			return true;
 		}
 	}
 	
-	if(filterVal == "Filter Unread Posts" && data[5] == $.i18n.prop('index_posttable_isReadIndicatorCLEAN')) {
+	if(filterVal == "Filter Unread Posts" && data[6] == $.i18n.prop('index_posttable_isReadIndicatorCLEAN')) {
 		if(favFilterVal == "Show Everything") {
 			return true;
-		} else if (favFilterVal == "Show Favourites" && data[4] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+		} else if (favFilterVal == "Show Favourites" && data[5] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
 			return true
-		} else if(favFilterVal == "Show Non Favourites" && data[4] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+		} else if(favFilterVal == "Show Non Favourites" && data[5] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
 			return true;
 		}
 	}
@@ -116,23 +116,22 @@ $(document).ready(function() {
 		},
 		"columns": [
 			{
-				"data": "id",
-				"title": $.i18n.prop('index_posttableheadings_id')
+				"data": "id"
 			},
 			{
 				"data": "type",
 				"render": function(data, type, row, meta) {
 					return getTypeFromID(data);
-				},
-				"title": $.i18n.prop('index_posttableheadings_type')
+				}
 			},
 			{
-				"data": "slug",
-				"title": $.i18n.prop('index_posttableheadings_slug')
+				"data": "slug"
 			},
 			{
-				"data": "date",
-				"title": $.i18n.prop('index_posttableheadings_date')
+				"data": "tags"
+			},
+			{
+				"data": "date"
 			},
 			{
 				"data": "isFavourite",
@@ -142,8 +141,7 @@ $(document).ready(function() {
 					} else {
 						return $.i18n.prop('index_posttable_isNotFavourite');;
 					}
-				},
-				"title": $.i18n.prop('index_posttableheadings_favourite')
+				}
 			},
 			{
 				"data": "isRead",
@@ -153,8 +151,7 @@ $(document).ready(function() {
 					} else {
 						return $.i18n.prop('index_posttable_isNotreadIndicator');
 					}
-				},
-				"title": $.i18n.prop('index_posttableheadings_read')
+				}
 			}
 		],
 		"initComplete": function() {
@@ -166,7 +163,7 @@ $(document).ready(function() {
 					url: "/api/posts/" + postID + "/markRead",
 					type: "PUT"
 				});
-				window.open("/postViewer?id=" + postID, "_blank", "menubar=no,status=no,toolbar=no,height=700,width=1000");
+				window.open("/postViewer?id=" + postID, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
 			});
 			$('#postTable').on('order.dt', function() {
 				var dataTable = $('#postTable').DataTable();
@@ -196,7 +193,7 @@ $(document).ready(function() {
 			url: "/api/posts/" + postID + "/markFavourite",
 			type: "PUT"
 		});
-		$(this).parents('tr').children('td:nth-child(5)').html($.i18n.prop('index_posttable_isFavourite'));
+		$(this).parents('tr').children('td:nth-child(6)').html($.i18n.prop('index_posttable_isFavourite'));
 		postTable.draw();
 		return false;
 	});
@@ -208,14 +205,14 @@ $(document).ready(function() {
 			url: "/api/posts/" + postID + "/markNonFavourite",
 			type: "PUT"
 		});
-		$(this).parents('tr').children('td:nth-child(5)').html($.i18n.prop('index_posttable_isNotFavourite'));
+		$(this).parents('tr').children('td:nth-child(6)').html($.i18n.prop('index_posttable_isNotFavourite'));
 		postTable.draw();
 		return false;
 	});
 	
 	$('#postTable thead tr').clone(true).appendTo('#postTable thead');
 	$('#postTable thead tr:eq(1) th').each(function(i) {
-		if(i < 4) {
+		if(i < 5) {
 			var title = $(this).text();
 			$(this).html('<input type="text" placeholder="' + $.i18n.prop('index_search') + title + '" />');
 			
@@ -257,6 +254,13 @@ $(document).ready(function() {
 		postTable.draw();
 		updateMDAPI();
 	});
+	
+	var urlParams = new URLSearchParams(window.location.search);
+	if(urlParams.has("hashsearch")) {
+		//$('#postTable thead tr:eq(1) th').children('input[type=text][nth-child(3)').val(urlParams("hashsearch"));
+		$('#postTable thead tr:eq(1) th:eq(3) input').val(urlParams.get("hashsearch"));
+		$('#postTable thead tr:eq(1) th:eq(3) input').change();
+	}
 });
 
 function sortTable() {
@@ -281,14 +285,17 @@ function sortTable() {
 	case "Slug":
 		sortColumn = 2;
 		break;
-	case "Date":
+	case "Hashtags":
 		sortColumn = 3;
 		break;
-	case "Is Favourite":
+	case "Date":
 		sortColumn = 4;
 		break;
-	case "Is Read":
+	case "Is Favourite":
 		sortColumn = 5;
+		break;
+	case "Is Read":
+		sortColumn = 6;
 		break;
 	default:
 		sortColumn = 0;
@@ -309,12 +316,15 @@ function updateSortOrderInMD(column, order) {
 		metadata.sortColumn = "Slug";
 		break;
 	case 3:
-		metadata.sortColumn = "Date";
+		metadata.sortColumn = "Hashtags";
 		break;
 	case 4:
-		metadata.sortColumn = "Is Favourite";
+		metadata.sortColumn = "Date";
 		break;
 	case 5:
+		metadata.sortColumn = "Is Favourite";
+		break;
+	case 6:
 		metadata.sortColumn = "Is Read";
 		break;
 	default:
