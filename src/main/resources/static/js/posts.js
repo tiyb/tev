@@ -79,7 +79,7 @@ $(document).ready(function() {
 		}
 		
 		if(metadata.favFilter == "Show Favourites") {
-			$('$showFavourites').prop('checked', true);
+			$('#showFavourites').prop('checked', true);
 		} else if(metadata.favFilter == "Show Non Favourites") {
 			$('#showNonFavourites').prop('checked', true);
 		} else {
