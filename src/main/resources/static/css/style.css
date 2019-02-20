@@ -21,6 +21,7 @@
 	text-align: center;
 	color: blue;
 	cursor: pointer;
+	font-size: 115%;
 }
 
 .notFavSpan {
@@ -29,6 +30,7 @@
 	margin-right: 5%;
 	text-align: center;
 	cursor: pointer;
+	font-size: 115%;
 }
 
 .readSpan {
@@ -38,6 +40,7 @@
 	text-align: center;
 	color: blue;
 	cursor: pointer;
+	font-size: 115%;
 }
 
 .notreadSpan {
