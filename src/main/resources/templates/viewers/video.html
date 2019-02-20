@@ -10,7 +10,7 @@
 <body>
 
 <div class="contentContainer">
-<video controls="true" autoplay="false" preload="none" th:height="${video.height}" th:width="${video.width}">
+<video controls="controls" preload="auto" th:height="${video.height}" th:width="${video.width}">
 	<source th:src="'/viewerVideo/' +  ${video.postId} + '.' + ${video.extension}" th:type="${video.contentType}" />
 </video>
 <div id="regularContentContainer" th:utext="${video.videoCaption}"></div>
