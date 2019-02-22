@@ -11,7 +11,7 @@
 
 <div class="contentContainer">
 <p th:each="photo : ${photos}">
-	<img th:src="'/viewerMedia/' + ${photo}" />
+	<a th:href="'/viewerMedia/' + ${photo}" target="_singlephotoviewer"><img th:src="'/viewerMedia/' + ${photo}" /></a>
 </p>
 <div id="regularContentContainer" th:utext="${caption}"></div>
 </div>
