@@ -31,6 +31,10 @@ $(document).ready(function () {
 			var divData = "<option value='" + obj + "'>" + getTranslatedFavFilters(obj) + "</option>";
 			$(divData).appendTo('#favsDropdown');
 		});
+		$.each(data.pageLengths, function(i, obj) {
+			var divData = "<option value='" + obj + "'>" + getTranslatedPageLength(obj) + "</option>";
+			$(divData).appendTo('#pageLengthDropdown');
+		});
 		
 		$.ajax({
 			url: "/api/metadata",
@@ -42,6 +46,7 @@ $(document).ready(function () {
 			$('#sortByDropdown').val(metadataObject.sortColumn);
 			$('#filterDropdown').val(metadataObject.filter);
 			$('#favsDropdown').val(metadataObject.favFilter);
+			$('#pageLengthDropdown').val(metadataObject.pageLength);
 			$('#mainUser').val(metadataObject.mainTumblrUser);
 			$('#mainUserAvatarUrl').val(metadataObject.mainTumblrUserAvatarUrl);
 		});
@@ -57,6 +62,7 @@ $(document).ready(function () {
 		metadataObject.sortColumn = $('#sortByDropdown').val();
 		metadataObject.filter = $('#filterDropdown').val();
 		metadataObject.favFilter = $('#favsDropdown').val();
+		metadataObject.pageLength = $('#pageLengthDropdown').val();
 		
 		$.ajax({
 			url: '/api/metadata',
@@ -131,6 +137,26 @@ function getTranslatedFavFilters(favFilter) {
 		break;
 	case "Show Everything":
 		return $.i18n.prop('md_favfilters_showeverything');
+		break;
+	}
+}
+
+function getTranslatedPageLength(pageLength) {
+	switch(pageLength) {
+	case 10:
+		return $.i18n.prop('md_pagelengths_10');
+		break;
+	case 25:
+		return $.i18n.prop('md_pagelengths_25');
+		break;
+	case 50:
+		return $.i18n.prop('md_pagelengths_50');
+		break;
+	case 100:
+		return $.i18n.prop('md_pagelengths_100');
+		break;
+	case -1:
+		return $.i18n.prop('md_pagelengths_all');
 		break;
 	}
 }

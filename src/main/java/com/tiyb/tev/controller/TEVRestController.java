@@ -758,6 +758,9 @@ public class TEVRestController {
 		for(String s : Metadata.FAV_FILTERS) {
 			sld.getFavFilters().add(s);
 		}
+		for(Integer i : Metadata.PAGE_LENGTHS) {
+			sld.getPageLengths().add(i);
+		}
 
 		return sld;
 	}
@@ -789,6 +792,7 @@ public class TEVRestController {
 		md.setMainTumblrUser(metadataDetails.getMainTumblrUser());
 		md.setMainTumblrUserAvatarUrl(metadataDetails.getMainTumblrUserAvatarUrl());
 		md.setFavFilter(metadataDetails.getFavFilter());
+		md.setPageLength(metadataDetails.getPageLength());
 		Metadata returnValue = metadataRepo.save(md);
 
 		return returnValue;

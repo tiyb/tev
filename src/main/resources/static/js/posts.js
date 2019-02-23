@@ -84,7 +84,7 @@ $(document).ready(function() {
 			$('#showNonFavourites').prop('checked', true);
 		} else {
 			$('#showAll').prop('checked', true);
-		}
+		}		
 	});
 	
 	var postTable = $('#postTable').DataTable( {
@@ -109,6 +109,7 @@ $(document).ready(function() {
 		        "sortDescending": $.i18n.prop('index_posttable_aria_sortdesc')
 		    }		
 	    },
+	    "lengthMenu": [[10, 25, 50, 100, -1], [$.i18n.prop('md_pagelengths_10'), $.i18n.prop('md_pagelengths_25'), $.i18n.prop('md_pagelengths_50'), $.i18n.prop('md_pagelengths_100'), $.i18n.prop('md_pagelengths_all')]],
 		"orderCellsTop": true,
 		"ajax": {
 			"url": "api/posts",
@@ -170,6 +171,12 @@ $(document).ready(function() {
 				var order = dataTable.order();
 				updateSortOrderInMD(order[0][0], order[0][1]);
 			});
+			dataTable = $('#postTable').DataTable();
+			dataTable.on('length.dt', function(e,settings,len) {
+				metadata.pageLength = len;
+				updateMDAPI();
+			});
+			dataTable.page.len(metadata.pageLength);
 			sortTable();
 		}
 	});

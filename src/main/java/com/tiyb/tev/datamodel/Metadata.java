@@ -59,6 +59,11 @@ public class Metadata implements Serializable {
 	 */
 	public static final List<String> FAV_FILTERS = Arrays.asList("Show Favourites", "Show Non Favourites",
 			"Show Everything");
+	
+	/**
+	 * Static list of lengths the "number of records shown" drop-down can be set to
+	 */
+	public static final List<Integer> PAGE_LENGTHS = Arrays.asList(10, 25, 50, 100, -1);
 
 	@Id
 	private Integer id;
@@ -69,6 +74,7 @@ public class Metadata implements Serializable {
 	private String mainTumblrUser;
 	private String mainTumblrUserAvatarUrl;
 	private String favFilter;
+	private Integer pageLength;
 
 	/**
 	 * Helper function to generate a new Metadata object, with some defaults filled
@@ -84,6 +90,7 @@ public class Metadata implements Serializable {
 		md.setSortColumn(SORT_COLUMNS.get(0));
 		md.setSortOrder(SORT_ORDERS.get(1));
 		md.setFavFilter(FAV_FILTERS.get(2));
+		md.setPageLength(10);
 
 		return md;
 	}
@@ -130,6 +137,11 @@ public class Metadata implements Serializable {
 		if (favFilter != null) {
 			builder.append("favFilter=");
 			builder.append(favFilter);
+			builder.append(", ");
+		}
+		if (pageLength != null) {
+			builder.append("pageLength=");
+			builder.append(pageLength);
 		}
 		builder.append("]");
 		return builder.toString();
@@ -197,6 +209,14 @@ public class Metadata implements Serializable {
 
 	public void setFavFilter(String favFilter) {
 		this.favFilter = favFilter;
+	}
+
+	public Integer getPageLength() {
+		return pageLength;
+	}
+
+	public void setPageLength(Integer pageLength) {
+		this.pageLength = pageLength;
 	}
 
 }
