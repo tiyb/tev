@@ -15,7 +15,7 @@ import com.tiyb.tev.repository.PostRepository;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class PostRepositoryIntegrationTest {
+public class PostRepositoryUnitTest {
 
 	@Autowired
 	private TestEntityManager entityManager;

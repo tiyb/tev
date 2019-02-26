@@ -247,6 +247,19 @@ public class TEVUIController {
 		
 		return "viewers/conversation";
 	}
+	
+	/**
+	 * Used to display a pop-up window to display a single image
+	 * 
+	 * @param imageName Name of the image to be displayed
+	 * @param model     Model used used for populating the Thymeleaf page
+	 * @return Name of the viewer to load
+	 */
+	@RequestMapping(value = { "/viewers/imageViewer/{imageName}" }, method = RequestMethod.GET)
+	public String showSingleImageViewer(@PathVariable("imageName") String imageName, Model model) {
+		model.addAttribute("imageName", imageName);
+		return "viewers/singleimageviewer";
+	}
 
 	/**
 	 * Returns a binary image, for use in the viewer. HTML pages can't directly

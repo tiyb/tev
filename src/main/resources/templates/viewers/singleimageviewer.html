@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="#{imageviewer.title}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/singleimageviewer.css}"/>
+</head>
+<body>
+<div class="imageBox"><img class="centre-fit" th:src="'/viewerMedia/' + ${imageName}" /></div>
+
+<script type="text/javascript"
+        src="/webjars/jquery/3.3.1/jquery.min.js"></script>
+
+<script type="text/javascript" th:src="@{/js/taghandler.js}"></script>
+
+</body>
+</html>

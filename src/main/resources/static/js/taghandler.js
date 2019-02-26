@@ -4,4 +4,11 @@ $(document).ready(function() {
 		window.parent.opener.location.replace(newHostURL);
 		window.close();
 	});
+	
+	$(document).keydown(function(e) {
+		//ESC
+		if(e.keyCode == 27) {
+			window.close();
+		}
+	});
 });
