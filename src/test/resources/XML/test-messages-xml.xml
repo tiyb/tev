@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tumblr version="1.0">
+	<conversations>
+		<conversation status="ACTIVE">
+			<participants>
+				<participant avatar_url="https://66.media.tumblr.com/avatar_7a68d3c41305_64.pnj">wm4afs</participant>
+				<participant avatar_url="https://assets.tumblr.com/images/default_avatar/pyramid_closed_64.png">participant1</participant>
+			</participants>
+			<messages>
+				<message ts="1544197586" participant="wm4afs" type="TEXT">Message 1</message>
+				<message ts="1544197605" participant="wm4afs" type="TEXT">Message 2</message>
+				<message ts="1544197624" participant="wm4afs" type="TEXT">Message 3</message>
+				<message ts="1544197647" participant="wm4afs" type="IMAGE">
+					<photo-url max-width="0">http://www.photourl.com/photo.png</photo-url>
+				</message>
+				<message ts="1544198315" participant="wm4afs" type="TEXT">Message 5</message>
+				<message ts="1544221130" participant="participant1" type="TEXT">Message 6</message>
+				<message ts="1544221197" participant="wm4afs" type="TEXT">Message 7</message>
+				<message ts="1544221203" participant="participant1" type="TEXT">Message 8</message>
+				<message ts="1544221221" participant="wm4afs" type="POSTREF">http://www.tumblr.com/somepost</message>
+			</messages>
+		</conversation>
+		<conversation status="ACTIVE">
+			<participants>
+				<participant avatar_url="https://66.media.tumblr.com/avatar_7762e83ea701_64.pnj">participant2</participant>
+				<participant avatar_url="https://66.media.tumblr.com/avatar_7a68d3c41305_64.pnj">wm4afs</participant>
+			</participants>
+			<messages>
+				<message ts="1544012468" participant="participant2" type="TEXT">Message 1</message>
+				<message ts="1544016206" participant="wm4afs" type="TEXT">Message 2</message>
+				<message ts="1544016402" participant="participant2" type="TEXT">Message 3</message>
+				<message ts="1544016410" participant="participant2" type="TEXT">Message 4</message>
+				<message ts="1544016579" participant="participant2" type="TEXT">Message 5</message>
+				<message ts="1544016582" participant="participant2" type="TEXT">Message 6</message>
+				<message ts="1544022051" participant="wm4afs" type="TEXT">Message 7</message>
+				<message ts="1544115936" participant="participant2" type="TEXT">Message 8</message>
+				<message ts="1544126671" participant="wm4afs" type="TEXT">Message 9</message>
+			</messages>
+		</conversation>
+	</conversations>
+</tumblr>
