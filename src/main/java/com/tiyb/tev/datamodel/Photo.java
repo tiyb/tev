@@ -31,6 +31,7 @@ public class Photo implements Serializable {
 	@Column(name="caption", length=50000)
 	private String caption;
 	private String photoLinkUrl;
+	@Column(name="photo_offset")
 	private String offset;
 	private Integer width;
 	private Integer height;

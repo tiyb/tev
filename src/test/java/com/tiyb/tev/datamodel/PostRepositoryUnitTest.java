@@ -2,6 +2,7 @@ package com.tiyb.tev.datamodel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -72,6 +73,42 @@ public class PostRepositoryUnitTest {
 		
 		assertThat(returnPost.getId()).isEqualTo(post.getId());
 		assertThat(returnPost.getDate()).isEqualTo(post.getDate());
+	}
+	
+	@Test
+	public void findAllPosts() {
+		Post post1 = new Post();
+		post1.setId((long) 1);
+		post1.setDate("Jan 1, 2019");
+		entityManager.persist(post1);
+		Post post2 = new Post();
+		post2.setId((long) 2);
+		post2.setDate("Jan 2, 2019");
+		entityManager.persist(post2);
+		entityManager.flush();
+		
+		List<Post> returnedPosts = postRepo.findAll();
+		
+		assertThat(returnedPosts.size()).isEqualTo(2);
+	}
+	
+	@Test
+	public void deleteAllPosts() {
+		Post post1 = new Post();
+		post1.setId((long) 1);
+		post1.setDate("Jan 1, 2019");
+		entityManager.persist(post1);
+		Post post2 = new Post();
+		post2.setId((long) 2);
+		post2.setDate("Jan 2, 2019");
+		entityManager.persist(post2);
+		entityManager.flush();
+		
+		postRepo.deleteAll();
+		
+		List<Post> returnedPosts = postRepo.findAll();
+		
+		assertThat(returnedPosts.size()).isEqualTo(0);
 	}
 	
 }
