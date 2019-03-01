@@ -47,7 +47,7 @@ import com.tiyb.tev.xml.ConversationXmlReader;
  * 
  * @author tiyb
  * @apiviz.landmark
- * @apivix.uses com.tiyb.tev.controller.TEVRestController
+ * @apiviz.uses com.tiyb.tev.controller.TEVRestController
  *
  */
 @Controller
