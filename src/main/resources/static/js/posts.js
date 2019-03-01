@@ -1,4 +1,5 @@
 var typesMap;
+var isTypesMapLoaded = false;
 var metadata;
 
 $.i18n.properties({
@@ -62,6 +63,7 @@ $(document).ready(function() {
 		typesMap = new Map();
 		
 		data.forEach(element => typesMap.set(element.id, element.type));
+		isTypesMapLoaded = true;
 	});
 	
 	$.ajax({
@@ -85,100 +87,101 @@ $(document).ready(function() {
 		} else {
 			$('#showAll').prop('checked', true);
 		}		
-	});
-	
-	var postTable = $('#postTable').DataTable( {
-		"language": {
-			"emptyTable": 	  $.i18n.prop('index_posttable_emptytable'),
-		    "info":           $.i18n.prop('index_posttable_info'),
-		    "infoEmpty":      $.i18n.prop('index_posttable_infoempty'),
-		    "infoFiltered":   $.i18n.prop('index_posttable_infofiltered'),
-		    "lengthMenu":     $.i18n.prop('index_posttable_lengthmenu'),
-		    "loadingRecords": $.i18n.prop('index_posttable_loadingrecords'),
-		    "processing":     $.i18n.prop('index_posttable_processing'),
-		    "search":         $.i18n.prop('index_posttable_search'),
-		    "zeroRecords":    $.i18n.prop('index_posttable_zerorecords'),
-		    "paginate": {
-		        "first":      $.i18n.prop('index_posttable_paginate_first'),
-		        "last":       $.i18n.prop('index_posttable_paginate_last'),
-		        "next":       $.i18n.prop('index_posttable_paginate_next'),
-		        "previous":   $.i18n.prop('index_posttable_paginate_previous')
+		
+		var postTable = $('#postTable').DataTable( {
+			"language": {
+				"emptyTable": 	  $.i18n.prop('index_posttable_emptytable'),
+			    "info":           $.i18n.prop('index_posttable_info'),
+			    "infoEmpty":      $.i18n.prop('index_posttable_infoempty'),
+			    "infoFiltered":   $.i18n.prop('index_posttable_infofiltered'),
+			    "lengthMenu":     $.i18n.prop('index_posttable_lengthmenu'),
+			    "loadingRecords": $.i18n.prop('index_posttable_loadingrecords'),
+			    "processing":     $.i18n.prop('index_posttable_processing'),
+			    "search":         $.i18n.prop('index_posttable_search'),
+			    "zeroRecords":    $.i18n.prop('index_posttable_zerorecords'),
+			    "paginate": {
+			        "first":      $.i18n.prop('index_posttable_paginate_first'),
+			        "last":       $.i18n.prop('index_posttable_paginate_last'),
+			        "next":       $.i18n.prop('index_posttable_paginate_next'),
+			        "previous":   $.i18n.prop('index_posttable_paginate_previous')
+			    },
+			    "aria": {
+			        "sortAscending":  $.i18n.prop('index_posttable_aria_sortasc'),
+			        "sortDescending": $.i18n.prop('index_posttable_aria_sortdesc')
+			    }		
 		    },
-		    "aria": {
-		        "sortAscending":  $.i18n.prop('index_posttable_aria_sortasc'),
-		        "sortDescending": $.i18n.prop('index_posttable_aria_sortdesc')
-		    }		
-	    },
-	    "lengthMenu": [[10, 25, 50, 100, -1], [$.i18n.prop('md_pagelengths_10'), $.i18n.prop('md_pagelengths_25'), $.i18n.prop('md_pagelengths_50'), $.i18n.prop('md_pagelengths_100'), $.i18n.prop('md_pagelengths_all')]],
-		"orderCellsTop": true,
-		"ajax": {
-			"url": "api/posts",
-			"dataSrc": ""
-		},
-		"columns": [
-			{
-				"data": "id"
+		    "lengthMenu": [[10, 25, 50, 100, -1], [$.i18n.prop('md_pagelengths_10'), $.i18n.prop('md_pagelengths_25'), $.i18n.prop('md_pagelengths_50'), $.i18n.prop('md_pagelengths_100'), $.i18n.prop('md_pagelengths_all')]],
+			"orderCellsTop": true,
+			"ajax": {
+				"url": "api/posts",
+				"dataSrc": ""
 			},
-			{
-				"data": "type",
-				"render": function(data, type, row, meta) {
-					return getTypeFromID(data);
-				}
-			},
-			{
-				"data": "slug"
-			},
-			{
-				"data": "tags"
-			},
-			{
-				"data": "date"
-			},
-			{
-				"data": "isFavourite",
-				"render": function(data, type, row, meta) {
-					if(data) {
-						return $.i18n.prop('index_posttable_isFavourite');
-					} else {
-						return $.i18n.prop('index_posttable_isNotFavourite');;
+			"columns": [
+				{
+					"data": "id"
+				},
+				{
+					"data": "type",
+					"render": function(data, type, row, meta) {
+						return getTypeFromID(data);
+					}
+				},
+				{
+					"data": "slug"
+				},
+				{
+					"data": "tags"
+				},
+				{
+					"data": "date"
+				},
+				{
+					"data": "isFavourite",
+					"render": function(data, type, row, meta) {
+						if(data) {
+							return $.i18n.prop('index_posttable_isFavourite');
+						} else {
+							return $.i18n.prop('index_posttable_isNotFavourite');;
+						}
+					}
+				},
+				{
+					"data": "isRead",
+					"render": function(data, type, row, meta) {
+						if(data) {
+							return $.i18n.prop('index_posttable_isReadIndicator');
+						} else {
+							return $.i18n.prop('index_posttable_isNotreadIndicator');
+						}
 					}
 				}
-			},
-			{
-				"data": "isRead",
-				"render": function(data, type, row, meta) {
-					if(data) {
-						return $.i18n.prop('index_posttable_isReadIndicator');
-					} else {
-						return $.i18n.prop('index_posttable_isNotreadIndicator');
-					}
-				}
-			}
-		],
-		"initComplete": function() {
-			$('#postTable tbody').on('click', 'tr', function () {
-				var postID = $(this).children('td:first-child').text();
-				$(this).children('td:last-child').html($.i18n.prop('index_posttable_isReadIndicator'));
-				postTable.draw();
-				$.ajax({
-					url: "/api/posts/" + postID + "/markRead",
-					type: "PUT"
+			],
+			"initComplete": function() {
+				$('#postTable tbody').on('click', 'tr', function () {
+					var postID = $(this).children('td:first-child').text();
+					$(this).children('td:last-child').html($.i18n.prop('index_posttable_isReadIndicator'));
+					postTable.draw();
+					$.ajax({
+						url: "/api/posts/" + postID + "/markRead",
+						type: "PUT"
+					});
+					window.open("/postViewer?id=" + postID, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
 				});
-				window.open("/postViewer?id=" + postID, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
-			});
-			$('#postTable').on('order.dt', function() {
-				var dataTable = $('#postTable').DataTable();
-				var order = dataTable.order();
-				updateSortOrderInMD(order[0][0], order[0][1]);
-			});
-			dataTable = $('#postTable').DataTable();
-			dataTable.on('length.dt', function(e,settings,len) {
-				metadata.pageLength = len;
-				updateMDAPI();
-			});
-			dataTable.page.len(metadata.pageLength);
-			sortTable();
-		}
+				$('#postTable').on('order.dt', function() {
+					var dataTable = $('#postTable').DataTable();
+					var order = dataTable.order();
+					updateSortOrderInMD(order[0][0], order[0][1]);
+				});
+				dataTable = $('#postTable').DataTable();
+				dataTable.on('length.dt', function(e,settings,len) {
+					metadata.pageLength = len;
+					updateMDAPI();
+				});
+				dataTable.page.len(metadata.pageLength);
+				sortTable();
+			}
+		});
+		
 	});
 	
 	$('#postTable tbody').on('click', 'div[class=readSpan]', function() {
@@ -361,5 +364,6 @@ function updateMDAPI() {
 }
 
 function getTypeFromID(typeID) {
+	
 	return typesMap.get(typeID);
 }
