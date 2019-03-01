@@ -36,8 +36,8 @@ import com.tiyb.tev.repository.VideoRepository;
 @WebMvcTest(TEVRestController.class)
 public class PostXmlParsingUnitTest {
 
-	private InputStream xmlFile;
-	private List<Type> allowableTypes;
+	private TEVSuperClass tsc;
+	
 	@Autowired
 	private TEVRestController restController;
 	@MockBean
@@ -63,16 +63,16 @@ public class PostXmlParsingUnitTest {
 	
 	@Before
 	public void setupData() throws FileNotFoundException {
-		this.allowableTypes = restController.getAllTypes();
+		List<Type> allowableTypes = restController.getAllTypes();
 		
 		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-xml.xml");
-		this.xmlFile = new FileInputStream(rawXmlFile);
+		InputStream xmlFile = new FileInputStream(rawXmlFile);
+		
+		tsc = BlogXmlReader.parseDocument(xmlFile, allowableTypes);
 	}
 	
 	@Test
 	public void testAnswer() {
-		TEVSuperClass tsc = BlogXmlReader.parseDocument(this.xmlFile, this.allowableTypes);
-		
 		assertThat(tsc.getAnswers().size()).isEqualTo(1);
 		assertThat(tsc.getAnswers().get(0).getQuestion()).isEqualTo("Question text");
 		assertThat(tsc.getAnswers().get(0).getAnswer()).isEqualTo("Answer text");
@@ -81,8 +81,6 @@ public class PostXmlParsingUnitTest {
 	
 	@Test
 	public void testLink() {
-		TEVSuperClass tsc = BlogXmlReader.parseDocument(this.xmlFile, this.allowableTypes);
-		
 		assertThat(tsc.getLinks().size()).isEqualTo(1);
 		assertThat(tsc.getLinks().get(0).getPostId()).isEqualTo(180265557725L);
 		assertThat(tsc.getLinks().get(0).getDescription()).isEqualTo("This is the link description");
@@ -92,8 +90,6 @@ public class PostXmlParsingUnitTest {
 	
 	@Test
 	public void testRegular() {
-		TEVSuperClass tsc = BlogXmlReader.parseDocument(this.xmlFile, this.allowableTypes);
-		
 		assertThat(tsc.getRegulars().size()).isEqualTo(1);
 		assertThat(tsc.getRegulars().get(0).getPostId()).isEqualTo(180894436671L);
 		assertThat(tsc.getRegulars().get(0).getBody()).isEqualTo("post body text here");
@@ -102,8 +98,6 @@ public class PostXmlParsingUnitTest {
 	
 	@Test
 	public void testVideo() {
-		TEVSuperClass tsc = BlogXmlReader.parseDocument(this.xmlFile, this.allowableTypes);
-		
 		assertThat(tsc.getVideos().size()).isEqualTo(1);
 		assertThat(tsc.getVideos().get(0).getContentType()).isEqualTo("video/mp4");
 		assertThat(tsc.getVideos().get(0).getDuration()).isEqualTo(45);
@@ -117,8 +111,6 @@ public class PostXmlParsingUnitTest {
 	
 	@Test
 	public void testPhotos() {
-		TEVSuperClass tsc = BlogXmlReader.parseDocument(this.xmlFile, this.allowableTypes);
-		
 		assertThat(tsc.getPhotos().size()).isEqualTo(3);
 		
 		Photo photo = tsc.getPhotos().get(0);

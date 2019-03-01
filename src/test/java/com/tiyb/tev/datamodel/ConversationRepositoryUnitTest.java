@@ -47,20 +47,20 @@ public class ConversationRepositoryUnitTest {
 	@Test
 	public void findConvoMsgsByConvoID() {
 		ConversationMessage msg1 = new ConversationMessage();
-		msg1.setConversationId((long) 1);
+		msg1.setConversationId(1L);
 		msg1.setMessage("first message");
 		msg1.setReceived(false);
-		msg1.setTimestamp((long) 2);
+		msg1.setTimestamp(2L);
 		entityManager.persist(msg1);
 		ConversationMessage msg2 = new ConversationMessage();
-		msg2.setConversationId((long) 1);
+		msg2.setConversationId(1L);
 		msg2.setMessage("second message");
 		msg2.setReceived(false);
-		msg2.setTimestamp((long) 1);
+		msg2.setTimestamp(1L);
 		entityManager.persist(msg2);
 		entityManager.flush();
 		
-		List<ConversationMessage> returnedMessages = convoMsgRepo.findByConversationIdOrderByTimestamp((long) 1);
+		List<ConversationMessage> returnedMessages = convoMsgRepo.findByConversationIdOrderByTimestamp(1L);
 		
 		assertThat(returnedMessages.size()).isEqualTo(2);
 		assertThat(returnedMessages.get(0).getMessage()).isEqualTo(msg2.getMessage());

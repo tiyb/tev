@@ -147,6 +147,9 @@ public class TEVRestController {
 		post.setUrl(postDetails.getUrl());
 		post.setUrlWithSlug(postDetails.getUrlWithSlug());
 		post.setWidth(postDetails.getWidth());
+		post.setIsRead(postDetails.getIsRead());
+		post.setTags(postDetails.getTags());
+		post.setIsFavourite(postDetails.getIsFavourite());
 
 		Post updatedPost = postRepo.save(post);
 
@@ -683,31 +686,31 @@ public class TEVRestController {
 
 		if (types.size() == 0) {
 			Type type1 = new Type();
-			type1.setId((long) 1);
+			type1.setId(1L);
 			type1.setType("answer");
 			typeRepo.save(type1);
 			types.add(type1);
 
 			Type type2 = new Type();
-			type2.setId((long) 2);
+			type2.setId(2L);
 			type2.setType("link");
 			typeRepo.save(type2);
 			types.add(type2);
 
 			Type type3 = new Type();
-			type3.setId((long) 3);
+			type3.setId(3L);
 			type3.setType("photo");
 			typeRepo.save(type3);
 			types.add(type3);
 
 			Type type4 = new Type();
-			type4.setId((long) 4);
+			type4.setId(4L);
 			type4.setType("regular");
 			typeRepo.save(type4);
 			types.add(type4);
 
 			Type type5 = new Type();
-			type5.setId((long) 5);
+			type5.setId(5L);
 			type5.setType("video");
 			typeRepo.save(type5);
 			types.add(type5);
@@ -858,6 +861,7 @@ public class TEVRestController {
 
 		convo.setParticipant(convoDetails.getParticipant());
 		convo.setParticipantAvatarUrl(convoDetails.getParticipantAvatarUrl());
+		convo.setNumMessages(convoDetails.getNumMessages());
 
 		Conversation updatedConvo = conversationRepo.save(convo);
 
@@ -941,6 +945,7 @@ public class TEVRestController {
 		cm.setMessage(convoMsg.getMessage());
 		cm.setReceived(convoMsg.getReceived());
 		cm.setType(convoMsg.getType());
+		cm.setTimestamp(convoMsg.getTimestamp());
 
 		ConversationMessage updatedCM = convoMsgRepo.save(cm);
 

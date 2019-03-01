@@ -30,14 +30,14 @@ public class PostRepositoryUnitTest {
 		Post post = new Post();
 		post.setDate("Jan 1, 2019");
 		post.setDateGmt("123456");
-		post.setId((long)1);
+		post.setId(1L);
 		post.setIsFavourite(false);
 		post.setIsRead(false);
 		post.setIsReblog(true);
 		post.setReblogKey("abc");
 		post.setSlug("slug");
 		post.setTags("tag 1, tag 2");
-		post.setType((long)1);
+		post.setType(1L);
 		post.setUrl("http://url.com");
 		post.setUrlWithSlug("http://url.com/slug");
 		
@@ -45,7 +45,7 @@ public class PostRepositoryUnitTest {
 		entityManager.flush();
 		
 		//when
-		Optional<Post> found = postRepo.findById((long)1);
+		Optional<Post> found = postRepo.findById(1L);
 		
 		//then
 		assertThat(found.isPresent());
@@ -66,7 +66,7 @@ public class PostRepositoryUnitTest {
 	@Test
 	public void createPost() {
 		Post post = new Post();
-		post.setId((long)2);
+		post.setId(2L);
 		post.setDate("Jan 1, 2019");
 		
 		Post returnPost = postRepo.save(post);
@@ -78,11 +78,11 @@ public class PostRepositoryUnitTest {
 	@Test
 	public void findAllPosts() {
 		Post post1 = new Post();
-		post1.setId((long) 1);
+		post1.setId(1L);
 		post1.setDate("Jan 1, 2019");
 		entityManager.persist(post1);
 		Post post2 = new Post();
-		post2.setId((long) 2);
+		post2.setId(2L);
 		post2.setDate("Jan 2, 2019");
 		entityManager.persist(post2);
 		entityManager.flush();
@@ -95,11 +95,11 @@ public class PostRepositoryUnitTest {
 	@Test
 	public void deleteAllPosts() {
 		Post post1 = new Post();
-		post1.setId((long) 1);
+		post1.setId(1L);
 		post1.setDate("Jan 1, 2019");
 		entityManager.persist(post1);
 		Post post2 = new Post();
-		post2.setId((long) 2);
+		post2.setId(2L);
 		post2.setDate("Jan 2, 2019");
 		entityManager.persist(post2);
 		entityManager.flush();
