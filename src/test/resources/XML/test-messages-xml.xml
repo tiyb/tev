@@ -22,7 +22,7 @@
 		</conversation>
 		<conversation status="ACTIVE">
 			<participants>
-				<participant avatar_url="http://participant2/avatar">participant2</participant>
+				<participant avatar_url="http://participant2/avatar">participant2-deact</participant>
 				<participant avatar_url="http://mainblog/avatar">blogname</participant>
 			</participants>
 			<messages>
@@ -35,6 +35,24 @@
 				<message ts="1544022051" participant="blogname" type="TEXT">Message 7</message>
 				<message ts="1544115936" participant="participant2" type="TEXT">Message 8</message>
 				<message ts="1544126671" participant="blogname" type="TEXT">Message 9</message>
+			</messages>
+		</conversation>
+		<conversation status="ACTIVE">
+			<participants>
+				<participant avatar_url="http://participant3/avatar">participant3-deactivated</participant>
+				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+			</participants>
+			<messages>
+				<message ts="1544012468" participant="participant3-deactivated" type="TEXT">Message 1</message>
+			</messages>
+		</conversation>
+		<conversation status="ACTIVE">
+			<participants>
+				<participant avatar_url="http://participant4/avatar">participant4-deactivated20190101</participant>
+				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+			</participants>
+			<messages>
+				<message ts="1544012468" participant="participant4-deactivated20190101" type="TEXT">Message 1</message>
 			</messages>
 		</conversation>
 	</conversations>

@@ -49,7 +49,7 @@ public class ConversationXmlParsingUnitTests {
 		List<Conversation> convos = restController.getAllConversations();
 		
 		assertThat(convos).isNotNull();
-		assertThat(convos.size()).isEqualTo(2);
+		assertThat(convos.size()).isEqualTo(4);
 		
 		Conversation firstConvo = restController.getConversationByParticipant("participant1");
 		assertThat(firstConvo).isNotNull();
@@ -60,6 +60,14 @@ public class ConversationXmlParsingUnitTests {
 		assertThat(secondConvo).isNotNull();
 		assertThat(secondConvo.getNumMessages()).isEqualTo(9);
 		assertThat(secondConvo.getParticipantAvatarUrl()).isEqualTo("http://participant2/avatar");
+		
+		Conversation thirdConvo = restController.getConversationByParticipant("participant3");
+		assertThat(thirdConvo).isNotNull();
+		assertThat(thirdConvo.getNumMessages()).isEqualTo(1);
+		
+		Conversation fourthConvo = restController.getConversationByParticipant("participant4");
+		assertThat(fourthConvo).isNotNull();
+		assertThat(fourthConvo.getNumMessages()).isEqualTo(1);
 	}
 	
 	@Test

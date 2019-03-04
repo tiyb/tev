@@ -276,14 +276,15 @@ public class ConversationXmlReader {
 	/**
 	 * Helper function used to "fix" names for deactivated users. When a user has
 	 * been deactivated, Tumblr returns the name as "username-deactivated" or
-	 * "username-deactivatedyyyymmdd". This function just keeps the username,
-	 * without the "-deactivated" or "-deactivatedyyyymmdd" part.
+	 * "username-deactivatedyyyymmdd" or even "username-deact". This function just
+	 * keeps the username, without the "-deactivated" or "-deactivatedyyyymmdd"
+	 * part.
 	 * 
 	 * @param participantName "raw" username
 	 * @return Username without the postfix (if any)
 	 */
 	private static String fixName(String participantName) {
-		int postfix = participantName.indexOf("-deactivated");
+		int postfix = participantName.indexOf("-deact");
 		if (postfix == -1) {
 			return participantName;
 		}
