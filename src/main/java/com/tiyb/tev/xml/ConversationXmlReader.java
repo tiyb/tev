@@ -1,9 +1,12 @@
 package com.tiyb.tev.xml;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -13,6 +16,8 @@ import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tiyb.tev.controller.TEVRestController;
 import com.tiyb.tev.datamodel.Conversation;
@@ -43,16 +48,99 @@ public class ConversationXmlReader {
 	private static final String END_OF_FILE_MESSAGE = "Premature end of file";
 
 	/**
-	 * Main method; simply gets the metadata (for the name of the Tumblr user), and
-	 * then calls <code>readConversations()</code> to do the work.
+	 * Main method. There are multiple steps to parsing the XML file:
 	 * 
-	 * @param xmlFile        Stream containing file to be parsed
+	 * <ol>
+	 * <li>Get a stream for the file</li>
+	 * <li>Use that stream to call the <code>getMainParticipant()</code> method to
+	 * parse the XML document, to determine the main Tumblr user's name (and avatar
+	 * URL)</li>
+	 * <li>Update the application's metadata with that information</li>
+	 * <li>Get a <i>new</i> stream (to start over at the beginning of the file)</li>
+	 * <li>Use that stream to call the <code>readConversations()</code> method to
+	 * parse the document again, this time reading in all of the data (making use of
+	 * the main Tumblr user information captured earlier)</li>
+	 * </ol>
+	 * 
+	 * @param xmlFile        File containing XML to be parsed
 	 * @param restController Used for updating the database as each
 	 *                       conversation/message is parsed
 	 */
-	public static void parseDocument(InputStream xmlFile, TEVRestController restController) {
+	public static void parseDocument(MultipartFile xmlFile, TEVRestController restController) {
 		Metadata md = restController.getMetadata();
-		readConversations(xmlFile, md.getMainTumblrUser(), restController);
+		InputStream xmlStream;
+		
+		try {
+			InputStream participantXmlStream = xmlFile.getInputStream();
+			List<String> mainParticipant = getMainParticipant(participantXmlStream);
+			md.setMainTumblrUser(mainParticipant.get(0));
+			md.setMainTumblrUserAvatarUrl(mainParticipant.get(1));
+			md = restController.updateMetadata(md);
+			
+			xmlStream = xmlFile.getInputStream();
+			readConversations(xmlStream, md.getMainTumblrUser(), restController);
+		} catch (IOException e) {
+			throw new XMLParsingException();
+		}
+	}
+
+	/**
+	 * The XML is set up such that each conversation is between two participants:
+	 * the main Tumblr user, and another user. Therefore, this helper function
+	 * parses through the XML document looking for participants; as soon as it finds
+	 * a participant that's been listed <i>more than once,</i> it makes that
+	 * participant the main Tumblr user, so it returns that user (and the URL for
+	 * the user's avatar).
+	 * 
+	 * @param participantXmlStream The XML file to be parsed
+	 * @return An array of two strings: the main Tumblr user's name, and the main
+	 *         Tumblr user's avatar URL.
+	 */
+	private static List<String> getMainParticipant(InputStream participantXmlStream) {
+		List<String> results = new ArrayList<String>();
+		Map<String, String> participants = new HashMap<String, String>();
+		
+		try {
+			XMLInputFactory factory = XMLInputFactory.newInstance();
+			XMLEventReader reader = factory.createXMLEventReader(participantXmlStream);
+			
+			while(reader.hasNext()) {
+				XMLEvent event = reader.nextEvent();
+				
+				if(event.isStartElement()) {
+					StartElement se = event.asStartElement();
+					
+					if(se.getName().getLocalPart().equals("participant")) {
+						@SuppressWarnings("unchecked")
+						Iterator<Attribute> atts = se.getAttributes();
+						String participantName = "";
+						String participantURL = "";
+						
+						while(atts.hasNext()) {
+							Attribute att = atts.next();
+							if(att.getName().getLocalPart().equals("avatar_url")) {
+								participantURL = att.getValue();
+							}
+						}
+						
+						participantName = readCharacters(reader);
+						
+						String participantInList = participants.get(participantName);
+						if(participantInList == null) {
+							participants.put(participantName, participantURL);
+						} else {
+							results.add(participantName);
+							results.add(participantURL);
+							return results;
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			throw new XMLParsingException();
+		}
+		
+		throw new XMLParsingException();
 	}
 
 	/**

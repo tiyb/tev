@@ -159,8 +159,8 @@ public class TEVUIController {
 		restController.deleteAllConversations();
 
 		try {
-			ConversationXmlReader.parseDocument(file.getInputStream(), restController);
-		} catch (XMLParsingException | IOException e) {
+			ConversationXmlReader.parseDocument(file, restController);
+		} catch (XMLParsingException e) {
 			throw new XMLParsingException();
 		}
 

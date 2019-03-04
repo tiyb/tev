@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 
@@ -31,17 +32,18 @@ public class ConversationXmlParsingUnitTests {
 	private TEVRestController restController;
 	
 	@Before
-	public void Setup() throws FileNotFoundException {
+	public void Setup() throws IOException {
 		Metadata md = restController.getMetadata();
 		md.setMainTumblrUser("blogname");
 		restController.updateMetadata(md);
 		
 		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-messages-xml.xml");
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
+		MockMultipartFile mockFile = new MockMultipartFile("testmessages", xmlFile);
 		
 		restController.deleteAllConversations();
 		restController.deleteAllConvoMsgs();
-		ConversationXmlReader.parseDocument(xmlFile, restController);
+		ConversationXmlReader.parseDocument(mockFile, restController);
 	}
 	
 	@Test
