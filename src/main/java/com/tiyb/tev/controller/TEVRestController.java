@@ -796,6 +796,7 @@ public class TEVRestController {
 		md.setMainTumblrUserAvatarUrl(metadataDetails.getMainTumblrUserAvatarUrl());
 		md.setFavFilter(metadataDetails.getFavFilter());
 		md.setPageLength(metadataDetails.getPageLength());
+		md.setShowReadingPane(metadataDetails.getShowReadingPane());
 		Metadata returnValue = metadataRepo.save(md);
 
 		return returnValue;

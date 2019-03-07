@@ -8,50 +8,6 @@ $.i18n.properties({
 	mode: 'both'
 });
 
-$.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
-	var filterVal = metadata.filter;
-	var favFilterVal = metadata.favFilter;
-	
-	if(filterVal == null || filterVal == "") {
-		filterVal = "Do not Filter";
-	}
-	if(favFilterVal == null || favFilterVal == "") {
-		favFilterVal = "Show Everything";
-	}
-	
-	if(filterVal == "Do not Filter") {
-		if(favFilterVal == "Show Everything") {
-			return true;
-		} else if (favFilterVal == "Show Favourites" && data[5] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
-			return true
-		} else if(favFilterVal == "Show Non Favourites" && data[5] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
-			return true;
-		}
-	}
-	
-	if(filterVal == "Filter Read Posts" && data[6] == $.i18n.prop('index_posttable_isNotreadIndicatorCLEAN')) {
-		if(favFilterVal == "Show Everything") {
-			return true;
-		} else if (favFilterVal == "Show Favourites" && data[5] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
-			return true
-		} else if(favFilterVal == "Show Non Favourites" && data[5] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
-			return true;
-		}
-	}
-	
-	if(filterVal == "Filter Unread Posts" && data[6] == $.i18n.prop('index_posttable_isReadIndicatorCLEAN')) {
-		if(favFilterVal == "Show Everything") {
-			return true;
-		} else if (favFilterVal == "Show Favourites" && data[5] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
-			return true
-		} else if(favFilterVal == "Show Non Favourites" && data[5] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
-			return true;
-		}
-	}
-	
-	return false;
-});
-
 $(document).ready(function() {
 	$('#header').load("/header");
 	$('#footer').load("/footer");
@@ -86,7 +42,13 @@ $(document).ready(function() {
 			$('#showNonFavourites').prop('checked', true);
 		} else {
 			$('#showAll').prop('checked', true);
-		}		
+		}
+		
+		if(metadata.showReadingPane) {
+			$('#showReadingPaneSelected').prop('checked', true);
+		} else {
+			$('#showPopupsSelected').prop('checked', true);
+		}
 		
 		var postTable = $('#postTable').DataTable( {
 			"language": {
@@ -178,7 +140,12 @@ $(document).ready(function() {
 						url: "/api/posts/" + postID + "/markRead",
 						type: "PUT"
 					});
-					window.open("/postViewer?id=" + postID, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
+					if(metadata.showReadingPane) {
+						$('#contentDisplayReadingPane').show();
+						$('#displayPaneIFrame').prop('src', "/postViewer?id=" + postID, "viewer")
+					} else {
+						window.open("/postViewer?id=" + postID, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
+					}
 				});
 				$('#postTable').on('order.dt', function() {
 					var dataTable = $('#postTable').DataTable();
@@ -278,12 +245,67 @@ $(document).ready(function() {
 		updateMDAPI();
 	});
 	
+	$('input[type=radio][name=showReadingPaneRadio]').change(function() {
+		if(this.id == "showReadingPaneSelected") {
+			metadata.showReadingPane = true;
+		} else {
+			$('#contentDisplayReadingPane').hide();
+			metadata.showReadingPane = false;
+		}
+		
+		updateMDAPI();
+	});
+	
 	var urlParams = new URLSearchParams(window.location.search);
 	if(urlParams.has("hashsearch")) {
 		//$('#postTable thead tr:eq(1) th').children('input[type=text][nth-child(3)').val(urlParams("hashsearch"));
 		$('#postTable thead tr:eq(1) th:eq(3) input').val(urlParams.get("hashsearch"));
 		$('#postTable thead tr:eq(1) th:eq(3) input').change();
 	}
+});
+
+$.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+	var filterVal = metadata.filter;
+	var favFilterVal = metadata.favFilter;
+	
+	if(filterVal == null || filterVal == "") {
+		filterVal = "Do not Filter";
+	}
+	if(favFilterVal == null || favFilterVal == "") {
+		favFilterVal = "Show Everything";
+	}
+	
+	if(filterVal == "Do not Filter") {
+		if(favFilterVal == "Show Everything") {
+			return true;
+		} else if (favFilterVal == "Show Favourites" && data[5] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+			return true
+		} else if(favFilterVal == "Show Non Favourites" && data[5] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+			return true;
+		}
+	}
+	
+	if(filterVal == "Filter Read Posts" && data[6] == $.i18n.prop('index_posttable_isNotreadIndicatorCLEAN')) {
+		if(favFilterVal == "Show Everything") {
+			return true;
+		} else if (favFilterVal == "Show Favourites" && data[5] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+			return true
+		} else if(favFilterVal == "Show Non Favourites" && data[5] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+			return true;
+		}
+	}
+	
+	if(filterVal == "Filter Unread Posts" && data[6] == $.i18n.prop('index_posttable_isReadIndicatorCLEAN')) {
+		if(favFilterVal == "Show Everything") {
+			return true;
+		} else if (favFilterVal == "Show Favourites" && data[5] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+			return true
+		} else if(favFilterVal == "Show Non Favourites" && data[5] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+			return true;
+		}
+	}
+	
+	return false;
 });
 
 function sortTable() {

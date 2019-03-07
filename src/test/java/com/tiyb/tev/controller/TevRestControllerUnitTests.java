@@ -268,6 +268,7 @@ public class TevRestControllerUnitTests {
 		md.setPageLength(25);
 		md.setSortColumn("sort column");
 		md.setSortOrder("sort order");
+		md.setShowReadingPane(true);
 		
 		restController.updateMetadata(md);
 		

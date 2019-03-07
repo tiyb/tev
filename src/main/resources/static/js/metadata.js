@@ -35,6 +35,10 @@ $(document).ready(function () {
 			var divData = "<option value='" + obj + "'>" + getTranslatedPageLength(obj) + "</option>";
 			$(divData).appendTo('#pageLengthDropdown');
 		});
+		var divData = "<option value='true'>" + $.i18n.prop('md_showReadingPaneYes') + "</option>";
+		$(divData).appendTo('#showReadingPaneDropdown');
+		divData = "<option value='false'>" + $.i18n.prop('md_showReadingPaneNo') + "</option>";
+		$(divData).appendTo('#showReadingPaneDropdown');
 		
 		$.ajax({
 			url: "/api/metadata",
@@ -49,6 +53,12 @@ $(document).ready(function () {
 			$('#pageLengthDropdown').val(metadataObject.pageLength);
 			$('#mainUser').val(metadataObject.mainTumblrUser);
 			$('#mainUserAvatarUrl').val(metadataObject.mainTumblrUserAvatarUrl);
+			if(metadataObject.showReadingPane) {
+				$('#showReadingPaneDropdown').val('true');
+			} else {
+				$('#showReadingPaneDropdown').val('false');
+			}
+			
 		});
 				
 	});
@@ -63,6 +73,7 @@ $(document).ready(function () {
 		metadataObject.filter = $('#filterDropdown').val();
 		metadataObject.favFilter = $('#favsDropdown').val();
 		metadataObject.pageLength = $('#pageLengthDropdown').val();
+		metadataObject.showReadingPane = $('#showReadingPaneDropdown').val();
 		
 		$.ajax({
 			url: '/api/metadata',

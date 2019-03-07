@@ -75,6 +75,7 @@ public class Metadata implements Serializable {
 	private String mainTumblrUserAvatarUrl;
 	private String favFilter;
 	private Integer pageLength;
+	private Boolean showReadingPane;
 
 	/**
 	 * Helper function to generate a new Metadata object, with some defaults filled
@@ -142,6 +143,11 @@ public class Metadata implements Serializable {
 		if (pageLength != null) {
 			builder.append("pageLength=");
 			builder.append(pageLength);
+			builder.append(", ");
+		}
+		if (showReadingPane != null) {
+			builder.append("showReadingPane=");
+			builder.append(showReadingPane);
 		}
 		builder.append("]");
 		return builder.toString();
@@ -217,6 +223,14 @@ public class Metadata implements Serializable {
 
 	public void setPageLength(Integer pageLength) {
 		this.pageLength = pageLength;
+	}
+
+	public Boolean getShowReadingPane() {
+		return showReadingPane;
+	}
+
+	public void setShowReadingPane(Boolean showReadingPane) {
+		this.showReadingPane = showReadingPane;
 	}
 
 }
