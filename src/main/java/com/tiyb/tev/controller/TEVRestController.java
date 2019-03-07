@@ -1,5 +1,8 @@
 package com.tiyb.tev.controller;
 
+import java.io.BufferedInputStream;
+import java.io.FileOutputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
@@ -249,6 +252,53 @@ public class TEVRestController {
 		postRepo.deleteAll();
 
 		return ResponseEntity.ok().build();
+	}
+	
+	/**
+	 * The Tumblr export doesn't always include every image, for some reason.
+	 * However, in many cases the images referred to in the image URLs from Tumblr's
+	 * export XML still exist on Tumblr's servers. So, in cases where a post is
+	 * missing its images, this API can be used to fetch the images from Tumblr's
+	 * servers (according to their URLs in the XML), download them, and save them to
+	 * the media directory being used by TEV, using the naming convention Tumblr
+	 * would have used, if the images had been included in the export.
+	 * 
+	 * @param postId The ID of the post to be "fixed"
+	 * @return bool indicating whether the action completed successfully or not.
+	 */
+	@GetMapping("/posts/{id}/fixPhotos")
+	public Boolean fixPhotosForPost(@PathVariable(value = "id") Long postId) {
+		String imageDirectory = getMetadata().getBaseMediaPath();
+		if(imageDirectory == null || imageDirectory.equals("")) {
+			return false;
+		}
+		
+		if(imageDirectory.charAt(imageDirectory.length()-1) != '/') {
+			imageDirectory = imageDirectory + "/";
+		}
+		
+		List<Photo> photos = photoRepo.findByPostIdOrderByOffset(postId);
+		boolean response = true;
+		
+		for(int i = 0; i < photos.size(); i++) {
+			Photo photo = photos.get(i);
+			String url = photo.getUrl1280();
+			String ext = url.substring(url.lastIndexOf('.'));
+			try {
+				BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
+				FileOutputStream out = new FileOutputStream(imageDirectory + photo.getPostId() + "_" + i + ext);
+				byte dataBuffer[] = new byte[1024];
+				int bytesRead;
+				while((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+					out.write(dataBuffer, 0, bytesRead);
+				}
+				out.close();
+			}
+			catch(Exception e) {
+				response = false;
+			} 
+		}
+		return response;
 	}
 
 	/**

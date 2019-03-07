@@ -220,6 +220,7 @@ public class TEVUIController {
 			}
 			model.addAttribute("photos", images);
 			model.addAttribute("caption", photos.get(0).getCaption());
+			model.addAttribute("post", post);
 			return "viewers/photo";
 		case "video":
 			Video vid = restController.getVideoById(postID);
