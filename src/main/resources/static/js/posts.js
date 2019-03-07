@@ -169,7 +169,7 @@ $(document).ready(function() {
 				url: "/api/posts/" + postID + "/markUnread",
 				type: "PUT"
 			});
-			$(this).parents('tr').children('td:last-child').html($.i18n.prop('index_posttable_isNotreadIndicator'));
+			$(this).parent().parent('tr').children('td:last-child').html($.i18n.prop('index_posttable_isNotreadIndicator'));
 			postTable.draw();
 			return false;
 		});
