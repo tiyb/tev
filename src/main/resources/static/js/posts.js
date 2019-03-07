@@ -110,6 +110,7 @@ $(document).ready(function() {
 			        "sortDescending": $.i18n.prop('index_posttable_aria_sortdesc')
 			    }		
 		    },
+		    "autoWidth": false,
 		    "lengthMenu": [[10, 25, 50, 100, -1], [$.i18n.prop('md_pagelengths_10'), $.i18n.prop('md_pagelengths_25'), $.i18n.prop('md_pagelengths_50'), $.i18n.prop('md_pagelengths_100'), $.i18n.prop('md_pagelengths_all')]],
 			"orderCellsTop": true,
 			"ajax": {
@@ -118,22 +119,34 @@ $(document).ready(function() {
 			},
 			"columns": [
 				{
-					"data": "id"
+					"data": "id",
+					"render": function(data,type,row,meta) {
+						return "<div class='clickableTableValue'>" + data + "</div>";
+					}
 				},
 				{
 					"data": "type",
 					"render": function(data, type, row, meta) {
-						return getTypeFromID(data);
+						return "<div class='clickableTableValue'>" + getTypeFromID(data) + "</div>";
 					}
 				},
 				{
-					"data": "slug"
+					"data": "slug",
+					"render": function(data,type,row,meta) {
+						return "<div class='clickableTableValue'>" + data.replace(/\-/g, ' ') + "</div>";
+						}
 				},
 				{
-					"data": "tags"
+					"data": "tags",
+					"render": function(data,type,row,meta) {
+						return "<div class='clickableTableValue'>" + data + "</div>";
+						}
 				},
 				{
-					"data": "date"
+					"data": "date",
+					"render": function(data,type,row,meta) {
+						return "<div class='clickableTableValue'>" + data + "</div>";
+					}
 				},
 				{
 					"data": "isFavourite",
@@ -157,9 +170,9 @@ $(document).ready(function() {
 				}
 			],
 			"initComplete": function() {
-				$('#postTable tbody').on('click', 'tr', function () {
-					var postID = $(this).children('td:first-child').text();
-					$(this).children('td:last-child').html($.i18n.prop('index_posttable_isReadIndicator'));
+				$('#postTable tbody').on('click', 'div[class=clickableTableValue]', function () {
+					var postID = $(this).parent().parent().children('td:first-child').text();
+					$(this).parent().parent().children('td:last-child').html($.i18n.prop('index_posttable_isReadIndicator'));
 					postTable.draw();
 					$.ajax({
 						url: "/api/posts/" + postID + "/markRead",

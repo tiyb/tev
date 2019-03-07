@@ -6,6 +6,11 @@
 	vertical-align: top;
 }
 
+.clickableTableValue {
+	cursor: pointer;
+	overflow-wrap: break-word;
+}
+
 #submitButtonTD {
 	text-align: center;
 }
