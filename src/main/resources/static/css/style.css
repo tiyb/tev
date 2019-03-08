@@ -10,17 +10,24 @@
 
 #contentDisplayTable {
 	display: table-cell;
-	width: 60%;
+	width: 50%;
 }
 
 #contentDisplayReadingPane {
 	display: none;
-	width: 40%;
+	width: 50%;
+	vertical-align: top;
 }
 
 #displayPaneIFrame {
 	width: 100%;
-	height: 100vh;
+	height: 700px;
+	float: right;
+}
+
+.fixed {
+	position: fixed;
+	top: 20px;
 }
 
 .clickableTableValue {
