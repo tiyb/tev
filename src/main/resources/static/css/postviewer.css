@@ -73,7 +73,7 @@ h2 {
 	padding-bottom: 15px;
 }
 
-.photoLinks a, a:active, a:hover, a:link, a:visited {
+.photoLinks a, .photoLinks a:active, .photoLinks a:hover, .photoLinks a:link, .photoLinks a:visited {
 	color: rgba(255, 255, 255, 0.46);
 	font-family: ""Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
 	font-size: 12px;
