@@ -3,6 +3,7 @@ package com.tiyb.tev.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,16 +28,20 @@ import com.tiyb.tev.exception.XMLParsingException;
 
 /**
  * This class is responsible for reading in an XML export from Tumblr containing
- * conversations. The XML generated from Tumblr for conversations is better
- * structured than that for posts, so less strange logic is required here than
- * is required in {@link com.tiyb.tev.xml.BlogXmlReader}.} The only interesting
- * caveat is that message[@type=IMAGE] has a child element, for the photo's URL,
- * whereas other messages just have the text of the message in the "message"
- * element itself.
+ * conversations. A couple of interesting caveats:
+ * 
+ * <ul>
+ * <li>message[@type=IMAGE] has a child element, for the photo's URL, whereas
+ * other messages just have the text of the message in the "message" element
+ * itself.</li>
+ * <li>For some reason two different formats are used for identifying users; the
+ * "participants" element has their name, but actual messages have their
+ * internal ID. These two don't relate to each other in any way. So the internal
+ * ID for the TEV user has to be inferred.</li>
+ * </ul>
  * 
  * @author tiyb
  * @apiviz.landmark
- * @apiviz.uses com.tiyb.tev.datamodel.helpers.TEVConversationSuperClass
  * @apiviz.uses javax.xml.stream.XMLEventReader
  *
  */
@@ -53,8 +58,8 @@ public class ConversationXmlReader {
 	 * <ol>
 	 * <li>Get a stream for the file</li>
 	 * <li>Use that stream to call the <code>getMainParticipant()</code> method to
-	 * parse the XML document, to determine the main Tumblr user's name (and avatar
-	 * URL)</li>
+	 * parse the XML document, to determine the main Tumblr user's name, avatar URL,
+	 * and internal ID</li>
 	 * <li>Update the application's metadata with that information</li>
 	 * <li>Get a <i>new</i> stream (to start over at the beginning of the file)</li>
 	 * <li>Use that stream to call the <code>readConversations()</code> method to
@@ -69,77 +74,115 @@ public class ConversationXmlReader {
 	public static void parseDocument(MultipartFile xmlFile, TEVRestController restController) {
 		Metadata md = restController.getMetadata();
 		InputStream xmlStream;
-		
+
 		try {
 			InputStream participantXmlStream = xmlFile.getInputStream();
 			List<String> mainParticipant = getMainParticipant(participantXmlStream);
 			md.setMainTumblrUser(mainParticipant.get(0));
 			md.setMainTumblrUserAvatarUrl(mainParticipant.get(1));
+			String mainParticipantID = mainParticipant.get(2);
 			md = restController.updateMetadata(md);
-			
+
 			xmlStream = xmlFile.getInputStream();
-			readConversations(xmlStream, md.getMainTumblrUser(), restController);
+			readConversations(xmlStream, md.getMainTumblrUser(), mainParticipantID, restController);
 		} catch (IOException e) {
 			throw new XMLParsingException();
 		}
 	}
 
 	/**
+	 * <p>
 	 * The XML is set up such that each conversation is between two participants:
 	 * the main Tumblr user, and another user. Therefore, this helper function
 	 * parses through the XML document looking for participants; as soon as it finds
 	 * a participant that's been listed <i>more than once,</i> it makes that
 	 * participant the main Tumblr user, so it returns that user (and the URL for
 	 * the user's avatar).
+	 * </p>
+	 * 
+	 * <p>
+	 * And, because the Tumblr engineers are incompetent at <i>everything</i>,
+	 * they've included two versions of the user: the name, and an opaque ID, but
+	 * they don't map to each other in the XML document, so there's no way to tell
+	 * which ID belongs to which user. So, the code also looks for duplicate
+	 * versions of IDs; when an ID is found in multiple conversations, it's assumed
+	 * to be the ID of the TEV user.
+	 * </p>
 	 * 
 	 * @param participantXmlStream The XML file to be parsed
-	 * @return An array of two strings: the main Tumblr user's name, and the main
-	 *         Tumblr user's avatar URL.
+	 * @return An array of three strings: the main Tumblr user's name, the main
+	 *         Tumblr user's avatar URL, and the main user's ID.
 	 */
 	private static List<String> getMainParticipant(InputStream participantXmlStream) {
-		List<String> results = new ArrayList<String>();
+		String[] results = new String[3];
 		Map<String, String> participants = new HashMap<String, String>();
-		
+		List<String> nameIds = new ArrayList<String>();
+		boolean newConversation = false;
+
 		try {
 			XMLInputFactory factory = XMLInputFactory.newInstance();
 			XMLEventReader reader = factory.createXMLEventReader(participantXmlStream);
-			
-			while(reader.hasNext()) {
+
+			while (reader.hasNext()) {
 				XMLEvent event = reader.nextEvent();
-				
-				if(event.isStartElement()) {
+
+				if (event.isStartElement()) {
 					StartElement se = event.asStartElement();
-					
-					if(se.getName().getLocalPart().equals("participant")) {
+
+					if (se.getName().getLocalPart().equals("participant")) {
 						@SuppressWarnings("unchecked")
 						Iterator<Attribute> atts = se.getAttributes();
 						String participantName = "";
 						String participantURL = "";
-						
-						while(atts.hasNext()) {
+
+						while (atts.hasNext()) {
 							Attribute att = atts.next();
-							if(att.getName().getLocalPart().equals("avatar_url")) {
+							if (att.getName().getLocalPart().equals("avatar_url")) {
 								participantURL = att.getValue();
 							}
 						}
-						
+
 						participantName = readCharacters(reader);
-						
+
 						String participantInList = participants.get(participantName);
-						if(participantInList == null) {
+						if (participantInList == null) {
 							participants.put(participantName, participantURL);
 						} else {
-							results.add(participantName);
-							results.add(participantURL);
-							return results;
+							results[0] = participantName;
+							results[1] = participantURL;
 						}
+					} else if (se.getName().getLocalPart().equals("message")) {
+						@SuppressWarnings("unchecked")
+						Iterator<Attribute> atts = se.getAttributes();
+
+						while (atts.hasNext()) {
+							Attribute att = atts.next();
+							if (att.getName().getLocalPart().equals("participant")) {
+								if (newConversation) {
+									if (nameIds.contains(att.getValue())) {
+										results[2] = att.getValue();
+										return Arrays.asList(results);
+									}
+								} else {
+									if (!nameIds.contains(att.getValue())) {
+										nameIds.add(att.getValue());
+									}
+								}
+							}
+						}
+					}
+				} else if (event.isEndElement()) {
+					EndElement ee = event.asEndElement();
+
+					if (ee.getName().getLocalPart().equals("messages")) {
+						newConversation = true;
 					}
 				}
 			}
 		} catch (Exception e) {
 			throw new XMLParsingException();
 		}
-		
+
 		throw new XMLParsingException();
 	}
 
@@ -152,12 +195,14 @@ public class ConversationXmlReader {
 	 * 
 	 * @param xmlFile        Stream containing the XML file to be parsed
 	 * @param tumblrUser     The Tumblr name of the user of the application
+	 * @param tumblrId       The ID assigned to the user of the application by
+	 *                       Tumblr
 	 * @param restController Controller used to update the database with
 	 *                       conversations/messages
 	 * @throws XMLParsingException
 	 */
-	private static void readConversations(InputStream xmlFile, String tumblrUser, TEVRestController restController)
-			throws XMLParsingException {
+	private static void readConversations(InputStream xmlFile, String tumblrUser, String tumblrId,
+			TEVRestController restController) throws XMLParsingException {
 		try {
 			XMLInputFactory factory = XMLInputFactory.newInstance();
 			XMLEventReader reader = factory.createXMLEventReader(xmlFile);
@@ -174,7 +219,7 @@ public class ConversationXmlReader {
 
 					if (se.getName().getLocalPart().equals("conversation")) {
 						participant = getParticipantName(reader, tumblrUser);
-						messages = getMessages(reader, tumblrUser);
+						messages = getMessages(reader, tumblrId);
 
 						conversation = new Conversation();
 						conversation.setParticipant(participant.getName());
@@ -201,12 +246,12 @@ public class ConversationXmlReader {
 	 * The two attributes are read (via <code>readMessageAttributes()</code>,
 	 * followed by the text of the element.
 	 * 
-	 * @param reader     Stream containing the XML document being read
-	 * @param tumblrUser Tumblr name of the TEV user
+	 * @param reader       Stream containing the XML document being read
+	 * @param tumblrUserID Tumblr ID of the TEV user
 	 * @return list of messages
 	 * @throws XMLStreamException
 	 */
-	private static List<ConversationMessage> getMessages(XMLEventReader reader, String tumblrUser)
+	private static List<ConversationMessage> getMessages(XMLEventReader reader, String tumblrUserID)
 			throws XMLStreamException {
 		List<ConversationMessage> messages = new ArrayList<ConversationMessage>();
 
@@ -218,7 +263,7 @@ public class ConversationXmlReader {
 
 				if (se.getName().getLocalPart().equals("message")) {
 					ConversationMessage currentMessage = new ConversationMessage();
-					readMessageAttributes(se, currentMessage, tumblrUser);
+					readMessageAttributes(se, currentMessage, tumblrUserID);
 					if (currentMessage.getType().equals("IMAGE")) {
 						currentMessage.setMessage(readImageMessage(reader));
 					} else {
@@ -279,9 +324,10 @@ public class ConversationXmlReader {
 	 * @param se             The <code>StartElement</code> object currently being
 	 *                       processed
 	 * @param currentMessage The message to add the data to
-	 * @param tumblrUser
+	 * @param tumblrUserID   The ID of the main user
 	 */
-	private static void readMessageAttributes(StartElement se, ConversationMessage currentMessage, String tumblrUser) {
+	private static void readMessageAttributes(StartElement se, ConversationMessage currentMessage,
+			String tumblrUserID) {
 		@SuppressWarnings("unchecked")
 		Iterator<Attribute> atts = se.getAttributes();
 
@@ -295,7 +341,7 @@ public class ConversationXmlReader {
 				break;
 			case "participant":
 				String participant = att.getValue();
-				if (participant.equals(tumblrUser)) {
+				if (participant.equals(tumblrUserID)) {
 					currentMessage.setReceived(false);
 				} else {
 					currentMessage.setReceived(true);

@@ -7,17 +7,17 @@
 				<participant avatar_url="http://participant1/avatar">participant1</participant>
 			</participants>
 			<messages>
-				<message ts="1544197586" participant="blogname" type="TEXT">Message 1</message>
-				<message ts="1544197605" participant="blogname" type="TEXT">Message 2</message>
-				<message ts="1544197624" participant="blogname" type="TEXT">Message 3</message>
-				<message ts="1544197647" participant="blogname" type="IMAGE">
+				<message ts="1544197586" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 1</message>
+				<message ts="1544197605" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 2</message>
+				<message ts="1544197624" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 3</message>
+				<message ts="1544197647" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="IMAGE">
 					<photo-url max-width="0">http://www.photourl.com/photo.png</photo-url>
 				</message>
-				<message ts="1544198315" participant="blogname" type="TEXT">Message 5</message>
-				<message ts="1544221130" participant="participant1" type="TEXT">Message 6</message>
-				<message ts="1544221197" participant="blogname" type="TEXT">Message 7</message>
-				<message ts="1544221203" participant="participant1" type="TEXT">Message 8</message>
-				<message ts="1544221221" participant="blogname" type="POSTREF">http://www.tumblr.com/somepost</message>
+				<message ts="1544198315" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 5</message>
+				<message ts="1544221130" participant="t:eMUq2ec6xRwaki33S-DLig" type="TEXT">Message 6</message>
+				<message ts="1544221197" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 7</message>
+				<message ts="1544221203" participant="t:eMUq2ec6xRwaki33S-DLig" type="TEXT">Message 8</message>
+				<message ts="1544221221" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="POSTREF">http://www.tumblr.com/somepost</message>
 			</messages>
 		</conversation>
 		<conversation status="ACTIVE">
@@ -26,15 +26,15 @@
 				<participant avatar_url="http://mainblog/avatar">blogname</participant>
 			</participants>
 			<messages>
-				<message ts="1544012468" participant="participant2" type="TEXT">Message 1</message>
-				<message ts="1544016206" participant="blogname" type="TEXT">Message 2</message>
-				<message ts="1544016402" participant="participant2" type="TEXT">Message 3</message>
-				<message ts="1544016410" participant="participant2" type="TEXT">Message 4</message>
-				<message ts="1544016579" participant="participant2" type="TEXT">Message 5</message>
-				<message ts="1544016582" participant="participant2" type="TEXT">Message 6</message>
-				<message ts="1544022051" participant="blogname" type="TEXT">Message 7</message>
-				<message ts="1544115936" participant="participant2" type="TEXT">Message 8</message>
-				<message ts="1544126671" participant="blogname" type="TEXT">Message 9</message>
+				<message ts="1544012468" participant="t:daPIjnWif90ATTPO_iqMVA" type="TEXT">Message 1</message>
+				<message ts="1544016206" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 2</message>
+				<message ts="1544016402" participant="t:daPIjnWif90ATTPO_iqMVA" type="TEXT">Message 3</message>
+				<message ts="1544016410" participant="t:daPIjnWif90ATTPO_iqMVA" type="TEXT">Message 4</message>
+				<message ts="1544016579" participant="t:daPIjnWif90ATTPO_iqMVA" type="TEXT">Message 5</message>
+				<message ts="1544016582" participant="t:daPIjnWif90ATTPO_iqMVA" type="TEXT">Message 6</message>
+				<message ts="1544022051" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 7</message>
+				<message ts="1544115936" participant="t:daPIjnWif90ATTPO_iqMVA" type="TEXT">Message 8</message>
+				<message ts="1544126671" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 9</message>
 			</messages>
 		</conversation>
 		<conversation status="ACTIVE">
