@@ -14,11 +14,22 @@
 
 <div id="header"></div>
 
-<div class="container">
+<div class="container-fluid">
 <h1 th:text="#{conversations.title}"></h1>
 <p th:text="#{conversations.explanatoryText(${metadata.mainTumblrUser})}"></p>
+<div id="radioContainer">
+	<input type="radio" name="showReadingPaneRadio" id="showReadingPaneSelected" th:text="#{main.radios.showReadingPane}"></input>
+	<input type="radio" name="showReadingPaneRadio" id="showPopupsSelected" th:text="#{main.radios.showPopUps}"></input>
+</div>
+<table id="contentDisplayContainer"><tr>
+	<td id="contentDisplayTable">
+		<div id="conversationWordCloudContainer"></div>
+	</td>
+	<td id="contentDisplayReadingPane">
+		<iframe id="displayPaneIFrame"></iframe>
+	</td>
+</tr></table>
 
-<div id="conversationWordCloudContainer"></div>
 </div>
 
 <p><button id="unhideAllConversationsBtn" th:text="#{conversations.unhideAllBtn}"></button></p>

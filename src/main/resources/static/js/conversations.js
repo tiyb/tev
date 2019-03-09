@@ -1,3 +1,5 @@
+var metadata;
+
 $.i18n.properties({
 	name: 'messages',
 	path: 'js/i18n/',
@@ -17,6 +19,31 @@ $(document).ready(function() {
 			location.reload();
 		});
 	});
+
+	$.ajax({
+		url: "/api/metadata",
+		dataSrc: ""
+	}).then(function(data) {
+		metadata = data;
+		
+		if(metadata.showReadingPane) {
+			$('#showReadingPaneSelected').prop('checked', true);
+		} else {
+			$('#showPopupsSelected').prop('checked', true);
+		}
+		
+	});
+		
+	$('input[type=radio][name=showReadingPaneRadio]').change(function() {
+		if(this.id == "showReadingPaneSelected") {
+			metadata.showReadingPane = true;
+		} else {
+			$('#contentDisplayReadingPane').hide();
+			metadata.showReadingPane = false;
+		}
+		
+		updateMDAPI();
+	});
 	
 	$.ajax({
 		url: "/api/conversations/unhidden",
@@ -29,7 +56,12 @@ $(document).ready(function() {
 			weight: element.numMessages, 
 			handlers: {
 				click: function(item) {
-					window.open("/conversationViewer?participant=" + item.target.textContent, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
+					if(metadata.showReadingPane) {
+						$('#contentDisplayReadingPane').show();
+						$('#displayPaneIFrame').prop('src', "/conversationViewer?participant=" + item.target.textContent, "viewer");
+					} else {
+						window.open("/conversationViewer?participant=" + item.target.textContent, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
+					}
 				}
 			}
 		}));
@@ -37,4 +69,27 @@ $(document).ready(function() {
 		$('#conversationWordCloudContainer').jQCloud(words, {width:900,height:500,fontSize:{from:0.1,to:0.02},autoResize:true});
 	});
 	
+	var iframeOffset = $('#displayPaneIFrame').offset();
+	$(window).scroll(function() {
+		var scrollTop = $(window).scrollTop();
+		
+		if(iframeOffset.top < scrollTop) {
+			$('#displayPaneIFrame').addClass('fixed');
+		} else {
+			$('#displayPaneIFrame').removeClass('fixed');
+		}
+	});
 });
+
+function updateMDAPI() {
+	$.ajax({
+		url: '/api/metadata',
+		type: 'PUT',
+		data: JSON.stringify(metadata),
+		contentType: 'application/json',
+		error: function(xhr, textStatus, errorThrown) {
+			alert($.i18n.prop('index_errorsubmittingdata'));
+		}
+	});	
+}
+

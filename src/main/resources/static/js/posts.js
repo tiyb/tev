@@ -142,7 +142,7 @@ $(document).ready(function() {
 					});
 					if(metadata.showReadingPane) {
 						$('#contentDisplayReadingPane').show();
-						$('#displayPaneIFrame').prop('src', "/postViewer?id=" + postID, "viewer")
+						$('#displayPaneIFrame').prop('src', "/postViewer?id=" + postID, "viewer");
 					} else {
 						window.open("/postViewer?id=" + postID, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
 					}
