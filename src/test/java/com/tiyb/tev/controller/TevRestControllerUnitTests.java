@@ -288,6 +288,7 @@ public class TevRestControllerUnitTests {
 		modified.setNumMessages(5);
 		modified.setParticipant("new participant");
 		modified.setParticipantAvatarUrl("avatar URL");
+		modified.setHideConversation(true);
 		
 		restController.updateConversation(modified.getId(), modified);
 		
@@ -295,6 +296,79 @@ public class TevRestControllerUnitTests {
 		
 		assertThat(finalFromServer).isNotNull();
 		assertThat(finalFromServer).isEqualToComparingFieldByField(modified);
+	}
+	
+	@Test
+	public void markConversationHidden() {
+		String participantName = "participant1";
+		
+		Conversation original = new Conversation();
+		original.setId(1L);
+		original.setHideConversation(false);
+		original.setParticipant(participantName);
+		
+		original = restController.createConversation(original);
+		assertThat(original).isNotNull();
+		
+		Conversation newConvo = restController.ignoreConversation(participantName);
+		assertThat(newConvo).isNotNull();
+		assertThat(newConvo.getHideConversation()).isEqualTo(true);
+		
+		Conversation finalConvo = restController.getConversationByParticipant(participantName);
+		assertThat(finalConvo).isNotNull();
+		assertThat(finalConvo.getHideConversation()).isEqualTo(true);
+	}
+	
+	@Test
+	public void markConversationUnhidden() {
+		String participantName = "participant1";
+		
+		Conversation original = new Conversation();
+		original.setId(1L);
+		original.setHideConversation(true);
+		original.setParticipant(participantName);
+		
+		original = restController.createConversation(original);
+		assertThat(original).isNotNull();
+		
+		Conversation newConvo = restController.unignoreConversation(participantName);
+		assertThat(newConvo).isNotNull();
+		assertThat(newConvo.getHideConversation()).isEqualTo(false);
+		
+		Conversation finalConvo = restController.getConversationByParticipant(participantName);
+		assertThat(finalConvo).isNotNull();
+		assertThat(finalConvo.getHideConversation()).isEqualTo(false);
+	}
+	
+	@Test
+	public void markAllConversationsUnhidden() {
+		String participant1 = "participant1";
+		String participant2 = "participant2";
+		
+		Conversation convo1 = new Conversation();
+		convo1.setId(1L);
+		convo1.setParticipant(participant1);
+		convo1.setHideConversation(true);
+		restController.createConversation(convo1);
+		Conversation convo2 = new Conversation();
+		convo2.setId(2L);
+		convo2.setParticipant(participant2);
+		convo2.setHideConversation(true);
+		restController.createConversation(convo2);
+		
+		List<Conversation> allConvos = restController.getAllConversations();
+		assertThat(allConvos).isNotNull();
+		assertThat(allConvos.size()).isEqualTo(2);
+		
+		List<Conversation> allUnHiddenConvos = restController.getUnhiddenConversations();
+		assertThat(allUnHiddenConvos).isNotNull();
+		assertThat(allUnHiddenConvos.size()).isEqualTo(0);
+		
+		restController.unignoreAllConversations();
+		
+		List<Conversation> finalList = restController.getUnhiddenConversations();
+		assertThat(finalList).isNotNull();
+		assertThat(finalList.size()).isEqualTo(2);
 	}
 	
 	@Test

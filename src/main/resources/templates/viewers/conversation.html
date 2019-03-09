@@ -11,6 +11,7 @@
 
 <div class="contentContainer">
 <h1 th:utext="'Conversation with ' + ${conversation.participant}"></h1>
+<p><button id="hideConvoBtn" th:text="#{conversation.hideConvoBtn}"></button></p>
 <table id="messagesTable">
 <tr th:each="message: ${messages}">
 	<td>
@@ -40,9 +41,12 @@
 </tr>
 </table>
 </div>
-
+<script type="text/javascript">var participant = '[[${conversation.participant}]]';</script>
 <script type="text/javascript"
         src="webjars/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" 
+        src="webjars/jquery-i18n-properties/1.10.2/jquery.i18n.properties.min.js"></script>
 <script type="text/javascript" th:src="@{/js/taghandler.js}"></script>
+<script type="text/javascript" th:src="@{/js/conversationviewer.js}"></script>
 </body>
 </html>

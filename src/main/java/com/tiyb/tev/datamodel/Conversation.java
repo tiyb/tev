@@ -27,6 +27,11 @@ public class Conversation implements Serializable {
 	private String participant;
 	private String participantAvatarUrl;
 	private Integer numMessages;
+	private Boolean hideConversation;
+	
+	public Conversation() {
+		hideConversation = false;
+	}
 
 	@Override
 	public String toString() {
@@ -45,6 +50,16 @@ public class Conversation implements Serializable {
 		if (participantAvatarUrl != null) {
 			builder.append("participantAvatarUrl=");
 			builder.append(participantAvatarUrl);
+			builder.append(", ");
+		}
+		if (numMessages != null) {
+			builder.append("numMessages=");
+			builder.append(numMessages);
+			builder.append(", ");
+		}
+		if (hideConversation != null) {
+			builder.append("hideConversation=");
+			builder.append(hideConversation);
 		}
 		builder.append("]");
 		return builder.toString();
@@ -80,5 +95,13 @@ public class Conversation implements Serializable {
 
 	public void setNumMessages(Integer numMessages) {
 		this.numMessages = numMessages;
+	}
+
+	public Boolean getHideConversation() {
+		return hideConversation;
+	}
+
+	public void setHideConversation(Boolean hideConversation) {
+		this.hideConversation = hideConversation;
 	}
 }

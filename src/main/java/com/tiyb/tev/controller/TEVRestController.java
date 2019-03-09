@@ -884,6 +884,16 @@ public class TEVRestController {
 	public Conversation getConversationByParticipant(@RequestParam("participant") String participantName) {
 		return conversationRepo.findByParticipant(participantName);
 	}
+	
+	/**
+	 * Returns all conversations that are not set to "hidden" status
+	 * 
+	 * @return <code>List</code> of conversations
+	 */
+	@GetMapping("/conversations/unhidden")
+	public List<Conversation> getUnhiddenConversations() {
+		return conversationRepo.findByHideConversationFalse();
+	}
 
 	/**
 	 * POST request to submit a conversation into the system
@@ -913,10 +923,66 @@ public class TEVRestController {
 		convo.setParticipant(convoDetails.getParticipant());
 		convo.setParticipantAvatarUrl(convoDetails.getParticipantAvatarUrl());
 		convo.setNumMessages(convoDetails.getNumMessages());
+		convo.setHideConversation(convoDetails.getHideConversation());
 
 		Conversation updatedConvo = conversationRepo.save(convo);
 
 		return updatedConvo;
+	}
+
+	/**
+	 * Sets a conversation to "ignored" status
+	 * 
+	 * @param participantName Name of the participant in the conversation to be
+	 *                        ignored
+	 * @return Updated Conversation
+	 */
+	@PutMapping("/conversations/{participant}/ignoreConvo")
+	public Conversation ignoreConversation(@PathVariable(value = "participant") String participantName) {
+		Conversation convo = conversationRepo.findByParticipant(participantName);
+
+		convo.setHideConversation(true);
+
+		convo = conversationRepo.save(convo);
+
+		return convo;
+	}
+	
+	/**
+	 * Sets a conversation to "un-ignored" status
+	 * 
+	 * @param participantName Name of the participant in the conversation to be
+	 *                        ignored
+	 * @return Updated Conversation
+	 */
+	@PutMapping("/conversations/{participant}/unignoreConvo")
+	public Conversation unignoreConversation(@PathVariable(value = "participant") String participantName) {
+		Conversation convo = conversationRepo.findByParticipant(participantName);
+
+		convo.setHideConversation(false);
+
+		convo = conversationRepo.save(convo);
+
+		return convo;
+	}
+	
+	/**
+	 * Used to reset all conversations back to an un-hidden state
+	 */
+	@GetMapping("/conversations/unignoreAllConversations")
+	public void unignoreAllConversations() {
+		List<Conversation> hiddenConvos = conversationRepo.findByHideConversationTrue();
+
+		if (hiddenConvos.size() < 1) {
+			return;
+		}
+
+		for (Conversation convo : hiddenConvos) {
+			convo.setHideConversation(false);
+			conversationRepo.save(convo);
+		}
+
+		return;
 	}
 
 	/**
