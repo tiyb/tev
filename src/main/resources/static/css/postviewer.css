@@ -31,10 +31,19 @@ h2 {
 	font-weight: 700;
 }
 
-.regularContentContainer {
+#regularContentContainer {
 	font-familiy: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
 	font-size: 14px;
 	font-weight: 400;
+}
+
+#regularContentContainer blockquote {
+	background-color: rgba(0, 13, 23, 0.05);
+	border-left: 2px solid #001935;
+	padding-left: 5px;
+}
+
+#regularContentContainer blockquote p {
 }
 
 #tagContainer {
