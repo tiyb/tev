@@ -67,7 +67,6 @@ $(document).ready(function() {
 		}));
 		
 		$('#conversationWordCloudContainer').jQCloud(words, {width:900,height:500,fontSize:{from:0.1,to:0.02},autoResize:false,removeOverflowing:false});
-		alert(words.length);
 	});
 	
 	var iframeOffset = $('#displayPaneIFrame').offset();
