@@ -11,7 +11,8 @@ $(document).ready(function() {
 			dataSrc: "",
 			type: "PUT"
 		}).then(function(data) {
-			alert($.i18n.prop('convo_markedConvoHidden'));
+			opener.location.reload();
+			window.close();
 		});
 	});
 });
