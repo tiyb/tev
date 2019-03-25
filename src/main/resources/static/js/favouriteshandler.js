@@ -16,8 +16,8 @@ $(document).ready(function() {
 			dataSrc: "",
 			type: "PUT"
 		}).then(function(data) {
-			opener.location.reload();
-			window.close();
+			$('#favouriteButton').show();
+			$('#unfavouriteButton').hide();
 		});		
 	});
 	
@@ -27,9 +27,18 @@ $(document).ready(function() {
 			dataSrc: "",
 			type: "PUT"
 		}).then(function(data) {
-			opener.location.reload();
-			window.close();
+			$('#unfavouriteButton').show();
+			$('#favouriteButton').hide();
 		});		
+	});
+	
+	$('#closeButton').click(function() {
+		window.close();
+	});
+	
+	$('#closeAndRefresh').click(function() {
+		opener.location.reload();
+		window.close();
 	});
 	
 });

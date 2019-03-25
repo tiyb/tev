@@ -12,12 +12,18 @@
 <div class="contentContainer">
 <div th:switch="${post.isFavourite}">
 	<h2 th:case="true">
+		<button id="favouriteButton" th:text="#{postviewers.markFavouriteButton}" style="display:none;"></button>
 		<button id="unfavouriteButton" th:text="#{postviewers.markNonFavouriteButton}"></button>
 		<button id="markUnreadButton" th:text="#{postviewers.markunreadbutton}"></button>
+		<button id="closeButton" th:text="#{postviewers.closeButton}"></button>
+		<button id="closeAndRefresh" th:text="#{postviewers.closeAndRefresnButton}"></button>
 	</h2>
 	<h2 th:case="*">
 		<button id="favouriteButton" th:text="#{postviewers.markFavouriteButton}"></button>
+		<button id="unfavouriteButton" th:text="#{postviewers.markNonFavouriteButton}" style="display:none;"></button>
 		<button id="markUnreadButton" th:text="#{postviewers.markunreadbutton}"></button>
+		<button id="closeButton" th:text="#{postviewers.closeButton}"></button>
+		<button id="closeAndRefresh" th:text="#{postviewers.closeAndRefresnButton}"></button>
 	</h2>
 </div>
 <video controls="controls" preload="auto" th:height="${video.height}" th:width="${video.width}">

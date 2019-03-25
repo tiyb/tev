@@ -13,12 +13,18 @@
 <h1 th:text="${link.text}"></h1>
 <div th:switch="${post.isFavourite}">
 	<h2 th:case="true">
+		<button id="favouriteButton" th:text="#{postviewers.markFavouriteButton}" style="display:none;"></button>
 		<button id="unfavouriteButton" th:text="#{postviewers.markNonFavouriteButton}"></button>
 		<button id="markUnreadButton" th:text="#{postviewers.markunreadbutton}"></button>
+		<button id="closeButton" th:text="#{postviewers.closeButton}"></button>
+		<button id="closeAndRefresh" th:text="#{postviewers.closeAndRefresnButton}"></button>
 	</h2>
 	<h2 th:case="*">
 		<button id="favouriteButton" th:text="#{postviewers.markFavouriteButton}"></button>
+		<button id="unfavouriteButton" th:text="#{postviewers.markNonFavouriteButton}" style="display:none;"></button>
 		<button id="markUnreadButton" th:text="#{postviewers.markunreadbutton}"></button>
+		<button id="closeButton" th:text="#{postviewers.closeButton}"></button>
+		<button id="closeAndRefresh" th:text="#{postviewers.closeAndRefresnButton}"></button>
 	</h2>
 </div>
 <h2><a th:href="${link.url}" target="_blank">LINK</a></h2>
