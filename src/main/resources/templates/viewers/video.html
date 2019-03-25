@@ -10,16 +10,29 @@
 <body>
 
 <div class="contentContainer">
+<div th:switch="${post.isFavourite}">
+	<h2 th:case="true">
+		<button id="unfavouriteButton" th:text="#{postviewers.markNonFavouriteButton}"></button>
+		<button id="markUnreadButton" th:text="#{postviewers.markunreadbutton}"></button>
+	</h2>
+	<h2 th:case="*">
+		<button id="favouriteButton" th:text="#{postviewers.markFavouriteButton}"></button>
+		<button id="markUnreadButton" th:text="#{postviewers.markunreadbutton}"></button>
+	</h2>
+</div>
 <video controls="controls" preload="auto" th:height="${video.height}" th:width="${video.width}">
 	<source th:src="'/viewerVideo/' +  ${video.postId} + '.' + ${video.extension}" th:type="${video.contentType}" />
 </video>
 <div id="regularContentContainer" th:utext="${video.videoCaption}"></div>
 </div>
 <div id="tagContainer" th:utext="${tags}"></div>
+
+<script type="text/javascript" th:text="'var postId = ' + ${post.Id} + ';'"></script>
 <script type="text/javascript"
         src="webjars/jquery/3.3.1/jquery.min.js"></script>
 
 <script type="text/javascript" th:src="@{/js/taghandler.js}"></script>
+<script type="text/javascript" th:src="@{/js/favouriteshandler.js}"></script>
 
 </body>
 </html>

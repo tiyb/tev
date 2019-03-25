@@ -182,6 +182,7 @@ public class TEVUIController {
 	@RequestMapping(value = { "/postViewer" }, method = RequestMethod.GET)
 	public String showViewer(@RequestParam("id") Long postID, Model model) {
 		Post post = restController.getPostById(postID);
+		model.addAttribute("post", post);
 		model.addAttribute("tags", pullOutTagValues(post.getTags()));
 		List<Type> availableTypes = restController.getAllTypes();
 		String postType = "";
@@ -220,7 +221,6 @@ public class TEVUIController {
 			}
 			model.addAttribute("photos", images);
 			model.addAttribute("caption", photos.get(0).getCaption());
-			model.addAttribute("post", post);
 			return "viewers/photo";
 		case "video":
 			Video vid = restController.getVideoById(postID);
