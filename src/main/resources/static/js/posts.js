@@ -201,8 +201,8 @@ $(document).ready(function() {
 			return false;
 		});
 		
-		$('#postTable thead tr').clone(true).appendTo('#postTable thead');
-		$('#postTable thead tr:eq(1) th').each(function(i) {
+		$('#postTable tfoot tr').clone(true).appendTo('#postTable tfoot');
+		$('#postTable tfoot tr:eq(1) th').each(function(i) {
 			if(i < 5) {
 				var title = $(this).text();
 				$(this).html('<input type="text" placeholder="' + $.i18n.prop('index_search') + title + '" />');
