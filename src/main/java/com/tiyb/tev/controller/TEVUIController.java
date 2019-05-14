@@ -103,7 +103,7 @@ public class TEVUIController {
 	 * @return The page to which the successful upload should be redirected
 	 */
 	@PostMapping("/postDataUpload")
-	public String handleFileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+	public String handlePostFileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
 		TEVSuperClass tsc;
 		List<Type> types = restController.getAllTypes();
 		try {
