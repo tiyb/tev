@@ -76,6 +76,7 @@ public class Metadata implements Serializable {
 	private String favFilter;
 	private Integer pageLength;
 	private Boolean showReadingPane;
+	private Boolean overwritePostData;
 
 	/**
 	 * Helper function to generate a new Metadata object, with some defaults filled
@@ -92,6 +93,7 @@ public class Metadata implements Serializable {
 		md.setSortOrder(SORT_ORDERS.get(1));
 		md.setFavFilter(FAV_FILTERS.get(2));
 		md.setPageLength(10);
+		md.setOverwritePostData(false);
 
 		return md;
 	}
@@ -231,6 +233,14 @@ public class Metadata implements Serializable {
 
 	public void setShowReadingPane(Boolean showReadingPane) {
 		this.showReadingPane = showReadingPane;
+	}
+
+	public Boolean getOverwritePostData() {
+		return overwritePostData;
+	}
+
+	public void setOverwritePostData(Boolean overwritePostData) {
+		this.overwritePostData = overwritePostData;
 	}
 
 }

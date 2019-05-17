@@ -40,6 +40,11 @@ $(document).ready(function () {
 		divData = "<option value='false'>" + $.i18n.prop('md_showReadingPaneNo') + "</option>";
 		$(divData).appendTo('#showReadingPaneDropdown');
 		
+		divData = "<option value='true'>" + $.i18n.prop('md_overwritePostsYes') + "</option>";
+		$(divData).appendTo('#overwritePostsDropdown');
+		divData = "<option value='false'>" + $.i18n.prop('md_overwritePostsNo') + "</option>";
+		$(divData).appendTo('#overwritePostsDropdown');
+		
 		$.ajax({
 			url: "/api/metadata",
 			data: ""
@@ -58,6 +63,11 @@ $(document).ready(function () {
 			} else {
 				$('#showReadingPaneDropdown').val('false');
 			}
+			if(metadataObject.overwritePostData) {
+				$('#overwritePostsDropdown').val('true');
+			} else {
+				$('#overwritePostsDropdown').val('false');
+			}
 			
 		});
 				
@@ -74,6 +84,7 @@ $(document).ready(function () {
 		metadataObject.favFilter = $('#favsDropdown').val();
 		metadataObject.pageLength = $('#pageLengthDropdown').val();
 		metadataObject.showReadingPane = $('#showReadingPaneDropdown').val();
+		metadataObject.overwritePostData = $('#overwritePostsDropdown').val();
 		
 		$.ajax({
 			url: '/api/metadata',

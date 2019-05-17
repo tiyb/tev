@@ -847,6 +847,7 @@ public class TEVRestController {
 		md.setFavFilter(metadataDetails.getFavFilter());
 		md.setPageLength(metadataDetails.getPageLength());
 		md.setShowReadingPane(metadataDetails.getShowReadingPane());
+		md.setOverwritePostData(metadataDetails.getOverwritePostData());
 		Metadata returnValue = metadataRepo.save(md);
 
 		return returnValue;
