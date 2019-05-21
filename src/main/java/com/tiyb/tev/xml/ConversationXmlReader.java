@@ -3,7 +3,6 @@ package com.tiyb.tev.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -53,7 +52,9 @@ public class ConversationXmlReader {
 	private static final String END_OF_FILE_MESSAGE = "Premature end of file";
 
 	/**
+	 * <p>
 	 * Main method. There are multiple steps to parsing the XML file:
+	 * </p>
 	 * 
 	 * <ol>
 	 * <li>Get a stream for the file</li>
@@ -67,6 +68,11 @@ public class ConversationXmlReader {
 	 * the main Tumblr user information captured earlier)</li>
 	 * </ol>
 	 * 
+	 * <p>
+	 * Data is inserted directly into the database, via the REST APIs (accessed via
+	 * the <code>restController</code> parameter).
+	 * </p>
+	 * 
 	 * @param xmlFile        File containing XML to be parsed
 	 * @param restController Used for updating the database as each
 	 *                       conversation/message is parsed
@@ -77,10 +83,10 @@ public class ConversationXmlReader {
 
 		try {
 			InputStream participantXmlStream = xmlFile.getInputStream();
-			List<String> mainParticipant = getMainParticipant(participantXmlStream);
-			md.setMainTumblrUser(mainParticipant.get(0));
-			md.setMainTumblrUserAvatarUrl(mainParticipant.get(1));
-			String mainParticipantID = mainParticipant.get(2);
+			ConversationUsers cu = getMainParticipant(participantXmlStream);
+			md.setMainTumblrUser(cu.name);
+			md.setMainTumblrUserAvatarUrl(cu.avatarURL);
+			String mainParticipantID = cu.id;
 			md = restController.updateMetadata(md);
 
 			xmlStream = xmlFile.getInputStream();
@@ -95,26 +101,25 @@ public class ConversationXmlReader {
 	 * The XML is set up such that each conversation is between two participants:
 	 * the main Tumblr user, and another user. Therefore, this helper function
 	 * parses through the XML document looking for participants; as soon as it finds
-	 * a participant that's been listed <i>more than once,</i> it makes that
+	 * a participant that's been listed <b>more than once,</b> it makes that
 	 * participant the main Tumblr user, so it returns that user (and the URL for
 	 * the user's avatar).
 	 * </p>
 	 * 
 	 * <p>
-	 * And, because the Tumblr engineers are incompetent at <i>everything</i>,
-	 * they've included two versions of the user: the name, and an opaque ID, but
-	 * they don't map to each other in the XML document, so there's no way to tell
-	 * which ID belongs to which user. So, the code also looks for duplicate
+	 * Because the Tumblr engineers are incompetent at <i>everything</i>, they've
+	 * included two versions of the user: the <b>name</b> and an <b>opaque ID</b>,
+	 * but they don't map to each other in the XML document, so there's no way to
+	 * tell which ID belongs to which user. So the code also looks for duplicate
 	 * versions of IDs; when an ID is found in multiple conversations, it's assumed
 	 * to be the ID of the TEV user.
 	 * </p>
 	 * 
 	 * @param participantXmlStream The XML file to be parsed
-	 * @return An array of three strings: the main Tumblr user's name, the main
-	 *         Tumblr user's avatar URL, and the main user's ID.
+	 * @return A <code>ConversationUsers</code> object, with the relevant data
 	 */
-	private static List<String> getMainParticipant(InputStream participantXmlStream) {
-		String[] results = new String[3];
+	private static ConversationUsers getMainParticipant(InputStream participantXmlStream) {
+		ConversationUsers cu = new ConversationUsers();
 		Map<String, String> participants = new HashMap<String, String>();
 		List<String> nameIds = new ArrayList<String>();
 		boolean newConversation = false;
@@ -148,8 +153,8 @@ public class ConversationXmlReader {
 						if (participantInList == null) {
 							participants.put(participantName, participantURL);
 						} else {
-							results[0] = participantName;
-							results[1] = participantURL;
+							cu.name = participantName;
+							cu.avatarURL = participantURL;
 						}
 					} else if (se.getName().getLocalPart().equals("message")) {
 						@SuppressWarnings("unchecked")
@@ -160,8 +165,8 @@ public class ConversationXmlReader {
 							if (att.getName().getLocalPart().equals("participant")) {
 								if (newConversation) {
 									if (nameIds.contains(att.getValue())) {
-										results[2] = att.getValue();
-										return Arrays.asList(results);
+										cu.id = att.getValue();
+										return cu;
 									}
 								} else {
 									if (!nameIds.contains(att.getValue())) {
@@ -463,6 +468,29 @@ public class ConversationXmlReader {
 		}
 
 		throw new XMLStreamException(END_OF_FILE_MESSAGE);
+	}
+	
+	/**
+	 * Helper class (essentially a struct), used by the
+	 * <code>getMainParticipant()</code> method for returning a few pieces of
+	 * information. Since this is just an inner, helper class, the trouble wasn't
+	 * taken to make it a proper bean with getters/setters; just using public member
+	 * variables.
+	 *
+	 */
+	private static class ConversationUsers {
+		/**
+		 * The Tumblr user's public-facing name
+		 */
+		public String name;
+		/**
+		 * The URL of the Tumblr user's avatar
+		 */
+		public String avatarURL;
+		/**
+		 * The Tumblr user's ID, as contained in the conversation XML.
+		 */
+		public String id;
 	}
 
 }

@@ -17,6 +17,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import com.tiyb.tev.controller.TEVRestController;
 import com.tiyb.tev.datamodel.Answer;
 import com.tiyb.tev.datamodel.Link;
 import com.tiyb.tev.datamodel.Photo;
@@ -24,36 +25,37 @@ import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
 import com.tiyb.tev.datamodel.Type;
 import com.tiyb.tev.datamodel.Video;
-import com.tiyb.tev.datamodel.helpers.TEVSuperClass;
+import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.exception.XMLParsingException;
 
 /**
  * <p>
  * This class is responsible for parsing the XML file exported from Tumblr for a
- * user's blogs. It leverages the <b>StAX</b> library's event-based processing
- * model to read the file.
+ * user's <b>blogs</b>. It leverages the <b>StAX</b> library's event-based
+ * processing model to read the file.
  * </p>
  * 
  * <p>
  * The XML export from Tumblr is... not always a well thought out piece of
  * information architecture. There are inconsistencies as to how some things are
  * structured, and so it had to be reverse engineered to figure things out.
- * Especially when it comes to "photo" posts, there are inconsistent ways in
- * which links to photos are handled. That being said, the <i>general</i>
+ * Especially when it comes to "photo" posts, where there are inconsistent ways
+ * in which links to photos are handled. That being said, the <i>general</i>
  * structure is that there is a <code>&lt;post&gt;</code> element for each post,
- * with attributes for all of the data that is common to <i>any</i> kind of a
- * post; URL, "slug," date it was posted (in various formats), etc. Under that
- * <code>&lt;post&gt;</code> element are child elements, however, the child
- * elements to be found are very different, depending on the type of post. An
- * "answer" post, for example, will have two child elements (for the question
+ * with attributes for all of the data that is common to any kind of a post
+ * (URL, "slug," date it was posted in a couple of different formats, etc.).
+ * Under that <code>&lt;post&gt;</code> element are child elements, where the
+ * child elements to be found are very different depending on the type of post.
+ * An "answer" post, for example, will have two child elements (for the question
  * and the answer), whereas a "photo" post will have numerous child elements
  * covering the post's caption, various sizes of the images, etc.
  * </p>
  * 
  * <p>
- * Not all of the attributes or elements in the document are pulled out; only
- * the ones that are useful for the TEV application. Probably about 90% of the
- * information is retrieved, however.
+ * Not all of the attributes or elements in the document are pulled out, only
+ * the ones that are useful for the TEV application (or deemed to be potentially
+ * useful). Probably about 90% of the information is retrieved, with the rest
+ * being discarded.
  * </p>
  * 
  * <p>
@@ -66,7 +68,6 @@ import com.tiyb.tev.exception.XMLParsingException;
  * 
  * @author tiyb
  * @apiviz.landmark
- * @apiviz.uses com.tiyb.tev.datamodel.helpers.TEVSuperClass
  * @apiviz.uses javax.xml.stream.XMLEventReader
  */
 public class BlogXmlReader {
@@ -78,28 +79,42 @@ public class BlogXmlReader {
 	private static final String END_OF_FILE_ERROR = "Premature end of file";
 
 	/**
+	 * <p>
 	 * This is the main method of the class, which kicks off the processing of the
-	 * document. It doesn't do any work itself, it simply sets up some type-related
+	 * document. It doesn't do much work itself, it simply sets up some type-related
 	 * metadata, and calls the <code>readPosts()</code> method to get into the
 	 * actual XML document.
+	 * </p>
+	 * 
+	 * <p>
+	 * The one piece of logic actually performed by this method is to delete all of
+	 * the data in the database (via the REST controller), if the "overwrite post
+	 * data" option is set.
+	 * </p>
 	 * 
 	 * @param xmlFile        <code>InputStream</code> containing the XML document to
 	 *                       be parsed.
-	 * @param allowableTypes A list of the different types (link, answer, photo,
-	 *                       etc.), with their associated IDs, so that the posts can
-	 *                       be linked in the database.
-	 * @return A <code>TEVSuperClass</code> object, which simply packages up all of
-	 *         the objects that have been generated.
+	 * @param restController REST controller for the application, used for storing
+	 *                       data
 	 * @throws XMLParsingException
 	 */
-	public static TEVSuperClass parseDocument(InputStream xmlFile, List<Type> allowableTypes)
-			throws XMLParsingException {
+	public static void parseDocument(InputStream xmlFile, TEVRestController restController) throws XMLParsingException {
 		Map<Long, String> typeEntries = new HashMap<Long, String>();
 		Map<String, Long> typeIDs = new HashMap<String, Long>();
+		List<Type> allowableTypes = restController.getAllTypes();
 		loadTypeData(allowableTypes, typeEntries, typeIDs);
+		boolean isOverwritePosts = restController.getMetadata().getOverwritePostData();
+		
+		if(isOverwritePosts) {
+			restController.deleteAllRegulars();
+			restController.deleteAllAnswers();
+			restController.deleteAllLinks();
+			restController.deleteAllPhotos();
+			restController.deleteAllVideos();
+			restController.deleteAllPosts();			
+		}
 
-		TEVSuperClass masterData = readPosts(xmlFile, typeEntries, typeIDs);
-		return masterData;
+		readPosts(xmlFile, typeEntries, typeIDs, restController, isOverwritePosts);
 	}
 
 	/**
@@ -114,32 +129,45 @@ public class BlogXmlReader {
 	 * 
 	 * <ol>
 	 * <li>As the "start element" event is encountered for each post, a new
-	 * <code>Post</code> object is created.</li>
+	 * <code>Post</code> object is created</li>
 	 * <li>The attributes are read into that object (via the
 	 * <code>readPostAttributes()</code> method, to populate its data.</li>
+	 * <li>The post is inserted into the DB via the REST controller.
+	 * <ul>
+	 * <li>If the "overwrite posts" option is set in the metadata, the logic first
+	 * checks to see if the post already exists, and only inserts it if it
+	 * doesn't.</li>
+	 * <li>A boolean value is set, based on this logic, so that insertions of
+	 * subsequent data for this post doesn't have to figure it out all over
+	 * again.</li>
+	 * </ul>
+	 * </li>
 	 * <li>Depending on the value of the <code>type</code> attribute, one of the
 	 * additional methods is called to parse the type-specific data</li>
-	 * <li>Those child methods populate their own objects, and then add them to the
-	 * <code>TEVSuperClass</code> object</i>
-	 * <li>Once the child method has completed, the <code>Post</code> object is also
-	 * added to the <code>TEVSuperClass</code> object. (This would normally have been
-	 * done in the "end element" event for the <code>&lt;post&gt;</code> element,
-	 * however, the nature of this processing means that the "end element" event is
-	 * actually consumed by the child methods.)</li>
+	 * <li>Those child methods populate their own objects, and then use the REST
+	 * controller to insert the data into the DB
+	 * <ul>
+	 * <li>The previously set boolean is checked first, before submitting the
+	 * data.</li>
+	 * </ul>
+	 * </i>
 	 * </ol>
 	 * 
-	 * @param xmlFile     The stream containing the XML file to be parsed
-	 * @param typeEntries A list of available types, in a <code>Map</code> for easy
-	 *                    access by ID
-	 * @param typeIDs     A list of available types, in a <code>Map</code> for easy
-	 *                    access by name
-	 * @return A <code>TEVSuperClass</code> object, containing all of the data
-	 *         pulled out of the XML document.
+	 * @param xmlFile          The stream containing the XML file to be parsed
+	 * @param typeEntries      A list of available types, in a <code>Map</code> for
+	 *                         easy access by ID
+	 * @param typeIDs          A list of available types, in a <code>Map</code> for
+	 *                         easy access by name
+	 * @param restController   REST controller used for storing the data
+	 * @param isOverwritePosts Indicates whether this is a clean upload, or
+	 *                         additive; the REST controller could have been used to
+	 *                         determine this, but since the calling method needed
+	 *                         to figure it out anyway, it was just as easy to pass
+	 *                         it as a parameter.
 	 * @throws XMLParsingException
 	 */
-	private static TEVSuperClass readPosts(InputStream xmlFile, Map<Long, String> typeEntries,
-			Map<String, Long> typeIDs) throws XMLParsingException {
-		TEVSuperClass masterData = new TEVSuperClass();
+	private static void readPosts(InputStream xmlFile, Map<Long, String> typeEntries, Map<String, Long> typeIDs,
+			TEVRestController restController, boolean isOverwritePosts) throws XMLParsingException {
 
 		try {
 			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -155,31 +183,53 @@ public class BlogXmlReader {
 
 					if (se.getName().getLocalPart().equals("post")) {
 						post = new Post();
+						boolean isSubmitablePost = true;
 						readPostAttributes(se, post, typeIDs);
+						if (isOverwritePosts) {
+							restController.createPost(post);
+						} else {
+							try {
+								restController.getPostById(post.getId());
+								isSubmitablePost = false;
+							} catch (ResourceNotFoundException e) {
+								restController.createPost(post);
+							}
+						}
 						switch (typeEntries.get(post.getType())) {
 						case "regular":
 							Regular regular = readRegular(reader, post);
-							masterData.getRegulars().add(regular);
+							if (isSubmitablePost) {
+								restController.createRegular(post.getId(), regular);
+							}
 							break;
 						case "answer":
 							Answer answer = readAnswer(reader, post);
-							masterData.getAnswers().add(answer);
+							if (isSubmitablePost) {
+								restController.createAnswer(post.getId(), answer);
+							}
 							break;
 						case "link":
 							Link link = readLink(reader, post);
-							masterData.getLinks().add(link);
+							if (isSubmitablePost) {
+								restController.createLink(post.getId(), link);
+							}
 							break;
 						case "photo":
 							List<Photo> photos = readPhotos(reader, post);
-							masterData.getPhotos().addAll(photos);
+							if (isSubmitablePost) {
+								for (Photo p : photos) {
+									restController.createPhoto(p);
+								}
+							}
 							break;
 						case "video":
 							Video video = readVideos(reader, post);
-							masterData.getVideos().add(video);
+							if (isSubmitablePost) {
+								restController.createVideo(post.getId(), video);
+							}
 							break;
 						}
 
-						masterData.getPosts().add(post);
 					}
 				}
 			}
@@ -188,8 +238,6 @@ public class BlogXmlReader {
 		} finally {
 
 		}
-
-		return masterData;
 	}
 
 	/**

@@ -35,7 +35,6 @@ import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
 import com.tiyb.tev.datamodel.Type;
 import com.tiyb.tev.datamodel.Video;
-import com.tiyb.tev.datamodel.helpers.TEVSuperClass;
 import com.tiyb.tev.exception.InvalidTypeException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.exception.XMLParsingException;
@@ -96,8 +95,9 @@ public class TEVUIController {
 	}
 
 	/**
-	 * Handles file uploads, for reading in the big Tumblr XML Export. Actual import
-	 * of data into the database is farmed off to one of two helper functions.
+	 * Handles file uploads, for reading in the big Tumblr XML Export. Actual logic
+	 * is handled by the <code>BlogXmlReader</code> class; this method simply calls
+	 * that class, and then (upon success) redirects to the index.
 	 * 
 	 * @param file               The Tumblr XML file to be read
 	 * @param redirectAttributes not used
@@ -106,105 +106,15 @@ public class TEVUIController {
 	@PostMapping("/postDataUpload")
 	public String handlePostFileUpload(@RequestParam("file") MultipartFile file,
 			RedirectAttributes redirectAttributes) {
-		TEVSuperClass tsc;
-		List<Type> types = restController.getAllTypes();
-		Metadata md = restController.getMetadata();
 		try {
-			tsc = BlogXmlReader.parseDocument(file.getInputStream(), types);
+			BlogXmlReader.parseDocument(file.getInputStream(), restController);
 		} catch (XMLParsingException | IOException e) {
 			throw new XMLParsingException();
 		}
 
-		if (tsc == null) {
-			throw new XMLParsingException();
-		}
-
-		if (md.getOverwritePostData()) {
-			restController.deleteAllRegulars();
-			restController.deleteAllAnswers();
-			restController.deleteAllLinks();
-			restController.deleteAllPhotos();
-			restController.deleteAllVideos();
-			restController.deleteAllPosts();
-		}
-		
-		List<Long> idsToAdd = getPostIDsToAdd(tsc, md.getOverwritePostData());
-		updatePosts(tsc, idsToAdd);
-
 		return "redirect:/index";
 	}
 	
-	/**
-	 * Helper function that figures out what posts should be added to the DB.
-	 * Either: 1) <i>all</i> of them (because the metadata indicates that posts
-	 * should be overwritten), or 2) <i>new</i> posts (as in: posts that aren't
-	 * already in the DB)
-	 * 
-	 * @param tsc               Post data (as read from the file)
-	 * @param overwritePostData Indicator as to whether posts are to be overwritten
-	 * @return List of IDs for posts that should be added to the DB (by another
-	 *         function)
-	 */
-	private List<Long> getPostIDsToAdd(TEVSuperClass tsc, boolean overwritePostData) {
-		List<Long> newPosts = new ArrayList<Long>();
-		
-		if(overwritePostData) {
-			for(Post post : tsc.getPosts()) {
-				newPosts.add(post.getId());
-			}
-		} else {
-			for(Post post : tsc.getPosts()) {
-				try {
-					restController.getPostById(post.getId());
-				} catch (ResourceNotFoundException e) {
-					newPosts.add(post.getId());
-				}
-			}
-		}
-		
-		return newPosts;
-	}
-
-	/**
-	 * Helper function that takes in a <code>TEVSuperClass</code> and updates the
-	 * database with new posts, leaving existing posts as they are
-	 * 
-	 * @param tsc      The incoming post data as read from the file
-	 * @param newPosts The list of IDs for posts that should be added to the DB
-	 */
-	private void updatePosts(TEVSuperClass tsc, List<Long> newPosts) {
-		for (Post post : tsc.getPosts()) {
-			if(newPosts.contains(post.getId())) {
-				restController.createPost(post);
-			}
-		}
-		for (Regular regular : tsc.getRegulars()) {
-			if(newPosts.contains(regular.getPostId())) {
-				restController.createRegular(regular.getPostId(), regular);
-			}
-		}
-		for (Answer answer : tsc.getAnswers()) {
-			if(newPosts.contains(answer.getPostId())) {
-				restController.createAnswer(answer.getPostId(), answer);
-			}
-		}
-		for (Link link : tsc.getLinks()) {
-			if(newPosts.contains(link.getPostId())) {
-				restController.createLink(link.getPostId(), link);
-			}
-		}
-		for (Photo photo : tsc.getPhotos()) {
-			if(newPosts.contains(photo.getPostId())) {
-				restController.createPhoto(photo);
-			}
-		}
-		for (Video video : tsc.getVideos()) {
-			if(newPosts.contains(video.getPostId())) {
-				restController.createVideo(video.getPostId(), video);
-			}
-		}
-	}
-
 	/**
 	 * Handles file uploads for reading in Tumblr messaging extract
 	 * 

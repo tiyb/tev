@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tumblr version="1.0">
+	<posts>
+		<post id="180894436671" url="https://mainblog.tumblr.com/post/180894436671" url-with-slug="https://mainblog.tumblr.com/post/180894436671/first-post" type="regular" date-gmt="2018-12-07 16:48:43 GMT" date="Fri, 07 Dec 2018 11:48:43" unix-timestamp="1544201323" format="html" reblog-key="O6pLVlp1" slug="first-post" state="published" is_reblog="true" tumblelog="mainblog">
+			<regular-title>First Post</regular-title>
+			<regular-body>post body text here</regular-body>
+			<tag>tag1</tag>
+			<tag>tag2</tag>
+		</post>
+		<post id="180894436672" url="https://mainblog.tumblr.com/post/180894436672" url-with-slug="https://mainblog.tumblr.com/post/180894436672/added-post" type="regular" date-gmt="2018-12-07 16:48:43 GMT" date="Fri, 07 Dec 2018 11:48:43" unix-timestamp="1544201323" format="html" reblog-key="O6pLVlp1" slug="added-post" state="published" is_reblog="true" tumblelog="mainblog">
+			<regular-title>Added Post</regular-title>
+			<regular-body>post added after initial load</regular-body>
+			<tag>tag1</tag>
+			<tag>tag2</tag>
+		</post>
+		<post id="180784644740" url="https://mainblog.tumblr.com/post/180784644740" url-with-slug="https://mainblog.tumblr.com/post/180784644740/new-slug" type="photo" date-gmt="2018-12-04 07:17:52 GMT" date="Tue, 04 Dec 2018 02:17:52" unix-timestamp="1543907872" format="html" reblog-key="Pius5FOw" slug="new-slug" state="published" is_reblog="true" tumblelog="mainblog" width="500" height="750">
+			<photo-caption>This is the caption for a photo post</photo-caption>
+			<photo-link-url>http://bit.ly/some-photo</photo-link-url>
+			<photo-url max-width="1280">photo 1 1280</photo-url>
+			<photo-url max-width="500">photo 1 500</photo-url>
+			<photo-url max-width="400">photo 1 400</photo-url>
+			<photo-url max-width="250">photo 1 250</photo-url>
+			<photo-url max-width="100">photo 1 100</photo-url>
+			<photo-url max-width="75">photo 1 75</photo-url>
+			<tag>tag3</tag>
+			<tag>tag4</tag>
+		</post>
+		<post id="180782992914" url="https://mainblog.tumblr.com/post/180782992914" url-with-slug="https://mainblog.tumblr.com/post/180782992914/another-slug" type="video" date-gmt="2018-12-04 06:09:21 GMT" date="Tue, 04 Dec 2018 01:09:21" unix-timestamp="1543903761" format="html" reblog-key="IPc1CZyV" slug="another-slug" state="published" is_reblog="true" tumblelog="mainblog" direct-video="true">
+			<video-source>
+				<content-type>video/mp4</content-type>
+				<extension>mp4</extension>
+				<width>854</width>
+				<height>480</height>
+				<duration>45</duration>
+				<revision>0</revision>
+			</video-source>
+			<video-caption>This is the caption for a video</video-caption>
+			<video-player>
+&lt;video  id='embed-5c0df1d16b7d4180127212' class='crt-video crt-skin-default' width='400' height='225' poster='https://somesite.com/smart1.jpg' preload='none' muted data-crt-video data-crt-options='{"autoheight":null,"duration":45,"hdUrl":false,"filmstrip":{"url":"https://somesite.com/previews/filmstrip.jpg","width":"200","height":"112"}}' &gt;
+    &lt;source src="https://mainblog.tumblr.com/video_file/t:somefile" type="video/mp4"&gt;
+&lt;/video&gt;
+			</video-player>
+			<video-player max-width="500">
+&lt;video  id='embed-5c0df1d16b7d4180127212' class='crt-video crt-skin-default' width='400' height='225' poster='https://somesite.com/smart1.jpg' preload='none' muted data-crt-video data-crt-options='{"autoheight":null,"duration":45,"hdUrl":false,"filmstrip":{"url":"https://somesite.com/previews/filmstrip.jpg","width":"200","height":"112"}}' &gt;
+    &lt;source src="https://mainblog.tumblr.com/video_file/t:somefile" type="video/mp4"&gt;
+&lt;/video&gt;
+			</video-player>
+			<video-player max-width="250">
+&lt;video  id='embed-5c0df1d16b7d4180127212' class='crt-video crt-skin-default' width='400' height='225' poster='https://somesite.com/smart1.jpg' preload='none' muted data-crt-video data-crt-options='{"autoheight":null,"duration":45,"hdUrl":false,"filmstrip":{"url":"https://somesite.com/previews/filmstrip.jpg","width":"200","height":"112"}}' &gt;
+    &lt;source src="https://mainblog.tumblr.com/video_file/t:somefile" type="video/mp4"&gt;
+&lt;/video&gt;
+			</video-player>
+			<tag>tag5</tag>
+			<tag>tag6</tag>
+			<tag>tag7</tag>
+			<tag>tag8</tag>
+			<tag>tag9</tag>
+			<tag>tag10</tag>
+		</post>
+		<post id="180371366195" url="https://mainblog.tumblr.com/post/180371366195" url-with-slug="https://mainblog.tumblr.com/post/180371366195/slug-slug-slug" type="answer" date-gmt="2018-11-22 08:26:25 GMT" date="Thu, 22 Nov 2018 03:26:25" unix-timestamp="1542875185" format="html" reblog-key="OQqor1Zh" slug="slug-slug-slug" state="published" is_reblog="true" tumblelog="mainblog">
+			<question>Question text</question>
+			<answer>Answer text</answer>
+			<tag>tag2</tag>
+		</post>
+		<post id="180265557725" url="https://mainblog.tumblr.com/post/180265557725" url-with-slug="https://mainblog.tumblr.com/post/180265557725/tumblr" type="link" date-gmt="2018-11-19 06:09:08 GMT" date="Mon, 19 Nov 2018 01:09:08" unix-timestamp="1542607748" format="html" reblog-key="6pFgAxH2" slug="tumblr" state="published" is_reblog="false" tumblelog="mainblog">
+			<link-text>Tumblr</link-text>
+			<link-url>https://someblog.tumblr.com/</link-url>
+			<link-description>This is the link description</link-description>
+			<tag>tag1</tag>
+		</post>
+		<post id="180254465582" url="https://mainblog.tumblr.com/post/180254465582" url-with-slug="https://mainblog.tumblr.com/post/180254465582/slugs-are-delicious" type="photo" date-gmt="2018-11-18 23:17:36 GMT" date="Sun, 18 Nov 2018 18:17:36" unix-timestamp="1542583056" format="html" reblog-key="jTxuwC0o" slug="slugs-are-delicious" state="published" is_reblog="true" tumblelog="mainblog" width="692" height="583">
+			<photo-caption>This is hte photo caption</photo-caption>
+			<photo-url max-width="1280">photo 2 1280</photo-url>
+			<photo-url max-width="500">photo 2 500</photo-url>
+			<photo-url max-width="400">photo 2 400</photo-url>
+			<photo-url max-width="250">photo 2 250</photo-url>
+			<photo-url max-width="100">photo 2 100</photo-url>
+			<photo-url max-width="75">photo 2 75</photo-url>
+			<photoset>
+				<photo offset="o1" caption="" width="692" height="583">
+					<photo-url max-width="1280">photo 3 1280</photo-url>
+					<photo-url max-width="500">photo 3 500</photo-url>
+					<photo-url max-width="400">photo 3 400</photo-url>
+					<photo-url max-width="250">photo 3 250</photo-url>
+					<photo-url max-width="100">photo 3 100</photo-url>
+					<photo-url max-width="75">photo 3 75</photo-url>
+				</photo>
+				<photo offset="o2" caption="" width="990" height="532">
+					<photo-url max-width="1280">photo 4 1280</photo-url>
+					<photo-url max-width="500">photo 4 500</photo-url>
+					<photo-url max-width="400">photo 4 400</photo-url>
+					<photo-url max-width="250">photo 4 250</photo-url>
+					<photo-url max-width="100">photo 4 100</photo-url>
+					<photo-url max-width="75">photo 4 75</photo-url>
+				</photo>
+			</photoset>
+			<tag>tag11</tag>
+			<tag>tag12</tag>
+			<tag>tag13</tag>
+			<tag>tag14</tag>
+			<tag>tag15</tag>
+		</post>
+	</posts>
+</tumblr>

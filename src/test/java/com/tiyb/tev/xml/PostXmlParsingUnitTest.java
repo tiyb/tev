@@ -12,120 +12,101 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 
 import com.tiyb.tev.controller.TEVRestController;
+import com.tiyb.tev.datamodel.Answer;
+import com.tiyb.tev.datamodel.Link;
+import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.Photo;
-import com.tiyb.tev.datamodel.Type;
-import com.tiyb.tev.datamodel.helpers.TEVSuperClass;
-import com.tiyb.tev.repository.AnswerRepository;
-import com.tiyb.tev.repository.ConversationMessageRepository;
-import com.tiyb.tev.repository.ConversationRepository;
-import com.tiyb.tev.repository.LinkRepository;
-import com.tiyb.tev.repository.MetadataRepository;
-import com.tiyb.tev.repository.PhotoRepository;
-import com.tiyb.tev.repository.PostRepository;
-import com.tiyb.tev.repository.RegularRepository;
-import com.tiyb.tev.repository.TypeRepository;
-import com.tiyb.tev.repository.VideoRepository;
+import com.tiyb.tev.datamodel.Post;
+import com.tiyb.tev.datamodel.Regular;
+import com.tiyb.tev.datamodel.Video;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(TEVRestController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class PostXmlParsingUnitTest {
 
-	private TEVSuperClass tsc;
-	
 	@Autowired
 	private TEVRestController restController;
-	@MockBean
-	PostRepository postRepo;
-	@MockBean
-	TypeRepository typeRepo;
-	@MockBean
-	RegularRepository regularRepo;
-	@MockBean
-	AnswerRepository answerRepo;
-	@MockBean
-	LinkRepository linkRepo;
-	@MockBean
-	PhotoRepository photoRepo;
-	@MockBean
-	VideoRepository videoRepo;
-	@MockBean
-	MetadataRepository metadataRepo;
-	@MockBean
-	ConversationRepository conversationRepo;
-	@MockBean
-	ConversationMessageRepository convoMsgRepo;
 	
+	private long answerPostID = 180371366195L;
+	private long linkPostID = 180265557725L;
+	private long regularPostID = 180894436671L;
+	private long videoPostID = 180782992914L;
+	private long firstPhotoPostID = 180784644740L;
+	private long secondPhotoPostID = 180254465582L;
+	private long addedRegularPostID = 180894436672L;
+
 	@Before
 	public void setupData() throws FileNotFoundException {
-		List<Type> allowableTypes = restController.getAllTypes();
-		
 		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-xml.xml");
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
-		
-		tsc = BlogXmlReader.parseDocument(xmlFile, allowableTypes);
+
+		Metadata md = restController.getMetadata();
+		md.setOverwritePostData(true);
+		md = restController.updateMetadata(md);
+
+		BlogXmlReader.parseDocument(xmlFile, restController);
 	}
-	
+
 	@Test
 	public void testAnswer() {
-		assertThat(tsc.getAnswers().size()).isEqualTo(1);
-		assertThat(tsc.getAnswers().get(0).getQuestion()).isEqualTo("Question text");
-		assertThat(tsc.getAnswers().get(0).getAnswer()).isEqualTo("Answer text");
-		assertThat(tsc.getAnswers().get(0).getPostId()).isEqualTo(180371366195L);
+		assertThat(restController.getAllAnswers().size()).isEqualTo(1);
+		Answer answer = restController.getAnswerById(answerPostID);
+		assertThat(answer).isNotNull();
+		assertThat(answer.getQuestion()).isEqualTo("Question text");
+		assertThat(answer.getAnswer()).isEqualTo("Answer text");
+		assertThat(answer.getPostId()).isEqualTo(answerPostID);
 	}
-	
+
 	@Test
 	public void testLink() {
-		assertThat(tsc.getLinks().size()).isEqualTo(1);
-		assertThat(tsc.getLinks().get(0).getPostId()).isEqualTo(180265557725L);
-		assertThat(tsc.getLinks().get(0).getDescription()).isEqualTo("This is the link description");
-		assertThat(tsc.getLinks().get(0).getText()).isEqualTo("Tumblr");
-		assertThat(tsc.getLinks().get(0).getUrl()).isEqualTo("https://someblog.tumblr.com/");
+		assertThat(restController.getAllLinks().size()).isEqualTo(1);
+		Link link = restController.getLinkById(linkPostID);
+		assertThat(link).isNotNull();
+		assertThat(link.getPostId()).isEqualTo(linkPostID);
+		assertThat(link.getDescription()).isEqualTo("This is the link description");
+		assertThat(link.getText()).isEqualTo("Tumblr");
+		assertThat(link.getUrl()).isEqualTo("https://someblog.tumblr.com/");
 	}
-	
+
 	@Test
 	public void testRegular() {
-		assertThat(tsc.getRegulars().size()).isEqualTo(1);
-		assertThat(tsc.getRegulars().get(0).getPostId()).isEqualTo(180894436671L);
-		assertThat(tsc.getRegulars().get(0).getBody()).isEqualTo("post body text here");
-		assertThat(tsc.getRegulars().get(0).getTitle()).isEqualTo("First Post");
+		assertThat(restController.getAllRegulars().size()).isEqualTo(1);
+		Regular regular = restController.getRegularById(regularPostID);
+		assertThat(regular).isNotNull();
+		assertThat(regular.getPostId()).isEqualTo(regularPostID);
+		assertThat(regular.getBody()).isEqualTo("post body text here");
+		assertThat(regular.getTitle()).isEqualTo("First Post");
 	}
-	
+
 	@Test
 	public void testVideo() {
-		assertThat(tsc.getVideos().size()).isEqualTo(1);
-		assertThat(tsc.getVideos().get(0).getContentType()).isEqualTo("video/mp4");
-		assertThat(tsc.getVideos().get(0).getDuration()).isEqualTo(45);
-		assertThat(tsc.getVideos().get(0).getExtension()).isEqualTo("mp4");
-		assertThat(tsc.getVideos().get(0).getHeight()).isEqualTo(480);
-		assertThat(tsc.getVideos().get(0).getPostId()).isEqualTo(180782992914L);
-		assertThat(tsc.getVideos().get(0).getRevision()).isEqualTo("0");
-		assertThat(tsc.getVideos().get(0).getVideoCaption()).isEqualTo("This is the caption for a video");
-		assertThat(tsc.getVideos().get(0).getWidth()).isEqualTo(854);
+		assertThat(restController.getAllVideos().size()).isEqualTo(1);
+		Video video = restController.getVideoById(videoPostID);
+		assertThat(video).isNotNull();
+		assertThat(video.getContentType()).isEqualTo("video/mp4");
+		assertThat(video.getDuration()).isEqualTo(45);
+		assertThat(video.getExtension()).isEqualTo("mp4");
+		assertThat(video.getHeight()).isEqualTo(480);
+		assertThat(video.getPostId()).isEqualTo(videoPostID);
+		assertThat(video.getRevision()).isEqualTo("0");
+		assertThat(video.getVideoCaption()).isEqualTo("This is the caption for a video");
+		assertThat(video.getWidth()).isEqualTo(854);
 	}
-	
+
 	@Test
 	public void testPhotos() {
-		assertThat(tsc.getPhotos().size()).isEqualTo(3);
-		
-		Photo photo = tsc.getPhotos().get(0);
-		assertThat(photo.getPostId()).isEqualTo(180784644740L);
-		assertThat(photo.getCaption()).isEqualTo("This is the caption for a photo post");
-		//assertThat(photo.getPhotoLinkUrl()).isEqualTo("http://bit.ly/some-photo");
-		assertThat(photo.getUrl1280()).isEqualTo("photo 1 1280");
-		assertThat(photo.getUrl500()).isEqualTo("photo 1 500");
-		assertThat(photo.getUrl400()).isEqualTo("photo 1 400");
-		assertThat(photo.getUrl250()).isEqualTo("photo 1 250");
-		assertThat(photo.getUrl100()).isEqualTo("photo 1 100");
-		assertThat(photo.getUrl75()).isEqualTo("photo 1 75");
-		
-		photo = tsc.getPhotos().get(1);
-		assertThat(photo.getPostId()).isEqualTo(180254465582L);
+		List<Photo> photos = restController.getPhotoById(secondPhotoPostID);
+		assertThat(photos.size()).isEqualTo(2);
+
+		Photo photo = photos.get(0);
+		assertThat(photo.getPostId()).isEqualTo(secondPhotoPostID);
 		assertThat(photo.getCaption()).isEqualTo("This is hte photo caption");
 		assertThat(photo.getUrl1280()).isEqualTo("photo 3 1280");
 		assertThat(photo.getUrl500()).isEqualTo("photo 3 500");
@@ -133,9 +114,9 @@ public class PostXmlParsingUnitTest {
 		assertThat(photo.getUrl250()).isEqualTo("photo 3 250");
 		assertThat(photo.getUrl100()).isEqualTo("photo 3 100");
 		assertThat(photo.getUrl75()).isEqualTo("photo 3 75");
-		
-		photo = tsc.getPhotos().get(2);
-		assertThat(photo.getPostId()).isEqualTo(180254465582L);
+
+		photo = photos.get(1);
+		assertThat(photo.getPostId()).isEqualTo(secondPhotoPostID);
 		assertThat(photo.getCaption()).isEqualTo("This is hte photo caption");
 		assertThat(photo.getUrl1280()).isEqualTo("photo 4 1280");
 		assertThat(photo.getUrl500()).isEqualTo("photo 4 500");
@@ -143,5 +124,76 @@ public class PostXmlParsingUnitTest {
 		assertThat(photo.getUrl250()).isEqualTo("photo 4 250");
 		assertThat(photo.getUrl100()).isEqualTo("photo 4 100");
 		assertThat(photo.getUrl75()).isEqualTo("photo 4 75");
+
+		photos = restController.getPhotoById(firstPhotoPostID);
+		assertThat(photos.size()).isEqualTo(1);
+		photo = photos.get(0);
+		assertThat(photo.getPostId()).isEqualTo(firstPhotoPostID);
+		assertThat(photo.getCaption()).isEqualTo("This is the caption for a photo post");
+		assertThat(photo.getUrl1280()).isEqualTo("photo 1 1280");
+		assertThat(photo.getUrl500()).isEqualTo("photo 1 500");
+		assertThat(photo.getUrl400()).isEqualTo("photo 1 400");
+		assertThat(photo.getUrl250()).isEqualTo("photo 1 250");
+		assertThat(photo.getUrl100()).isEqualTo("photo 1 100");
+		assertThat(photo.getUrl75()).isEqualTo("photo 1 75");
+
 	}
+
+	@Test
+	public void testAddingPosts() throws FileNotFoundException {
+		List<Post> posts = restController.getAllPosts();
+		assertThat(posts.size()).isEqualTo(6);
+
+		for (Post post : posts) {
+			restController.markPostRead(post.getId());
+		}
+
+		Metadata md = restController.getMetadata();
+		md.setOverwritePostData(false);
+		md = restController.updateMetadata(md);
+
+		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-extended-xml.xml");
+		InputStream xmlFile = new FileInputStream(rawXmlFile);
+		BlogXmlReader.parseDocument(xmlFile, restController);
+		
+		posts = restController.getAllPosts();
+		assertThat(posts.size()).isEqualTo(7);
+		
+		assertThat(restController.getAllRegulars().size()).isEqualTo(2);
+		Regular regular = restController.getRegularById(addedRegularPostID);
+		assertThat(regular).isNotNull();
+		assertThat(regular.getPostId()).isEqualTo(addedRegularPostID);
+		assertThat(regular.getBody()).isEqualTo("post added after initial load");
+		assertThat(regular.getTitle()).isEqualTo("Added Post");
+		
+		Post post = restController.getPostById(addedRegularPostID);
+		assertThat(post).isNotNull();
+		assertThat(post.getIsRead()).isEqualTo(false);
+		
+		post = restController.getPostById(regularPostID);
+		assertThat(post).isNotNull();
+		assertThat(post.getIsRead()).isEqualTo(true);
+		
+		post = restController.getPostById(answerPostID);
+		assertThat(post).isNotNull();
+		assertThat(post.getIsRead()).isEqualTo(true);
+		
+		post = restController.getPostById(linkPostID);
+		assertThat(post).isNotNull();
+		assertThat(post.getIsRead()).isEqualTo(true);
+		
+		post = restController.getPostById(videoPostID);
+		assertThat(post).isNotNull();
+		assertThat(post.getIsRead()).isEqualTo(true);
+		
+		post = restController.getPostById(firstPhotoPostID);
+		assertThat(post).isNotNull();
+		assertThat(post.getIsRead()).isEqualTo(true);
+		
+		post = restController.getPostById(secondPhotoPostID);
+		assertThat(post).isNotNull();
+		assertThat(post.getIsRead()).isEqualTo(true);
+		
+	}
+
 }
