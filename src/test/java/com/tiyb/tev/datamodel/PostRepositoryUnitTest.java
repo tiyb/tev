@@ -14,16 +14,27 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.tiyb.tev.repository.PostRepository;
 
+/**
+ * Unit Tests for working with the Post Repo. A bit more testing is done here
+ * than is done for most XX Repo unit testing, just to verify that things are
+ * working as they should. In theory, if Spring Boot libraries are updated in
+ * such a way that it would break the application, these Unit Tests would
+ * highlight that.
+ */
 @RunWith(SpringRunner.class)
 @DataJpaTest
 public class PostRepositoryUnitTest {
 
 	@Autowired
 	private TestEntityManager entityManager;
-	
+
 	@Autowired
 	private PostRepository postRepo;
-	
+
+	/**
+	 * Verify that posts, once in the DB, can be retrieved via the Post Repo
+	 * implementation
+	 */
 	@Test
 	public void findPost() {
 		// given
@@ -40,14 +51,14 @@ public class PostRepositoryUnitTest {
 		post.setType(1L);
 		post.setUrl("http://url.com");
 		post.setUrlWithSlug("http://url.com/slug");
-		
+
 		entityManager.persist(post);
 		entityManager.flush();
-		
-		//when
+
+		// when
 		Optional<Post> found = postRepo.findById(1L);
-		
-		//then
+
+		// then
 		assertThat(found.isPresent());
 		assertThat(found.get().getDate()).isEqualTo(post.getDate());
 		assertThat(found.get().getDateGmt()).isEqualTo(post.getDateGmt());
@@ -62,19 +73,27 @@ public class PostRepositoryUnitTest {
 		assertThat(found.get().getUrl()).isEqualTo(post.getUrl());
 		assertThat(found.get().getUrlWithSlug()).isEqualTo(post.getUrlWithSlug());
 	}
-	
+
+	/**
+	 * Verifies that posts can be properly created in the DB via the Repo
+	 * implementation
+	 */
 	@Test
 	public void createPost() {
 		Post post = new Post();
 		post.setId(2L);
 		post.setDate("Jan 1, 2019");
-		
+
 		Post returnPost = postRepo.save(post);
-		
+
 		assertThat(returnPost.getId()).isEqualTo(post.getId());
 		assertThat(returnPost.getDate()).isEqualTo(post.getDate());
 	}
-	
+
+	/**
+	 * Verifies that the repo implementation's <code>findAll()</code> functions
+	 * correctly
+	 */
 	@Test
 	public void findAllPosts() {
 		Post post1 = new Post();
@@ -86,12 +105,15 @@ public class PostRepositoryUnitTest {
 		post2.setDate("Jan 2, 2019");
 		entityManager.persist(post2);
 		entityManager.flush();
-		
+
 		List<Post> returnedPosts = postRepo.findAll();
-		
+
 		assertThat(returnedPosts.size()).isEqualTo(2);
 	}
-	
+
+	/**
+	 * Verifies that the post repo's "delete all" functionality works
+	 */
 	@Test
 	public void deleteAllPosts() {
 		Post post1 = new Post();
@@ -103,12 +125,12 @@ public class PostRepositoryUnitTest {
 		post2.setDate("Jan 2, 2019");
 		entityManager.persist(post2);
 		entityManager.flush();
-		
+
 		postRepo.deleteAll();
-		
+
 		List<Post> returnedPosts = postRepo.findAll();
-		
+
 		assertThat(returnedPosts.size()).isEqualTo(0);
 	}
-	
+
 }

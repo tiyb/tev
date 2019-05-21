@@ -14,36 +14,47 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.tiyb.tev.repository.ConversationMessageRepository;
 import com.tiyb.tev.repository.ConversationRepository;
 
+/**
+ * Unit tests for the Conversation Repo. Only methods with a bit of logic are
+ * tested; i.e. not testing Spring Boot
+ */
 @RunWith(SpringRunner.class)
 @DataJpaTest
 public class ConversationRepositoryUnitTest {
 
 	@Autowired
 	private TestEntityManager entityManager;
-	
+
 	@Autowired
 	private ConversationRepository convoRepo;
-	
+
 	@Autowired
 	private ConversationMessageRepository convoMsgRepo;
-	
+
+	/**
+	 * Verify that conversations can be located via Participant
+	 */
 	@Test
 	public void findConversationByParticipant() {
 		Conversation convo = new Conversation();
 		convo.setNumMessages(2);
 		convo.setParticipant("convo participant");
 		convo.setParticipantAvatarUrl("http://www.participant1.com");
-		
+
 		entityManager.persist(convo);
 		entityManager.flush();
-		
+
 		Conversation foundConvo = convoRepo.findByParticipant("convo participant");
-		
+
 		assertThat(foundConvo.getId()).isEqualTo(convo.getId());
 		assertThat(foundConvo.getParticipant()).isEqualTo(convo.getParticipant());
 		assertThat(foundConvo.getParticipantAvatarUrl()).isEqualTo(convo.getParticipantAvatarUrl());
 	}
-	
+
+	/**
+	 * Verify that Conversation Messages can be located via ConversationID (i.e. not
+	 * Conversation <i>Message</i> ID)
+	 */
 	@Test
 	public void findConvoMsgsByConvoID() {
 		ConversationMessage msg1 = new ConversationMessage();
@@ -59,9 +70,9 @@ public class ConversationRepositoryUnitTest {
 		msg2.setTimestamp(1L);
 		entityManager.persist(msg2);
 		entityManager.flush();
-		
+
 		List<ConversationMessage> returnedMessages = convoMsgRepo.findByConversationIdOrderByTimestamp(1L);
-		
+
 		assertThat(returnedMessages.size()).isEqualTo(2);
 		assertThat(returnedMessages.get(0).getMessage()).isEqualTo(msg2.getMessage());
 		assertThat(returnedMessages.get(1).getMessage()).isEqualTo(msg1.getMessage());
