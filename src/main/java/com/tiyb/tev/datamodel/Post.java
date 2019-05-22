@@ -27,6 +27,8 @@ public class Post implements Serializable {
 	private Long id;
 
 	private String url;
+	@Lob
+	@Column(name="url_with_slug", length=10000)
 	private String urlWithSlug;
 	private String dateGmt;
 	private String date;

@@ -27,7 +27,6 @@ public class Answer implements Serializable {
 	@Lob
 	@Column(name="question", length=50000)
 	private String question;
-	@NotBlank
 	@Lob
 	@Column(name="answer", length=50000)
 	private String answer;
