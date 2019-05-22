@@ -327,6 +327,7 @@ public class TevRestControllerUnitTests {
 		md.setSortOrder("sort order");
 		md.setShowReadingPane(true);
 		md.setOverwritePostData(true);
+		md.setOverwriteConvoData(true);
 
 		restController.updateMetadata(md);
 

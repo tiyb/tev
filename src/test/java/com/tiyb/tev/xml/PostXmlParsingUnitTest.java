@@ -48,13 +48,13 @@ public class PostXmlParsingUnitTest {
 	@Autowired
 	private TEVRestController restController;
 
-	private long answerPostID = 180371366195L;
-	private long linkPostID = 180265557725L;
-	private long regularPostID = 180894436671L;
-	private long videoPostID = 180782992914L;
-	private long firstPhotoPostID = 180784644740L;
-	private long secondPhotoPostID = 180254465582L;
-	private long addedRegularPostID = 180894436672L;
+	private static final long answerPostID = 180371366195L;
+	private static final long linkPostID = 180265557725L;
+	private static final long regularPostID = 180894436671L;
+	private static final long videoPostID = 180782992914L;
+	private static final long firstPhotoPostID = 180784644740L;
+	private static final long secondPhotoPostID = 180254465582L;
+	private static final long addedRegularPostID = 180894436672L;
 
 	/**
 	 * Called before each unit test to properly reset the data back to an original

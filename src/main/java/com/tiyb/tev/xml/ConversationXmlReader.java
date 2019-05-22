@@ -23,6 +23,7 @@ import com.tiyb.tev.controller.TEVRestController;
 import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.ConversationMessage;
 import com.tiyb.tev.datamodel.Metadata;
+import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.exception.XMLParsingException;
 
 /**
@@ -192,22 +193,42 @@ public class ConversationXmlReader {
 	}
 
 	/**
+	 * <p>
 	 * Reads in the XML file, conversation by conversation. Whenever a new
-	 * conversation element is reached, a new object is created, the participant is
+	 * conversation element is reached a new object is created, the participant is
 	 * discovered (via <code>getParticipantName()</code>, and then
 	 * <code>getMessages()</code> is called to get all of the messages. The count of
 	 * that list is added to the conversation object.
+	 * </p>
 	 * 
-	 * @param xmlFile        Stream containing the XML file to be parsed
-	 * @param tumblrUser     The Tumblr name of the user of the application
-	 * @param tumblrId       The ID assigned to the user of the application by
-	 *                       Tumblr
-	 * @param restController Controller used to update the database with
-	 *                       conversations/messages
+	 * <p>
+	 * Logic also takes into account the "overwrite conversations" flag in metadata.
+	 * If the flag is set, all data is wiped ahead of time. When the flag is not
+	 * set: as each conversation is encountered the REST API is used to look for
+	 * that conversation: if it's found and the number of new messages isn't greater
+	 * than the number of existing messages it is left alone; otherwise, messages
+	 * are wiped, the conversation is set to no longer be read-only, and the new set
+	 * of messages is uploaded.
+	 * </p>
+	 * 
+	 * @param xmlFile           Stream containing the XML file to be parsed
+	 * @param tumblrUser        The Tumblr name of the user of the application
+	 * @param tumblrId          The ID assigned to the user of the application by
+	 *                          Tumblr
+	 * @param restController    Controller used to update the database with
+	 *                          conversations/messages
+	 * @param isOverwriteConvos Indicates whether conversations should be
+	 *                          overwritten, or left alone
 	 * @throws XMLParsingException
 	 */
 	private static void readConversations(InputStream xmlFile, String tumblrUser, String tumblrId,
 			TEVRestController restController) throws XMLParsingException {
+		boolean isOverwriteConvos = restController.getMetadata().getOverwriteConvoData();
+		
+		if(isOverwriteConvos) {
+			restController.deleteAllConvoMsgs();
+			restController.deleteAllConversations();
+		}
 		try {
 			XMLInputFactory factory = XMLInputFactory.newInstance();
 			XMLEventReader reader = factory.createXMLEventReader(xmlFile);
@@ -231,10 +252,37 @@ public class ConversationXmlReader {
 						conversation.setParticipantAvatarUrl(participant.getAvatarUrl());
 						conversation.setNumMessages(messages.size());
 
-						conversation = restController.createConversation(conversation);
-						for (ConversationMessage msg : messages) {
-							msg.setConversationId(conversation.getId());
-							restController.createConvoMessage(msg);
+						boolean isSendConvoToServer = true;
+
+						if (isOverwriteConvos) {
+							conversation = restController.createConversation(conversation);
+							isSendConvoToServer = true;
+						} else {
+							try {
+								Conversation convoOnServer = restController
+										.getConversationByParticipant(participant.getName());
+								if (messages.size() > convoOnServer.getNumMessages()) {
+									convoOnServer.setHideConversation(false);
+									convoOnServer = restController.updateConversation(convoOnServer.getId(),
+											convoOnServer);
+									List<ConversationMessage> msgsForConv = restController
+											.getConvoMsgByConvoID(convoOnServer.getId());
+									for (ConversationMessage msg : msgsForConv) {
+										restController.deleteConversationMessage(msg.getId());
+									}
+									isSendConvoToServer = true;
+									conversation.setId(convoOnServer.getId());
+								} else {
+									isSendConvoToServer = false;
+								}
+							} catch (ResourceNotFoundException e) {
+								conversation = restController.createConversation(conversation);
+								isSendConvoToServer = true;
+							}
+						}
+
+						if (isSendConvoToServer) {
+							uploadMessagesForConvo(restController, messages, conversation.getId());
 						}
 					}
 				}
@@ -243,6 +291,21 @@ public class ConversationXmlReader {
 			throw new XMLParsingException();
 		} finally {
 
+		}
+	}
+
+	/**
+	 * Helper function to upload messages for a given conversation
+	 * 
+	 * @param restController The controller for accessing the REST API
+	 * @param messages       The messages to upload
+	 * @param convoID        The ID of the conversation
+	 */
+	private static void uploadMessagesForConvo(TEVRestController restController, List<ConversationMessage> messages,
+			Long convoID) {
+		for (ConversationMessage msg : messages) {
+			msg.setConversationId(convoID);
+			restController.createConvoMessage(msg);
 		}
 	}
 
@@ -469,7 +532,7 @@ public class ConversationXmlReader {
 
 		throw new XMLStreamException(END_OF_FILE_MESSAGE);
 	}
-	
+
 	/**
 	 * Helper class (essentially a struct), used by the
 	 * <code>getMainParticipant()</code> method for returning a few pieces of

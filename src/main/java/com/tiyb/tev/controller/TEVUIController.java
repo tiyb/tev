@@ -126,9 +126,6 @@ public class TEVUIController {
 	public String handleConversationFileUpload(@RequestParam("file") MultipartFile file,
 			RedirectAttributes redirectAttributes) {
 
-		restController.deleteAllConvoMsgs();
-		restController.deleteAllConversations();
-
 		try {
 			ConversationXmlReader.parseDocument(file, restController);
 		} catch (XMLParsingException e) {

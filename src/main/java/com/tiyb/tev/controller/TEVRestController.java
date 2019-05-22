@@ -848,6 +848,7 @@ public class TEVRestController {
 		md.setPageLength(metadataDetails.getPageLength());
 		md.setShowReadingPane(metadataDetails.getShowReadingPane());
 		md.setOverwritePostData(metadataDetails.getOverwritePostData());
+		md.setOverwriteConvoData(metadataDetails.getOverwriteConvoData());
 		Metadata returnValue = metadataRepo.save(md);
 
 		return returnValue;
@@ -883,7 +884,13 @@ public class TEVRestController {
 	 */
 	@GetMapping("/conversation")
 	public Conversation getConversationByParticipant(@RequestParam("participant") String participantName) {
-		return conversationRepo.findByParticipant(participantName);
+		Conversation convo = conversationRepo.findByParticipant(participantName);
+		
+		if(convo == null) {
+			throw new ResourceNotFoundException("Conversation", "id", participantName);
+		}
+		
+		return convo;
 	}
 	
 	/**

@@ -44,6 +44,12 @@ public class ConversationXmlParsingUnitTests {
 
 	@Autowired
 	private TEVRestController restController;
+	
+	private static final String convo1Participant = "participant1";
+	private static final String convo2Participant = "participant2";
+	private static final String convo3Participant = "participant3";
+	private static final String convo4Participant = "participant4";
+	private static final String convo5Participant = "participant5";
 
 	/**
 	 * Run before each test to populate the DB fresh, so that the Unit Tests can
@@ -56,6 +62,7 @@ public class ConversationXmlParsingUnitTests {
 	public void Setup() throws IOException {
 		Metadata md = restController.getMetadata();
 		md.setMainTumblrUser("blogname");
+		md.setOverwriteConvoData(true);
 		restController.updateMetadata(md);
 
 		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-messages-xml.xml");
@@ -80,21 +87,21 @@ public class ConversationXmlParsingUnitTests {
 		assertThat(convos).isNotNull();
 		assertThat(convos.size()).isEqualTo(4);
 
-		Conversation firstConvo = restController.getConversationByParticipant("participant1");
+		Conversation firstConvo = restController.getConversationByParticipant(convo1Participant);
 		assertThat(firstConvo).isNotNull();
 		assertThat(firstConvo.getNumMessages()).isEqualTo(9);
 		assertThat(firstConvo.getParticipantAvatarUrl()).isEqualTo("http://participant1/avatar");
 
-		Conversation secondConvo = restController.getConversationByParticipant("participant2");
+		Conversation secondConvo = restController.getConversationByParticipant(convo2Participant);
 		assertThat(secondConvo).isNotNull();
 		assertThat(secondConvo.getNumMessages()).isEqualTo(9);
 		assertThat(secondConvo.getParticipantAvatarUrl()).isEqualTo("http://participant2/avatar");
 
-		Conversation thirdConvo = restController.getConversationByParticipant("participant3");
+		Conversation thirdConvo = restController.getConversationByParticipant(convo3Participant);
 		assertThat(thirdConvo).isNotNull();
 		assertThat(thirdConvo.getNumMessages()).isEqualTo(1);
 
-		Conversation fourthConvo = restController.getConversationByParticipant("participant4");
+		Conversation fourthConvo = restController.getConversationByParticipant(convo4Participant);
 		assertThat(fourthConvo).isNotNull();
 		assertThat(fourthConvo.getNumMessages()).isEqualTo(1);
 	}
@@ -107,7 +114,7 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test
 	public void checkMessages() {
-		Conversation firstConvo = restController.getConversationByParticipant("participant1");
+		Conversation firstConvo = restController.getConversationByParticipant(convo1Participant);
 		List<ConversationMessage> firstConvoMsgs = restController.getConvoMsgByConvoID(firstConvo.getId());
 		assertThat(firstConvoMsgs).isNotNull();
 		assertThat(firstConvoMsgs.size()).isEqualTo(9);
@@ -127,5 +134,70 @@ public class ConversationXmlParsingUnitTests {
 		assertThat(firstConvoMsgs.get(8).getReceived()).isEqualTo(false);
 		assertThat(firstConvoMsgs.get(8).getTimestamp()).isEqualTo(1544221221L);
 
+	}
+	
+	/**
+	 * Tests parsing of the Conversation XML in cases where the "overwrite
+	 * conversations" flag is set to false; unchanged conversations shoudl be left
+	 * alone, new conversations should be uploaded, and conversations that have had
+	 * new messages added should have those messages uploaded, and be marked as
+	 * un-hidden.
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	public void testAddingConvos() throws IOException {
+		List<Conversation> convos = restController.getAllConversations();
+		assertThat(convos.size()).isEqualTo(4);
+		
+		for(Conversation convo : convos) {
+			convo.setHideConversation(true);
+			restController.updateConversation(convo.getId(), convo);
+		}
+		
+		Metadata md = restController.getMetadata();
+		md.setOverwriteConvoData(false);
+		md = restController.updateMetadata(md);
+		
+		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-messages-extended-xml.xml");
+		InputStream xmlFile = new FileInputStream(rawXmlFile);
+		MockMultipartFile mockFile = new MockMultipartFile("testmessages", xmlFile);
+		ConversationXmlReader.parseDocument(mockFile, restController);
+		
+		convos = restController.getAllConversations();
+		assertThat(convos).isNotNull();
+		assertThat(convos.size()).isEqualTo(5);
+		
+		Conversation convo = restController.getConversationByParticipant(convo1Participant);
+		assertThat(convo).isNotNull();
+		assertThat(convo.getHideConversation()).isEqualTo(false);
+		List<ConversationMessage> messages = restController.getConvoMsgByConvoID(convo.getId());
+		assertThat(messages).isNotNull();
+		assertThat(messages.size()).isEqualTo(10);
+		
+		convo = restController.getConversationByParticipant(convo2Participant);
+		assertThat(convo).isNotNull();
+		assertThat(convo.getHideConversation()).isEqualTo(true);
+		
+		convo = restController.getConversationByParticipant(convo3Participant);
+		assertThat(convo).isNotNull();
+		assertThat(convo.getHideConversation()).isEqualTo(true);
+		
+		convo = restController.getConversationByParticipant(convo4Participant);
+		assertThat(convo).isNotNull();
+		assertThat(convo.getHideConversation()).isEqualTo(true);
+		
+		convo = restController.getConversationByParticipant(convo5Participant);
+		assertThat(convo).isNotNull();
+		assertThat(convo.getHideConversation()).isEqualTo(false);
+		messages = restController.getConvoMsgByConvoID(convo.getId());
+		assertThat(messages).isNotNull();
+		assertThat(messages.size()).isEqualTo(1);
+		
+		ConversationMessage message = messages.get(0);
+		assertThat(message.getMessage()).isEqualTo("Message 1");
+		assertThat(message.getType()).isEqualTo("TEXT");
+		assertThat(message.getReceived()).isEqualTo(true);
+		assertThat(message.getTimestamp()).isEqualTo(1544012468L);
 	}
 }

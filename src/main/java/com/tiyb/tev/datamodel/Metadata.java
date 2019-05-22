@@ -77,6 +77,7 @@ public class Metadata implements Serializable {
 	private Integer pageLength;
 	private Boolean showReadingPane;
 	private Boolean overwritePostData;
+	private Boolean overwriteConvoData;
 
 	/**
 	 * Helper function to generate a new Metadata object, with some defaults filled
@@ -94,6 +95,7 @@ public class Metadata implements Serializable {
 		md.setFavFilter(FAV_FILTERS.get(2));
 		md.setPageLength(10);
 		md.setOverwritePostData(false);
+		md.setOverwriteConvoData(false);
 
 		return md;
 	}
@@ -150,6 +152,16 @@ public class Metadata implements Serializable {
 		if (showReadingPane != null) {
 			builder.append("showReadingPane=");
 			builder.append(showReadingPane);
+			builder.append(", ");
+		}
+		if (overwritePostData != null) {
+			builder.append("overwritePostData=");
+			builder.append(overwritePostData);
+			builder.append(", ");
+		}
+		if (overwriteConvoData != null) {
+			builder.append("overwriteConvoData=");
+			builder.append(overwriteConvoData);
 		}
 		builder.append("]");
 		return builder.toString();
@@ -241,6 +253,14 @@ public class Metadata implements Serializable {
 
 	public void setOverwritePostData(Boolean overwritePostData) {
 		this.overwritePostData = overwritePostData;
+	}
+
+	public Boolean getOverwriteConvoData() {
+		return overwriteConvoData;
+	}
+
+	public void setOverwriteConvoData(Boolean overwriteConvoData) {
+		this.overwriteConvoData = overwriteConvoData;
 	}
 
 }
