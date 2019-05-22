@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
 
 /**
  * Encapsulates the data needed for a Tumblr "Answer" style of post
@@ -23,7 +22,6 @@ public class Answer implements Serializable {
 	private static final long serialVersionUID = -4839741081483158077L;
 	@Id
 	private Long postId;
-	@NotBlank
 	@Lob
 	@Column(name="question", length=50000)
 	private String question;

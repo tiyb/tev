@@ -93,6 +93,12 @@ $(document).ready(function() {
 					}
 				},
 				{
+					"data": "state",
+					"render": function(data, type, row, meta) {
+						return "<div class='clickableTableValue'>" + data + "</div>";
+					}
+				},
+				{
 					"data": "slug",
 					"render": function(data,type,row,meta) {
 						return "<div class='clickableTableValue'>" + data.replace(/\-/g, ' ') + "</div>";
@@ -182,7 +188,7 @@ $(document).ready(function() {
 				url: "/api/posts/" + postID + "/markFavourite",
 				type: "PUT"
 			});
-			$(this).parents('tr').children('td:nth-child(6)').html($.i18n.prop('index_posttable_isFavourite'));
+			$(this).parents('tr').children('td:nth-child(7)').html($.i18n.prop('index_posttable_isFavourite'));
 			$('#displayPaneIFrame').height($('#contentDisplayTable').height());
 			postTable.draw();
 			return false;
@@ -295,29 +301,29 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
 	if(filterVal == "Do not Filter") {
 		if(favFilterVal == "Show Everything") {
 			return true;
-		} else if (favFilterVal == "Show Favourites" && data[5] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+		} else if (favFilterVal == "Show Favourites" && data[6] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
 			return true
-		} else if(favFilterVal == "Show Non Favourites" && data[5] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+		} else if(favFilterVal == "Show Non Favourites" && data[6] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
 			return true;
 		}
 	}
 	
-	if(filterVal == "Filter Read Posts" && data[6] == $.i18n.prop('index_posttable_isNotreadIndicatorCLEAN')) {
+	if(filterVal == "Filter Read Posts" && data[7] == $.i18n.prop('index_posttable_isNotreadIndicatorCLEAN')) {
 		if(favFilterVal == "Show Everything") {
 			return true;
-		} else if (favFilterVal == "Show Favourites" && data[5] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+		} else if (favFilterVal == "Show Favourites" && data[6] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
 			return true
-		} else if(favFilterVal == "Show Non Favourites" && data[5] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+		} else if(favFilterVal == "Show Non Favourites" && data[6] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
 			return true;
 		}
 	}
 	
-	if(filterVal == "Filter Unread Posts" && data[6] == $.i18n.prop('index_posttable_isReadIndicatorCLEAN')) {
+	if(filterVal == "Filter Unread Posts" && data[7] == $.i18n.prop('index_posttable_isReadIndicatorCLEAN')) {
 		if(favFilterVal == "Show Everything") {
 			return true;
-		} else if (favFilterVal == "Show Favourites" && data[5] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+		} else if (favFilterVal == "Show Favourites" && data[6] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
 			return true
-		} else if(favFilterVal == "Show Non Favourites" && data[5] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+		} else if(favFilterVal == "Show Non Favourites" && data[6] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
 			return true;
 		}
 	}
@@ -344,20 +350,23 @@ function sortTable() {
 	case "Type":
 		sortColumn = 1;
 		break;
-	case "Slug":
+	case "State":
 		sortColumn = 2;
 		break;
-	case "Hashtags":
+	case "Slug":
 		sortColumn = 3;
 		break;
-	case "Date":
+	case "Hashtags":
 		sortColumn = 4;
 		break;
-	case "Is Favourite":
+	case "Date":
 		sortColumn = 5;
 		break;
-	case "Is Read":
+	case "Is Favourite":
 		sortColumn = 6;
+		break;
+	case "Is Read":
+		sortColumn = 7;
 		break;
 	default:
 		sortColumn = 0;
@@ -376,18 +385,21 @@ function updateSortOrderInMD(column, order) {
 		metadata.sortColumn = "Type";
 		break;
 	case 2:
-		metadata.sortColumn = "Slug";
+		metadata.sortColumn = "State";
 		break;
 	case 3:
-		metadata.sortColumn = "Hashtags";
+		metadata.sortColumn = "Slug";
 		break;
 	case 4:
-		metadata.sortColumn = "Date";
+		metadata.sortColumn = "Hashtags";
 		break;
 	case 5:
-		metadata.sortColumn = "Is Favourite";
+		metadata.sortColumn = "Date";
 		break;
 	case 6:
+		metadata.sortColumn = "Is Favourite";
+		break;
+	case 7:
 		metadata.sortColumn = "Is Read";
 		break;
 	default:

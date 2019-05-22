@@ -37,14 +37,13 @@ public class Post implements Serializable {
 	private String slug;
 	private Boolean isReblog;
 	private String tumblelog;
-	private Integer width;
-	private Integer height;
 	private Long type;
 	private Boolean isRead = false;
 	@Lob
 	@Column(name="tags", length=50000)
 	private String tags = "";
 	private Boolean isFavourite = false;
+	private String state;
 
 	@Override
 	public String toString() {
@@ -100,16 +99,6 @@ public class Post implements Serializable {
 			builder.append(tumblelog);
 			builder.append(", ");
 		}
-		if (width != null) {
-			builder.append("width=");
-			builder.append(width);
-			builder.append(", ");
-		}
-		if (height != null) {
-			builder.append("height=");
-			builder.append(height);
-			builder.append(", ");
-		}
 		if (type != null) {
 			builder.append("type=");
 			builder.append(type);
@@ -128,6 +117,11 @@ public class Post implements Serializable {
 		if (isFavourite != null) {
 			builder.append("isFavourite=");
 			builder.append(isFavourite);
+			builder.append(", ");
+		}
+		if (state != null) {
+			builder.append("state=");
+			builder.append(state);
 		}
 		builder.append("]");
 		return builder.toString();
@@ -213,22 +207,6 @@ public class Post implements Serializable {
 		this.tumblelog = tumblelog;
 	}
 
-	public Integer getWidth() {
-		return width;
-	}
-
-	public void setWidth(Integer width) {
-		this.width = width;
-	}
-
-	public Integer getHeight() {
-		return height;
-	}
-
-	public void setHeight(Integer height) {
-		this.height = height;
-	}
-
 	public Long getType() {
 		return type;
 	}
@@ -259,5 +237,13 @@ public class Post implements Serializable {
 
 	public void setIsFavourite(Boolean isFavourite) {
 		this.isFavourite = isFavourite;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
 	}
 }

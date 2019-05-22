@@ -63,7 +63,6 @@ public class TevRestControllerUnitTests {
 		modifiedPost.setIsReblog(true);
 		modifiedPost.setSlug("New Slug");
 		modifiedPost.setDateGmt("Date GMT");
-		modifiedPost.setHeight(1);
 		modifiedPost.setIsFavourite(true);
 		modifiedPost.setIsRead(true);
 		modifiedPost.setIsReblog(true);
@@ -74,7 +73,7 @@ public class TevRestControllerUnitTests {
 		modifiedPost.setUnixtimestamp(25L);
 		modifiedPost.setUrl("URL");
 		modifiedPost.setUrlWithSlug("URL with slug");
-		modifiedPost.setWidth(5);
+		modifiedPost.setState("published");
 
 		restController.updatePost(1L, modifiedPost);
 

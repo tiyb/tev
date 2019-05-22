@@ -45,7 +45,7 @@ public class Metadata implements Serializable {
 	/**
 	 * Static constant list of the different columns by which data can be sorted
 	 */
-	public static final List<String> SORT_COLUMNS = Arrays.asList("ID", "Type", "Slug", "Date", "Is Read",
+	public static final List<String> SORT_COLUMNS = Arrays.asList("ID", "Type", "State", "Slug", "Date", "Is Read",
 			"Is Favourite", "Hashtags");
 	/**
 	 * Static constant list of the different ways data can be sorted (ascending or
@@ -59,7 +59,7 @@ public class Metadata implements Serializable {
 	 */
 	public static final List<String> FAV_FILTERS = Arrays.asList("Show Favourites", "Show Non Favourites",
 			"Show Everything");
-	
+
 	/**
 	 * Static list of lengths the "number of records shown" drop-down can be set to
 	 */

@@ -174,7 +174,6 @@ public class TEVRestController {
 
 		post.setDate(postDetails.getDate());
 		post.setDateGmt(postDetails.getDateGmt());
-		post.setHeight(postDetails.getHeight());
 		post.setIsReblog(postDetails.getIsReblog());
 		post.setReblogKey(postDetails.getReblogKey());
 		post.setSlug(postDetails.getSlug());
@@ -183,10 +182,10 @@ public class TEVRestController {
 		post.setUnixtimestamp(postDetails.getUnixtimestamp());
 		post.setUrl(postDetails.getUrl());
 		post.setUrlWithSlug(postDetails.getUrlWithSlug());
-		post.setWidth(postDetails.getWidth());
 		post.setIsRead(postDetails.getIsRead());
 		post.setTags(postDetails.getTags());
 		post.setIsFavourite(postDetails.getIsFavourite());
+		post.setState(postDetails.getState());
 
 		Post updatedPost = postRepo.save(post);
 

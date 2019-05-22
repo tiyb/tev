@@ -73,6 +73,16 @@ public class PostXmlParsingUnitTest {
 
 		BlogXmlReader.parseDocument(xmlFile, restController);
 	}
+	
+	/**
+	 * Simple check that all posts have been loaded; details are checked in other unit tests
+	 */
+	@Test
+	public void testAllPosts() {
+		List<Post> posts = restController.getAllPosts();
+		assertThat(posts).isNotNull();
+		assertThat(posts.size()).isEqualTo(6);		
+	}
 
 	/**
 	 * Verify that test Answers in the input XML have been properly inserted into
@@ -80,6 +90,23 @@ public class PostXmlParsingUnitTest {
 	 */
 	@Test
 	public void testAnswer() {
+		Post post = restController.getPostById(answerPostID);
+		assertThat(post).isNotNull();
+		assertThat(post.getDate()).isEqualTo("Thu, 22 Nov 2018 03:26:25");
+		assertThat(post.getDateGmt()).isEqualTo("2018-11-22 08:26:25 GMT");
+		assertThat(post.getIsFavourite()).isEqualTo(false);
+		assertThat(post.getIsRead()).isEqualTo(false);
+		assertThat(post.getIsReblog()).isEqualTo(true);
+		assertThat(post.getReblogKey()).isEqualTo("OQqor1Zh");
+		assertThat(post.getSlug()).isEqualTo("slug-slug-slug");
+		assertThat(post.getState()).isEqualTo("published");
+		assertThat(post.getTags()).isEqualTo("tag2");
+		assertThat(post.getTumblelog()).isEqualTo("mainblog");
+		assertThat(post.getType()).isEqualTo(1L);
+		assertThat(post.getUnixtimestamp()).isEqualTo(1542875185L);
+		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180371366195");
+		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180371366195/slug-slug-slug");
+		
 		assertThat(restController.getAllAnswers().size()).isEqualTo(1);
 		Answer answer = restController.getAnswerById(answerPostID);
 		assertThat(answer).isNotNull();
@@ -94,6 +121,23 @@ public class PostXmlParsingUnitTest {
 	 */
 	@Test
 	public void testLink() {
+		Post post = restController.getPostById(linkPostID);
+		assertThat(post).isNotNull();
+		assertThat(post.getDate()).isEqualTo("Mon, 19 Nov 2018 01:09:08");
+		assertThat(post.getDateGmt()).isEqualTo("2018-11-19 06:09:08 GMT");
+		assertThat(post.getIsFavourite()).isEqualTo(false);
+		assertThat(post.getIsRead()).isEqualTo(false);
+		assertThat(post.getIsReblog()).isEqualTo(false);
+		assertThat(post.getReblogKey()).isEqualTo("6pFgAxH2");
+		assertThat(post.getSlug()).isEqualTo("tumblr");
+		assertThat(post.getState()).isEqualTo("published");
+		assertThat(post.getTags()).isEqualTo("tag1");
+		assertThat(post.getTumblelog()).isEqualTo("mainblog");
+		assertThat(post.getType()).isEqualTo(2L);
+		assertThat(post.getUnixtimestamp()).isEqualTo(1542607748L);
+		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180265557725");
+		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180265557725/tumblr");
+		
 		assertThat(restController.getAllLinks().size()).isEqualTo(1);
 		Link link = restController.getLinkById(linkPostID);
 		assertThat(link).isNotNull();
@@ -109,6 +153,23 @@ public class PostXmlParsingUnitTest {
 	 */
 	@Test
 	public void testRegular() {
+		Post post = restController.getPostById(regularPostID);
+		assertThat(post).isNotNull();
+		assertThat(post.getDate()).isEqualTo("Fri, 07 Dec 2018 11:48:43");
+		assertThat(post.getDateGmt()).isEqualTo("2018-12-07 16:48:43 GMT");
+		assertThat(post.getIsFavourite()).isEqualTo(false);
+		assertThat(post.getIsRead()).isEqualTo(false);
+		assertThat(post.getIsReblog()).isEqualTo(true);
+		assertThat(post.getReblogKey()).isEqualTo("O6pLVlp1");
+		assertThat(post.getSlug()).isEqualTo("first-post");
+		assertThat(post.getState()).isEqualTo("queued");
+		assertThat(post.getTags()).isEqualTo("tag1, tag2");
+		assertThat(post.getTumblelog()).isEqualTo("mainblog");
+		assertThat(post.getType()).isEqualTo(4L);
+		assertThat(post.getUnixtimestamp()).isEqualTo(1544201323L);
+		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180894436671");
+		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180894436671/first-post");
+		
 		assertThat(restController.getAllRegulars().size()).isEqualTo(1);
 		Regular regular = restController.getRegularById(regularPostID);
 		assertThat(regular).isNotNull();
@@ -123,6 +184,23 @@ public class PostXmlParsingUnitTest {
 	 */
 	@Test
 	public void testVideo() {
+		Post post = restController.getPostById(videoPostID);
+		assertThat(post).isNotNull();
+		assertThat(post.getDate()).isEqualTo("Tue, 04 Dec 2018 01:09:21");
+		assertThat(post.getDateGmt()).isEqualTo("2018-12-04 06:09:21 GMT");
+		assertThat(post.getIsFavourite()).isEqualTo(false);
+		assertThat(post.getIsRead()).isEqualTo(false);
+		assertThat(post.getIsReblog()).isEqualTo(true);
+		assertThat(post.getReblogKey()).isEqualTo("IPc1CZyV");
+		assertThat(post.getSlug()).isEqualTo("another-slug");
+		assertThat(post.getState()).isEqualTo("published");
+		assertThat(post.getTags()).isEqualTo("tag5, tag6, tag7, tag8, tag9, tag10");
+		assertThat(post.getTumblelog()).isEqualTo("mainblog");
+		assertThat(post.getType()).isEqualTo(5L);
+		assertThat(post.getUnixtimestamp()).isEqualTo(1543903761L);
+		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180782992914");
+		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180782992914/another-slug");
+		
 		assertThat(restController.getAllVideos().size()).isEqualTo(1);
 		Video video = restController.getVideoById(videoPostID);
 		assertThat(video).isNotNull();
@@ -142,6 +220,40 @@ public class PostXmlParsingUnitTest {
 	 */
 	@Test
 	public void testPhotos() {
+		Post post = restController.getPostById(firstPhotoPostID);
+		assertThat(post).isNotNull();
+		assertThat(post.getDate()).isEqualTo("Tue, 04 Dec 2018 02:17:52");
+		assertThat(post.getDateGmt()).isEqualTo("2018-12-04 07:17:52 GMT");
+		assertThat(post.getIsFavourite()).isEqualTo(false);
+		assertThat(post.getIsRead()).isEqualTo(false);
+		assertThat(post.getIsReblog()).isEqualTo(true);
+		assertThat(post.getReblogKey()).isEqualTo("Pius5FOw");
+		assertThat(post.getSlug()).isEqualTo("new-slug");
+		assertThat(post.getState()).isEqualTo("published");
+		assertThat(post.getTags()).isEqualTo("tag3, tag4");
+		assertThat(post.getTumblelog()).isEqualTo("mainblog");
+		assertThat(post.getType()).isEqualTo(3L);
+		assertThat(post.getUnixtimestamp()).isEqualTo(1543907872L);
+		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180784644740");
+		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180784644740/new-slug");
+		
+		post = restController.getPostById(secondPhotoPostID);
+		assertThat(post).isNotNull();
+		assertThat(post.getDate()).isEqualTo("Sun, 18 Nov 2018 18:17:36");
+		assertThat(post.getDateGmt()).isEqualTo("2018-11-18 23:17:36 GMT");
+		assertThat(post.getIsFavourite()).isEqualTo(false);
+		assertThat(post.getIsRead()).isEqualTo(false);
+		assertThat(post.getIsReblog()).isEqualTo(true);
+		assertThat(post.getReblogKey()).isEqualTo("jTxuwC0o");
+		assertThat(post.getSlug()).isEqualTo("slugs-are-delicious");
+		assertThat(post.getState()).isEqualTo("draft");
+		assertThat(post.getTags()).isEqualTo("tag11, tag12, tag13, tag14, tag15");
+		assertThat(post.getTumblelog()).isEqualTo("mainblog");
+		assertThat(post.getType()).isEqualTo(3L);
+		assertThat(post.getUnixtimestamp()).isEqualTo(1542583056L);
+		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180254465582");
+		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180254465582/slugs-are-delicious");
+		
 		List<Photo> photos = restController.getPhotoById(secondPhotoPostID);
 		assertThat(photos.size()).isEqualTo(2);
 

@@ -104,14 +104,14 @@ public class BlogXmlReader {
 		List<Type> allowableTypes = restController.getAllTypes();
 		loadTypeData(allowableTypes, typeEntries, typeIDs);
 		boolean isOverwritePosts = restController.getMetadata().getOverwritePostData();
-		
-		if(isOverwritePosts) {
+
+		if (isOverwritePosts) {
 			restController.deleteAllRegulars();
 			restController.deleteAllAnswers();
 			restController.deleteAllLinks();
 			restController.deleteAllPhotos();
 			restController.deleteAllVideos();
-			restController.deleteAllPosts();			
+			restController.deleteAllPosts();
 		}
 
 		readPosts(xmlFile, typeEntries, typeIDs, restController, isOverwritePosts);
@@ -130,8 +130,8 @@ public class BlogXmlReader {
 	 * <ol>
 	 * <li>As the "start element" event is encountered for each post, a new
 	 * <code>Post</code> object is created</li>
-	 * <li>The attributes are read into that object (via the
-	 * <code>readPostAttributes()</code> method, to populate its data.</li>
+	 * <li>The attributes are read into that object via the
+	 * <code>readPostAttributes()</code> method to populate its data</li>
 	 * <li>The post is inserted into the DB via the REST controller.
 	 * <ul>
 	 * <li>If the "overwrite posts" option is set in the metadata, the logic first
@@ -150,7 +150,9 @@ public class BlogXmlReader {
 	 * <li>The previously set boolean is checked first, before submitting the
 	 * data.</li>
 	 * </ul>
-	 * </i>
+	 * </li>
+	 * <li>A final update of the post is done. This is necessary because tags for
+	 * the post were discovered <i>after</i> the post was originally inserted.</li>
 	 * </ol>
 	 * 
 	 * @param xmlFile          The stream containing the XML file to be parsed
@@ -229,7 +231,9 @@ public class BlogXmlReader {
 							}
 							break;
 						}
-
+						if (isSubmitablePost) {
+							post = restController.updatePost(post.getId(), post);
+						}
 					}
 				}
 			}
@@ -289,7 +293,7 @@ public class BlogXmlReader {
 				post.setSlug(att.getValue());
 				break;
 			case "state":
-				// attribute not used
+				post.setState(att.getValue());
 				break;
 			case "is_reblog":
 				post.setIsReblog(new Boolean(att.getValue()));
