@@ -103,6 +103,40 @@ public class TEVRestController {
 	public List<Post> getAllPosts() {
 		return postRepo.findAll();
 	}
+	
+	/**
+	 * GET request to mark all posts in the database as read. Not intended to be
+	 * used by the UI, but helpful as a "helper" API.
+	 * 
+	 * @return Success indicator
+	 */
+	@GetMapping("/posts/markAllRead")
+	public String markAllPostsRead() {
+		List<Post> posts = getAllPosts();
+		
+		for(Post post : posts) {
+			markPostRead(post.getId());
+		}
+		
+		return "Success";
+	}
+	
+	/**
+	 * GET request to mark all posts in the database as unread. Not intended to be
+	 * used by the UI, but helpful as a "helper" API.
+	 * 
+	 * @return Success indicator
+	 */
+	@GetMapping("/posts/markAllUnread")
+	public String markAllPostsUnread() {
+		List<Post> posts = getAllPosts();
+
+		for (Post post : posts) {
+			markPostUnread(post.getId());
+		}
+
+		return "Success";
+	}
 
 	/**
 	 * POST request to submit a Tumblr post into the system
