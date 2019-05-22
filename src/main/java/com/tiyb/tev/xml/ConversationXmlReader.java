@@ -233,7 +233,7 @@ public class ConversationXmlReader {
 
 			Conversation conversation = null;
 			List<ConversationMessage> messages = null;
-			Participant participant = null;
+			ConversationXmlReader.Participant participant = null;
 
 			while (reader.hasNext()) {
 				XMLEvent event = reader.nextEvent();
@@ -246,8 +246,8 @@ public class ConversationXmlReader {
 						messages = getMessages(reader, tumblrId);
 
 						conversation = new Conversation();
-						conversation.setParticipant(participant.getName());
-						conversation.setParticipantAvatarUrl(participant.getAvatarUrl());
+						conversation.setParticipant(participant.name);
+						conversation.setParticipantAvatarUrl(participant.avatarUrl);
 						conversation.setNumMessages(messages.size());
 
 						boolean isSendConvoToServer = true;
@@ -258,7 +258,7 @@ public class ConversationXmlReader {
 						} else {
 							try {
 								Conversation convoOnServer = restController
-										.getConversationByParticipant(participant.getName());
+										.getConversationByParticipant(participant.name);
 								if (messages.size() > convoOnServer.getNumMessages()) {
 									convoOnServer.setHideConversation(false);
 									convoOnServer = restController.updateConversation(convoOnServer.getId(),
@@ -433,10 +433,10 @@ public class ConversationXmlReader {
 	 *         <i>other</i> (non-TEV-user) participant in the conversation
 	 * @throws XMLStreamException
 	 */
-	private static Participant getParticipantName(XMLEventReader reader, String tumblrUser) throws XMLStreamException {
+	private static ConversationXmlReader.Participant getParticipantName(XMLEventReader reader, String tumblrUser) throws XMLStreamException {
 		String participantName = "";
 		String participantAvatar = "";
-		Participant participant = new Participant();
+		ConversationXmlReader.Participant participant = new ConversationXmlReader.Participant();
 
 		while (reader.hasNext()) {
 			XMLEvent event = reader.nextEvent();
@@ -457,8 +457,8 @@ public class ConversationXmlReader {
 					}
 					participantName = readCharacters(reader);
 					if (!participantName.equals(tumblrUser)) {
-						participant.setAvatarUrl(participantAvatar);
-						participant.setName(fixName(participantName));
+						participant.avatarUrl = participantAvatar;
+						participant.name = fixName(participantName);
 					}
 				}
 			} else if (event.isEndElement()) {
@@ -552,6 +552,23 @@ public class ConversationXmlReader {
 		 * The Tumblr user's ID, as contained in the conversation XML.
 		 */
 		public String id;
+	}
+	
+	/**
+	 * Helper class (essentially a struct), used by the
+	 * <code>getParticipantName()</code> method. Since this is just an inner, helper
+	 * class, trouble wasn't taken to make it a proper bean with getters/setters,
+	 * just public member variables.
+	 */
+	public static class Participant {
+		/**
+		 * Participant's public name
+		 */
+		public String name;
+		/**
+		 * Participant's avatar URL
+		 */
+		public String avatarUrl;
 	}
 
 }
