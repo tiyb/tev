@@ -217,8 +217,6 @@ public class ConversationXmlReader {
 	 *                          Tumblr
 	 * @param restController    Controller used to update the database with
 	 *                          conversations/messages
-	 * @param isOverwriteConvos Indicates whether conversations should be
-	 *                          overwritten, or left alone
 	 * @throws XMLParsingException
 	 */
 	private static void readConversations(InputStream xmlFile, String tumblrUser, String tumblrId,
