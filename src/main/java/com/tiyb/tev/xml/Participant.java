@@ -12,6 +12,23 @@ public class Participant {
 	private String name;
 	private String avatarUrl;
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Participant [");
+		if (name != null) {
+			builder.append("name=");
+			builder.append(name);
+			builder.append(", ");
+		}
+		if (avatarUrl != null) {
+			builder.append("avatarUrl=");
+			builder.append(avatarUrl);
+		}
+		builder.append("]");
+		return builder.toString();
+	}
+
 	public String getName() {
 		return name;
 	}
