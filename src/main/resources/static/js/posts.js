@@ -4,12 +4,12 @@ var metadata;
 
 var ID_COLUMN_NO = 0;
 var TYPE_COLUMN_NO = 1;
-var STATE_COLUMN_NO = 2;
-var SLUG_COLUMN_NO = 3;
-var HASHTAGS_COLUMN_NO = 4;
-var DATE_COLUMN_NO = 5;
-var FAV_COLUMN_NO = 6;
-var READ_COLUMN_NO = 7;
+var STATE_COLUMN_NO = -1;
+var SLUG_COLUMN_NO = 2;
+var HASHTAGS_COLUMN_NO = 3;
+var DATE_COLUMN_NO = 4;
+var FAV_COLUMN_NO = 5;
+var READ_COLUMN_NO = 6;
 
 $.i18n.properties({
 	name: 'messages',
@@ -102,12 +102,6 @@ $(document).ready(function() {
 					}
 				},
 				{
-					"data": "state",
-					"render": function(data, type, row, meta) {
-						return "<div class='clickableTableValue'>" + data + "</div>";
-					}
-				},
-				{
 					"data": "slug",
 					"render": function(data,type,row,meta) {
 						return "<div class='clickableTableValue'>" + data.replace(/\-/g, ' ') + "</div>";
@@ -197,7 +191,7 @@ $(document).ready(function() {
 				url: "/api/posts/" + postID + "/markFavourite",
 				type: "PUT"
 			});
-			$(this).parents('tr').children('td:nth-child(7)').html($.i18n.prop('index_posttable_isFavourite'));
+			$(this).parents('tr').children('td:nth-child(' + (FAV_COLUMN_NO + 1) + ')').html($.i18n.prop('index_posttable_isFavourite'));
 			$('#displayPaneIFrame').height($('#contentDisplayTable').height());
 			postTable.draw();
 			return false;
@@ -210,7 +204,7 @@ $(document).ready(function() {
 				url: "/api/posts/" + postID + "/markNonFavourite",
 				type: "PUT"
 			});
-			$(this).parents('tr').children('td:nth-child(7)').html($.i18n.prop('index_posttable_isNotFavourite'));
+			$(this).parents('tr').children('td:nth-child(' + (FAV_COLUMN_NO + 1) + ')').html($.i18n.prop('index_posttable_isNotFavourite'));
 			$('#displayPaneIFrame').height($('#contentDisplayTable').height());
 			postTable.draw();
 			return false;
@@ -310,29 +304,29 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
 	if(filterVal == "Do not Filter") {
 		if(favFilterVal == "Show Everything") {
 			return true;
-		} else if (favFilterVal == "Show Favourites" && data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+		} else if ((favFilterVal == "Show Favourites") && (data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isFavouriteCLEAN'))) {
 			return true
-		} else if(favFilterVal == "Show Non Favourites" && data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+		} else if((favFilterVal == "Show Non Favourites") && (data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN'))) {
 			return true;
 		}
 	}
 	
-	if(filterVal == "Filter Read Posts" && data[READ_COLUMN_NO] == $.i18n.prop('index_posttable_isNotreadIndicatorCLEAN')) {
+	if((filterVal == "Filter Read Posts") && (data[READ_COLUMN_NO] == $.i18n.prop('index_posttable_isNotreadIndicatorCLEAN'))) {
 		if(favFilterVal == "Show Everything") {
 			return true;
-		} else if (favFilterVal == "Show Favourites" && data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+		} else if ((favFilterVal == "Show Favourites") && (data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isFavouriteCLEAN'))) {
 			return true
-		} else if(favFilterVal == "Show Non Favourites" && data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+		} else if((favFilterVal == "Show Non Favourites") && (data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN'))) {
 			return true;
 		}
 	}
 	
-	if(filterVal == "Filter Unread Posts" && data[READ_COLUMN_NO] == $.i18n.prop('index_posttable_isReadIndicatorCLEAN')) {
+	if((filterVal == "Filter Unread Posts") && (data[READ_COLUMN_NO] == $.i18n.prop('index_posttable_isReadIndicatorCLEAN'))) {
 		if(favFilterVal == "Show Everything") {
 			return true;
-		} else if (favFilterVal == "Show Favourites" && data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+		} else if ((favFilterVal == "Show Favourites") && (data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isFavouriteCLEAN'))) {
 			return true
-		} else if(favFilterVal == "Show Non Favourites" && data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+		} else if((favFilterVal == "Show Non Favourites") && (data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN'))) {
 			return true;
 		}
 	}
