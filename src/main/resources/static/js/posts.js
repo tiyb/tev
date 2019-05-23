@@ -2,6 +2,15 @@ var typesMap;
 var isTypesMapLoaded = false;
 var metadata;
 
+var ID_COLUMN_NO = 0;
+var TYPE_COLUMN_NO = 1;
+var STATE_COLUMN_NO = 2;
+var SLUG_COLUMN_NO = 3;
+var HASHTAGS_COLUMN_NO = 4;
+var DATE_COLUMN_NO = 5;
+var FAV_COLUMN_NO = 6;
+var READ_COLUMN_NO = 7;
+
 $.i18n.properties({
 	name: 'messages',
 	path: 'js/i18n/',
@@ -201,7 +210,7 @@ $(document).ready(function() {
 				url: "/api/posts/" + postID + "/markNonFavourite",
 				type: "PUT"
 			});
-			$(this).parents('tr').children('td:nth-child(6)').html($.i18n.prop('index_posttable_isNotFavourite'));
+			$(this).parents('tr').children('td:nth-child(7)').html($.i18n.prop('index_posttable_isNotFavourite'));
 			$('#displayPaneIFrame').height($('#contentDisplayTable').height());
 			postTable.draw();
 			return false;
@@ -209,7 +218,7 @@ $(document).ready(function() {
 		
 		$('#postTable tfoot tr').clone(true).appendTo('#postTable tfoot');
 		$('#postTable tfoot tr:eq(1) th').each(function(i) {
-			if(i < 5) {
+			if(i < FAV_COLUMN_NO) {
 				var title = $(this).text();
 				$(this).html('<input type="text" placeholder="' + $.i18n.prop('index_search') + title + '" />');
 				
@@ -301,29 +310,29 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
 	if(filterVal == "Do not Filter") {
 		if(favFilterVal == "Show Everything") {
 			return true;
-		} else if (favFilterVal == "Show Favourites" && data[6] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+		} else if (favFilterVal == "Show Favourites" && data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
 			return true
-		} else if(favFilterVal == "Show Non Favourites" && data[6] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+		} else if(favFilterVal == "Show Non Favourites" && data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
 			return true;
 		}
 	}
 	
-	if(filterVal == "Filter Read Posts" && data[7] == $.i18n.prop('index_posttable_isNotreadIndicatorCLEAN')) {
+	if(filterVal == "Filter Read Posts" && data[READ_COLUMN_NO] == $.i18n.prop('index_posttable_isNotreadIndicatorCLEAN')) {
 		if(favFilterVal == "Show Everything") {
 			return true;
-		} else if (favFilterVal == "Show Favourites" && data[6] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+		} else if (favFilterVal == "Show Favourites" && data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
 			return true
-		} else if(favFilterVal == "Show Non Favourites" && data[6] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+		} else if(favFilterVal == "Show Non Favourites" && data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
 			return true;
 		}
 	}
 	
-	if(filterVal == "Filter Unread Posts" && data[7] == $.i18n.prop('index_posttable_isReadIndicatorCLEAN')) {
+	if(filterVal == "Filter Unread Posts" && data[READ_COLUMN_NO] == $.i18n.prop('index_posttable_isReadIndicatorCLEAN')) {
 		if(favFilterVal == "Show Everything") {
 			return true;
-		} else if (favFilterVal == "Show Favourites" && data[6] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
+		} else if (favFilterVal == "Show Favourites" && data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isFavouriteCLEAN')) {
 			return true
-		} else if(favFilterVal == "Show Non Favourites" && data[6] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
+		} else if(favFilterVal == "Show Non Favourites" && data[FAV_COLUMN_NO] == $.i18n.prop('index_posttable_isNotFavouriteCLEAN')) {
 			return true;
 		}
 	}
@@ -345,31 +354,31 @@ function sortTable() {
 	
 	switch(metadata.sortColumn) {
 	case "ID":
-		sortColumn = 0;
+		sortColumn = ID_COLUMN_NO;
 		break;
 	case "Type":
-		sortColumn = 1;
+		sortColumn = TYPE_COLUMN_NO;
 		break;
 	case "State":
-		sortColumn = 2;
+		sortColumn = STATE_COLUMN_NO;
 		break;
 	case "Slug":
-		sortColumn = 3;
+		sortColumn = SLUG_COLUMN_NO;
 		break;
 	case "Hashtags":
-		sortColumn = 4;
+		sortColumn = HASHTAGS_COLUMN_NO;
 		break;
 	case "Date":
-		sortColumn = 5;
+		sortColumn = DATE_COLUMN_NO;
 		break;
 	case "Is Favourite":
-		sortColumn = 6;
+		sortColumn = FAV_COLUMN_NO;
 		break;
 	case "Is Read":
-		sortColumn = 7;
+		sortColumn = READ_COLUMN_NO;
 		break;
 	default:
-		sortColumn = 0;
+		sortColumn = ID_COLUMN_NO;
 	}
 	
 	$('#displayPaneIFrame').height($('#contentDisplayTable').height());
@@ -378,28 +387,28 @@ function sortTable() {
 
 function updateSortOrderInMD(column, order) {
 	switch(column) {
-	case 0:
+	case ID_COLUMN_NO:
 		metadata.sortColumn = "ID";
 		break;
-	case 1:
+	case TYPE_COLUMN_NO:
 		metadata.sortColumn = "Type";
 		break;
-	case 2:
+	case STATE_COLUMN_NO:
 		metadata.sortColumn = "State";
 		break;
-	case 3:
+	case SLUG_COLUMN_NO:
 		metadata.sortColumn = "Slug";
 		break;
-	case 4:
+	case HASHTAGS_COLUMN_NO:
 		metadata.sortColumn = "Hashtags";
 		break;
-	case 5:
+	case DATE_COLUMN_NO:
 		metadata.sortColumn = "Date";
 		break;
-	case 6:
+	case FAV_COLUMN_NO:
 		metadata.sortColumn = "Is Favourite";
 		break;
-	case 7:
+	case READ_COLUMN_NO:
 		metadata.sortColumn = "Is Read";
 		break;
 	default:

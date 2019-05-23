@@ -132,6 +132,12 @@ function getTranslatedNameForColumn(columnName) {
 	case "Is Favourite":
 		return $.i18n.prop('md_columnnames_isfavourite');
 		break;
+	case "State":
+		return $.i18n.prop('md_columnnames_state');
+		break;
+	case "Hashtags":
+		return $.i18n.prop('md_columnnames_hashtags');
+		break;
 	}
 }
 
