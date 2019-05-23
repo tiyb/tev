@@ -25,6 +25,7 @@ import com.tiyb.tev.datamodel.Photo;
 import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
 import com.tiyb.tev.datamodel.Video;
+import com.tiyb.tev.exception.ResourceNotFoundException;
 
 /**
  * <p>
@@ -55,6 +56,8 @@ public class PostXmlParsingUnitTest {
 	private static final long firstPhotoPostID = 180784644740L;
 	private static final long secondPhotoPostID = 180254465582L;
 	private static final long addedRegularPostID = 180894436672L;
+	private static final long draftRegularPostID = 190097591599L;
+	private static final long queuedRegularPostID = 778563537472L;
 
 	/**
 	 * Called before each unit test to properly reset the data back to an original
@@ -162,7 +165,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getIsReblog()).isEqualTo(true);
 		assertThat(post.getReblogKey()).isEqualTo("O6pLVlp1");
 		assertThat(post.getSlug()).isEqualTo("first-post");
-		assertThat(post.getState()).isEqualTo("queued");
+		assertThat(post.getState()).isEqualTo("published");
 		assertThat(post.getTags()).isEqualTo("tag1, tag2");
 		assertThat(post.getTumblelog()).isEqualTo("mainblog");
 		assertThat(post.getType()).isEqualTo(4L);
@@ -176,6 +179,22 @@ public class PostXmlParsingUnitTest {
 		assertThat(regular.getPostId()).isEqualTo(regularPostID);
 		assertThat(regular.getBody()).isEqualTo("post body text here");
 		assertThat(regular.getTitle()).isEqualTo("First Post");
+	}
+	
+	/**
+	 * Tests that a draft post was skipped during the import process
+	 */
+	@Test(expected = ResourceNotFoundException.class)
+	public void testIgnoredDraft() {
+		restController.getPostById(draftRegularPostID);
+	}
+	
+	/**
+	 * Tests that a queued post was skipped during the import process
+	 */
+	@Test(expected = ResourceNotFoundException.class)
+	public void testIgnoredQueued() {
+		restController.getPostById(queuedRegularPostID);
 	}
 
 	/**
@@ -246,7 +265,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getIsReblog()).isEqualTo(true);
 		assertThat(post.getReblogKey()).isEqualTo("jTxuwC0o");
 		assertThat(post.getSlug()).isEqualTo("slugs-are-delicious");
-		assertThat(post.getState()).isEqualTo("draft");
+		assertThat(post.getState()).isEqualTo("published");
 		assertThat(post.getTags()).isEqualTo("tag11, tag12, tag13, tag14, tag15");
 		assertThat(post.getTumblelog()).isEqualTo("mainblog");
 		assertThat(post.getType()).isEqualTo(3L);
@@ -294,8 +313,9 @@ public class PostXmlParsingUnitTest {
 	/**
 	 * <p>
 	 * Verifies that parsing XML input files with the "overwrite posts" flag turned
-	 * OFF will properly read in new posts, while ignoring existing posts. Performs
-	 * the following steps:
+	 * OFF will properly read in new posts, while ignoring existing posts. Also
+	 * tests that a post is properly reset if the state/date changes. Performs the
+	 * following steps:
 	 * </p>
 	 * 
 	 * <ol>

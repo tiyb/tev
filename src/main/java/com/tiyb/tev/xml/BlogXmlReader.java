@@ -187,12 +187,24 @@ public class BlogXmlReader {
 						post = new Post();
 						boolean isSubmitablePost = true;
 						readPostAttributes(se, post, typeIDs);
-						if (isOverwritePosts) {
+						if (isOverwritePosts && post.getState().equals("published")) {
 							restController.createPost(post);
+						} else if (!post.getState().equals("published")) {
+							isSubmitablePost = false;
 						} else {
 							try {
-								restController.getPostById(post.getId());
-								isSubmitablePost = false;
+								Post serverPost = restController.getPostById(post.getId());
+								if (!serverPost.getState().equals(post.getState())) {
+									isSubmitablePost = true;
+								} else if (!serverPost.getDate().equals(post.getDate())) {
+									isSubmitablePost = true;
+								} else if (!serverPost.getDateGmt().equals(post.getDateGmt())) {
+									isSubmitablePost = true;
+								} else if (!serverPost.getUnixtimestamp().equals(post.getUnixtimestamp())) {
+									isSubmitablePost = true;
+								} else {
+									isSubmitablePost = false;
+								}
 							} catch (ResourceNotFoundException e) {
 								restController.createPost(post);
 							}
