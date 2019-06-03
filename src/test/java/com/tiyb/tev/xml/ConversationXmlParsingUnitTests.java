@@ -50,6 +50,7 @@ public class ConversationXmlParsingUnitTests {
 	private static final String convo3Participant = "participant3";
 	private static final String convo4Participant = "participant4";
 	private static final String convo5Participant = "participant5";
+	private static final String oldNameParticipantId = "foaiehoihafoei";
 
 	/**
 	 * Run before each test to populate the DB fresh, so that the Unit Tests can
@@ -85,7 +86,7 @@ public class ConversationXmlParsingUnitTests {
 		List<Conversation> convos = restController.getAllConversations();
 
 		assertThat(convos).isNotNull();
-		assertThat(convos.size()).isEqualTo(4);
+		assertThat(convos.size()).isEqualTo(5);
 
 		Conversation firstConvo = restController.getConversationByParticipant(convo1Participant);
 		assertThat(firstConvo).isNotNull();
@@ -104,36 +105,168 @@ public class ConversationXmlParsingUnitTests {
 		Conversation fourthConvo = restController.getConversationByParticipant(convo4Participant);
 		assertThat(fourthConvo).isNotNull();
 		assertThat(fourthConvo.getNumMessages()).isEqualTo(1);
+		
+		Conversation changedConvo = restController.getConversationByParticipantIdOrName(oldNameParticipantId, "");
+		assertThat(changedConvo).isNotNull();
+		assertThat(changedConvo.getNumMessages()).isEqualTo(1);
+		assertThat(changedConvo.getParticipant()).isEqualTo("participant-oldname");
+		assertThat(changedConvo.getParticipantAvatarUrl()).isEqualTo("http://participanton/avatar");
 	}
 
 	/**
 	 * Verifies that all of the conversation messages in the test XML input file
-	 * have been properly imported into the database. Since the message, type, and
-	 * timestamp is known for each conversation message, this information is
-	 * asserted to be present.
+	 * have been properly imported into the database for Conversation 1. Since the
+	 * message, type, and timestamp is known for each conversation message, this
+	 * information is asserted to be present.
 	 */
 	@Test
-	public void checkMessages() {
-		Conversation firstConvo = restController.getConversationByParticipant(convo1Participant);
-		List<ConversationMessage> firstConvoMsgs = restController.getConvoMsgByConvoID(firstConvo.getId());
-		assertThat(firstConvoMsgs).isNotNull();
-		assertThat(firstConvoMsgs.size()).isEqualTo(9);
+	public void checkConvo1Messages() {
+		Conversation convo = restController.getConversationByParticipant(convo1Participant);
+		List<ConversationMessage> msgs = restController.getConvoMsgByConvoID(convo.getId());
+		assertThat(msgs).isNotNull();
+		assertThat(msgs.size()).isEqualTo(9);
 
-		assertThat(firstConvoMsgs.get(0).getMessage()).isEqualTo("Message 1");
-		assertThat(firstConvoMsgs.get(0).getType()).isEqualTo("TEXT");
-		assertThat(firstConvoMsgs.get(0).getReceived()).isEqualTo(false);
-		assertThat(firstConvoMsgs.get(0).getTimestamp()).isEqualTo(1544197586L);
+		assertThat(msgs.get(0).getMessage()).isEqualTo("Message 1");
+		assertThat(msgs.get(0).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(0).getReceived()).isEqualTo(false);
+		assertThat(msgs.get(0).getTimestamp()).isEqualTo(1544197586L);
 
-		assertThat(firstConvoMsgs.get(3).getMessage()).isEqualTo("http://www.photourl.com/photo.png");
-		assertThat(firstConvoMsgs.get(3).getType()).isEqualTo("IMAGE");
-		assertThat(firstConvoMsgs.get(3).getReceived()).isEqualTo(false);
-		assertThat(firstConvoMsgs.get(3).getTimestamp()).isEqualTo(1544197647L);
+		assertThat(msgs.get(1).getMessage()).isEqualTo("Message 2");
+		assertThat(msgs.get(1).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(1).getReceived()).isEqualTo(false);
+		assertThat(msgs.get(1).getTimestamp()).isEqualTo(1544197605L);
 
-		assertThat(firstConvoMsgs.get(8).getMessage()).isEqualTo("http://www.tumblr.com/somepost");
-		assertThat(firstConvoMsgs.get(8).getType()).isEqualTo("POSTREF");
-		assertThat(firstConvoMsgs.get(8).getReceived()).isEqualTo(false);
-		assertThat(firstConvoMsgs.get(8).getTimestamp()).isEqualTo(1544221221L);
+		assertThat(msgs.get(2).getMessage()).isEqualTo("Message 3");
+		assertThat(msgs.get(2).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(2).getReceived()).isEqualTo(false);
+		assertThat(msgs.get(2).getTimestamp()).isEqualTo(1544197624L);
 
+		assertThat(msgs.get(3).getMessage()).isEqualTo("http://www.photourl.com/photo.png");
+		assertThat(msgs.get(3).getType()).isEqualTo("IMAGE");
+		assertThat(msgs.get(3).getReceived()).isEqualTo(false);
+		assertThat(msgs.get(3).getTimestamp()).isEqualTo(1544197647L);
+
+		assertThat(msgs.get(4).getMessage()).isEqualTo("Message 5");
+		assertThat(msgs.get(4).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(4).getReceived()).isEqualTo(false);
+		assertThat(msgs.get(4).getTimestamp()).isEqualTo(1544198315L);
+
+		assertThat(msgs.get(5).getMessage()).isEqualTo("Message 6");
+		assertThat(msgs.get(5).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(5).getReceived()).isEqualTo(true);
+		assertThat(msgs.get(5).getTimestamp()).isEqualTo(1544221130L);
+
+		assertThat(msgs.get(6).getMessage()).isEqualTo("Message 7");
+		assertThat(msgs.get(6).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(6).getReceived()).isEqualTo(false);
+		assertThat(msgs.get(6).getTimestamp()).isEqualTo(1544221197L);
+
+		assertThat(msgs.get(7).getMessage()).isEqualTo("Message 8");
+		assertThat(msgs.get(7).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(7).getReceived()).isEqualTo(true);
+		assertThat(msgs.get(7).getTimestamp()).isEqualTo(1544221203L);
+
+		assertThat(msgs.get(8).getMessage()).isEqualTo("http://www.tumblr.com/somepost");
+		assertThat(msgs.get(8).getType()).isEqualTo("POSTREF");
+		assertThat(msgs.get(8).getReceived()).isEqualTo(false);
+		assertThat(msgs.get(8).getTimestamp()).isEqualTo(1544221221L);
+	}
+	
+	/**
+	 * Verifies that all of the conversation messages in the test XML input file
+	 * have been properly imported into the database for Conversation 2. Since the
+	 * message, type, and timestamp is known for each conversation message, this
+	 * information is asserted to be present.
+	 */
+	@Test
+	public void checkConvo2Messages() {
+		Conversation convo = restController.getConversationByParticipant(convo2Participant);
+		List<ConversationMessage> msgs = restController.getConvoMsgByConvoID(convo.getId());
+		assertThat(msgs).isNotNull();
+		assertThat(msgs.size()).isEqualTo(9);
+
+		assertThat(msgs.get(0).getMessage()).isEqualTo("Message 1");
+		assertThat(msgs.get(0).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(0).getReceived()).isEqualTo(true);
+		assertThat(msgs.get(0).getTimestamp()).isEqualTo(1544012468L);
+
+		assertThat(msgs.get(1).getMessage()).isEqualTo("Message 2");
+		assertThat(msgs.get(1).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(1).getReceived()).isEqualTo(false);
+		assertThat(msgs.get(1).getTimestamp()).isEqualTo(1544016206L);
+
+		assertThat(msgs.get(2).getMessage()).isEqualTo("Message 3");
+		assertThat(msgs.get(2).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(2).getReceived()).isEqualTo(true);
+		assertThat(msgs.get(2).getTimestamp()).isEqualTo(1544016402L);
+
+		assertThat(msgs.get(3).getMessage()).isEqualTo("Message 4");
+		assertThat(msgs.get(3).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(3).getReceived()).isEqualTo(true);
+		assertThat(msgs.get(3).getTimestamp()).isEqualTo(1544016410L);
+
+		assertThat(msgs.get(4).getMessage()).isEqualTo("Message 5");
+		assertThat(msgs.get(4).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(4).getReceived()).isEqualTo(true);
+		assertThat(msgs.get(4).getTimestamp()).isEqualTo(1544016579L);
+
+		assertThat(msgs.get(5).getMessage()).isEqualTo("Message 6");
+		assertThat(msgs.get(5).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(5).getReceived()).isEqualTo(true);
+		assertThat(msgs.get(5).getTimestamp()).isEqualTo(1544016582L);
+
+		assertThat(msgs.get(6).getMessage()).isEqualTo("Message 7");
+		assertThat(msgs.get(6).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(6).getReceived()).isEqualTo(false);
+		assertThat(msgs.get(6).getTimestamp()).isEqualTo(1544022051L);
+
+		assertThat(msgs.get(7).getMessage()).isEqualTo("Message 8");
+		assertThat(msgs.get(7).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(7).getReceived()).isEqualTo(true);
+		assertThat(msgs.get(7).getTimestamp()).isEqualTo(1544115936L);
+
+		assertThat(msgs.get(8).getMessage()).isEqualTo("Message 9");
+		assertThat(msgs.get(8).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(8).getReceived()).isEqualTo(false);
+		assertThat(msgs.get(8).getTimestamp()).isEqualTo(1544126671L);
+	}
+	
+	/**
+	 * Verifies that all of the conversation messages in the test XML input file
+	 * have been properly imported into the database for Conversation 3. Since the
+	 * message, type, and timestamp is known for each conversation message, this
+	 * information is asserted to be present.
+	 */
+	@Test
+	public void checkConvo3Messages() {
+		Conversation convo = restController.getConversationByParticipant(convo3Participant);
+		List<ConversationMessage> msgs = restController.getConvoMsgByConvoID(convo.getId());
+		assertThat(msgs).isNotNull();
+		assertThat(msgs.size()).isEqualTo(1);
+
+		assertThat(msgs.get(0).getMessage()).isEqualTo("Message 1");
+		assertThat(msgs.get(0).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(0).getReceived()).isEqualTo(false);
+		assertThat(msgs.get(0).getTimestamp()).isEqualTo(1544012468L);
+	}
+	
+	/**
+	 * Verifies that all of the conversation messages in the test XML input file
+	 * have been properly imported into the database for Conversation 4. Since the
+	 * message, type, and timestamp is known for each conversation message, this
+	 * information is asserted to be present.
+	 */
+	@Test
+	public void checkConvo4Messages() {
+		Conversation convo = restController.getConversationByParticipant(convo4Participant);
+		List<ConversationMessage> msgs = restController.getConvoMsgByConvoID(convo.getId());
+		assertThat(msgs).isNotNull();
+		assertThat(msgs.size()).isEqualTo(1);
+
+		assertThat(msgs.get(0).getMessage()).isEqualTo("Message 1");
+		assertThat(msgs.get(0).getType()).isEqualTo("TEXT");
+		assertThat(msgs.get(0).getReceived()).isEqualTo(true);
+		assertThat(msgs.get(0).getTimestamp()).isEqualTo(1544012468L);
 	}
 	
 	/**
@@ -148,7 +281,7 @@ public class ConversationXmlParsingUnitTests {
 	@Test
 	public void testAddingConvos() throws IOException {
 		List<Conversation> convos = restController.getAllConversations();
-		assertThat(convos.size()).isEqualTo(4);
+		assertThat(convos.size()).isEqualTo(5);
 		
 		for(Conversation convo : convos) {
 			convo.setHideConversation(true);
@@ -166,7 +299,7 @@ public class ConversationXmlParsingUnitTests {
 		
 		convos = restController.getAllConversations();
 		assertThat(convos).isNotNull();
-		assertThat(convos.size()).isEqualTo(5);
+		assertThat(convos.size()).isEqualTo(6);
 		
 		Conversation convo = restController.getConversationByParticipant(convo1Participant);
 		assertThat(convo).isNotNull();
@@ -181,7 +314,11 @@ public class ConversationXmlParsingUnitTests {
 		
 		convo = restController.getConversationByParticipant(convo3Participant);
 		assertThat(convo).isNotNull();
-		assertThat(convo.getHideConversation()).isEqualTo(true);
+		assertThat(convo.getHideConversation()).isEqualTo(false);
+		assertThat(convo.getNumMessages()).isEqualTo(2);
+		messages = restController.getConvoMsgByConvoID(convo.getId());
+		assertThat(messages).isNotNull();
+		assertThat(messages.size()).isEqualTo(2);
 		
 		convo = restController.getConversationByParticipant(convo4Participant);
 		assertThat(convo).isNotNull();
@@ -199,5 +336,12 @@ public class ConversationXmlParsingUnitTests {
 		assertThat(message.getType()).isEqualTo("TEXT");
 		assertThat(message.getReceived()).isEqualTo(true);
 		assertThat(message.getTimestamp()).isEqualTo(1544012468L);
+		
+		convo = restController.getConversationByParticipantIdOrName(oldNameParticipantId, "");
+		assertThat(convo).isNotNull();
+		assertThat(convo.getHideConversation()).isEqualTo(false);
+		assertThat(convo.getNumMessages()).isEqualTo(1);
+		assertThat(convo.getParticipant()).isEqualTo("participant-newname");
+		assertThat(convo.getParticipantAvatarUrl()).isEqualTo("http://participantnn/avatar");
 	}
 }

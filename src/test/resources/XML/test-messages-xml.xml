@@ -43,7 +43,7 @@
 				<participant avatar_url="http://mainblog/avatar">blogname</participant>
 			</participants>
 			<messages>
-				<message ts="1544012468" participant="participant3-deactivated" type="TEXT">Message 1</message>
+				<message ts="1544012468" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 1</message>
 			</messages>
 		</conversation>
 		<conversation status="ACTIVE">
@@ -52,7 +52,16 @@
 				<participant avatar_url="http://mainblog/avatar">blogname</participant>
 			</participants>
 			<messages>
-				<message ts="1544012468" participant="participant4-deactivated20190101" type="TEXT">Message 1</message>
+				<message ts="1544012468" participant="OY3QnUHjX3lZs6orBDaI" type="TEXT">Message 1</message>
+			</messages>
+		</conversation>
+		<conversation status="ACTIVE">
+			<participants>
+				<participant avatar_url="http://participanton/avatar">participant-oldname</participant>
+				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+			</participants>
+			<messages>
+				<message ts="1544012468" participant="foaiehoihafoei" type="TEXT">Message 1</message>
 			</messages>
 		</conversation>
 	</conversations>

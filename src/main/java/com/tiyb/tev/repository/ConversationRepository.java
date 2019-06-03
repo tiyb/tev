@@ -13,4 +13,5 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
 	public Conversation findByParticipant(String participantName);
 	public List<Conversation> findByHideConversationTrue();
 	public List<Conversation> findByHideConversationFalse();
+	public List<Conversation> findByParticipantId(String participantId);
 }

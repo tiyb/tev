@@ -84,10 +84,10 @@ public class ConversationXmlReader {
 
 		try {
 			InputStream participantXmlStream = xmlFile.getInputStream();
-			ConversationUsers cu = getMainParticipant(participantXmlStream);
-			md.setMainTumblrUser(cu.name);
-			md.setMainTumblrUserAvatarUrl(cu.avatarURL);
-			String mainParticipantID = cu.id;
+			Participant mainParticipant = getMainParticipant(participantXmlStream);
+			md.setMainTumblrUser(mainParticipant.name);
+			md.setMainTumblrUserAvatarUrl(mainParticipant.avatarURL);
+			String mainParticipantID = mainParticipant.id;
 			md = restController.updateMetadata(md);
 
 			xmlStream = xmlFile.getInputStream();
@@ -119,8 +119,8 @@ public class ConversationXmlReader {
 	 * @param participantXmlStream The XML file to be parsed
 	 * @return A <code>ConversationUsers</code> object, with the relevant data
 	 */
-	private static ConversationUsers getMainParticipant(InputStream participantXmlStream) {
-		ConversationUsers cu = new ConversationUsers();
+	private static Participant getMainParticipant(InputStream participantXmlStream) {
+		Participant participant = new Participant();
 		Map<String, String> participants = new HashMap<String, String>();
 		List<String> nameIds = new ArrayList<String>();
 		boolean newConversation = false;
@@ -154,8 +154,8 @@ public class ConversationXmlReader {
 						if (participantInList == null) {
 							participants.put(participantName, participantURL);
 						} else {
-							cu.name = participantName;
-							cu.avatarURL = participantURL;
+							participant.name = participantName;
+							participant.avatarURL = participantURL;
 						}
 					} else if (se.getName().getLocalPart().equals("message")) {
 						@SuppressWarnings("unchecked")
@@ -166,8 +166,8 @@ public class ConversationXmlReader {
 							if (att.getName().getLocalPart().equals("participant")) {
 								if (newConversation) {
 									if (nameIds.contains(att.getValue())) {
-										cu.id = att.getValue();
-										return cu;
+										participant.id = att.getValue();
+										return participant;
 									}
 								} else {
 									if (!nameIds.contains(att.getValue())) {
@@ -211,19 +211,37 @@ public class ConversationXmlReader {
 	 * of messages is uploaded.
 	 * </p>
 	 * 
-	 * @param xmlFile           Stream containing the XML file to be parsed
-	 * @param tumblrUser        The Tumblr name of the user of the application
-	 * @param tumblrId          The ID assigned to the user of the application by
-	 *                          Tumblr
-	 * @param restController    Controller used to update the database with
-	 *                          conversations/messages
+	 * <p>
+	 * Finally, it should be noted that participant <b>names</b> sometimes change,
+	 * but their <b>IDs</b> stay the same. So when searching the database for
+	 * existing conversations, the search is initially done by ID. In cases where a
+	 * participant has <i>changed</i> their name (and overwrite is set to false),
+	 * the name will be updated in the DB. In some cases, where all of the messages
+	 * were sent from the main blog (none received from the participant), the
+	 * conversation is saved to the DB with an empty Participant ID (since the only
+	 * place to get that ID is from a message received from the Participant). For
+	 * this reason, the search for Conversations has a fallback, whereby it searches
+	 * by name if searching by ID turns up 0 results. In cases where message(s) were
+	 * 1) an initial import is performed, including a conversation with messages
+	 * sent from the main blog and non received from the Participant; 2) a new
+	 * export is uploaded (with overwrite turned off); 3) the conversation was
+	 * augmented with messages from the Participant; <i>and</i> 4) the Participant
+	 * changed their name, a duplicate conversation will be created.
+	 * </p>
+	 * 
+	 * @param xmlFile        Stream containing the XML file to be parsed
+	 * @param tumblrUser     The Tumblr name of the user of the application
+	 * @param tumblrId       The ID assigned to the user of the application by
+	 *                       Tumblr
+	 * @param restController Controller used to update the database with
+	 *                       conversations/messages
 	 * @throws XMLParsingException
 	 */
 	private static void readConversations(InputStream xmlFile, String tumblrUser, String tumblrId,
 			TEVRestController restController) throws XMLParsingException {
 		boolean isOverwriteConvos = restController.getMetadata().getOverwriteConvoData();
-		
-		if(isOverwriteConvos) {
+
+		if (isOverwriteConvos) {
 			restController.deleteAllConvoMsgs();
 			restController.deleteAllConversations();
 		}
@@ -243,11 +261,13 @@ public class ConversationXmlReader {
 
 					if (se.getName().getLocalPart().equals("conversation")) {
 						participant = getParticipantName(reader, tumblrUser);
-						messages = getMessages(reader, tumblrId);
+						MessageSuperStructure messageData = getMessages(reader, tumblrId);
+						messages = messageData.messages;
 
 						conversation = new Conversation();
 						conversation.setParticipant(participant.name);
-						conversation.setParticipantAvatarUrl(participant.avatarUrl);
+						conversation.setParticipantAvatarUrl(participant.avatarURL);
+						conversation.setParticipantId(messageData.participantId);
 						conversation.setNumMessages(messages.size());
 
 						boolean isSendConvoToServer = true;
@@ -257,10 +277,14 @@ public class ConversationXmlReader {
 							isSendConvoToServer = true;
 						} else {
 							try {
-								Conversation convoOnServer = restController
-										.getConversationByParticipant(participant.name);
-								if (messages.size() > convoOnServer.getNumMessages()) {
+								Conversation convoOnServer = restController.getConversationByParticipantIdOrName(
+										conversation.getParticipantId(), participant.name);
+								if ((messages.size() > convoOnServer.getNumMessages())
+										|| !convoOnServer.getParticipant().equals(conversation.getParticipant())) {
 									convoOnServer.setHideConversation(false);
+									convoOnServer.setNumMessages(messages.size());
+									convoOnServer.setParticipant(participant.name);
+									convoOnServer.setParticipantAvatarUrl(participant.avatarURL);
 									convoOnServer = restController.updateConversation(convoOnServer.getId(),
 											convoOnServer);
 									List<ConversationMessage> msgsForConv = restController
@@ -317,9 +341,10 @@ public class ConversationXmlReader {
 	 * @return list of messages
 	 * @throws XMLStreamException
 	 */
-	private static List<ConversationMessage> getMessages(XMLEventReader reader, String tumblrUserID)
+	private static MessageSuperStructure getMessages(XMLEventReader reader, String tumblrUserID)
 			throws XMLStreamException {
 		List<ConversationMessage> messages = new ArrayList<ConversationMessage>();
+		MessageSuperStructure returnObject = new MessageSuperStructure();
 
 		while (reader.hasNext()) {
 			XMLEvent event = reader.nextEvent();
@@ -329,7 +354,10 @@ public class ConversationXmlReader {
 
 				if (se.getName().getLocalPart().equals("message")) {
 					ConversationMessage currentMessage = new ConversationMessage();
-					readMessageAttributes(se, currentMessage, tumblrUserID);
+					String pId = readMessageAttributes(se, currentMessage, tumblrUserID);
+					if ((returnObject.participantId.equals("")) && (!pId.equals(""))) {
+						returnObject.participantId = pId;
+					}
 					if (currentMessage.getType().equals("IMAGE")) {
 						currentMessage.setMessage(readImageMessage(reader));
 					} else {
@@ -341,7 +369,8 @@ public class ConversationXmlReader {
 				EndElement ee = event.asEndElement();
 
 				if (ee.getName().getLocalPart().equals("conversation")) {
-					return messages;
+					returnObject.messages = messages;
+					return returnObject;
 				}
 			}
 		}
@@ -385,17 +414,19 @@ public class ConversationXmlReader {
 	}
 
 	/**
-	 * Helper method to read in a message's attributes.
+	 * Helper method to read in a message's attributes
 	 * 
 	 * @param se             The <code>StartElement</code> object currently being
 	 *                       processed
 	 * @param currentMessage The message to add the data to
 	 * @param tumblrUserID   The ID of the main user
+	 * @return The ID of the participant
 	 */
-	private static void readMessageAttributes(StartElement se, ConversationMessage currentMessage,
+	private static String readMessageAttributes(StartElement se, ConversationMessage currentMessage,
 			String tumblrUserID) {
 		@SuppressWarnings("unchecked")
 		Iterator<Attribute> atts = se.getAttributes();
+		String participantId = "";
 
 		while (atts.hasNext()) {
 			Attribute att = atts.next();
@@ -411,6 +442,7 @@ public class ConversationXmlReader {
 					currentMessage.setReceived(false);
 				} else {
 					currentMessage.setReceived(true);
+					participantId = participant;
 				}
 				break;
 			case "type":
@@ -418,6 +450,8 @@ public class ConversationXmlReader {
 				break;
 			}
 		}
+
+		return participantId;
 	}
 
 	/**
@@ -433,7 +467,8 @@ public class ConversationXmlReader {
 	 *         <i>other</i> (non-TEV-user) participant in the conversation
 	 * @throws XMLStreamException
 	 */
-	private static ConversationXmlReader.Participant getParticipantName(XMLEventReader reader, String tumblrUser) throws XMLStreamException {
+	private static ConversationXmlReader.Participant getParticipantName(XMLEventReader reader, String tumblrUser)
+			throws XMLStreamException {
 		String participantName = "";
 		String participantAvatar = "";
 		ConversationXmlReader.Participant participant = new ConversationXmlReader.Participant();
@@ -457,7 +492,7 @@ public class ConversationXmlReader {
 					}
 					participantName = readCharacters(reader);
 					if (!participantName.equals(tumblrUser)) {
-						participant.avatarUrl = participantAvatar;
+						participant.avatarURL = participantAvatar;
 						participant.name = fixName(participantName);
 					}
 				}
@@ -539,7 +574,7 @@ public class ConversationXmlReader {
 	 * variables.
 	 *
 	 */
-	private static class ConversationUsers {
+	private static class Participant {
 		/**
 		 * The Tumblr user's public-facing name
 		 */
@@ -553,22 +588,23 @@ public class ConversationXmlReader {
 		 */
 		public String id;
 	}
-	
+
 	/**
-	 * Helper class (essentially a struct), used by the
-	 * <code>getParticipantName()</code> method. Since this is just an inner, helper
-	 * class, trouble wasn't taken to make it a proper bean with getters/setters,
-	 * just public member variables.
+	 * Helper class (essentially a struct), returned from the
+	 * <code>getMessages()</code> method, which needs to return more complicated
+	 * data than just the list of messages - it also needs to determine the
+	 * participant ID
 	 */
-	public static class Participant {
+	private static class MessageSuperStructure {
 		/**
-		 * Participant's public name
+		 * List of populated messages
 		 */
-		public String name;
+		public List<ConversationMessage> messages;
+
 		/**
-		 * Participant's avatar URL
+		 * The ID of the participant in the conversation
 		 */
-		public String avatarUrl;
+		public String participantId = "";
 	}
 
 }

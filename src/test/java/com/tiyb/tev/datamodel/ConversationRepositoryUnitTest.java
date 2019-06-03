@@ -40,12 +40,39 @@ public class ConversationRepositoryUnitTest {
 		convo.setNumMessages(2);
 		convo.setParticipant("convo participant");
 		convo.setParticipantAvatarUrl("http://www.participant1.com");
+		convo.setParticipantId("pid123");
 
 		entityManager.persist(convo);
 		entityManager.flush();
 
 		Conversation foundConvo = convoRepo.findByParticipant("convo participant");
 
+		assertThat(foundConvo).isNotNull();
+		assertThat(foundConvo.getId()).isEqualTo(convo.getId());
+		assertThat(foundConvo.getParticipant()).isEqualTo(convo.getParticipant());
+		assertThat(foundConvo.getParticipantAvatarUrl()).isEqualTo(convo.getParticipantAvatarUrl());
+	}
+	
+	/**
+	 * Verify that conversations can be located via Participant ID
+	 */
+	@Test
+	public void findConversationByParticipantId() {
+		Conversation convo = new Conversation();
+		convo.setNumMessages(2);
+		convo.setParticipant("convo participant");
+		convo.setParticipantAvatarUrl("http://www.participant1.com");
+		convo.setParticipantId("pid123");
+		
+		entityManager.persist(convo);
+		entityManager.flush();
+		
+		List<Conversation> conversations = convoRepo.findByParticipantId("pid123");
+		assertThat(conversations).isNotNull();
+		assertThat(conversations.size()).isEqualTo(1);
+		
+		Conversation foundConvo = conversations.get(0);
+		assertThat(foundConvo).isNotNull();
 		assertThat(foundConvo.getId()).isEqualTo(convo.getId());
 		assertThat(foundConvo.getParticipant()).isEqualTo(convo.getParticipant());
 		assertThat(foundConvo.getParticipantAvatarUrl()).isEqualTo(convo.getParticipantAvatarUrl());
@@ -77,4 +104,5 @@ public class ConversationRepositoryUnitTest {
 		assertThat(returnedMessages.get(0).getMessage()).isEqualTo(msg2.getMessage());
 		assertThat(returnedMessages.get(1).getMessage()).isEqualTo(msg1.getMessage());
 	}
+	
 }

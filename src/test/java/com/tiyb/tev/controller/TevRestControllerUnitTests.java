@@ -349,6 +349,7 @@ public class TevRestControllerUnitTests {
 		modified.setNumMessages(5);
 		modified.setParticipant("new participant");
 		modified.setParticipantAvatarUrl("avatar URL");
+		modified.setParticipantId("pid123");
 		modified.setHideConversation(true);
 
 		restController.updateConversation(modified.getId(), modified);

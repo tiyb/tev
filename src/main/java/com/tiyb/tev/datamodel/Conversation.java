@@ -26,6 +26,7 @@ public class Conversation implements Serializable {
 	private Long id;
 	private String participant;
 	private String participantAvatarUrl;
+	private String participantId;
 	private Integer numMessages;
 	private Boolean hideConversation;
 	
@@ -50,6 +51,11 @@ public class Conversation implements Serializable {
 		if (participantAvatarUrl != null) {
 			builder.append("participantAvatarUrl=");
 			builder.append(participantAvatarUrl);
+			builder.append(", ");
+		}
+		if (participantId != null) {
+			builder.append("participantId=");
+			builder.append(participantId);
 			builder.append(", ");
 		}
 		if (numMessages != null) {
@@ -103,5 +109,13 @@ public class Conversation implements Serializable {
 
 	public void setHideConversation(Boolean hideConversation) {
 		this.hideConversation = hideConversation;
+	}
+
+	public String getParticipantId() {
+		return participantId;
+	}
+
+	public void setParticipantId(String participantId) {
+		this.participantId = participantId;
 	}
 }

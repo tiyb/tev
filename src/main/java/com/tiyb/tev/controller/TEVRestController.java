@@ -915,15 +915,43 @@ public class TEVRestController {
 	 * @param participantName Name of the participant
 	 * @return Single Conversation
 	 */
-	@GetMapping("/conversation")
-	public Conversation getConversationByParticipant(@RequestParam("participant") String participantName) {
+	@GetMapping("/conversations/{participantName}")
+	public Conversation getConversationByParticipant(@RequestParam("participantName") String participantName) {
 		Conversation convo = conversationRepo.findByParticipant(participantName);
 		
 		if(convo == null) {
-			throw new ResourceNotFoundException("Conversation", "id", participantName);
+			throw new ResourceNotFoundException("Conversation", "name", participantName);
 		}
 		
 		return convo;
+	}
+	
+	/**
+	 * GET to return a single conversation, by participant ID. Because some
+	 * conversations (where all messages are from the main blog, and none are from
+	 * the participant) will have no conversation ID, a backup method is provided
+	 * whereby conversations can be searched by Participant Name instead of ID.
+	 * 
+	 * @param participantId   ID of the participant
+	 * @param participantName Name of the participant; not used if ID is
+	 *                        successfully used to retrieve a Conversation
+	 * @return Single Conversation
+	 */
+	@GetMapping("/conversations/id/{participantId}/{participantName}")
+	public Conversation getConversationByParticipantIdOrName(@RequestParam("participantId") String participantId,
+			@RequestParam("participantName") String participantName) {
+		List<Conversation> convos = conversationRepo.findByParticipantId(participantId);
+		if (convos.size() == 1) {
+			return convos.get(0);
+		}
+
+		Conversation convoByName = conversationRepo.findByParticipant(participantName);
+
+		if (convoByName != null) {
+			return convoByName;
+		} else {
+			throw new ResourceNotFoundException("Conversation", "id", participantId);
+		}
 	}
 	
 	/**
@@ -965,6 +993,7 @@ public class TEVRestController {
 		convo.setParticipantAvatarUrl(convoDetails.getParticipantAvatarUrl());
 		convo.setNumMessages(convoDetails.getNumMessages());
 		convo.setHideConversation(convoDetails.getHideConversation());
+		convo.setParticipantId(convoDetails.getParticipantId());
 
 		Conversation updatedConvo = conversationRepo.save(convo);
 
