@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tumblr version="1.0">
 	<conversations>
+		<!-- Normal conversation, with back and forth, and different post types -->
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://mainblog/avatar">blogname</participant>
@@ -20,6 +21,8 @@
 				<message ts="1544221221" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="POSTREF">http://www.tumblr.com/somepost</message>
 			</messages>
 		</conversation>
+		
+		<!-- Normal conversation with back and forth, all text messages -->
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://participant2/avatar">participant2-deact</participant>
@@ -37,6 +40,8 @@
 				<message ts="1544126671" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 9</message>
 			</messages>
 		</conversation>
+		
+		<!-- message from a deactivated participant (simple style deactivation), 1 sent message -->
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://participant3/avatar">participant3-deactivated</participant>
@@ -46,6 +51,8 @@
 				<message ts="1544012468" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 1</message>
 			</messages>
 		</conversation>
+		
+		<!-- deactivated participant (datestamp style deactivation), with one received message -->
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://participant4/avatar">participant4-deactivated20190101</participant>
@@ -55,6 +62,8 @@
 				<message ts="1544012468" participant="OY3QnUHjX3lZs6orBDaI" type="TEXT">Message 1</message>
 			</messages>
 		</conversation>
+		
+		<!-- normal conversation, one received message, from a participant who WILL change their name -->
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://participanton/avatar">participant-oldname</participant>
@@ -62,6 +71,18 @@
 			</participants>
 			<messages>
 				<message ts="1544012468" participant="foaiehoihafoei" type="TEXT">Message 1</message>
+			</messages>
+		</conversation>
+		
+		<!--  normal conversation -->
+		<conversation status="ACTIVE">
+			<participants>
+				<participant avatar_url="http://goingtobedeac/avatar">goingtobedeactivated</participant>
+				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+			</participants>
+			<messages>
+				<message ts="1544012470" participant="afoiehaifeh" type="TEXT">Message 1</message>
+				<message ts="1544012485" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 2</message>
 			</messages>
 		</conversation>
 	</conversations>

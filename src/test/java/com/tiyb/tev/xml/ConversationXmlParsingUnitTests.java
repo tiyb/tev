@@ -51,6 +51,7 @@ public class ConversationXmlParsingUnitTests {
 	private static final String convo4Participant = "participant4";
 	private static final String convo5Participant = "participant5";
 	private static final String oldNameParticipantId = "foaiehoihafoei";
+	private static final String tobeDeactivatedId = "afoiehaifeh";
 
 	/**
 	 * Run before each test to populate the DB fresh, so that the Unit Tests can
@@ -86,7 +87,7 @@ public class ConversationXmlParsingUnitTests {
 		List<Conversation> convos = restController.getAllConversations();
 
 		assertThat(convos).isNotNull();
-		assertThat(convos.size()).isEqualTo(5);
+		assertThat(convos.size()).isEqualTo(6);
 
 		Conversation firstConvo = restController.getConversationByParticipant(convo1Participant);
 		assertThat(firstConvo).isNotNull();
@@ -111,6 +112,31 @@ public class ConversationXmlParsingUnitTests {
 		assertThat(changedConvo.getNumMessages()).isEqualTo(1);
 		assertThat(changedConvo.getParticipant()).isEqualTo("participant-oldname");
 		assertThat(changedConvo.getParticipantAvatarUrl()).isEqualTo("http://participanton/avatar");
+		
+		Conversation toBeDeactConvo = restController.getConversationByParticipantIdOrName(tobeDeactivatedId, "");
+		assertThat(toBeDeactConvo).isNotNull();
+		assertThat(toBeDeactConvo.getNumMessages()).isEqualTo(2);
+		assertThat(toBeDeactConvo.getParticipant()).isEqualTo("goingtobedeactivated");
+		assertThat(toBeDeactConvo.getParticipantAvatarUrl()).isEqualTo("http://goingtobedeac/avatar");
+	}
+	
+	/**
+	 * Tests that Conversations with only sent messages can still be retrieved via
+	 * participant name, even though no ID was created. (The
+	 * <code>testAddingConvos()</code> method will test that the conversation can be
+	 * updated properly.) Would make more logical sense to put this test in the
+	 * {@link com.tiyb.tev.controller.TevRestControllerUnitTests
+	 * TevRestControllerUnitTests} class, but is included here instead since the
+	 * proper set has been done for inserting the data into the DB.
+	 */
+	@Test
+	public void testRetrieveConvoWithNoId() {
+		Conversation returnedConvo = restController.getConversationByParticipantIdOrName("", convo3Participant);
+		assertThat(returnedConvo).isNotNull();
+		assertThat(returnedConvo.getNumMessages()).isEqualTo(1);
+		assertThat(returnedConvo.getParticipant()).isEqualTo(convo3Participant);
+		assertThat(returnedConvo.getParticipantAvatarUrl()).isEqualTo("http://participant3/avatar");
+		assertThat(returnedConvo.getParticipantId()).isBlank();
 	}
 
 	/**
@@ -281,7 +307,7 @@ public class ConversationXmlParsingUnitTests {
 	@Test
 	public void testAddingConvos() throws IOException {
 		List<Conversation> convos = restController.getAllConversations();
-		assertThat(convos.size()).isEqualTo(5);
+		assertThat(convos.size()).isEqualTo(6);
 		
 		for(Conversation convo : convos) {
 			convo.setHideConversation(true);
@@ -299,7 +325,7 @@ public class ConversationXmlParsingUnitTests {
 		
 		convos = restController.getAllConversations();
 		assertThat(convos).isNotNull();
-		assertThat(convos.size()).isEqualTo(6);
+		assertThat(convos.size()).isEqualTo(7);
 		
 		Conversation convo = restController.getConversationByParticipant(convo1Participant);
 		assertThat(convo).isNotNull();
@@ -343,5 +369,12 @@ public class ConversationXmlParsingUnitTests {
 		assertThat(convo.getNumMessages()).isEqualTo(1);
 		assertThat(convo.getParticipant()).isEqualTo("participant-newname");
 		assertThat(convo.getParticipantAvatarUrl()).isEqualTo("http://participantnn/avatar");
+		
+		convo = restController.getConversationByParticipantIdOrName(tobeDeactivatedId, "");
+		assertThat(convo).isNotNull();
+		assertThat(convo.getHideConversation()).isEqualTo(true);
+		assertThat(convo.getNumMessages()).isEqualTo(2);
+		assertThat(convo.getParticipant()).isEqualTo("goingtobedeactivated");
+		assertThat(convo.getParticipantAvatarUrl()).isEqualTo("http://goingtobedeac/avatar");
 	}
 }

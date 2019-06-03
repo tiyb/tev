@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tumblr version="1.0">
 	<conversations>
+		<!-- one message added to conversation -->
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://mainblog/avatar">blogname</participant>
@@ -21,6 +22,8 @@
 				<message ts="1544221222" participant="t:eMUq2ec6xRwaki33S-DLig" type="TEXT">Message 10</message>
 			</messages>
 		</conversation>
+		
+		<!-- No changes -->
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://participant2/avatar">participant2-deact</participant>
@@ -38,6 +41,8 @@
 				<message ts="1544126671" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 9</message>
 			</messages>
 		</conversation>
+		
+		<!-- one received message added -->
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://participant3/avatar">participant3-deactivated</participant>
@@ -48,6 +53,8 @@
 				<message ts="1544012469" participant="blriageh" type="TEXT">Message 2</message>
 			</messages>
 		</conversation>
+		
+		<!-- no changes -->
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://participant4/avatar">participant4-deactivated20190101</participant>
@@ -66,6 +73,8 @@
 				<message ts="1544012468" participant="nXzOfmy2olCu9bjO0ScS" type="TEXT">Message 1</message>
 			</messages>
 		</conversation>
+		
+		<!-- updated participant name/avatar -->
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://participantnn/avatar">participant-newname</participant>
@@ -73,6 +82,18 @@
 			</participants>
 			<messages>
 				<message ts="1544012468" participant="foaiehoihafoei" type="TEXT">Message 1</message>
+			</messages>
+		</conversation>
+		
+		<!--  formerly active participant now deactivated -->
+		<conversation status="ACTIVE">
+			<participants>
+				<participant avatar_url="http://goingtobedeac/avatar">goingtobedeactivated-deactivated</participant>
+				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+			</participants>
+			<messages>
+				<message ts="1544012470" participant="afoiehaifeh" type="TEXT">Message 1</message>
+				<message ts="1544012485" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 2</message>
 			</messages>
 		</conversation>
 	</conversations>
