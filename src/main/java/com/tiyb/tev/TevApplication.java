@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * <p>
@@ -69,6 +70,17 @@ public class TevApplication {
 	public DataSource primaryDataSource() {
 		return DataSourceBuilder.create().username("sa").password("").url("jdbc:hsqldb:file:hsql/tev.db")
 				.driverClassName("org.hsqldb.jdbc.JDBCDriver").build();
+	}
+	
+	/**
+	 * Used for custom DB scripts that need to be executed by admin tools
+	 * 
+	 * @param dataSource The DS used by the application
+	 * @return a <code>JdbcTemplate</code> for this application/data source
+	 */
+	@Bean
+	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+		return new JdbcTemplate(dataSource);
 	}
 
 }
