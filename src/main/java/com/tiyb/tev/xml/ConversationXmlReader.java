@@ -19,7 +19,8 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.tiyb.tev.controller.TEVRestController;
+import com.tiyb.tev.controller.TEVConvoRestController;
+import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.ConversationMessage;
 import com.tiyb.tev.datamodel.Metadata;
@@ -75,11 +76,11 @@ public class ConversationXmlReader {
 	 * </p>
 	 * 
 	 * @param xmlFile        File containing XML to be parsed
-	 * @param restController Used for updating the database as each
+	 * @param mdController Used for updating the database as each
 	 *                       conversation/message is parsed
 	 */
-	public static void parseDocument(MultipartFile xmlFile, TEVRestController restController) {
-		Metadata md = restController.getMetadata();
+	public static void parseDocument(MultipartFile xmlFile, TEVMetadataRestController mdController, TEVConvoRestController convoRestController) {
+		Metadata md = mdController.getMetadata();
 		InputStream xmlStream;
 
 		try {
@@ -88,10 +89,10 @@ public class ConversationXmlReader {
 			md.setMainTumblrUser(mainParticipant.name);
 			md.setMainTumblrUserAvatarUrl(mainParticipant.avatarURL);
 			String mainParticipantID = mainParticipant.id;
-			md = restController.updateMetadata(md);
+			md = mdController.updateMetadata(md);
 
 			xmlStream = xmlFile.getInputStream();
-			readConversations(xmlStream, md.getMainTumblrUser(), mainParticipantID, restController);
+			readConversations(xmlStream, md.getMainTumblrUser(), mainParticipantID, mdController, convoRestController);
 		} catch (IOException e) {
 			throw new XMLParsingException();
 		}
@@ -233,17 +234,17 @@ public class ConversationXmlReader {
 	 * @param tumblrUser     The Tumblr name of the user of the application
 	 * @param tumblrId       The ID assigned to the user of the application by
 	 *                       Tumblr
-	 * @param restController Controller used to update the database with
+	 * @param mdController Controller used to update the database with
 	 *                       conversations/messages
 	 * @throws XMLParsingException
 	 */
 	private static void readConversations(InputStream xmlFile, String tumblrUser, String tumblrId,
-			TEVRestController restController) throws XMLParsingException {
-		boolean isOverwriteConvos = restController.getMetadata().getOverwriteConvoData();
+			TEVMetadataRestController mdController, TEVConvoRestController convoRestController) throws XMLParsingException {
+		boolean isOverwriteConvos = mdController.getMetadata().getOverwriteConvoData();
 
 		if (isOverwriteConvos) {
-			restController.deleteAllConvoMsgs();
-			restController.deleteAllConversations();
+			convoRestController.deleteAllConvoMsgs();
+			convoRestController.deleteAllConversations();
 		}
 		try {
 			XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -273,11 +274,11 @@ public class ConversationXmlReader {
 						boolean isSendConvoToServer = true;
 
 						if (isOverwriteConvos) {
-							conversation = restController.createConversation(conversation);
+							conversation = convoRestController.createConversation(conversation);
 							isSendConvoToServer = true;
 						} else {
 							try {
-								Conversation convoOnServer = restController.getConversationByParticipantIdOrName(
+								Conversation convoOnServer = convoRestController.getConversationByParticipantIdOrName(
 										conversation.getParticipantId(), participant.name);
 								if ((messages.size() > convoOnServer.getNumMessages())
 										|| !convoOnServer.getParticipant().equals(conversation.getParticipant())) {
@@ -285,12 +286,12 @@ public class ConversationXmlReader {
 									convoOnServer.setNumMessages(messages.size());
 									convoOnServer.setParticipant(participant.name);
 									convoOnServer.setParticipantAvatarUrl(participant.avatarURL);
-									convoOnServer = restController.updateConversation(convoOnServer.getId(),
+									convoOnServer = convoRestController.updateConversation(convoOnServer.getId(),
 											convoOnServer);
-									List<ConversationMessage> msgsForConv = restController
+									List<ConversationMessage> msgsForConv = convoRestController
 											.getConvoMsgByConvoID(convoOnServer.getId());
 									for (ConversationMessage msg : msgsForConv) {
-										restController.deleteConversationMessage(msg.getId());
+										convoRestController.deleteConversationMessage(msg.getId());
 									}
 									isSendConvoToServer = true;
 									conversation.setId(convoOnServer.getId());
@@ -298,13 +299,13 @@ public class ConversationXmlReader {
 									isSendConvoToServer = false;
 								}
 							} catch (ResourceNotFoundException e) {
-								conversation = restController.createConversation(conversation);
+								conversation = convoRestController.createConversation(conversation);
 								isSendConvoToServer = true;
 							}
 						}
 
 						if (isSendConvoToServer) {
-							uploadMessagesForConvo(restController, messages, conversation.getId());
+							uploadMessagesForConvo(convoRestController, messages, conversation.getId());
 						}
 					}
 				}
@@ -323,7 +324,7 @@ public class ConversationXmlReader {
 	 * @param messages       The messages to upload
 	 * @param convoID        The ID of the conversation
 	 */
-	private static void uploadMessagesForConvo(TEVRestController restController, List<ConversationMessage> messages,
+	private static void uploadMessagesForConvo(TEVConvoRestController restController, List<ConversationMessage> messages,
 			Long convoID) {
 		for (ConversationMessage msg : messages) {
 			msg.setConversationId(convoID);

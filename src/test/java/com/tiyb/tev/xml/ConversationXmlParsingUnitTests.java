@@ -18,7 +18,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 
-import com.tiyb.tev.controller.TEVRestController;
+import com.tiyb.tev.controller.TEVConvoRestController;
+import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.ConversationMessage;
 import com.tiyb.tev.datamodel.Metadata;
@@ -43,7 +44,9 @@ import com.tiyb.tev.datamodel.Metadata;
 public class ConversationXmlParsingUnitTests {
 
 	@Autowired
-	private TEVRestController restController;
+	private TEVConvoRestController postRestController;
+	@Autowired
+	private TEVMetadataRestController mdRestController;
 	
 	private static final String convo1Participant = "participant1";
 	private static final String convo2Participant = "participant2";
@@ -62,18 +65,18 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Before
 	public void Setup() throws IOException {
-		Metadata md = restController.getMetadata();
+		Metadata md = mdRestController.getMetadata();
 		md.setMainTumblrUser("blogname");
 		md.setOverwriteConvoData(true);
-		restController.updateMetadata(md);
+		mdRestController.updateMetadata(md);
 
 		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-messages-xml.xml");
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
 		MockMultipartFile mockFile = new MockMultipartFile("testmessages", xmlFile);
 
-		restController.deleteAllConversations();
-		restController.deleteAllConvoMsgs();
-		ConversationXmlReader.parseDocument(mockFile, restController);
+		postRestController.deleteAllConversations();
+		postRestController.deleteAllConvoMsgs();
+		ConversationXmlReader.parseDocument(mockFile, mdRestController, postRestController);
 	}
 
 	/**
@@ -84,36 +87,36 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test
 	public void checkConversations() {
-		List<Conversation> convos = restController.getAllConversations();
+		List<Conversation> convos = postRestController.getAllConversations();
 
 		assertThat(convos).isNotNull();
 		assertThat(convos.size()).isEqualTo(6);
 
-		Conversation firstConvo = restController.getConversationByParticipant(convo1Participant);
+		Conversation firstConvo = postRestController.getConversationByParticipant(convo1Participant);
 		assertThat(firstConvo).isNotNull();
 		assertThat(firstConvo.getNumMessages()).isEqualTo(9);
 		assertThat(firstConvo.getParticipantAvatarUrl()).isEqualTo("http://participant1/avatar");
 
-		Conversation secondConvo = restController.getConversationByParticipant(convo2Participant);
+		Conversation secondConvo = postRestController.getConversationByParticipant(convo2Participant);
 		assertThat(secondConvo).isNotNull();
 		assertThat(secondConvo.getNumMessages()).isEqualTo(9);
 		assertThat(secondConvo.getParticipantAvatarUrl()).isEqualTo("http://participant2/avatar");
 
-		Conversation thirdConvo = restController.getConversationByParticipant(convo3Participant);
+		Conversation thirdConvo = postRestController.getConversationByParticipant(convo3Participant);
 		assertThat(thirdConvo).isNotNull();
 		assertThat(thirdConvo.getNumMessages()).isEqualTo(1);
 
-		Conversation fourthConvo = restController.getConversationByParticipant(convo4Participant);
+		Conversation fourthConvo = postRestController.getConversationByParticipant(convo4Participant);
 		assertThat(fourthConvo).isNotNull();
 		assertThat(fourthConvo.getNumMessages()).isEqualTo(1);
 		
-		Conversation changedConvo = restController.getConversationByParticipantIdOrName(oldNameParticipantId, "");
+		Conversation changedConvo = postRestController.getConversationByParticipantIdOrName(oldNameParticipantId, "");
 		assertThat(changedConvo).isNotNull();
 		assertThat(changedConvo.getNumMessages()).isEqualTo(1);
 		assertThat(changedConvo.getParticipant()).isEqualTo("participant-oldname");
 		assertThat(changedConvo.getParticipantAvatarUrl()).isEqualTo("http://participanton/avatar");
 		
-		Conversation toBeDeactConvo = restController.getConversationByParticipantIdOrName(tobeDeactivatedId, "");
+		Conversation toBeDeactConvo = postRestController.getConversationByParticipantIdOrName(tobeDeactivatedId, "");
 		assertThat(toBeDeactConvo).isNotNull();
 		assertThat(toBeDeactConvo.getNumMessages()).isEqualTo(2);
 		assertThat(toBeDeactConvo.getParticipant()).isEqualTo("goingtobedeactivated");
@@ -125,13 +128,13 @@ public class ConversationXmlParsingUnitTests {
 	 * participant name, even though no ID was created. (The
 	 * <code>testAddingConvos()</code> method will test that the conversation can be
 	 * updated properly.) Would make more logical sense to put this test in the
-	 * {@link com.tiyb.tev.controller.TevRestControllerUnitTests
+	 * {@link com.tiyb.tev.controller.TevPostRestControllerUnitTests
 	 * TevRestControllerUnitTests} class, but is included here instead since the
 	 * proper set has been done for inserting the data into the DB.
 	 */
 	@Test
 	public void testRetrieveConvoWithNoId() {
-		Conversation returnedConvo = restController.getConversationByParticipantIdOrName("", convo3Participant);
+		Conversation returnedConvo = postRestController.getConversationByParticipantIdOrName("", convo3Participant);
 		assertThat(returnedConvo).isNotNull();
 		assertThat(returnedConvo.getNumMessages()).isEqualTo(1);
 		assertThat(returnedConvo.getParticipant()).isEqualTo(convo3Participant);
@@ -147,8 +150,8 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test
 	public void checkConvo1Messages() {
-		Conversation convo = restController.getConversationByParticipant(convo1Participant);
-		List<ConversationMessage> msgs = restController.getConvoMsgByConvoID(convo.getId());
+		Conversation convo = postRestController.getConversationByParticipant(convo1Participant);
+		List<ConversationMessage> msgs = postRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(msgs).isNotNull();
 		assertThat(msgs.size()).isEqualTo(9);
 
@@ -206,8 +209,8 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test
 	public void checkConvo2Messages() {
-		Conversation convo = restController.getConversationByParticipant(convo2Participant);
-		List<ConversationMessage> msgs = restController.getConvoMsgByConvoID(convo.getId());
+		Conversation convo = postRestController.getConversationByParticipant(convo2Participant);
+		List<ConversationMessage> msgs = postRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(msgs).isNotNull();
 		assertThat(msgs.size()).isEqualTo(9);
 
@@ -265,8 +268,8 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test
 	public void checkConvo3Messages() {
-		Conversation convo = restController.getConversationByParticipant(convo3Participant);
-		List<ConversationMessage> msgs = restController.getConvoMsgByConvoID(convo.getId());
+		Conversation convo = postRestController.getConversationByParticipant(convo3Participant);
+		List<ConversationMessage> msgs = postRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(msgs).isNotNull();
 		assertThat(msgs.size()).isEqualTo(1);
 
@@ -284,8 +287,8 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test
 	public void checkConvo4Messages() {
-		Conversation convo = restController.getConversationByParticipant(convo4Participant);
-		List<ConversationMessage> msgs = restController.getConvoMsgByConvoID(convo.getId());
+		Conversation convo = postRestController.getConversationByParticipant(convo4Participant);
+		List<ConversationMessage> msgs = postRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(msgs).isNotNull();
 		assertThat(msgs.size()).isEqualTo(1);
 
@@ -297,7 +300,7 @@ public class ConversationXmlParsingUnitTests {
 	
 	/**
 	 * Tests parsing of the Conversation XML in cases where the "overwrite
-	 * conversations" flag is set to false; unchanged conversations shoudl be left
+	 * conversations" flag is set to false; unchanged conversations should be left
 	 * alone, new conversations should be uploaded, and conversations that have had
 	 * new messages added should have those messages uploaded, and be marked as
 	 * un-hidden.
@@ -306,54 +309,54 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test
 	public void testAddingConvos() throws IOException {
-		List<Conversation> convos = restController.getAllConversations();
+		List<Conversation> convos = postRestController.getAllConversations();
 		assertThat(convos.size()).isEqualTo(6);
 		
 		for(Conversation convo : convos) {
 			convo.setHideConversation(true);
-			restController.updateConversation(convo.getId(), convo);
+			postRestController.updateConversation(convo.getId(), convo);
 		}
 		
-		Metadata md = restController.getMetadata();
+		Metadata md = mdRestController.getMetadata();
 		md.setOverwriteConvoData(false);
-		md = restController.updateMetadata(md);
+		md = mdRestController.updateMetadata(md);
 		
 		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-messages-extended-xml.xml");
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
 		MockMultipartFile mockFile = new MockMultipartFile("testmessages", xmlFile);
-		ConversationXmlReader.parseDocument(mockFile, restController);
+		ConversationXmlReader.parseDocument(mockFile, mdRestController, postRestController);
 		
-		convos = restController.getAllConversations();
+		convos = postRestController.getAllConversations();
 		assertThat(convos).isNotNull();
 		assertThat(convos.size()).isEqualTo(7);
 		
-		Conversation convo = restController.getConversationByParticipant(convo1Participant);
+		Conversation convo = postRestController.getConversationByParticipant(convo1Participant);
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(false);
-		List<ConversationMessage> messages = restController.getConvoMsgByConvoID(convo.getId());
+		List<ConversationMessage> messages = postRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(messages).isNotNull();
 		assertThat(messages.size()).isEqualTo(10);
 		
-		convo = restController.getConversationByParticipant(convo2Participant);
+		convo = postRestController.getConversationByParticipant(convo2Participant);
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(true);
 		
-		convo = restController.getConversationByParticipant(convo3Participant);
+		convo = postRestController.getConversationByParticipant(convo3Participant);
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(false);
 		assertThat(convo.getNumMessages()).isEqualTo(2);
-		messages = restController.getConvoMsgByConvoID(convo.getId());
+		messages = postRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(messages).isNotNull();
 		assertThat(messages.size()).isEqualTo(2);
 		
-		convo = restController.getConversationByParticipant(convo4Participant);
+		convo = postRestController.getConversationByParticipant(convo4Participant);
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(true);
 		
-		convo = restController.getConversationByParticipant(convo5Participant);
+		convo = postRestController.getConversationByParticipant(convo5Participant);
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(false);
-		messages = restController.getConvoMsgByConvoID(convo.getId());
+		messages = postRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(messages).isNotNull();
 		assertThat(messages.size()).isEqualTo(1);
 		
@@ -363,14 +366,14 @@ public class ConversationXmlParsingUnitTests {
 		assertThat(message.getReceived()).isEqualTo(true);
 		assertThat(message.getTimestamp()).isEqualTo(1544012468L);
 		
-		convo = restController.getConversationByParticipantIdOrName(oldNameParticipantId, "");
+		convo = postRestController.getConversationByParticipantIdOrName(oldNameParticipantId, "");
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(false);
 		assertThat(convo.getNumMessages()).isEqualTo(1);
 		assertThat(convo.getParticipant()).isEqualTo("participant-newname");
 		assertThat(convo.getParticipantAvatarUrl()).isEqualTo("http://participantnn/avatar");
 		
-		convo = restController.getConversationByParticipantIdOrName(tobeDeactivatedId, "");
+		convo = postRestController.getConversationByParticipantIdOrName(tobeDeactivatedId, "");
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(true);
 		assertThat(convo.getNumMessages()).isEqualTo(2);

@@ -53,7 +53,11 @@ import com.tiyb.tev.xml.ConversationXmlReader;
 public class TEVUIController {
 
 	@Autowired
-	private TEVRestController restController;
+	private TEVPostRestController postRestController;
+	@Autowired
+	private TEVConvoRestController convoRestController;
+	@Autowired
+	private TEVMetadataRestController mdRestController;
 
 	/**
 	 * Returns the main (or index) page, at either / or /index
@@ -75,9 +79,9 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/conversations" }, method = RequestMethod.GET)
 	public String conversations(Model model) {
-		Metadata md = restController.getMetadata();
+		Metadata md = mdRestController.getMetadata();
 		model.addAttribute("metadata", md);
-		List<Conversation> conversations = restController.getAllConversations();
+		List<Conversation> conversations = convoRestController.getAllConversations();
 		model.addAttribute("conversations", conversations);
 
 		return "conversations";
@@ -108,7 +112,7 @@ public class TEVUIController {
 	public String handlePostFileUpload(@RequestParam("file") MultipartFile file,
 			RedirectAttributes redirectAttributes) {
 		try {
-			BlogXmlReader.parseDocument(file.getInputStream(), restController);
+			BlogXmlReader.parseDocument(file.getInputStream(), postRestController, mdRestController);
 		} catch (XMLParsingException | IOException e) {
 			return "redirect:/errorbadxml";
 		}
@@ -129,7 +133,7 @@ public class TEVUIController {
 			RedirectAttributes redirectAttributes) {
 
 		try {
-			ConversationXmlReader.parseDocument(file, restController);
+			ConversationXmlReader.parseDocument(file, mdRestController, convoRestController);
 		} catch (XMLParsingException e) {
 			return "redirect:/errorbadxml";
 		}
@@ -151,10 +155,10 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/postViewer" }, method = RequestMethod.GET)
 	public String showViewer(@RequestParam("id") Long postID, Model model) {
-		Post post = restController.getPostById(postID);
+		Post post = postRestController.getPostById(postID);
 		model.addAttribute("post", post);
 		model.addAttribute("tags", pullOutTagValues(post.getTags()));
-		List<Type> availableTypes = restController.getAllTypes();
+		List<Type> availableTypes = mdRestController.getAllTypes();
 		String postType = "";
 
 		for (Type type : availableTypes) {
@@ -170,20 +174,20 @@ public class TEVUIController {
 
 		switch (postType) {
 		case "regular":
-			Regular reg = restController.getRegularById(postID);
+			Regular reg = postRestController.getRegularById(postID);
 			model.addAttribute("regular", reg);
 			return "viewers/regular";
 		case "link":
-			Link ln = restController.getLinkById(postID);
+			Link ln = postRestController.getLinkById(postID);
 			model.addAttribute("link", ln);
 			return "viewers/link";
 		case "answer":
-			Answer ans = restController.getAnswerById(postID);
+			Answer ans = postRestController.getAnswerById(postID);
 			model.addAttribute("answer", ans);
 			return "viewers/answer";
 		case "photo":
 			List<String> images = new ArrayList<String>();
-			List<Photo> photos = restController.getPhotoById(postID);
+			List<Photo> photos = postRestController.getPhotoById(postID);
 			for (int i = 0; i < photos.size(); i++) {
 				Photo photo = photos.get(i);
 				String ext = photo.getUrl1280().substring(photo.getUrl1280().lastIndexOf('.'));
@@ -193,7 +197,7 @@ public class TEVUIController {
 			model.addAttribute("caption", photos.get(0).getCaption());
 			return "viewers/photo";
 		case "video":
-			Video vid = restController.getVideoById(postID);
+			Video vid = postRestController.getVideoById(postID);
 			model.addAttribute("video", vid);
 			return "viewers/video";
 		}
@@ -210,11 +214,11 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/conversationViewer" }, method = RequestMethod.GET)
 	public String showConversationViewer(@RequestParam("participant") String participantName, Model model) {
-		Metadata md = restController.getMetadata();
+		Metadata md = mdRestController.getMetadata();
 		model.addAttribute("metadata", md);
-		Conversation convo = restController.getConversationByParticipant(participantName);
+		Conversation convo = convoRestController.getConversationByParticipant(participantName);
 		model.addAttribute("conversation", convo);
-		List<ConversationMessage> messages = restController.getConvoMsgByConvoID(convo.getId());
+		List<ConversationMessage> messages = convoRestController.getConvoMsgByConvoID(convo.getId());
 		model.addAttribute("messages", messages);
 
 		return "viewers/conversation";
@@ -244,7 +248,7 @@ public class TEVUIController {
 	@RequestMapping(value = { "/viewerMedia/{imageName}" }, method = RequestMethod.GET, produces = {
 			MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_PNG_VALUE })
 	public @ResponseBody byte[] getMedia(@PathVariable("imageName") String imageName, Model model) {
-		String fullName = restController.getMetadata().getBaseMediaPath() + "/" + imageName;
+		String fullName = mdRestController.getMetadata().getBaseMediaPath() + "/" + imageName;
 
 		File file = new File(fullName);
 		try {
@@ -265,7 +269,7 @@ public class TEVUIController {
 	public void getVideo(HttpServletResponse response, HttpServletRequest request) {
 		// String ext =
 		// photo.getUrl1280().substring(photo.getUrl1280().lastIndexOf('.'));
-		String fullName = restController.getMetadata().getBaseMediaPath() + "/"
+		String fullName = mdRestController.getMetadata().getBaseMediaPath() + "/"
 				+ request.getRequestURI().substring(request.getRequestURI().lastIndexOf('/'));
 
 		response.setContentType("video/mp4");

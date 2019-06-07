@@ -35,7 +35,7 @@ public class TEVAdminToolsController {
 	 * The REST controller used for working with posts
 	 */
 	@Autowired
-	private TEVRestController restController;
+	private TEVPostRestController restController;
 
 	/**
 	 * GET call to compress the database.

@@ -26,7 +26,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * 
  * <ol>
  * <li>The RESTful API, exposing all of the data that has been imported
- * (controlled by {@link com.tiyb.tev.controller.TEVRestController}}</li>
+ * (controlled by {@link com.tiyb.tev.controller.TEVPostRestController}}</li>
  * <li>The jQuery-based HTML interface (controlled by
  * {@link com.tiyb.tev.controller.TEVUIController}})</li>
  * </ol>

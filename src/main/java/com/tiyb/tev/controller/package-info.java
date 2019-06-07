@@ -1,7 +1,7 @@
 /**
  * <p>
  * This package contains <b>Controllers</b> for the application (both REST and
- * UI). In general, the strucure of web and API calls supported is as follows:
+ * UI). In general, the structure of web and API calls supported is as follows:
  * </p>
  * 
  * <pre>

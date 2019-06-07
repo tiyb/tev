@@ -17,7 +17,8 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import com.tiyb.tev.controller.TEVRestController;
+import com.tiyb.tev.controller.TEVMetadataRestController;
+import com.tiyb.tev.controller.TEVPostRestController;
 import com.tiyb.tev.datamodel.Answer;
 import com.tiyb.tev.datamodel.Link;
 import com.tiyb.tev.datamodel.Photo;
@@ -94,27 +95,27 @@ public class BlogXmlReader {
 	 * 
 	 * @param xmlFile        <code>InputStream</code> containing the XML document to
 	 *                       be parsed.
-	 * @param restController REST controller for the application, used for storing
+	 * @param postController REST controller for the application, used for storing
 	 *                       data
 	 * @throws XMLParsingException
 	 */
-	public static void parseDocument(InputStream xmlFile, TEVRestController restController) throws XMLParsingException {
+	public static void parseDocument(InputStream xmlFile, TEVPostRestController postController, TEVMetadataRestController mdController) throws XMLParsingException {
 		Map<Long, String> typeEntries = new HashMap<Long, String>();
 		Map<String, Long> typeIDs = new HashMap<String, Long>();
-		List<Type> allowableTypes = restController.getAllTypes();
+		List<Type> allowableTypes = mdController.getAllTypes();
 		loadTypeData(allowableTypes, typeEntries, typeIDs);
-		boolean isOverwritePosts = restController.getMetadata().getOverwritePostData();
+		boolean isOverwritePosts = mdController.getMetadata().getOverwritePostData();
 
 		if (isOverwritePosts) {
-			restController.deleteAllRegulars();
-			restController.deleteAllAnswers();
-			restController.deleteAllLinks();
-			restController.deleteAllPhotos();
-			restController.deleteAllVideos();
-			restController.deleteAllPosts();
+			postController.deleteAllRegulars();
+			postController.deleteAllAnswers();
+			postController.deleteAllLinks();
+			postController.deleteAllPhotos();
+			postController.deleteAllVideos();
+			postController.deleteAllPosts();
 		}
 
-		readPosts(xmlFile, typeEntries, typeIDs, restController, isOverwritePosts);
+		readPosts(xmlFile, typeEntries, typeIDs, postController, isOverwritePosts);
 	}
 
 	/**
@@ -169,7 +170,7 @@ public class BlogXmlReader {
 	 * @throws XMLParsingException
 	 */
 	private static void readPosts(InputStream xmlFile, Map<Long, String> typeEntries, Map<String, Long> typeIDs,
-			TEVRestController restController, boolean isOverwritePosts) throws XMLParsingException {
+			TEVPostRestController restController, boolean isOverwritePosts) throws XMLParsingException {
 
 		try {
 			XMLInputFactory inputFactory = XMLInputFactory.newInstance();

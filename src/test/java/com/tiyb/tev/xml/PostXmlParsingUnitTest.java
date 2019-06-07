@@ -17,7 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 
-import com.tiyb.tev.controller.TEVRestController;
+import com.tiyb.tev.controller.TEVMetadataRestController;
+import com.tiyb.tev.controller.TEVPostRestController;
 import com.tiyb.tev.datamodel.Answer;
 import com.tiyb.tev.datamodel.Link;
 import com.tiyb.tev.datamodel.Metadata;
@@ -47,7 +48,9 @@ import com.tiyb.tev.exception.ResourceNotFoundException;
 public class PostXmlParsingUnitTest {
 
 	@Autowired
-	private TEVRestController restController;
+	private TEVPostRestController postController;
+	@Autowired
+	private TEVMetadataRestController mdController;
 
 	private static final long answerPostID = 180371366195L;
 	private static final long linkPostID = 180265557725L;
@@ -70,11 +73,11 @@ public class PostXmlParsingUnitTest {
 		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-xml.xml");
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
 
-		Metadata md = restController.getMetadata();
+		Metadata md = mdController.getMetadata();
 		md.setOverwritePostData(true);
-		md = restController.updateMetadata(md);
+		md = mdController.updateMetadata(md);
 
-		BlogXmlReader.parseDocument(xmlFile, restController);
+		BlogXmlReader.parseDocument(xmlFile, postController, mdController);
 	}
 	
 	/**
@@ -82,7 +85,7 @@ public class PostXmlParsingUnitTest {
 	 */
 	@Test
 	public void testAllPosts() {
-		List<Post> posts = restController.getAllPosts();
+		List<Post> posts = postController.getAllPosts();
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(6);		
 	}
@@ -93,7 +96,7 @@ public class PostXmlParsingUnitTest {
 	 */
 	@Test
 	public void testAnswer() {
-		Post post = restController.getPostById(answerPostID);
+		Post post = postController.getPostById(answerPostID);
 		assertThat(post).isNotNull();
 		assertThat(post.getDate()).isEqualTo("Thu, 22 Nov 2018 03:26:25");
 		assertThat(post.getDateGmt()).isEqualTo("2018-11-22 08:26:25 GMT");
@@ -110,8 +113,8 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180371366195");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180371366195/slug-slug-slug");
 		
-		assertThat(restController.getAllAnswers().size()).isEqualTo(1);
-		Answer answer = restController.getAnswerById(answerPostID);
+		assertThat(postController.getAllAnswers().size()).isEqualTo(1);
+		Answer answer = postController.getAnswerById(answerPostID);
 		assertThat(answer).isNotNull();
 		assertThat(answer.getQuestion()).isEqualTo("Question text");
 		assertThat(answer.getAnswer()).isEqualTo("Answer text");
@@ -124,7 +127,7 @@ public class PostXmlParsingUnitTest {
 	 */
 	@Test
 	public void testLink() {
-		Post post = restController.getPostById(linkPostID);
+		Post post = postController.getPostById(linkPostID);
 		assertThat(post).isNotNull();
 		assertThat(post.getDate()).isEqualTo("Mon, 19 Nov 2018 01:09:08");
 		assertThat(post.getDateGmt()).isEqualTo("2018-11-19 06:09:08 GMT");
@@ -141,8 +144,8 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180265557725");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180265557725/tumblr");
 		
-		assertThat(restController.getAllLinks().size()).isEqualTo(1);
-		Link link = restController.getLinkById(linkPostID);
+		assertThat(postController.getAllLinks().size()).isEqualTo(1);
+		Link link = postController.getLinkById(linkPostID);
 		assertThat(link).isNotNull();
 		assertThat(link.getPostId()).isEqualTo(linkPostID);
 		assertThat(link.getDescription()).isEqualTo("This is the link description");
@@ -156,7 +159,7 @@ public class PostXmlParsingUnitTest {
 	 */
 	@Test
 	public void testRegular() {
-		Post post = restController.getPostById(regularPostID);
+		Post post = postController.getPostById(regularPostID);
 		assertThat(post).isNotNull();
 		assertThat(post.getDate()).isEqualTo("Fri, 07 Dec 2018 11:48:43");
 		assertThat(post.getDateGmt()).isEqualTo("2018-12-07 16:48:43 GMT");
@@ -173,8 +176,8 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180894436671");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180894436671/first-post");
 		
-		assertThat(restController.getAllRegulars().size()).isEqualTo(1);
-		Regular regular = restController.getRegularById(regularPostID);
+		assertThat(postController.getAllRegulars().size()).isEqualTo(1);
+		Regular regular = postController.getRegularById(regularPostID);
 		assertThat(regular).isNotNull();
 		assertThat(regular.getPostId()).isEqualTo(regularPostID);
 		assertThat(regular.getBody()).isEqualTo("post body text here");
@@ -186,7 +189,7 @@ public class PostXmlParsingUnitTest {
 	 */
 	@Test(expected = ResourceNotFoundException.class)
 	public void testIgnoredDraft() {
-		restController.getPostById(draftRegularPostID);
+		postController.getPostById(draftRegularPostID);
 	}
 	
 	/**
@@ -194,7 +197,7 @@ public class PostXmlParsingUnitTest {
 	 */
 	@Test(expected = ResourceNotFoundException.class)
 	public void testIgnoredQueued() {
-		restController.getPostById(queuedRegularPostID);
+		postController.getPostById(queuedRegularPostID);
 	}
 
 	/**
@@ -203,7 +206,7 @@ public class PostXmlParsingUnitTest {
 	 */
 	@Test
 	public void testVideo() {
-		Post post = restController.getPostById(videoPostID);
+		Post post = postController.getPostById(videoPostID);
 		assertThat(post).isNotNull();
 		assertThat(post.getDate()).isEqualTo("Tue, 04 Dec 2018 01:09:21");
 		assertThat(post.getDateGmt()).isEqualTo("2018-12-04 06:09:21 GMT");
@@ -220,8 +223,8 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180782992914");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180782992914/another-slug");
 		
-		assertThat(restController.getAllVideos().size()).isEqualTo(1);
-		Video video = restController.getVideoById(videoPostID);
+		assertThat(postController.getAllVideos().size()).isEqualTo(1);
+		Video video = postController.getVideoById(videoPostID);
 		assertThat(video).isNotNull();
 		assertThat(video.getContentType()).isEqualTo("video/mp4");
 		assertThat(video.getDuration()).isEqualTo(45);
@@ -239,7 +242,7 @@ public class PostXmlParsingUnitTest {
 	 */
 	@Test
 	public void testPhotos() {
-		Post post = restController.getPostById(firstPhotoPostID);
+		Post post = postController.getPostById(firstPhotoPostID);
 		assertThat(post).isNotNull();
 		assertThat(post.getDate()).isEqualTo("Tue, 04 Dec 2018 02:17:52");
 		assertThat(post.getDateGmt()).isEqualTo("2018-12-04 07:17:52 GMT");
@@ -256,7 +259,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180784644740");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180784644740/new-slug");
 		
-		post = restController.getPostById(secondPhotoPostID);
+		post = postController.getPostById(secondPhotoPostID);
 		assertThat(post).isNotNull();
 		assertThat(post.getDate()).isEqualTo("Sun, 18 Nov 2018 18:17:36");
 		assertThat(post.getDateGmt()).isEqualTo("2018-11-18 23:17:36 GMT");
@@ -273,7 +276,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180254465582");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180254465582/slugs-are-delicious");
 		
-		List<Photo> photos = restController.getPhotoById(secondPhotoPostID);
+		List<Photo> photos = postController.getPhotoById(secondPhotoPostID);
 		assertThat(photos.size()).isEqualTo(2);
 
 		Photo photo = photos.get(0);
@@ -296,7 +299,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(photo.getUrl100()).isEqualTo("photo 4 100");
 		assertThat(photo.getUrl75()).isEqualTo("photo 4 75");
 
-		photos = restController.getPhotoById(firstPhotoPostID);
+		photos = postController.getPhotoById(firstPhotoPostID);
 		assertThat(photos.size()).isEqualTo(1);
 		photo = photos.get(0);
 		assertThat(photo.getPostId()).isEqualTo(firstPhotoPostID);
@@ -341,56 +344,56 @@ public class PostXmlParsingUnitTest {
 	 */
 	@Test
 	public void testAddingPosts() throws FileNotFoundException {
-		List<Post> posts = restController.getAllPosts();
+		List<Post> posts = postController.getAllPosts();
 		assertThat(posts.size()).isEqualTo(6);
 
 		for (Post post : posts) {
-			restController.markPostRead(post.getId());
+			postController.markPostRead(post.getId());
 		}
 
-		Metadata md = restController.getMetadata();
+		Metadata md = mdController.getMetadata();
 		md.setOverwritePostData(false);
-		md = restController.updateMetadata(md);
+		md = mdController.updateMetadata(md);
 
 		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-extended-xml.xml");
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
-		BlogXmlReader.parseDocument(xmlFile, restController);
+		BlogXmlReader.parseDocument(xmlFile, postController, mdController);
 
-		posts = restController.getAllPosts();
+		posts = postController.getAllPosts();
 		assertThat(posts.size()).isEqualTo(7);
 
-		assertThat(restController.getAllRegulars().size()).isEqualTo(2);
-		Regular regular = restController.getRegularById(addedRegularPostID);
+		assertThat(postController.getAllRegulars().size()).isEqualTo(2);
+		Regular regular = postController.getRegularById(addedRegularPostID);
 		assertThat(regular).isNotNull();
 		assertThat(regular.getPostId()).isEqualTo(addedRegularPostID);
 		assertThat(regular.getBody()).isEqualTo("post added after initial load");
 		assertThat(regular.getTitle()).isEqualTo("Added Post");
 
-		Post post = restController.getPostById(addedRegularPostID);
+		Post post = postController.getPostById(addedRegularPostID);
 		assertThat(post).isNotNull();
 		assertThat(post.getIsRead()).isEqualTo(false);
 
-		post = restController.getPostById(regularPostID);
+		post = postController.getPostById(regularPostID);
 		assertThat(post).isNotNull();
 		assertThat(post.getIsRead()).isEqualTo(true);
 
-		post = restController.getPostById(answerPostID);
+		post = postController.getPostById(answerPostID);
 		assertThat(post).isNotNull();
 		assertThat(post.getIsRead()).isEqualTo(true);
 
-		post = restController.getPostById(linkPostID);
+		post = postController.getPostById(linkPostID);
 		assertThat(post).isNotNull();
 		assertThat(post.getIsRead()).isEqualTo(true);
 
-		post = restController.getPostById(videoPostID);
+		post = postController.getPostById(videoPostID);
 		assertThat(post).isNotNull();
 		assertThat(post.getIsRead()).isEqualTo(true);
 
-		post = restController.getPostById(firstPhotoPostID);
+		post = postController.getPostById(firstPhotoPostID);
 		assertThat(post).isNotNull();
 		assertThat(post.getIsRead()).isEqualTo(true);
 
-		post = restController.getPostById(secondPhotoPostID);
+		post = postController.getPostById(secondPhotoPostID);
 		assertThat(post).isNotNull();
 		assertThat(post.getIsRead()).isEqualTo(true);
 
