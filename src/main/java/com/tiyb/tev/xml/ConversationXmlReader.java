@@ -12,7 +12,6 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
@@ -36,9 +35,9 @@ import com.tiyb.tev.exception.XMLParsingException;
  * other messages just have the text of the message in the "message" element
  * itself.</li>
  * <li>For some reason two different formats are used for identifying users; the
- * "participants" element has their name, but actual messages have their
- * internal ID. These two don't relate to each other in any way. So the internal
- * ID for the TEV user has to be inferred.</li>
+ * "participants" element has their <b>name</b>, but actual messages have their
+ * internal <b>ID</b>. These two don't relate to each other in any way. So the
+ * internal ID for the TEV user has to be inferred.</li>
  * </ul>
  * 
  * @author tiyb
@@ -46,12 +45,7 @@ import com.tiyb.tev.exception.XMLParsingException;
  * @apiviz.uses javax.xml.stream.XMLEventReader
  *
  */
-public class ConversationXmlReader {
-
-	/**
-	 * Error message used when the end of a file is unexpectedly reached
-	 */
-	private static final String END_OF_FILE_MESSAGE = "Premature end of file";
+public class ConversationXmlReader extends TEVXmlReader {
 
 	/**
 	 * <p>
@@ -60,26 +54,30 @@ public class ConversationXmlReader {
 	 * 
 	 * <ol>
 	 * <li>Get a stream for the file</li>
-	 * <li>Use that stream to call the <code>getMainParticipant()</code> method to
-	 * parse the XML document, to determine the main Tumblr user's name, avatar URL,
-	 * and internal ID</li>
+	 * <li>Use that stream to call the {@link #getMainParticipant(InputStream)
+	 * getMainParticipant()} method to parse the XML document, to determine the main
+	 * Tumblr user's name, avatar URL, and internal ID</li>
 	 * <li>Update the application's metadata with that information</li>
 	 * <li>Get a <i>new</i> stream (to start over at the beginning of the file)</li>
-	 * <li>Use that stream to call the <code>readConversations()</code> method to
-	 * parse the document again, this time reading in all of the data (making use of
-	 * the main Tumblr user information captured earlier)</li>
+	 * <li>Use that stream to call the
+	 * {@link #readConversations(InputStream, String, String, TEVMetadataRestController, TEVConvoRestController)
+	 * readConversations()} method to parse the document again, this time reading in
+	 * all of the data (making use of the main Tumblr user information captured
+	 * earlier)</li>
 	 * </ol>
 	 * 
 	 * <p>
 	 * Data is inserted directly into the database, via the REST APIs (accessed via
-	 * the <code>restController</code> parameter).
+	 * the <code>convoRestController</code> parameter).
 	 * </p>
 	 * 
-	 * @param xmlFile        File containing XML to be parsed
-	 * @param mdController Used for updating the database as each
-	 *                       conversation/message is parsed
+	 * @param xmlFile         File containing XML to be parsed
+	 * @param mdController    Used for working with the application's metadata
+	 * @param convoController Used for updating the database as each
+	 *                        conversation/message is parsed
 	 */
-	public static void parseDocument(MultipartFile xmlFile, TEVMetadataRestController mdController, TEVConvoRestController convoRestController) {
+	public static void parseDocument(MultipartFile xmlFile, TEVMetadataRestController mdController,
+			TEVConvoRestController convoController) {
 		Metadata md = mdController.getMetadata();
 		InputStream xmlStream;
 
@@ -92,7 +90,7 @@ public class ConversationXmlReader {
 			md = mdController.updateMetadata(md);
 
 			xmlStream = xmlFile.getInputStream();
-			readConversations(xmlStream, md.getMainTumblrUser(), mainParticipantID, mdController, convoRestController);
+			readConversations(xmlStream, md.getMainTumblrUser(), mainParticipantID, mdController, convoController);
 		} catch (IOException e) {
 			throw new XMLParsingException();
 		}
@@ -104,31 +102,31 @@ public class ConversationXmlReader {
 	 * the main Tumblr user, and another user. Therefore, this helper function
 	 * parses through the XML document looking for participants; as soon as it finds
 	 * a participant that's been listed <b>more than once,</b> it makes that
-	 * participant the main Tumblr user, so it returns that user (and the URL for
-	 * the user's avatar).
+	 * participant the main Tumblr user, so it returns that user (and, URL for the
+	 * user's avatar, and ID).
 	 * </p>
 	 * 
 	 * <p>
-	 * Because the Tumblr engineers are incompetent at <i>everything</i>, they've
-	 * included two versions of the user: the <b>name</b> and an <b>opaque ID</b>,
-	 * but they don't map to each other in the XML document, so there's no way to
-	 * tell which ID belongs to which user. So the code also looks for duplicate
-	 * versions of IDs; when an ID is found in multiple conversations, it's assumed
-	 * to be the ID of the TEV user.
+	 * There are two versions of the user in the XML: the <b>name</b> and an
+	 * <b>opaque ID</b>, but they don't map to each other in the XML document, so
+	 * there's no way to tell which ID belongs to which user. So the code also looks
+	 * for duplicate versions of IDs; when an ID is found in multiple conversations,
+	 * it's assumed to be the ID of the TEV user.
 	 * </p>
 	 * 
-	 * @param participantXmlStream The XML file to be parsed
-	 * @return A <code>ConversationUsers</code> object, with the relevant data
+	 * @param xmlStream The XML file to be parsed
+	 * @return A {@link com.tiyb.tev.xml.ConversationXmlReader.Participant
+	 *         Participant} object, with the relevant data
 	 */
-	private static Participant getMainParticipant(InputStream participantXmlStream) {
-		Participant participant = new Participant();
+	private static Participant getMainParticipant(InputStream xmlStream) {
+		Participant returnParticipant = new Participant();
 		Map<String, String> participants = new HashMap<String, String>();
 		List<String> nameIds = new ArrayList<String>();
 		boolean newConversation = false;
 
 		try {
 			XMLInputFactory factory = XMLInputFactory.newInstance();
-			XMLEventReader reader = factory.createXMLEventReader(participantXmlStream);
+			XMLEventReader reader = factory.createXMLEventReader(xmlStream);
 
 			while (reader.hasNext()) {
 				XMLEvent event = reader.nextEvent();
@@ -155,8 +153,8 @@ public class ConversationXmlReader {
 						if (participantInList == null) {
 							participants.put(participantName, participantURL);
 						} else {
-							participant.name = participantName;
-							participant.avatarURL = participantURL;
+							returnParticipant.name = participantName;
+							returnParticipant.avatarURL = participantURL;
 						}
 					} else if (se.getName().getLocalPart().equals("message")) {
 						@SuppressWarnings("unchecked")
@@ -167,8 +165,8 @@ public class ConversationXmlReader {
 							if (att.getName().getLocalPart().equals("participant")) {
 								if (newConversation) {
 									if (nameIds.contains(att.getValue())) {
-										participant.id = att.getValue();
-										return participant;
+										returnParticipant.id = att.getValue();
+										return returnParticipant;
 									}
 								} else {
 									if (!nameIds.contains(att.getValue())) {
@@ -197,15 +195,16 @@ public class ConversationXmlReader {
 	 * <p>
 	 * Reads in the XML file, conversation by conversation. Whenever a new
 	 * conversation element is reached a new object is created, the participant is
-	 * discovered (via <code>getParticipantName()</code>, and then
-	 * <code>getMessages()</code> is called to get all of the messages. The count of
-	 * that list is added to the conversation object.
+	 * discovered (via {@link #getParticipantName(XMLEventReader, String)
+	 * getParticipantName()}, and then {@link #getMessages(XMLEventReader, String)
+	 * getMessages()} is called to get all of the messages. The count of that list
+	 * is added to the conversation object.
 	 * </p>
 	 * 
 	 * <p>
 	 * Logic also takes into account the "overwrite conversations" flag in metadata.
 	 * If the flag is set, all data is wiped ahead of time. When the flag is not
-	 * set: as each conversation is encountered the REST API is used to look for
+	 * set, as each conversation is encountered the REST API is used to look for
 	 * that conversation: if it's found and the number of new messages isn't greater
 	 * than the number of existing messages it is left alone; otherwise, messages
 	 * are wiped, the conversation is set to no longer be read-only, and the new set
@@ -222,29 +221,29 @@ public class ConversationXmlReader {
 	 * conversation is saved to the DB with an empty Participant ID (since the only
 	 * place to get that ID is from a message received from the Participant). For
 	 * this reason, the search for Conversations has a fallback, whereby it searches
-	 * by name if searching by ID turns up 0 results. In cases where message(s) were
-	 * 1) an initial import is performed, including a conversation with messages
-	 * sent from the main blog and non received from the Participant; 2) a new
-	 * export is uploaded (with overwrite turned off); 3) the conversation was
-	 * augmented with messages from the Participant; <i>and</i> 4) the Participant
-	 * changed their name, a duplicate conversation will be created.
+	 * by name if searching by ID turns up 0 results. In cases where where 1) an
+	 * initial import is performed, including a conversation with messages sent from
+	 * the main blog and non received from the Participant; 2) a new export is
+	 * uploaded (with overwrite turned off); 3) the conversation was augmented with
+	 * messages from the Participant; <i>and</i> 4) the Participant changed their
+	 * name, a duplicate conversation will be created.
 	 * </p>
 	 * 
-	 * @param xmlFile        Stream containing the XML file to be parsed
-	 * @param tumblrUser     The Tumblr name of the user of the application
-	 * @param tumblrId       The ID assigned to the user of the application by
-	 *                       Tumblr
-	 * @param mdController Controller used to update the database with
-	 *                       conversations/messages
+	 * @param xmlFile            Stream containing the XML file to be parsed
+	 * @param mainTumblrUserName The Tumblr name of the user of the application
+	 * @param mainTumblrUserId   The ID assigned to the user of the application by
+	 *                           Tumblr
+	 * @param mdController       Controller used to update the database with
+	 *                           conversations/messages
 	 * @throws XMLParsingException
 	 */
-	private static void readConversations(InputStream xmlFile, String tumblrUser, String tumblrId,
-			TEVMetadataRestController mdController, TEVConvoRestController convoRestController) throws XMLParsingException {
+	private static void readConversations(InputStream xmlFile, String mainTumblrUserName, String mainTumblrUserId,
+			TEVMetadataRestController mdController, TEVConvoRestController convoController) throws XMLParsingException {
 		boolean isOverwriteConvos = mdController.getMetadata().getOverwriteConvoData();
 
 		if (isOverwriteConvos) {
-			convoRestController.deleteAllConvoMsgs();
-			convoRestController.deleteAllConversations();
+			convoController.deleteAllConvoMsgs();
+			convoController.deleteAllConversations();
 		}
 		try {
 			XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -261,8 +260,8 @@ public class ConversationXmlReader {
 					StartElement se = event.asStartElement();
 
 					if (se.getName().getLocalPart().equals("conversation")) {
-						participant = getParticipantName(reader, tumblrUser);
-						MessageSuperStructure messageData = getMessages(reader, tumblrId);
+						participant = getParticipantName(reader, mainTumblrUserName);
+						MessageSuperStructure messageData = getMessages(reader, mainTumblrUserId);
 						messages = messageData.messages;
 
 						conversation = new Conversation();
@@ -274,11 +273,11 @@ public class ConversationXmlReader {
 						boolean isSendConvoToServer = true;
 
 						if (isOverwriteConvos) {
-							conversation = convoRestController.createConversation(conversation);
+							conversation = convoController.createConversation(conversation);
 							isSendConvoToServer = true;
 						} else {
 							try {
-								Conversation convoOnServer = convoRestController.getConversationByParticipantIdOrName(
+								Conversation convoOnServer = convoController.getConversationByParticipantIdOrName(
 										conversation.getParticipantId(), participant.name);
 								if ((messages.size() > convoOnServer.getNumMessages())
 										|| !convoOnServer.getParticipant().equals(conversation.getParticipant())) {
@@ -286,12 +285,12 @@ public class ConversationXmlReader {
 									convoOnServer.setNumMessages(messages.size());
 									convoOnServer.setParticipant(participant.name);
 									convoOnServer.setParticipantAvatarUrl(participant.avatarURL);
-									convoOnServer = convoRestController.updateConversation(convoOnServer.getId(),
+									convoOnServer = convoController.updateConversation(convoOnServer.getId(),
 											convoOnServer);
-									List<ConversationMessage> msgsForConv = convoRestController
+									List<ConversationMessage> msgsForConv = convoController
 											.getConvoMsgByConvoID(convoOnServer.getId());
 									for (ConversationMessage msg : msgsForConv) {
-										convoRestController.deleteConversationMessage(msg.getId());
+										convoController.deleteConversationMessage(msg.getId());
 									}
 									isSendConvoToServer = true;
 									conversation.setId(convoOnServer.getId());
@@ -299,13 +298,13 @@ public class ConversationXmlReader {
 									isSendConvoToServer = false;
 								}
 							} catch (ResourceNotFoundException e) {
-								conversation = convoRestController.createConversation(conversation);
+								conversation = convoController.createConversation(conversation);
 								isSendConvoToServer = true;
 							}
 						}
 
 						if (isSendConvoToServer) {
-							uploadMessagesForConvo(convoRestController, messages, conversation.getId());
+							uploadMessagesForConvo(convoController, messages, conversation.getId());
 						}
 					}
 				}
@@ -324,8 +323,8 @@ public class ConversationXmlReader {
 	 * @param messages       The messages to upload
 	 * @param convoID        The ID of the conversation
 	 */
-	private static void uploadMessagesForConvo(TEVConvoRestController restController, List<ConversationMessage> messages,
-			Long convoID) {
+	private static void uploadMessagesForConvo(TEVConvoRestController restController,
+			List<ConversationMessage> messages, Long convoID) {
 		for (ConversationMessage msg : messages) {
 			msg.setConversationId(convoID);
 			restController.createConvoMessage(msg);
@@ -334,12 +333,15 @@ public class ConversationXmlReader {
 
 	/**
 	 * Gets a list of messages (stops when the end of the conversation is reached).
-	 * The two attributes are read (via <code>readMessageAttributes()</code>,
-	 * followed by the text of the element.
+	 * The two attributes are read (via
+	 * {@link #readMessageAttributes(StartElement, ConversationMessage, String)
+	 * readMessageAttributes()}), followed by the text of the element.
 	 * 
 	 * @param reader       Stream containing the XML document being read
 	 * @param tumblrUserID Tumblr ID of the TEV user
-	 * @return list of messages
+	 * @return list of messages, instead a
+	 *         {@link com.tiyb.tev.xml.ConversationXmlReader.MessageSuperStructure
+	 *         MessageSuperStructure} object
 	 * @throws XMLStreamException
 	 */
 	private static MessageSuperStructure getMessages(XMLEventReader reader, String tumblrUserID)
@@ -376,7 +378,7 @@ public class ConversationXmlReader {
 			}
 		}
 
-		throw new XMLStreamException(END_OF_FILE_MESSAGE);
+		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
 	/**
@@ -411,22 +413,22 @@ public class ConversationXmlReader {
 			}
 		}
 
-		throw new XMLStreamException(END_OF_FILE_MESSAGE);
+		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
 	/**
 	 * Helper method to read in a message's attributes
 	 * 
-	 * @param se             The <code>StartElement</code> object currently being
-	 *                       processed
+	 * @param startElement   The {@link javax.xml.stream.events.StartElement
+	 *                       StartElement} object currently being processed
 	 * @param currentMessage The message to add the data to
 	 * @param tumblrUserID   The ID of the main user
 	 * @return The ID of the participant
 	 */
-	private static String readMessageAttributes(StartElement se, ConversationMessage currentMessage,
+	private static String readMessageAttributes(StartElement startElement, ConversationMessage currentMessage,
 			String tumblrUserID) {
 		@SuppressWarnings("unchecked")
-		Iterator<Attribute> atts = se.getAttributes();
+		Iterator<Attribute> atts = startElement.getAttributes();
 		String participantId = "";
 
 		while (atts.hasNext()) {
@@ -458,17 +460,19 @@ public class ConversationXmlReader {
 	/**
 	 * Helper function to get the participant name (and avatar URL) from a
 	 * conversation. Each conversation contains a list of exactly two participants:
-	 * the TEV user's name, and the <i>other</i> participant's name. Each
-	 * "participant" element is read, and the one that is <i>not</i> that of the
-	 * current Tumblr user is eventually returned.
+	 * the TEV user, and the <i>other</i> participant. Each "participant" element is
+	 * read, and the one that is <i>not</i> that of the current Tumblr user is
+	 * returned.
 	 * 
-	 * @param reader     The reader from which to read the "participant" elements
-	 * @param tumblrUser Tumblr name of the TEV user
-	 * @return Helper <code>Participant</code> object, with the details of the
-	 *         <i>other</i> (non-TEV-user) participant in the conversation
+	 * @param reader         The reader from which to read the "participant"
+	 *                       elements
+	 * @param tumblrUserName Tumblr name of the TEV user
+	 * @return Helper {@link com.tiyb.tev.xml.ConversationXmlReader.Participant
+	 *         Participant} object, with the details of the <i>other</i>
+	 *         (non-TEV-user) participant in the conversation
 	 * @throws XMLStreamException
 	 */
-	private static ConversationXmlReader.Participant getParticipantName(XMLEventReader reader, String tumblrUser)
+	private static ConversationXmlReader.Participant getParticipantName(XMLEventReader reader, String tumblrUserName)
 			throws XMLStreamException {
 		String participantName = "";
 		String participantAvatar = "";
@@ -492,7 +496,7 @@ public class ConversationXmlReader {
 						}
 					}
 					participantName = readCharacters(reader);
-					if (!participantName.equals(tumblrUser)) {
+					if (!participantName.equals(tumblrUserName)) {
 						participant.avatarURL = participantAvatar;
 						participant.name = fixName(participantName);
 					}
@@ -506,15 +510,16 @@ public class ConversationXmlReader {
 			}
 		}
 
-		throw new XMLStreamException(END_OF_FILE_MESSAGE);
+		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
 	/**
 	 * Helper function used to "fix" names for deactivated users. When a user has
-	 * been deactivated, Tumblr returns the name as "username-deactivated" or
-	 * "username-deactivatedyyyymmdd" or even "username-deact". This function just
-	 * keeps the username, without the "-deactivated" or "-deactivatedyyyymmdd"
-	 * part.
+	 * been deactivated, Tumblr returns the name as
+	 * <code>username-deactivated</code> or
+	 * <code>username-deactivatedyyyymmdd</code> or even
+	 * <code>username-deact</code>. This function just keeps the username, without
+	 * the "-deactivated" or "-deactivatedyyyymmdd" part.
 	 * 
 	 * @param participantName "raw" username
 	 * @return Username without the postfix (if any)
@@ -530,49 +535,10 @@ public class ConversationXmlReader {
 	}
 
 	/**
-	 * <p>
-	 * This is a helper function, which reads characters out of an element, up to
-	 * the end of that element (the closing tag). There can be multiple events fired
-	 * as the event reader goes through the content, up to the end of the tag,
-	 * because there can be a mix of "text" content and "CDATA" content; both of
-	 * these are combined together into one String. Because the event for the
-	 * closing tag is consumed here, it cannot be consumed by the calling method,
-	 * but the logic for all of the calling methods takes that into account.
-	 * </p>
-	 * 
-	 * <p>
-	 * Any character entities within the data -- e.g. &amp;gt; and &amp;lt; instead
-	 * of &gt; and &lt; -- get unescaped, which is the desired behaviour for this
-	 * app.
-	 * </p>
-	 * 
-	 * @param reader The event parser from which the text should be extracted.
-	 * @return A simple <code>String</code> with the returned text
-	 * @throws XMLStreamException
-	 */
-	private static String readCharacters(XMLEventReader reader) throws XMLStreamException {
-		StringBuilder result = new StringBuilder();
-
-		while (reader.hasNext()) {
-			XMLEvent event = reader.nextEvent();
-
-			if (event.isCharacters() || event.isEntityReference()) {
-				Characters chars = event.asCharacters();
-				result.append(chars.getData());
-			} else if (event.isEndElement()) {
-				return result.toString();
-			}
-		}
-
-		throw new XMLStreamException(END_OF_FILE_MESSAGE);
-	}
-
-	/**
-	 * Helper class (essentially a struct), used by the
-	 * <code>getMainParticipant()</code> method for returning a few pieces of
+	 * Helper class (essentially a struct), used for working with participant
 	 * information. Since this is just an inner, helper class, the trouble wasn't
-	 * taken to make it a proper bean with getters/setters; just using public member
-	 * variables.
+	 * taken to make it a proper bean with getters/setters, it just exposes public
+	 * member variables.
 	 *
 	 */
 	private static class Participant {
@@ -580,10 +546,12 @@ public class ConversationXmlReader {
 		 * The Tumblr user's public-facing name
 		 */
 		public String name;
+
 		/**
 		 * The URL of the Tumblr user's avatar
 		 */
 		public String avatarURL;
+
 		/**
 		 * The Tumblr user's ID, as contained in the conversation XML.
 		 */
@@ -592,9 +560,9 @@ public class ConversationXmlReader {
 
 	/**
 	 * Helper class (essentially a struct), returned from the
-	 * <code>getMessages()</code> method, which needs to return more complicated
-	 * data than just the list of messages - it also needs to determine the
-	 * participant ID
+	 * {@link ConversationXmlReader#getMessages(XMLEventReader, String)
+	 * getMessages()} method, which needs to return more complicated data than just
+	 * the list of messages - it also needs to determine the participant ID
 	 */
 	private static class MessageSuperStructure {
 		/**

@@ -12,14 +12,22 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tiyb.tev.datamodel.Post;
 
 /**
- * A non-advertised REST controller with some admin tools for working with the
- * database behind the scenes. If TEV were ever to become anything more than
- * just a local application, proper security would be needed around these
- * operations, but since that's not the case the security is lax. None of these
- * APIs are ever intended to be used by the UI.
+ * <p>
+ * A non-advertised REST controller with some administration tools for working
+ * with the database behind the scenes.
+ * </p>
+ * 
+ * <p>
+ * If TEV were ever to become anything more than just a local application,
+ * proper security would be needed around these operations, but since that's not
+ * the case the security is lax. None of these APIs are ever intended to be used
+ * by the UI.
+ * </p>
  * 
  * @author tiyb
  * @apiviz.landmark
+ * @apiviz.uses org.springframework.jdbc.core.JdbcTemplate
+ * @apiviz.uses com.tiyb.tev.controller.TEVPostRestController
  */
 @RestController
 @RequestMapping("/admintools")
@@ -30,15 +38,15 @@ public class TEVAdminToolsController {
 	 */
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	
+
 	/**
 	 * The REST controller used for working with posts
 	 */
 	@Autowired
-	private TEVPostRestController restController;
+	private TEVPostRestController postController;
 
 	/**
-	 * GET call to compress the database.
+	 * GET call to compress the database file
 	 * 
 	 * @return Boolean indicating whether the operation was successful or not.
 	 */
@@ -60,10 +68,10 @@ public class TEVAdminToolsController {
 	 */
 	@GetMapping("/posts/markAllRead")
 	public String markAllPostsRead() {
-		List<Post> posts = restController.getAllPosts();
+		List<Post> posts = postController.getAllPosts();
 
 		for (Post post : posts) {
-			restController.markPostRead(post.getId());
+			postController.markPostRead(post.getId());
 		}
 
 		return "Success";
@@ -76,10 +84,10 @@ public class TEVAdminToolsController {
 	 */
 	@GetMapping("/posts/markAllUnread")
 	public String markAllPostsUnread() {
-		List<Post> posts = restController.getAllPosts();
+		List<Post> posts = postController.getAllPosts();
 
 		for (Post post : posts) {
-			restController.markPostUnread(post.getId());
+			postController.markPostUnread(post.getId());
 		}
 
 		return "Success";

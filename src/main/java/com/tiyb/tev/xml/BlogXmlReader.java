@@ -12,7 +12,6 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
@@ -60,31 +59,29 @@ import com.tiyb.tev.exception.XMLParsingException;
  * </p>
  * 
  * <p>
- * The general approach taken is that the <code>parseDocument()</code> method
- * sets up some initial variables, the <code>readPosts()</code> method then goes
- * through the document post-by-post, and as it determines what type each post
- * is, additional methods are called to read the additional, type-specific XML
- * within the post's XML element (answer, link, photo, etc.).
+ * The general approach taken is that the
+ * {@link #parseDocument(InputStream, TEVPostRestController, TEVMetadataRestController)
+ * parseDocument()} method sets up some initial variables, the
+ * {@link #readPosts(InputStream, Map, Map, TEVPostRestController, boolean)
+ * readPosts()} method then goes through the document post-by-post, and as it
+ * determines what type each post is, additional methods are called to read the
+ * additional, type-specific XML within the post's XML element (answer, link,
+ * photo, etc.).
  * </p>
  * 
  * @author tiyb
  * @apiviz.landmark
  * @apiviz.uses javax.xml.stream.XMLEventReader
  */
-public class BlogXmlReader {
-
-	/**
-	 * Value used for the exception encountered when XML parsing fails because of
-	 * unexpected conditions (i.e. a closing tag was expected but never arrived).
-	 */
-	private static final String END_OF_FILE_ERROR = "Premature end of file";
+public class BlogXmlReader extends TEVXmlReader {
 
 	/**
 	 * <p>
 	 * This is the main method of the class, which kicks off the processing of the
 	 * document. It doesn't do much work itself, it simply sets up some type-related
-	 * metadata, and calls the <code>readPosts()</code> method to get into the
-	 * actual XML document.
+	 * metadata, and calls the
+	 * {@link #readPosts(InputStream, Map, Map, TEVPostRestController, boolean)
+	 * readPosts()} method to get into the actual XML document.
 	 * </p>
 	 * 
 	 * <p>
@@ -93,13 +90,14 @@ public class BlogXmlReader {
 	 * data" option is set.
 	 * </p>
 	 * 
-	 * @param xmlFile        <code>InputStream</code> containing the XML document to
-	 *                       be parsed.
+	 * @param xmlFile        {@link java.io.InputStream InputStream} containing the
+	 *                       XML document to be parsed.
 	 * @param postController REST controller for the application, used for storing
 	 *                       data
 	 * @throws XMLParsingException
 	 */
-	public static void parseDocument(InputStream xmlFile, TEVPostRestController postController, TEVMetadataRestController mdController) throws XMLParsingException {
+	public static void parseDocument(InputStream xmlFile, TEVPostRestController postController,
+			TEVMetadataRestController mdController) throws XMLParsingException {
 		Map<Long, String> typeEntries = new HashMap<Long, String>();
 		Map<String, Long> typeIDs = new HashMap<String, Long>();
 		List<Type> allowableTypes = mdController.getAllTypes();
@@ -130,9 +128,10 @@ public class BlogXmlReader {
 	 * 
 	 * <ol>
 	 * <li>As the "start element" event is encountered for each post, a new
-	 * <code>Post</code> object is created</li>
+	 * {@link com.tiyb.tev.datamodel.Post Post} object is created</li>
 	 * <li>The attributes are read into that object via the
-	 * <code>readPostAttributes()</code> method to populate its data</li>
+	 * {@link #readPostAttributes(StartElement, Post, Map) readPostAttributes()}
+	 * method to populate its data</li>
 	 * <li>The post is inserted into the DB via the REST controller.
 	 * <ul>
 	 * <li>If the "overwrite posts" option is set in the metadata, the logic first
@@ -156,21 +155,21 @@ public class BlogXmlReader {
 	 * the post were discovered <i>after</i> the post was originally inserted.</li>
 	 * </ol>
 	 * 
-	 * @param xmlFile          The stream containing the XML file to be parsed
-	 * @param typeEntries      A list of available types, in a <code>Map</code> for
-	 *                         easy access by ID
-	 * @param typeIDs          A list of available types, in a <code>Map</code> for
-	 *                         easy access by name
-	 * @param restController   REST controller used for storing the data
-	 * @param isOverwritePosts Indicates whether this is a clean upload, or
-	 *                         additive; the REST controller could have been used to
-	 *                         determine this, but since the calling method needed
-	 *                         to figure it out anyway, it was just as easy to pass
-	 *                         it as a parameter.
+	 * @param xmlFile            The stream containing the XML file to be parsed
+	 * @param typeEntries        A list of available types, in a
+	 *                           {@link java.util.Map Map} for easy access by ID
+	 * @param typeIDs            A list of available types, in a
+	 *                           {@link java.util.Map Map} for easy access by name
+	 * @param postRestController REST controller used for storing the data
+	 * @param isOverwritePosts   Indicates whether this is a clean upload, or
+	 *                           additive; the REST controller could have been used
+	 *                           to determine this, but since the calling method
+	 *                           needed to figure it out anyway, it was just as easy
+	 *                           to pass it as a parameter.
 	 * @throws XMLParsingException
 	 */
 	private static void readPosts(InputStream xmlFile, Map<Long, String> typeEntries, Map<String, Long> typeIDs,
-			TEVPostRestController restController, boolean isOverwritePosts) throws XMLParsingException {
+			TEVPostRestController postRestController, boolean isOverwritePosts) throws XMLParsingException {
 
 		try {
 			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -189,12 +188,12 @@ public class BlogXmlReader {
 						boolean isSubmitablePost = true;
 						readPostAttributes(se, post, typeIDs);
 						if (isOverwritePosts && post.getState().equals("published")) {
-							restController.createPost(post);
+							postRestController.createPost(post);
 						} else if (!post.getState().equals("published")) {
 							isSubmitablePost = false;
 						} else {
 							try {
-								Post serverPost = restController.getPostById(post.getId());
+								Post serverPost = postRestController.getPostById(post.getId());
 								if (!serverPost.getState().equals(post.getState())) {
 									isSubmitablePost = true;
 								} else if (!serverPost.getDate().equals(post.getDate())) {
@@ -207,45 +206,45 @@ public class BlogXmlReader {
 									isSubmitablePost = false;
 								}
 							} catch (ResourceNotFoundException e) {
-								restController.createPost(post);
+								postRestController.createPost(post);
 							}
 						}
 						switch (typeEntries.get(post.getType())) {
 						case "regular":
 							Regular regular = readRegular(reader, post);
 							if (isSubmitablePost) {
-								restController.createRegular(post.getId(), regular);
+								postRestController.createRegular(post.getId(), regular);
 							}
 							break;
 						case "answer":
 							Answer answer = readAnswer(reader, post);
 							if (isSubmitablePost) {
-								restController.createAnswer(post.getId(), answer);
+								postRestController.createAnswer(post.getId(), answer);
 							}
 							break;
 						case "link":
 							Link link = readLink(reader, post);
 							if (isSubmitablePost) {
-								restController.createLink(post.getId(), link);
+								postRestController.createLink(post.getId(), link);
 							}
 							break;
 						case "photo":
 							List<Photo> photos = readPhotos(reader, post);
 							if (isSubmitablePost) {
 								for (Photo p : photos) {
-									restController.createPhoto(p);
+									postRestController.createPhoto(p);
 								}
 							}
 							break;
 						case "video":
 							Video video = readVideos(reader, post);
 							if (isSubmitablePost) {
-								restController.createVideo(post.getId(), video);
+								postRestController.createVideo(post.getId(), video);
 							}
 							break;
 						}
 						if (isSubmitablePost) {
-							post = restController.updatePost(post.getId(), post);
+							post = postRestController.updatePost(post.getId(), post);
 						}
 					}
 				}
@@ -260,17 +259,20 @@ public class BlogXmlReader {
 	/**
 	 * Helper function specifically for reading the attributes from a
 	 * <code>&lt;post&gt;</code> element. The logic could easily have been
-	 * incorporated into <code>readPosts()</code>, but the method would have gotten
-	 * much longer.
+	 * incorporated into
+	 * {@link #readPosts(InputStream, Map, Map, TEVPostRestController, boolean)
+	 * readPosts()}, but the method would have gotten much longer.
 	 * 
-	 * @param se      The <code>StartElement</code> object being processed
-	 * @param post    The <code>Post</code> object to which the data from each
-	 *                element should be added
-	 * @param typeIDs The <code>Map</code> containing the list of types
+	 * @param startElement The {@link javax.xml.stream.events.StartElement
+	 *                     StartElement} object being processed
+	 * @param post         The {@link com.tiyb.tev.datamodel.Post Post} object to
+	 *                     which the data from each element should be added
+	 * @param typeIDs      The {@link java.util.Map Map} containing the list of
+	 *                     types
 	 */
-	private static void readPostAttributes(StartElement se, Post post, Map<String, Long> typeIDs) {
+	private static void readPostAttributes(StartElement startElement, Post post, Map<String, Long> typeIDs) {
 		@SuppressWarnings("unchecked")
-		Iterator<Attribute> atts = se.getAttributes();
+		Iterator<Attribute> atts = startElement.getAttributes();
 		while (atts.hasNext()) {
 			Attribute att = atts.next();
 			String attName = att.getName().getLocalPart();
@@ -324,11 +326,12 @@ public class BlogXmlReader {
 	 * content related to a "regular" post. The content is very simple, containing
 	 * only "regular-title" and "regular-body" elements.
 	 * 
-	 * @param reader The <code>XMLEventReader</code> object for the XML document
-	 *               being parsed.
-	 * @param post   The current post, for use as the primary key of the
-	 *               <code>Regular</code> object and for setting tags
-	 * @return A <code>Regular</code> object with the data read
+	 * @param reader The {@link javax.xml.stream.XMLEventReader XMLEventReader}
+	 *               object for the XML document being parsed.
+	 * @param post   The current post, for use as the primary key of the Regular
+	 *               object and for setting tags
+	 * @return A {@link com.tiyb.tev.datamodel.Regular Regular} object with the data
+	 *         read
 	 * @throws XMLStreamException
 	 */
 	private static Regular readRegular(XMLEventReader reader, Post post) throws XMLStreamException {
@@ -366,8 +369,8 @@ public class BlogXmlReader {
 	 * only "question" and "answer" elements.
 	 * 
 	 * @param reader The event reader parsing the current document
-	 * @param post   The current post, for use as the primary key of the
-	 *               <code>Answer</code> object and for setting tags
+	 * @param post   The current post, for use as the primary key of the Answer
+	 *               object and for setting tags
 	 * @return The "answer" data
 	 * @throws XMLStreamException
 	 */
@@ -445,11 +448,11 @@ public class BlogXmlReader {
 	 * <p>
 	 * This method is responsible for reading the sub-content under a post for
 	 * content related to a "photo" post. This is the most complex of the post
-	 * types, as far as the XML is concerned -- but is also the least consistent of
-	 * the different data types. There is one consistent child element that always
-	 * appears ("photo-caption"), and then there is content for each photo within
-	 * the post. For each photo, there are 6 "photo-url" elements, for URLs to
-	 * differently sized versions of the same image (1280, 500, 400, ...).
+	 * types, as far as the XML is concerned, and is also the least consistent.
+	 * There is one child element that always appears ("photo-caption"), and then
+	 * there is content for each photo within the post. For each photo, there are 6
+	 * "photo-url" elements, for URLs to differently sized versions of the same
+	 * image (1280, 500, 400, ...).
 	 * </p>
 	 * 
 	 * <p>
@@ -480,23 +483,25 @@ public class BlogXmlReader {
 	 * <ol>
 	 * <li>The "photo-caption" element is read in. (It is added to every
 	 * <code>Photo</code> object created, which is not optimal, but... still.)</li>
-	 * <li>Any "photo-url" elements are read in, and the inforamtion is saved for
+	 * <li>Any "photo-url" elements are read in, and the information is saved for
 	 * later use</li>
 	 * <li><i>If</i> there is a "photoset" element, a sub-method is called for
-	 * parsing the content. That method will create a <code>Photo</code> object for
-	 * each photo it encounters.</li>
+	 * parsing the content. That method will create a
+	 * {@link com.tiyb.tev.datamodel.Photo Photo} object for each photo it
+	 * encounters.</li>
 	 * <li>When the end of the "post" element is reached, the list of
-	 * <code>Photo</code> objects is checked, to see if any were created (as part of
-	 * a photoset) or not; if not, a single <code>Photo</code> object is created,
-	 * with the URL and caption data already collected, and put in the collection.
-	 * If the collection is already populated, it is simply returned as-is, since
-	 * the "photo-url" elements at the root of the <code>&lt;post&gt;</code> element
-	 * are duplicated in the "photoset", and have therefore already been added.</li>
+	 * {@link com.tiyb.tev.datamodel.Photo Photo} objects is checked, to see if any
+	 * were created (as part of a photoset) or not; if not, a single
+	 * {@link com.tiyb.tev.datamodel.Photo Photo} object is created, with the URL
+	 * and caption data already collected, and put in the collection. If the
+	 * collection is already populated, it is simply returned as-is, since the
+	 * "photo-url" elements at the root of the <code>&lt;post&gt;</code> element are
+	 * duplicated in the "photoset", and have therefore already been added.</li>
 	 * </ol>
 	 * 
 	 * @param reader The event reader being used to parse the XML
 	 * @param post   The currently processed post
-	 * @return A list of <code>Photo</code> objects
+	 * @return A list of {@link com.tiyb.tev.datamodel.Photo Photo} objects
 	 * @throws XMLStreamException
 	 */
 	private static List<Photo> readPhotos(XMLEventReader reader, Post post) throws XMLStreamException {
@@ -701,46 +706,8 @@ public class BlogXmlReader {
 	}
 
 	/**
-	 * <p>
-	 * This is a helper function, which reads characters out of an element, up to
-	 * the end of that element (the closing tag). There can be multiple events fired
-	 * as the event reader goes through the content, up to the end of the tag,
-	 * because there can be a mix of "text" content and "CDATA" content; both of
-	 * these are combined together into one String. Because the event for the
-	 * closing tag is consumed here, it cannot be consumed by the calling method,
-	 * but the logic for all of the calling methods takes that into account.
-	 * </p>
-	 * 
-	 * <p>
-	 * Any character entities within the data -- e.g. &amp;gt; and &amp;lt; instead
-	 * of &gt; and &lt; -- get unescaped, which is the desired behaviour for this
-	 * app.
-	 * </p>
-	 * 
-	 * @param reader The event parser from which the text should be extracted.
-	 * @return A simple <code>String</code> with the returned text
-	 * @throws XMLStreamException
-	 */
-	private static String readCharacters(XMLEventReader reader) throws XMLStreamException {
-		StringBuilder result = new StringBuilder();
-
-		while (reader.hasNext()) {
-			XMLEvent event = reader.nextEvent();
-
-			if (event.isCharacters() || event.isEntityReference()) {
-				Characters chars = event.asCharacters();
-				result.append(chars.getData());
-			} else if (event.isEndElement()) {
-				return result.toString();
-			}
-		}
-
-		throw new XMLStreamException(END_OF_FILE_ERROR);
-	}
-
-	/**
-	 * Helper function which does nothing but create two opposite <code>Map</code>
-	 * objects, with Type data:
+	 * Helper function which does nothing but create two opposite
+	 * {@link java.util.Map Map} objects, with Type data:
 	 * 
 	 * <ul>
 	 * <li>One with the ID as the key, and the type as the field, and</li>
@@ -749,10 +716,10 @@ public class BlogXmlReader {
 	 * 
 	 * @param allowableTypes The full list of types from the database, with their
 	 *                       corresponding IDs
-	 * @param typeEntries    The <code>Map</code> to be used with ID as key and type
-	 *                       as value
-	 * @param typeIDs        The <code>Map</code> to be used with type as the key
-	 *                       and ID as value
+	 * @param typeEntries    The {@link java.util.Map Map} to be used with ID as key
+	 *                       and type as value
+	 * @param typeIDs        The {@link java.util.Map Map} to be used with type as
+	 *                       the key and ID as value
 	 */
 	private static void loadTypeData(List<Type> allowableTypes, Map<Long, String> typeEntries,
 			Map<String, Long> typeIDs) {
@@ -763,8 +730,8 @@ public class BlogXmlReader {
 	}
 
 	/**
-	 * Helper function to add a tag to a list of tags; the intent is for the list to
-	 * be comma-separated
+	 * Helper function to add a tag to a list of tags; the resultant list is
+	 * comma-separated.
 	 * 
 	 * @param original The existing list of tags (which could be empty)
 	 * @param tag      The tag to be added

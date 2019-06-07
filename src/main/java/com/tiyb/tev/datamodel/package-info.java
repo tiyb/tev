@@ -1,17 +1,17 @@
 /**
  * <p>
- * This package contains the <code>@Entity</code> classes for working with data
- * in the DB.
+ * This package contains the {@link javax.persistence.Entity Entity} classes for
+ * working with data in the DB.
  * </p>
  * 
  * <p>
  * The data model is built around the concept of <b>posts</b>; in Tumblr, there
  * are various <i>kinds</i> of post (Answer, Link, Photo, Regular, or Video);
- * there is common data that occurs for every post (e.g. URL of the post,
- * date/time the post went live), as well as content that is specific to the
- * individual type. For this reason, the classes here include a
- * <code>Post</code> class, which is used for every post, as well as individual
- * classes for the post types.
+ * with common data that occurs for every post (e.g. URL of the post, date/time
+ * the post went live), as well as content that is specific to the individual
+ * type. For this reason, the classes here include a
+ * {@link com.tiyb.tev.datamodel.Post Post} class, which is used for every post,
+ * as well as individual classes for the post types.
  * </p>
  * 
  * <p>

@@ -46,18 +46,30 @@ import com.tiyb.tev.xml.ConversationXmlReader;
  * 
  * @author tiyb
  * @apiviz.landmark
- * @apiviz.uses com.tiyb.tev.controller.TEVRestController
- *
+ * @apiviz.uses com.tiyb.tev.controller.TEVPostRestController
+ * @apiviz.uses com.tiyb.tev.controller.TEVConvoRestController
+ * @apiviz.uses com.tiyb.tev.controller.TEVMetadataRestController
  */
 @Controller
 public class TEVUIController {
 
+	/**
+	 * REST controller for working with posts
+	 */
 	@Autowired
-	private TEVPostRestController postRestController;
+	private TEVPostRestController postController;
+
+	/**
+	 * REST controller for working with conversations
+	 */
 	@Autowired
-	private TEVConvoRestController convoRestController;
+	private TEVConvoRestController convoController;
+
+	/**
+	 * REST controller for working with metadata
+	 */
 	@Autowired
-	private TEVMetadataRestController mdRestController;
+	private TEVMetadataRestController mdController;
 
 	/**
 	 * Returns the main (or index) page, at either / or /index
@@ -72,16 +84,17 @@ public class TEVUIController {
 
 	/**
 	 * Returns the page for showing a list of message conversations, at
-	 * /conversations
+	 * /conversations. Retrieves metadata and conversations, which are added to the
+	 * model, before returning the location of the conversations viewer.
 	 * 
 	 * @param model not used
 	 * @return name of the template to be used to render the page
 	 */
 	@RequestMapping(value = { "/conversations" }, method = RequestMethod.GET)
 	public String conversations(Model model) {
-		Metadata md = mdRestController.getMetadata();
+		Metadata md = mdController.getMetadata();
 		model.addAttribute("metadata", md);
-		List<Conversation> conversations = convoRestController.getAllConversations();
+		List<Conversation> conversations = convoController.getAllConversations();
 		model.addAttribute("conversations", conversations);
 
 		return "conversations";
@@ -99,10 +112,12 @@ public class TEVUIController {
 	}
 
 	/**
-	 * Handles file uploads, for reading in the big Tumblr XML Export. Actual logic
-	 * is handled by the <code>BlogXmlReader</code> class; this method simply calls
-	 * that class, and then (upon success) redirects to the index. Failure redirects
-	 * to the "bad XML" error page.
+	 * Handles file uploads, for reading in the Tumblr Post XML Export. Actual logic
+	 * is handled by the
+	 * {@link com.tiyb.tev.xml.BlogXmlReader#parseDocument(java.io.InputStream, TEVPostRestController, TEVMetadataRestController)
+	 * BlogXmlReader#parseDocument()} method; this method simply calls that class
+	 * and then (upon success) redirects to the index. Failure redirects to the "bad
+	 * XML" error page.
 	 * 
 	 * @param file               The Tumblr XML file to be read
 	 * @param redirectAttributes not used
@@ -112,7 +127,7 @@ public class TEVUIController {
 	public String handlePostFileUpload(@RequestParam("file") MultipartFile file,
 			RedirectAttributes redirectAttributes) {
 		try {
-			BlogXmlReader.parseDocument(file.getInputStream(), postRestController, mdRestController);
+			BlogXmlReader.parseDocument(file.getInputStream(), postController, mdController);
 		} catch (XMLParsingException | IOException e) {
 			return "redirect:/errorbadxml";
 		}
@@ -121,8 +136,12 @@ public class TEVUIController {
 	}
 
 	/**
-	 * Handles file uploads for reading in Tumblr messaging extract. Failure
-	 * redirects to the "bad XML" error page.
+	 * Handles file uploads for reading in Tumblr messaging XML extract. Actual
+	 * logic is handled by the
+	 * {@link com.tiyb.tev.xml.ConversationXmlReader#parseDocument(MultipartFile, TEVMetadataRestController, TEVConvoRestController)
+	 * ConversationXmlReader#parseDocument()} method; this method simply calls that
+	 * class and then (upon success) redirects to the index. Failure redirects to
+	 * the "bad XML" error page.
 	 * 
 	 * @param file               the XML file to be parsed
 	 * @param redirectAttributes not used
@@ -133,7 +152,7 @@ public class TEVUIController {
 			RedirectAttributes redirectAttributes) {
 
 		try {
-			ConversationXmlReader.parseDocument(file, mdRestController, convoRestController);
+			ConversationXmlReader.parseDocument(file, mdController, convoController);
 		} catch (XMLParsingException e) {
 			return "redirect:/errorbadxml";
 		}
@@ -142,11 +161,18 @@ public class TEVUIController {
 	}
 
 	/**
+	 * <p>
 	 * This request is used to populate the viewer. It first determines the correct
-	 * viewer to show (Regular, Photo, etc.), then returns the correct template to
-	 * show that type of post. In this case, the pages are being populated by
-	 * Thymeleaf, rather than jQuery, so the <code>Model</code> is populated with
-	 * the necessary data.
+	 * viewer to show (Regular, Photo, etc.), populates the
+	 * {@link org.springframework.ui.Model Model} (since the pages are rendered by
+	 * Thymeleaf on the server rather than jQuery on the client), then returns the
+	 * correct template to show that type of post.
+	 * </p>
+	 * 
+	 * <p>
+	 * {@link #pullOutTagValues(String)} is leveraged for getting a nicer view of
+	 * the tags in the post.
+	 * </p>
 	 * 
 	 * @param postID The ID of the post to be viewed (regardless of type)
 	 * @param model  The model to be populated with post data, for use by Thymeleaf
@@ -155,10 +181,10 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/postViewer" }, method = RequestMethod.GET)
 	public String showViewer(@RequestParam("id") Long postID, Model model) {
-		Post post = postRestController.getPostById(postID);
+		Post post = postController.getPostById(postID);
 		model.addAttribute("post", post);
 		model.addAttribute("tags", pullOutTagValues(post.getTags()));
-		List<Type> availableTypes = mdRestController.getAllTypes();
+		List<Type> availableTypes = mdController.getAllTypes();
 		String postType = "";
 
 		for (Type type : availableTypes) {
@@ -174,20 +200,20 @@ public class TEVUIController {
 
 		switch (postType) {
 		case "regular":
-			Regular reg = postRestController.getRegularById(postID);
+			Regular reg = postController.getRegularById(postID);
 			model.addAttribute("regular", reg);
 			return "viewers/regular";
 		case "link":
-			Link ln = postRestController.getLinkById(postID);
+			Link ln = postController.getLinkById(postID);
 			model.addAttribute("link", ln);
 			return "viewers/link";
 		case "answer":
-			Answer ans = postRestController.getAnswerById(postID);
+			Answer ans = postController.getAnswerById(postID);
 			model.addAttribute("answer", ans);
 			return "viewers/answer";
 		case "photo":
 			List<String> images = new ArrayList<String>();
-			List<Photo> photos = postRestController.getPhotoById(postID);
+			List<Photo> photos = postController.getPhotoById(postID);
 			for (int i = 0; i < photos.size(); i++) {
 				Photo photo = photos.get(i);
 				String ext = photo.getUrl1280().substring(photo.getUrl1280().lastIndexOf('.'));
@@ -197,7 +223,7 @@ public class TEVUIController {
 			model.addAttribute("caption", photos.get(0).getCaption());
 			return "viewers/photo";
 		case "video":
-			Video vid = postRestController.getVideoById(postID);
+			Video vid = postController.getVideoById(postID);
 			model.addAttribute("video", vid);
 			return "viewers/video";
 		}
@@ -214,11 +240,11 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/conversationViewer" }, method = RequestMethod.GET)
 	public String showConversationViewer(@RequestParam("participant") String participantName, Model model) {
-		Metadata md = mdRestController.getMetadata();
+		Metadata md = mdController.getMetadata();
 		model.addAttribute("metadata", md);
-		Conversation convo = convoRestController.getConversationByParticipant(participantName);
+		Conversation convo = convoController.getConversationByParticipant(participantName);
 		model.addAttribute("conversation", convo);
-		List<ConversationMessage> messages = convoRestController.getConvoMsgByConvoID(convo.getId());
+		List<ConversationMessage> messages = convoController.getConvoMsgByConvoID(convo.getId());
 		model.addAttribute("messages", messages);
 
 		return "viewers/conversation";
@@ -248,7 +274,7 @@ public class TEVUIController {
 	@RequestMapping(value = { "/viewerMedia/{imageName}" }, method = RequestMethod.GET, produces = {
 			MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_PNG_VALUE })
 	public @ResponseBody byte[] getMedia(@PathVariable("imageName") String imageName, Model model) {
-		String fullName = mdRestController.getMetadata().getBaseMediaPath() + "/" + imageName;
+		String fullName = mdController.getMetadata().getBaseMediaPath() + "/" + imageName;
 
 		File file = new File(fullName);
 		try {
@@ -269,7 +295,7 @@ public class TEVUIController {
 	public void getVideo(HttpServletResponse response, HttpServletRequest request) {
 		// String ext =
 		// photo.getUrl1280().substring(photo.getUrl1280().lastIndexOf('.'));
-		String fullName = mdRestController.getMetadata().getBaseMediaPath() + "/"
+		String fullName = mdController.getMetadata().getBaseMediaPath() + "/"
 				+ request.getRequestURI().substring(request.getRequestURI().lastIndexOf('/'));
 
 		response.setContentType("video/mp4");

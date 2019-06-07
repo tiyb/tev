@@ -13,11 +13,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 /**
  * <p>
  * This is the main class for the <b>Tumblr Export Viewer (TEV)</b> application.
- * As the name implies, the intent is to be able to read in a Tumblr export XML
- * document and provide a view of the posts within that XML. As an extra
- * feature, the application will allow posts to be marked as "read," for use
- * cases where the user wants to read through a blog and keep track of what has
- * been read and what hasn't.
+ * As the name implies, the intent is to be able to read in Tumblr export files
+ * and provide a UI for viewing posts and conversations from that export. As an
+ * extra feature, the application will allow posts to be marked as "read" as
+ * well as marked as "favourites," for use cases where the user wants to read
+ * through a blog and keep track of what has been read and what hasn't.
  * </p>
  * 
  * <p>
@@ -26,15 +26,19 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * 
  * <ol>
  * <li>The RESTful API, exposing all of the data that has been imported
- * (controlled by {@link com.tiyb.tev.controller.TEVPostRestController}}</li>
+ * (controlled by {@link com.tiyb.tev.controller.TEVPostRestController
+ * TEVPostRestController}, {@link com.tiyb.tev.controller.TEVConvoRestController
+ * TEVConvoRestController}, and
+ * {@link com.tiyb.tev.controller.TEVMetadataRestController
+ * TEVMetadataRestController})</li>
  * <li>The jQuery-based HTML interface (controlled by
- * {@link com.tiyb.tev.controller.TEVUIController}})</li>
+ * {@link com.tiyb.tev.controller.TEVUIController TEVUIController}})</li>
  * </ol>
  * 
  * <p>
- * The application leverages an HSQLDB database for storage. By default, Spring
- * Boot leverages HSQLDB in an in-memory format (and doesn't allow this to be
- * overridden, even when the appropriate properteis are set in
+ * The application leverages an <b>HSQLDB</b> database for storage. By default,
+ * Spring Boot leverages HSQLDB in an in-memory format (and doesn't allow this
+ * to be overridden, even when the appropriate properties are set in
  * <code>application.properties</code>, but TEV needs it to be persisted. For
  * this reason, the application is configured to ignore auto-configuration for
  * <code>DataSourceAutoConfiguration</code>, and instead supplies the data
@@ -43,7 +47,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * 
  * @author tiyb
  * @apiviz.landmark
- *
  */
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
@@ -51,7 +54,8 @@ public class TevApplication {
 
 	/**
 	 * The main function for starting the application, called by Spring Boot at
-	 * boot-up.
+	 * boot-up. No custom implementation, the standard implementation for Spring
+	 * Boot is used.
 	 * 
 	 * @param args Command-line arguments, if any. (TEV doesn't expect/use any.)
 	 */
@@ -60,23 +64,23 @@ public class TevApplication {
 	}
 
 	/**
-	 * Used for creation of a <code>DataSource</code> for the database, since this
-	 * is the only way the HSQL datasource can be forced to use a file-based
+	 * Returns the {@link javax.sql.DataSource DataSource} bean for working with the database. This
+	 * is the only way the HSQL data source can be forced to use a file-based
 	 * database, instead of in-memory.
 	 * 
-	 * @return Standard Java <code>DataSource</code>
+	 * @return Standard Java {@link javax.sql.DataSource DataSource}
 	 */
 	@Bean
 	public DataSource primaryDataSource() {
 		return DataSourceBuilder.create().username("sa").password("").url("jdbc:hsqldb:file:hsql/tev.db")
 				.driverClassName("org.hsqldb.jdbc.JDBCDriver").build();
 	}
-	
+
 	/**
 	 * Used for custom DB scripts that need to be executed by admin tools
 	 * 
 	 * @param dataSource The DS used by the application
-	 * @return a <code>JdbcTemplate</code> for this application/data source
+	 * @return a {@link org.springframework.jdbc.core.JdbcTemplate JdbcTemplate} for this application/data source
 	 */
 	@Bean
 	public JdbcTemplate jdbcTemplate(DataSource dataSource) {

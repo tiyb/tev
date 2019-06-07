@@ -16,22 +16,38 @@ import com.tiyb.tev.datamodel.helpers.StaticListData;
 import com.tiyb.tev.repository.MetadataRepository;
 import com.tiyb.tev.repository.TypeRepository;
 
+/**
+ * REST controller for working with the application's Metadata -- it's settings.
+ * 
+ * @author tiyb
+ * @apiviz.landmark
+ * @apiviz.uses com.tiyb.tev.repository.TypeRepository
+ * @apiviz.uses com.tiyb.tev.repository.MetadataRepository
+ */
 @RestController
 @RequestMapping("/api")
 public class TEVMetadataRestController {
-	
+
+	/**
+	 * The repo for working with Type data
+	 */
 	@Autowired
 	private TypeRepository typeRepo;
-	
+
+	/**
+	 * The repo for working with Metadata
+	 */
 	@Autowired
 	private MetadataRepository metadataRepo;
-	
+
 	/**
 	 * GET to return all Types stored in the system. If there are no types, a
-	 * hard-coded list of types is created. (Was originally done in
-	 * <code>data.sql</code>, but that no longer works in this implementation.)
+	 * hard-coded list of types is created. This implementation is <i>very</i>
+	 * hard-coded, because there are only a specific number of types actually
+	 * supported by Tumblr.
 	 * 
-	 * @return <code>List<></code> of <code>Type</code> objects
+	 * @return {@link java.util.List List} of {@link com.tiyb.tev.datamodel.Type
+	 *         Type} objects
 	 */
 	@GetMapping("/types")
 	public List<Type> getAllTypes() {
@@ -73,12 +89,20 @@ public class TEVMetadataRestController {
 	}
 
 	/**
+	 * <p>
 	 * GET to return the metadata stored in the system. Only one record will ever be
 	 * stored in the <code>metadata</code> table, so the API assumes one and only
-	 * oen <code>Metadata</code> object.
+	 * one {@link com.tiyb.tev.datamodel.Metadata Metadata} object.
+	 * </p>
 	 * 
-	 * @return The <code>Metadata</code> object stored in the database, or an empty
-	 *         object if the table has no data.
+	 * <p>
+	 * If there is no data in the database, a default object is returned based on
+	 * {@link com.tiyb.tev.datamodel.Metadata#newDefaultMetadata()
+	 * Metadata#newDefaultMetadata()}
+	 * </p>
+	 * 
+	 * @return The {@link com.tiyb.tev.datamodel.Metadata Metadata} object stored in
+	 *         the database, or an empty object if the table has no data.
 	 */
 	@GetMapping("/metadata")
 	public Metadata getMetadata() {
@@ -111,10 +135,10 @@ public class TEVMetadataRestController {
 		for (String s : Metadata.SORT_ORDERS) {
 			sld.getSortOrders().add(s);
 		}
-		for(String s : Metadata.FAV_FILTERS) {
+		for (String s : Metadata.FAV_FILTERS) {
 			sld.getFavFilters().add(s);
 		}
-		for(Integer i : Metadata.PAGE_LENGTHS) {
+		for (Integer i : Metadata.PAGE_LENGTHS) {
 			sld.getPageLengths().add(i);
 		}
 
@@ -128,7 +152,7 @@ public class TEVMetadataRestController {
 	 * is always 1.
 	 * 
 	 * @param metadataDetails The data to be updated in the DB
-	 * @return The updated <code>Metadata</code> object
+	 * @return The updated {@link com.tiyb.tev.datamodel.Metadata Metadata} object
 	 */
 	@PutMapping("/metadata")
 	public Metadata updateMetadata(@RequestBody Metadata metadataDetails) {
@@ -156,6 +180,5 @@ public class TEVMetadataRestController {
 
 		return returnValue;
 	}
-
 
 }

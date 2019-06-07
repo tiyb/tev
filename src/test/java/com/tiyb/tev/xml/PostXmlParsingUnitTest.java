@@ -27,6 +27,7 @@ import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
 import com.tiyb.tev.datamodel.Video;
 import com.tiyb.tev.exception.ResourceNotFoundException;
+import com.tiyb.tev.exception.XMLParsingException;
 
 /**
  * <p>
@@ -399,4 +400,15 @@ public class PostXmlParsingUnitTest {
 
 	}
 
+	/**
+	 * Tests that parsing of invalid XML throws the proper exception
+	 * @throws FileNotFoundException
+	 */
+	@Test(expected=XMLParsingException.class)
+	public void testBadXmlUpload() throws FileNotFoundException {
+		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-badxml.xml");
+		InputStream xmlFile = new FileInputStream(rawXmlFile);
+
+		BlogXmlReader.parseDocument(xmlFile, postController, mdController);
+	}
 }

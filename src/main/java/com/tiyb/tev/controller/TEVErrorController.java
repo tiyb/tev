@@ -39,8 +39,10 @@ public class TEVErrorController implements ErrorController {
 	}
 
 	/**
-	 * Override of the <code>ErrorController</code> method for getting the path to
-	 * the generic error page
+	 * Override of the
+	 * {@link org.springframework.boot.web.servlet.error.ErrorController#getErrorPath()
+	 * ErrorController#getErrorPath()} method for getting the path to the generic
+	 * error page
 	 */
 	@Override
 	public String getErrorPath() {

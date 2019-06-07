@@ -22,22 +22,38 @@ import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.repository.ConversationMessageRepository;
 import com.tiyb.tev.repository.ConversationRepository;
 
+/**
+ * REST controller for working with Conversations.
+ * 
+ * @author tiyb
+ * @apiviz.landmark
+ * @apiviz.uses com.tiyb.tev.repository.ConversationRepository
+ * @apiviz.uses com.tiyb.tev.repository.ConversationMessageRepository
+ */
 @RestController
 @RequestMapping("/api")
 public class TEVConvoRestController {
 
+	/**
+	 * The Repo for working with Conversation data
+	 */
 	@Autowired
-	ConversationRepository conversationRepo;
+	ConversationRepository convoRepo;
+
+	/**
+	 * The Repo for working with Conversation Message data
+	 */
 	@Autowired
-	ConversationMessageRepository convoMsgRepo;
+	ConversationMessageRepository msgRepo;
+
 	/**
 	 * GET request for listing all conversations
 	 * 
-	 * @return <code>List</code> of all conversations in the database
+	 * @return {@link java.util.List List} of all conversations in the database
 	 */
 	@GetMapping("/conversations")
 	public List<Conversation> getAllConversations() {
-		return conversationRepo.findAll();
+		return convoRepo.findAll();
 	}
 
 	/**
@@ -48,7 +64,7 @@ public class TEVConvoRestController {
 	 */
 	@GetMapping("/conversations/{id}")
 	public Conversation getConversationById(@PathVariable(value = "id") Long conversationID) {
-		return conversationRepo.findById(conversationID)
+		return convoRepo.findById(conversationID)
 				.orElseThrow(() -> new ResourceNotFoundException("Conversation", "id", conversationID));
 	}
 
@@ -60,7 +76,7 @@ public class TEVConvoRestController {
 	 */
 	@GetMapping("/conversations/{participantName}")
 	public Conversation getConversationByParticipant(@RequestParam("participantName") String participantName) {
-		Conversation convo = conversationRepo.findByParticipant(participantName);
+		Conversation convo = convoRepo.findByParticipant(participantName);
 
 		if (convo == null) {
 			throw new ResourceNotFoundException("Conversation", "name", participantName);
@@ -70,10 +86,12 @@ public class TEVConvoRestController {
 	}
 
 	/**
-	 * GET to return a single conversation, by participant ID. Because some
-	 * conversations (where all messages are from the main blog, and none are from
+	 * GET to return a single conversation by participant ID. Because some
+	 * conversations (where all messages are from the main blog and none are from
 	 * the participant) will have no conversation ID, a backup method is provided
-	 * whereby conversations can be searched by Participant Name instead of ID.
+	 * whereby conversations can be searched by Participant Name instead of ID. So
+	 * if the initial search (by Participant ID) returns no results, a secondary
+	 * search (by Participant name) will be attempted
 	 * 
 	 * @param participantId   ID of the participant
 	 * @param participantName Name of the participant; not used if ID is
@@ -83,12 +101,12 @@ public class TEVConvoRestController {
 	@GetMapping("/conversations/id/{participantId}/{participantName}")
 	public Conversation getConversationByParticipantIdOrName(@RequestParam("participantId") String participantId,
 			@RequestParam("participantName") String participantName) {
-		List<Conversation> convos = conversationRepo.findByParticipantId(participantId);
+		List<Conversation> convos = convoRepo.findByParticipantId(participantId);
 		if (convos.size() == 1) {
 			return convos.get(0);
 		}
 
-		Conversation convoByName = conversationRepo.findByParticipant(participantName);
+		Conversation convoByName = convoRepo.findByParticipant(participantName);
 
 		if (convoByName != null) {
 			return convoByName;
@@ -100,11 +118,22 @@ public class TEVConvoRestController {
 	/**
 	 * Returns all conversations that are not set to "hidden" status
 	 * 
-	 * @return <code>List</code> of conversations
+	 * @return {@link java.util.List List} of conversations
 	 */
 	@GetMapping("/conversations/unhidden")
 	public List<Conversation> getUnhiddenConversations() {
-		return conversationRepo.findByHideConversationFalse();
+		return convoRepo.findByHideConversationFalse();
+	}
+
+	/**
+	 * Returns all conversations that are set to "hidden" status. Not used by TEV,
+	 * but included for the sake of completeness.
+	 * 
+	 * @return {@link java.util.List List} of conversations
+	 */
+	@GetMapping("/conversations/hidden")
+	public List<Conversation> getHiddenConversations() {
+		return convoRepo.findByHideConversationTrue();
 	}
 
 	/**
@@ -116,7 +145,7 @@ public class TEVConvoRestController {
 	 */
 	@PostMapping("/conversations")
 	public Conversation createConversation(@Valid @RequestBody Conversation conversation) {
-		return conversationRepo.save(conversation);
+		return convoRepo.save(conversation);
 	}
 
 	/**
@@ -129,7 +158,7 @@ public class TEVConvoRestController {
 	@PutMapping("/conversations/{id}")
 	public Conversation updateConversation(@PathVariable(value = "id") Long conversationId,
 			@RequestBody Conversation convoDetails) {
-		Conversation convo = conversationRepo.findById(conversationId)
+		Conversation convo = convoRepo.findById(conversationId)
 				.orElseThrow(() -> new ResourceNotFoundException("Conversation", "id", conversationId));
 
 		convo.setParticipant(convoDetails.getParticipant());
@@ -138,7 +167,7 @@ public class TEVConvoRestController {
 		convo.setHideConversation(convoDetails.getHideConversation());
 		convo.setParticipantId(convoDetails.getParticipantId());
 
-		Conversation updatedConvo = conversationRepo.save(convo);
+		Conversation updatedConvo = convoRepo.save(convo);
 
 		return updatedConvo;
 	}
@@ -152,11 +181,11 @@ public class TEVConvoRestController {
 	 */
 	@PutMapping("/conversations/{participant}/ignoreConvo")
 	public Conversation ignoreConversation(@PathVariable(value = "participant") String participantName) {
-		Conversation convo = conversationRepo.findByParticipant(participantName);
+		Conversation convo = convoRepo.findByParticipant(participantName);
 
 		convo.setHideConversation(true);
 
-		convo = conversationRepo.save(convo);
+		convo = convoRepo.save(convo);
 
 		return convo;
 	}
@@ -170,11 +199,11 @@ public class TEVConvoRestController {
 	 */
 	@PutMapping("/conversations/{participant}/unignoreConvo")
 	public Conversation unignoreConversation(@PathVariable(value = "participant") String participantName) {
-		Conversation convo = conversationRepo.findByParticipant(participantName);
+		Conversation convo = convoRepo.findByParticipant(participantName);
 
 		convo.setHideConversation(false);
 
-		convo = conversationRepo.save(convo);
+		convo = convoRepo.save(convo);
 
 		return convo;
 	}
@@ -184,7 +213,7 @@ public class TEVConvoRestController {
 	 */
 	@GetMapping("/conversations/unignoreAllConversations")
 	public void unignoreAllConversations() {
-		List<Conversation> hiddenConvos = conversationRepo.findByHideConversationTrue();
+		List<Conversation> hiddenConvos = convoRepo.findByHideConversationTrue();
 
 		if (hiddenConvos.size() < 1) {
 			return;
@@ -192,7 +221,7 @@ public class TEVConvoRestController {
 
 		for (Conversation convo : hiddenConvos) {
 			convo.setHideConversation(false);
-			conversationRepo.save(convo);
+			convoRepo.save(convo);
 		}
 
 		return;
@@ -202,14 +231,15 @@ public class TEVConvoRestController {
 	 * DEL to delete a single conversation, by ID
 	 * 
 	 * @param convoId ID of convo to be deleted
-	 * @return <code>ResponseEntity</code> with the response details
+	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
+	 *         the response details
 	 */
 	@DeleteMapping("/conversations/{id}")
 	public ResponseEntity<?> deleteConversation(@PathVariable(value = "id") Long convoId) {
-		Conversation convo = conversationRepo.findById(convoId)
+		Conversation convo = convoRepo.findById(convoId)
 				.orElseThrow(() -> new ResourceNotFoundException("Conversation", "id", convoId));
 
-		conversationRepo.delete(convo);
+		convoRepo.delete(convo);
 
 		return ResponseEntity.ok().build();
 	}
@@ -217,11 +247,12 @@ public class TEVConvoRestController {
 	/**
 	 * DEL to delete all conversations in the DB
 	 * 
-	 * @return <code>ResponseEntity</code> with the response details
+	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
+	 *         the response details
 	 */
 	@DeleteMapping("/conversations")
 	public ResponseEntity<?> deleteAllConversations() {
-		conversationRepo.deleteAll();
+		convoRepo.deleteAll();
 
 		return ResponseEntity.ok().build();
 	}
@@ -233,7 +264,7 @@ public class TEVConvoRestController {
 	 */
 	@GetMapping("/conversations/messages")
 	public List<ConversationMessage> getAllConversationMessages() {
-		return convoMsgRepo.findAll();
+		return msgRepo.findAll();
 	}
 
 	/**
@@ -244,7 +275,7 @@ public class TEVConvoRestController {
 	 */
 	@PostMapping("/conversations/messages")
 	public ConversationMessage createConvoMessage(@Valid @RequestBody ConversationMessage convoMsg) {
-		return convoMsgRepo.save(convoMsg);
+		return msgRepo.save(convoMsg);
 	}
 
 	/**
@@ -255,7 +286,7 @@ public class TEVConvoRestController {
 	 */
 	@GetMapping("/conversations/{id}/messages")
 	public List<ConversationMessage> getConvoMsgByConvoID(@PathVariable(value = "id") Long convoId) {
-		return convoMsgRepo.findByConversationIdOrderByTimestamp(convoId);
+		return msgRepo.findByConversationIdOrderByTimestamp(convoId);
 	}
 
 	/**
@@ -268,7 +299,7 @@ public class TEVConvoRestController {
 	@PutMapping("/conversations/messages/{id}")
 	public ConversationMessage updateConvoMsg(@PathVariable(value = "id") Long msgId,
 			@RequestBody ConversationMessage convoMsg) {
-		ConversationMessage cm = convoMsgRepo.findById(msgId)
+		ConversationMessage cm = msgRepo.findById(msgId)
 				.orElseThrow(() -> new ResourceNotFoundException("ConversationMessage", "id", msgId));
 
 		cm.setConversationId(convoMsg.getConversationId());
@@ -277,7 +308,7 @@ public class TEVConvoRestController {
 		cm.setType(convoMsg.getType());
 		cm.setTimestamp(convoMsg.getTimestamp());
 
-		ConversationMessage updatedCM = convoMsgRepo.save(cm);
+		ConversationMessage updatedCM = msgRepo.save(cm);
 
 		return updatedCM;
 	}
@@ -285,11 +316,12 @@ public class TEVConvoRestController {
 	/**
 	 * DEL to delete all conversation messages in the DB
 	 * 
-	 * @return <code>ResponseEntity</code> with the response details
+	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
+	 *         the response details
 	 */
 	@DeleteMapping("/conversations/messages")
 	public ResponseEntity<?> deleteAllConvoMsgs() {
-		convoMsgRepo.deleteAll();
+		msgRepo.deleteAll();
 
 		return ResponseEntity.ok().build();
 	}
@@ -298,14 +330,15 @@ public class TEVConvoRestController {
 	 * DEL to delete a single conversation message, by ID
 	 * 
 	 * @param msgId ID of the message to be deleted
-	 * @return <code>ResponseEntity</code> with the response details
+	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
+	 *         the response details
 	 */
 	@DeleteMapping("/conversations/messages/{id}")
 	public ResponseEntity<?> deleteConversationMessage(@PathVariable(name = "id") Long msgId) {
-		ConversationMessage cm = convoMsgRepo.findById(msgId)
+		ConversationMessage cm = msgRepo.findById(msgId)
 				.orElseThrow(() -> new ResourceNotFoundException("ConversationMessage", "id", msgId));
 
-		convoMsgRepo.delete(cm);
+		msgRepo.delete(cm);
 
 		return ResponseEntity.ok().build();
 	}

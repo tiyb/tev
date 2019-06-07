@@ -23,6 +23,7 @@ import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.ConversationMessage;
 import com.tiyb.tev.datamodel.Metadata;
+import com.tiyb.tev.exception.XMLParsingException;
 
 /**
  * <p>
@@ -47,7 +48,7 @@ public class ConversationXmlParsingUnitTests {
 	private TEVConvoRestController postRestController;
 	@Autowired
 	private TEVMetadataRestController mdRestController;
-	
+
 	private static final String convo1Participant = "participant1";
 	private static final String convo2Participant = "participant2";
 	private static final String convo3Participant = "participant3";
@@ -109,20 +110,20 @@ public class ConversationXmlParsingUnitTests {
 		Conversation fourthConvo = postRestController.getConversationByParticipant(convo4Participant);
 		assertThat(fourthConvo).isNotNull();
 		assertThat(fourthConvo.getNumMessages()).isEqualTo(1);
-		
+
 		Conversation changedConvo = postRestController.getConversationByParticipantIdOrName(oldNameParticipantId, "");
 		assertThat(changedConvo).isNotNull();
 		assertThat(changedConvo.getNumMessages()).isEqualTo(1);
 		assertThat(changedConvo.getParticipant()).isEqualTo("participant-oldname");
 		assertThat(changedConvo.getParticipantAvatarUrl()).isEqualTo("http://participanton/avatar");
-		
+
 		Conversation toBeDeactConvo = postRestController.getConversationByParticipantIdOrName(tobeDeactivatedId, "");
 		assertThat(toBeDeactConvo).isNotNull();
 		assertThat(toBeDeactConvo.getNumMessages()).isEqualTo(2);
 		assertThat(toBeDeactConvo.getParticipant()).isEqualTo("goingtobedeactivated");
 		assertThat(toBeDeactConvo.getParticipantAvatarUrl()).isEqualTo("http://goingtobedeac/avatar");
 	}
-	
+
 	/**
 	 * Tests that Conversations with only sent messages can still be retrieved via
 	 * participant name, even though no ID was created. (The
@@ -200,7 +201,7 @@ public class ConversationXmlParsingUnitTests {
 		assertThat(msgs.get(8).getReceived()).isEqualTo(false);
 		assertThat(msgs.get(8).getTimestamp()).isEqualTo(1544221221L);
 	}
-	
+
 	/**
 	 * Verifies that all of the conversation messages in the test XML input file
 	 * have been properly imported into the database for Conversation 2. Since the
@@ -259,7 +260,7 @@ public class ConversationXmlParsingUnitTests {
 		assertThat(msgs.get(8).getReceived()).isEqualTo(false);
 		assertThat(msgs.get(8).getTimestamp()).isEqualTo(1544126671L);
 	}
-	
+
 	/**
 	 * Verifies that all of the conversation messages in the test XML input file
 	 * have been properly imported into the database for Conversation 3. Since the
@@ -278,7 +279,7 @@ public class ConversationXmlParsingUnitTests {
 		assertThat(msgs.get(0).getReceived()).isEqualTo(false);
 		assertThat(msgs.get(0).getTimestamp()).isEqualTo(1544012468L);
 	}
-	
+
 	/**
 	 * Verifies that all of the conversation messages in the test XML input file
 	 * have been properly imported into the database for Conversation 4. Since the
@@ -297,7 +298,7 @@ public class ConversationXmlParsingUnitTests {
 		assertThat(msgs.get(0).getReceived()).isEqualTo(true);
 		assertThat(msgs.get(0).getTimestamp()).isEqualTo(1544012468L);
 	}
-	
+
 	/**
 	 * Tests parsing of the Conversation XML in cases where the "overwrite
 	 * conversations" flag is set to false; unchanged conversations should be left
@@ -311,36 +312,36 @@ public class ConversationXmlParsingUnitTests {
 	public void testAddingConvos() throws IOException {
 		List<Conversation> convos = postRestController.getAllConversations();
 		assertThat(convos.size()).isEqualTo(6);
-		
-		for(Conversation convo : convos) {
+
+		for (Conversation convo : convos) {
 			convo.setHideConversation(true);
 			postRestController.updateConversation(convo.getId(), convo);
 		}
-		
+
 		Metadata md = mdRestController.getMetadata();
 		md.setOverwriteConvoData(false);
 		md = mdRestController.updateMetadata(md);
-		
+
 		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-messages-extended-xml.xml");
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
 		MockMultipartFile mockFile = new MockMultipartFile("testmessages", xmlFile);
 		ConversationXmlReader.parseDocument(mockFile, mdRestController, postRestController);
-		
+
 		convos = postRestController.getAllConversations();
 		assertThat(convos).isNotNull();
 		assertThat(convos.size()).isEqualTo(7);
-		
+
 		Conversation convo = postRestController.getConversationByParticipant(convo1Participant);
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(false);
 		List<ConversationMessage> messages = postRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(messages).isNotNull();
 		assertThat(messages.size()).isEqualTo(10);
-		
+
 		convo = postRestController.getConversationByParticipant(convo2Participant);
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(true);
-		
+
 		convo = postRestController.getConversationByParticipant(convo3Participant);
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(false);
@@ -348,36 +349,50 @@ public class ConversationXmlParsingUnitTests {
 		messages = postRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(messages).isNotNull();
 		assertThat(messages.size()).isEqualTo(2);
-		
+
 		convo = postRestController.getConversationByParticipant(convo4Participant);
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(true);
-		
+
 		convo = postRestController.getConversationByParticipant(convo5Participant);
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(false);
 		messages = postRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(messages).isNotNull();
 		assertThat(messages.size()).isEqualTo(1);
-		
+
 		ConversationMessage message = messages.get(0);
 		assertThat(message.getMessage()).isEqualTo("Message 1");
 		assertThat(message.getType()).isEqualTo("TEXT");
 		assertThat(message.getReceived()).isEqualTo(true);
 		assertThat(message.getTimestamp()).isEqualTo(1544012468L);
-		
+
 		convo = postRestController.getConversationByParticipantIdOrName(oldNameParticipantId, "");
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(false);
 		assertThat(convo.getNumMessages()).isEqualTo(1);
 		assertThat(convo.getParticipant()).isEqualTo("participant-newname");
 		assertThat(convo.getParticipantAvatarUrl()).isEqualTo("http://participantnn/avatar");
-		
+
 		convo = postRestController.getConversationByParticipantIdOrName(tobeDeactivatedId, "");
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(true);
 		assertThat(convo.getNumMessages()).isEqualTo(2);
 		assertThat(convo.getParticipant()).isEqualTo("goingtobedeactivated");
 		assertThat(convo.getParticipantAvatarUrl()).isEqualTo("http://goingtobedeac/avatar");
+	}
+
+	/**
+	 * Tests that parsing an invalid XML file throws the proper exception
+	 * 
+	 * @throws IOException
+	 */
+	@Test(expected = XMLParsingException.class)
+	public void testBadXml() throws IOException {
+		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-messages-badxml.xml");
+		InputStream xmlFile = new FileInputStream(rawXmlFile);
+		MockMultipartFile mockFile = new MockMultipartFile("testmessages", xmlFile);
+
+		ConversationXmlReader.parseDocument(mockFile, mdRestController, postRestController);
 	}
 }
