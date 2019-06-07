@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="#{error.title}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" type="text/css"
+          href="webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+</head>
+<body>
+
+<div id="header"></div>
+
+<div class="container-fluid">
+	<h1 th:text="#{error.heading}"></h1>
+	<p th:text="#{error.explanatorytext}"></p>
+	<a href="/" th:text="#{error.linktohome}"></a>
+
+</div>
+
+<div id="footer" class="container"></div>
+
+<script type="text/javascript"
+        src="webjars/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" th:src="@{/js/errorpage.js}"></script>
+</body>
+</html>

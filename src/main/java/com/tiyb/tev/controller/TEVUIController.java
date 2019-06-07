@@ -97,7 +97,8 @@ public class TEVUIController {
 	/**
 	 * Handles file uploads, for reading in the big Tumblr XML Export. Actual logic
 	 * is handled by the <code>BlogXmlReader</code> class; this method simply calls
-	 * that class, and then (upon success) redirects to the index.
+	 * that class, and then (upon success) redirects to the index. Failure redirects
+	 * to the "bad XML" error page.
 	 * 
 	 * @param file               The Tumblr XML file to be read
 	 * @param redirectAttributes not used
@@ -109,14 +110,15 @@ public class TEVUIController {
 		try {
 			BlogXmlReader.parseDocument(file.getInputStream(), restController);
 		} catch (XMLParsingException | IOException e) {
-			throw new XMLParsingException();
+			return "redirect:/errorbadxml";
 		}
 
 		return "redirect:/index";
 	}
-	
+
 	/**
-	 * Handles file uploads for reading in Tumblr messaging extract
+	 * Handles file uploads for reading in Tumblr messaging extract. Failure
+	 * redirects to the "bad XML" error page.
 	 * 
 	 * @param file               the XML file to be parsed
 	 * @param redirectAttributes not used
@@ -129,7 +131,7 @@ public class TEVUIController {
 		try {
 			ConversationXmlReader.parseDocument(file, restController);
 		} catch (XMLParsingException e) {
-			throw new XMLParsingException();
+			return "redirect:/errorbadxml";
 		}
 
 		return "redirect:/conversations";
