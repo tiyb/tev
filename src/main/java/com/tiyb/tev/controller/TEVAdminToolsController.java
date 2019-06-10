@@ -2,6 +2,8 @@ package com.tiyb.tev.controller;
 
 import java.util.List;
 
+import javax.annotation.PreDestroy;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -59,6 +61,19 @@ public class TEVAdminToolsController {
 		}
 
 		return true;
+	}
+	
+	/**
+	 * Used to compact the database upon shutdown. This causes shutdown to take
+	 * longer, but it's not very noticeable for an application of this size.
+	 */
+	@PreDestroy
+	public void preDestroy() {
+		try {
+			jdbcTemplate.execute("SHUTDOWN COMPACT");
+		} catch (DataAccessException e) {
+			// do nothing
+		}
 	}
 
 	/**

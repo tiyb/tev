@@ -51,7 +51,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
 public class TevApplication {
-
+	
 	/**
 	 * The main function for starting the application, called by Spring Boot at
 	 * boot-up. No custom implementation, the standard implementation for Spring
@@ -86,5 +86,5 @@ public class TevApplication {
 	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
 		return new JdbcTemplate(dataSource);
 	}
-
+	
 }
