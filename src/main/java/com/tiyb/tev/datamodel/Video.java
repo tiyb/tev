@@ -32,6 +32,17 @@ public class Video implements Serializable {
 	@Lob
 	@Column(name="video_caption", length=50000)
 	private String videoCaption;
+	
+	public void updateData(Video newDataObject) {
+		this.contentType = newDataObject.contentType;
+		this.duration = newDataObject.duration;
+		this.extension = newDataObject.extension;
+		this.height = newDataObject.height;
+		//this.postId = newDataObject.postId;
+		this.revision = newDataObject.revision;
+		this.videoCaption = newDataObject.videoCaption;
+		this.width = newDataObject.width;
+	}
 
 	@Override
 	public String toString() {

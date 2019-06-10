@@ -41,6 +41,22 @@ public class Photo implements Serializable {
 	private String url250;
 	private String url100;
 	private String url75;
+	
+	public void updateData(Photo newDataObject) {
+		this.caption = newDataObject.caption;
+		this.height = newDataObject.height;
+		//this.id = newDataObject.id;
+		this.offset = newDataObject.offset;
+		this.photoLinkUrl = newDataObject.photoLinkUrl;
+		//this.postId = newDataObject.postId;
+		this.url100 = newDataObject.url100;
+		this.url1280 = newDataObject.url1280;
+		this.url250 = newDataObject.url250;
+		this.url400 = newDataObject.url400;
+		this.url500 = newDataObject.url500;
+		this.url75 = newDataObject.url75;
+		this.width = newDataObject.width;
+	}
 
 	@Override
 	public String toString() {

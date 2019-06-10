@@ -50,7 +50,13 @@ public class Answer implements Serializable {
 		builder.append("]");
 		return builder.toString();
 	}
-
+	
+	public void updateData(Answer newDataObject) {
+		this.answer = newDataObject.answer;
+		//this.postId = newDataObject.postId;
+		this.question = newDataObject.question;
+	}
+	
 	public Long getPostId() {
 		return postId;
 	}

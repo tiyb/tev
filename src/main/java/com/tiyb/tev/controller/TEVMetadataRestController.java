@@ -165,17 +165,8 @@ public class TEVMetadataRestController {
 			md.setId(1);
 		}
 
-		md.setBaseMediaPath(metadataDetails.getBaseMediaPath());
-		md.setFilter(metadataDetails.getFilter());
-		md.setSortColumn(metadataDetails.getSortColumn());
-		md.setSortOrder(metadataDetails.getSortOrder());
-		md.setMainTumblrUser(metadataDetails.getMainTumblrUser());
-		md.setMainTumblrUserAvatarUrl(metadataDetails.getMainTumblrUserAvatarUrl());
-		md.setFavFilter(metadataDetails.getFavFilter());
-		md.setPageLength(metadataDetails.getPageLength());
-		md.setShowReadingPane(metadataDetails.getShowReadingPane());
-		md.setOverwritePostData(metadataDetails.getOverwritePostData());
-		md.setOverwriteConvoData(metadataDetails.getOverwriteConvoData());
+		md.updateData(metadataDetails);
+		
 		Metadata returnValue = metadataRepo.save(md);
 
 		return returnValue;

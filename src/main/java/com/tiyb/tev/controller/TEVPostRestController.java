@@ -139,21 +139,8 @@ public class TEVPostRestController {
 	public Post updatePost(@PathVariable(value = "id") Long postId, @RequestBody Post postDetails) {
 		Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
 
-		post.setDate(postDetails.getDate());
-		post.setDateGmt(postDetails.getDateGmt());
-		post.setIsReblog(postDetails.getIsReblog());
-		post.setReblogKey(postDetails.getReblogKey());
-		post.setSlug(postDetails.getSlug());
-		post.setTumblelog(postDetails.getTumblelog());
-		// post.setType(); not overwriting post type
-		post.setUnixtimestamp(postDetails.getUnixtimestamp());
-		post.setUrl(postDetails.getUrl());
-		post.setUrlWithSlug(postDetails.getUrlWithSlug());
-		post.setIsRead(postDetails.getIsRead());
-		post.setTags(postDetails.getTags());
-		post.setIsFavourite(postDetails.getIsFavourite());
-		post.setState(postDetails.getState());
-
+		post.updateData(postDetails);
+		
 		Post updatedPost = postRepo.save(post);
 
 		return updatedPost;
@@ -350,9 +337,8 @@ public class TEVPostRestController {
 		Answer ans = answerRepo.findById(postId)
 				.orElseThrow(() -> new ResourceNotFoundException("Answer", "id", postId));
 
-		ans.setAnswer(answerDetails.getAnswer());
-		ans.setQuestion(answerDetails.getQuestion());
-
+		ans.updateData(answerDetails);
+		
 		Answer updatedAns = answerRepo.save(ans);
 
 		return updatedAns;
@@ -435,10 +421,8 @@ public class TEVPostRestController {
 	public Link updateLink(@PathVariable(value = "id") Long postId, @RequestBody Link linkDetails) {
 		Link link = linkRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Link", "id", postId));
 
-		link.setDescription(linkDetails.getDescription());
-		link.setText(linkDetails.getText());
-		link.setUrl(linkDetails.getUrl());
-
+		link.updateData(linkDetails);
+		
 		Link updatedLink = linkRepo.save(link);
 
 		return updatedLink;
@@ -519,18 +503,8 @@ public class TEVPostRestController {
 		Photo photo = photoRepo.findById(postId)
 				.orElseThrow(() -> new ResourceNotFoundException("Photo", "id", postId));
 
-		photo.setCaption(photoDetails.getCaption());
-		photo.setHeight(photoDetails.getHeight());
-		photo.setOffset(photoDetails.getOffset());
-		photo.setPhotoLinkUrl(photoDetails.getPhotoLinkUrl());
-		photo.setUrl100(photoDetails.getUrl100());
-		photo.setUrl1280(photoDetails.getUrl1280());
-		photo.setUrl250(photoDetails.getUrl250());
-		photo.setUrl400(photoDetails.getUrl400());
-		photo.setUrl500(photoDetails.getUrl500());
-		photo.setUrl75(photoDetails.getUrl75());
-		photo.setWidth(photoDetails.getWidth());
-
+		photo.updateData(photoDetails);
+		
 		Photo updatedPhoto = photoRepo.save(photo);
 
 		return updatedPhoto;
@@ -615,9 +589,8 @@ public class TEVPostRestController {
 		Regular reg = regularRepo.findById(postId)
 				.orElseThrow(() -> new ResourceNotFoundException("Regular", "id", postId));
 
-		reg.setBody(regularDetails.getBody());
-		reg.setTitle(regularDetails.getTitle());
-
+		reg.updateData(regularDetails);
+		
 		Regular updatedReg = regularRepo.save(reg);
 
 		return updatedReg;
@@ -701,14 +674,8 @@ public class TEVPostRestController {
 		Video video = videoRepo.findById(postId)
 				.orElseThrow(() -> new ResourceNotFoundException("Video", "id", postId));
 
-		video.setContentType(videoDetails.getContentType());
-		video.setDuration(videoDetails.getDuration());
-		video.setExtension(videoDetails.getExtension());
-		video.setHeight(videoDetails.getHeight());
-		video.setRevision(videoDetails.getRevision());
-		video.setVideoCaption(videoDetails.getVideoCaption());
-		video.setWidth(videoDetails.getWidth());
-
+		video.updateData(videoDetails);
+		
 		Video updatedVideo = videoRepo.save(video);
 
 		return updatedVideo;

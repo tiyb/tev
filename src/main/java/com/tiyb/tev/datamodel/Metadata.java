@@ -101,6 +101,21 @@ public class Metadata implements Serializable {
 
 		return md;
 	}
+	
+	public void updateData(Metadata newDataObject) {
+		this.baseMediaPath = newDataObject.baseMediaPath;
+		this.favFilter = newDataObject.favFilter;
+		this.filter = newDataObject.filter;
+		//this.id = newDataObject.id;
+		this.mainTumblrUser = newDataObject.mainTumblrUser;
+		this.mainTumblrUserAvatarUrl = newDataObject.mainTumblrUserAvatarUrl;
+		this.overwriteConvoData = newDataObject.overwriteConvoData;
+		this.overwritePostData = newDataObject.overwritePostData;
+		this.pageLength = newDataObject.pageLength;
+		this.showReadingPane = newDataObject.showReadingPane;
+		this.sortColumn = newDataObject.sortColumn;
+		this.sortOrder = newDataObject.sortOrder;
+	}
 
 	@Override
 	public String toString() {

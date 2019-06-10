@@ -44,6 +44,24 @@ public class Post implements Serializable {
 	private String tags = "";
 	private Boolean isFavourite = false;
 	private String state;
+	
+	public void updateData(Post newDataObject) {
+		//this.id = newDataObject.id;
+		this.url = newDataObject.url;
+		this.urlWithSlug = newDataObject.urlWithSlug;
+		this.dateGmt = newDataObject.dateGmt;
+		this.date = newDataObject.date;
+		this.unixtimestamp = newDataObject.unixtimestamp;
+		this.reblogKey = newDataObject.reblogKey;
+		this.slug = newDataObject.slug;
+		this.isReblog = newDataObject.isReblog;
+		this.tumblelog = newDataObject.tumblelog;
+		//this.type = newDataObject.type;
+		this.isRead = newDataObject.isRead;
+		this.tags = newDataObject.tags;
+		this.isFavourite = newDataObject.isFavourite;
+		this.state = newDataObject.state;
+	}
 
 	@Override
 	public String toString() {

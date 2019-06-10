@@ -32,6 +32,13 @@ public class Link implements Serializable {
 	@Lob
 	@Column(name="description", length=50000)
 	private String description;
+	
+	public void updateData(Link newDataObject) {
+		this.description = newDataObject.description;
+		//this.postId = newDataObject.postId;
+		this.text = newDataObject.text;
+		this.url = newDataObject.url;
+	}
 
 	@Override
 	public String toString() {

@@ -28,6 +28,12 @@ public class Regular implements Serializable {
 	@Lob
 	@Column(name="body", length=50000)
 	private String body;
+	
+	public void updateData(Regular newDataObject) {
+		this.body = newDataObject.body;
+		//this.postId = newDataObject.postId;
+		this.title = newDataObject.title;
+	}
 
 	@Override
 	public String toString() {
