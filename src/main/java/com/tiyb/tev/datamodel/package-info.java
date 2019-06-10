@@ -35,6 +35,24 @@
  * keep things generic, and make the types table-driven.
  * </p>
  * 
+ * <p>
+ * Each class implements an <code>updateData()</code> helper method, which can
+ * be used for copying "safe" fields from one object to another. (There are
+ * typically one or two fields, such as <code>postId</code>, that do not get
+ * copied during this process.) Because most but not all fields are copied a
+ * copy constructor wasn't used. To make it even messier -- but clear to the
+ * reader -- every single attribute gets a line of code, with the unsafe
+ * attributes commented out. e.g.
+ * </p>
+ * 
+ * <pre>
+ * public void updateData(ClassType newDataObject) {
+ *   this.attributeOne = newDataObject.attributeOne;
+ *   //this.postId = newDataObject.postId;
+ *   this.attributeTwo = newDataObject.attributeTwo;
+ * }
+ * </pre>
+ * 
  * @author tiyb
  *
  */
