@@ -48,22 +48,6 @@ public class TEVAdminToolsController {
 	private TEVPostRestController postController;
 
 	/**
-	 * GET call to compress the database file
-	 * 
-	 * @return Boolean indicating whether the operation was successful or not.
-	 */
-	@GetMapping("/compressDB")
-	public Boolean compressDB() {
-		try {
-			jdbcTemplate.execute("CHECKPOINT DEFRAG");
-		} catch (DataAccessException e) {
-			return false;
-		}
-
-		return true;
-	}
-	
-	/**
 	 * Used to compact the database upon shutdown. This causes shutdown to take
 	 * longer, but it's not very noticeable for an application of this size.
 	 */

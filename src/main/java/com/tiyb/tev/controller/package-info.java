@@ -65,7 +65,6 @@
  * 
  * HELPER ADMIN API
  *  └─ /admintools:
- *    ├─ /compressDB:        Compresses the HSQLDB data file
  *    └─ /posts:
  *        ├─ /markAllRead:   Marks all posts in the dB as unread
  *        └─ /markAllUnread: Marks all posts in the DB as read
