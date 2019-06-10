@@ -81,7 +81,8 @@ public class Metadata implements Serializable {
 
 	/**
 	 * Helper function to generate a new Metadata object, with some defaults filled
-	 * in.
+	 * in. baseMediaPath, mainTumblrUser, and mainTumblrUserAvatarUrl not set, since
+	 * no defaults make sense for these values.
 	 * 
 	 * @return Metadata object, with an ID (1), and some reasonable defaults filled
 	 *         in.
@@ -89,11 +90,12 @@ public class Metadata implements Serializable {
 	public static Metadata newDefaultMetadata() {
 		Metadata md = new Metadata();
 		md.setId(1);
-		md.setFilter(FILTER_TYPES.get(2));
 		md.setSortColumn(SORT_COLUMNS.get(0));
 		md.setSortOrder(SORT_ORDERS.get(1));
+		md.setFilter(FILTER_TYPES.get(2));
 		md.setFavFilter(FAV_FILTERS.get(2));
 		md.setPageLength(10);
+		md.setShowReadingPane(false);
 		md.setOverwritePostData(false);
 		md.setOverwriteConvoData(false);
 
