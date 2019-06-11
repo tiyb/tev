@@ -3,7 +3,6 @@ package com.tiyb.tev.controller;
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -24,7 +23,6 @@ import com.tiyb.tev.datamodel.Link;
 import com.tiyb.tev.datamodel.Photo;
 import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
-import com.tiyb.tev.datamodel.Type;
 import com.tiyb.tev.datamodel.Video;
 import com.tiyb.tev.exception.InvalidTypeException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
@@ -138,18 +136,13 @@ public class TEVPostRestController {
 	 */
 	@GetMapping("/posts/type/{type}")
 	public List<Post> getPostsByType(@PathVariable(value = "type") String postType) {
-		List<Type> types = mdController.getAllTypes();
-		List<String> allTypeNames = new ArrayList<String>();
+		List<String> allTypeNames = mdController.getAllTypes();
 
-		for (Type type : types) {
-			allTypeNames.add(type.getType());
-		}
 		if (!isValidType(postType, allTypeNames)) {
 			throw new InvalidTypeException();
 		}
-		long typeId = getTypeFromName(postType, types);
 
-		return postRepo.findByType(typeId);
+		return postRepo.findByType(postType);
 	}
 
 	/**
@@ -169,24 +162,6 @@ public class TEVPostRestController {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Helper function to get the ID of a type, given its String name
-	 * 
-	 * @param typeName The name for which to retrieve the ID
-	 * @param allTypes List of all of the types supported by the system (would be
-	 *                 retrieved from the Metadata REST controller)
-	 * @return ID for the type
-	 */
-	private long getTypeFromName(String typeName, List<Type> allTypes) {
-		for (Type type : allTypes) {
-			if (typeName.equals(type.getType())) {
-				return type.getId();
-			}
-		}
-
-		throw new InvalidTypeException();
 	}
 
 	/**

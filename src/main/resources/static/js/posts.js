@@ -1,5 +1,3 @@
-var typesMap;
-var isTypesMapLoaded = false;
 var metadata;
 
 var ID_COLUMN_NO = 0;
@@ -20,16 +18,6 @@ $.i18n.properties({
 $(document).ready(function() {
 	$('#header').load("/header");
 	$('#footer').load("/footer");
-	
-	$.ajax({
-		url: "/api/types",
-		dataSrc: ""
-	}).then(function(data) {
-		typesMap = new Map();
-		
-		data.forEach(element => typesMap.set(element.id, element.type));
-		isTypesMapLoaded = true;
-	});
 	
 	$.ajax({
 		url: "/api/metadata",
@@ -98,7 +86,7 @@ $(document).ready(function() {
 				{
 					"data": "type",
 					"render": function(data, type, row, meta) {
-						return "<div class='clickableTableValue'>" + getTypeFromID(data) + "</div>";
+						return "<div class='clickableTableValue'>" + getReadableType(data) + "</div>";
 					}
 				},
 				{
@@ -431,7 +419,25 @@ function updateMDAPI() {
 	});	
 }
 
-function getTypeFromID(typeID) {
-	
-	return typesMap.get(typeID);
-}
+function getReadableType(typeValue) {
+	switch(typeValue) {
+	case "answer":
+		return $.i18n.prop('index_types_answer');
+		break;
+	case "link":
+		return $.i18n.prop('index_types_link');
+		break;
+	case "photo":
+		return $.i18n.prop('index_types_photo');
+		break;
+	case "regular":
+		return $.i18n.prop('index_types_regular');
+		break;
+	case "video":
+		return $.i18n.prop('index_types_video');
+		break;
+	default:
+		return "";
+		break;
+	}
+} 

@@ -2,7 +2,6 @@ package com.tiyb.tev.xml;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +22,6 @@ import com.tiyb.tev.datamodel.Link;
 import com.tiyb.tev.datamodel.Photo;
 import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
-import com.tiyb.tev.datamodel.Type;
 import com.tiyb.tev.datamodel.Video;
 import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.exception.XMLParsingException;
@@ -62,11 +60,10 @@ import com.tiyb.tev.exception.XMLParsingException;
  * The general approach taken is that the
  * {@link #parseDocument(InputStream, TEVPostRestController, TEVMetadataRestController)
  * parseDocument()} method sets up some initial variables, the
- * {@link #readPosts(InputStream, Map, Map, TEVPostRestController, boolean)
- * readPosts()} method then goes through the document post-by-post, and as it
- * determines what type each post is, additional methods are called to read the
- * additional, type-specific XML within the post's XML element (answer, link,
- * photo, etc.).
+ * {@link #readPosts(InputStream, TEVPostRestController, boolean) readPosts()}
+ * method then goes through the document post-by-post, and as it determines what
+ * type each post is, additional methods are called to read the additional,
+ * type-specific XML within the post's XML element (answer, link, photo, etc.).
  * </p>
  * 
  * @author tiyb
@@ -78,10 +75,9 @@ public class BlogXmlReader extends TEVXmlReader {
 	/**
 	 * <p>
 	 * This is the main method of the class, which kicks off the processing of the
-	 * document. It doesn't do much work itself, it simply sets up some type-related
-	 * metadata, and calls the
-	 * {@link #readPosts(InputStream, Map, Map, TEVPostRestController, boolean)
-	 * readPosts()} method to get into the actual XML document.
+	 * document. It doesn't do much work itself, it simply calls the
+	 * {@link #readPosts(InputStream, TEVPostRestController, boolean) readPosts()}
+	 * method to get into the actual XML document.
 	 * </p>
 	 * 
 	 * <p>
@@ -98,10 +94,6 @@ public class BlogXmlReader extends TEVXmlReader {
 	 */
 	public static void parseDocument(InputStream xmlFile, TEVPostRestController postController,
 			TEVMetadataRestController mdController) throws XMLParsingException {
-		Map<Long, String> typeEntries = new HashMap<Long, String>();
-		Map<String, Long> typeIDs = new HashMap<String, Long>();
-		List<Type> allowableTypes = mdController.getAllTypes();
-		loadTypeData(allowableTypes, typeEntries, typeIDs);
 		boolean isOverwritePosts = mdController.getMetadata().getOverwritePostData();
 
 		if (isOverwritePosts) {
@@ -113,7 +105,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			postController.deleteAllPosts();
 		}
 
-		readPosts(xmlFile, typeEntries, typeIDs, postController, isOverwritePosts);
+		readPosts(xmlFile, postController, isOverwritePosts);
 	}
 
 	/**
@@ -130,8 +122,8 @@ public class BlogXmlReader extends TEVXmlReader {
 	 * <li>As the "start element" event is encountered for each post, a new
 	 * {@link com.tiyb.tev.datamodel.Post Post} object is created</li>
 	 * <li>The attributes are read into that object via the
-	 * {@link #readPostAttributes(StartElement, Post, Map) readPostAttributes()}
-	 * method to populate its data</li>
+	 * {@link #readPostAttributes(StartElement, Post) readPostAttributes()} method
+	 * to populate its data</li>
 	 * <li>The post is inserted into the DB via the REST controller.
 	 * <ul>
 	 * <li>If the "overwrite posts" option is set in the metadata, the logic first
@@ -156,10 +148,6 @@ public class BlogXmlReader extends TEVXmlReader {
 	 * </ol>
 	 * 
 	 * @param xmlFile            The stream containing the XML file to be parsed
-	 * @param typeEntries        A list of available types, in a
-	 *                           {@link java.util.Map Map} for easy access by ID
-	 * @param typeIDs            A list of available types, in a
-	 *                           {@link java.util.Map Map} for easy access by name
 	 * @param postRestController REST controller used for storing the data
 	 * @param isOverwritePosts   Indicates whether this is a clean upload, or
 	 *                           additive; the REST controller could have been used
@@ -168,8 +156,8 @@ public class BlogXmlReader extends TEVXmlReader {
 	 *                           to pass it as a parameter.
 	 * @throws XMLParsingException
 	 */
-	private static void readPosts(InputStream xmlFile, Map<Long, String> typeEntries, Map<String, Long> typeIDs,
-			TEVPostRestController postRestController, boolean isOverwritePosts) throws XMLParsingException {
+	private static void readPosts(InputStream xmlFile, TEVPostRestController postRestController,
+			boolean isOverwritePosts) throws XMLParsingException {
 
 		try {
 			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -186,7 +174,7 @@ public class BlogXmlReader extends TEVXmlReader {
 					if (se.getName().getLocalPart().equals("post")) {
 						post = new Post();
 						boolean isSubmitablePost = true;
-						readPostAttributes(se, post, typeIDs);
+						readPostAttributes(se, post);
 						if (isOverwritePosts && post.getState().equals("published")) {
 							postRestController.createPost(post);
 						} else if (!post.getState().equals("published")) {
@@ -209,7 +197,7 @@ public class BlogXmlReader extends TEVXmlReader {
 								postRestController.createPost(post);
 							}
 						}
-						switch (typeEntries.get(post.getType())) {
+						switch (post.getType()) {
 						case "regular":
 							Regular regular = readRegular(reader, post);
 							if (isSubmitablePost) {
@@ -260,17 +248,15 @@ public class BlogXmlReader extends TEVXmlReader {
 	 * Helper function specifically for reading the attributes from a
 	 * <code>&lt;post&gt;</code> element. The logic could easily have been
 	 * incorporated into
-	 * {@link #readPosts(InputStream, Map, Map, TEVPostRestController, boolean)
-	 * readPosts()}, but the method would have gotten much longer.
+	 * {@link #readPosts(InputStream, TEVPostRestController, boolean) readPosts()},
+	 * but the method would have gotten much longer.
 	 * 
 	 * @param startElement The {@link javax.xml.stream.events.StartElement
 	 *                     StartElement} object being processed
 	 * @param post         The {@link com.tiyb.tev.datamodel.Post Post} object to
 	 *                     which the data from each element should be added
-	 * @param typeIDs      The {@link java.util.Map Map} containing the list of
-	 *                     types
 	 */
-	private static void readPostAttributes(StartElement startElement, Post post, Map<String, Long> typeIDs) {
+	private static void readPostAttributes(StartElement startElement, Post post) {
 		@SuppressWarnings("unchecked")
 		Iterator<Attribute> atts = startElement.getAttributes();
 		while (atts.hasNext()) {
@@ -287,7 +273,7 @@ public class BlogXmlReader extends TEVXmlReader {
 				post.setUrlWithSlug(att.getValue());
 				break;
 			case "type":
-				post.setType(typeIDs.get(att.getValue()));
+				post.setType(att.getValue());
 				break;
 			case "date-gmt":
 				post.setDateGmt(att.getValue());
@@ -703,30 +689,6 @@ public class BlogXmlReader extends TEVXmlReader {
 		}
 
 		throw new XMLStreamException(END_OF_FILE_ERROR);
-	}
-
-	/**
-	 * Helper function which does nothing but create two opposite
-	 * {@link java.util.Map Map} objects, with Type data:
-	 * 
-	 * <ul>
-	 * <li>One with the ID as the key, and the type as the field, and</li>
-	 * <li>One with the type as the key, and the ID as the field</li>
-	 * </ul>
-	 * 
-	 * @param allowableTypes The full list of types from the database, with their
-	 *                       corresponding IDs
-	 * @param typeEntries    The {@link java.util.Map Map} to be used with ID as key
-	 *                       and type as value
-	 * @param typeIDs        The {@link java.util.Map Map} to be used with type as
-	 *                       the key and ID as value
-	 */
-	private static void loadTypeData(List<Type> allowableTypes, Map<Long, String> typeEntries,
-			Map<String, Long> typeIDs) {
-		for (Type type : allowableTypes) {
-			typeEntries.put(type.getId(), type.getType());
-			typeIDs.put(type.getType(), type.getId());
-		}
 	}
 
 	/**

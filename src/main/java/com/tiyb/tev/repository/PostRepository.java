@@ -10,5 +10,5 @@ import com.tiyb.tev.datamodel.Post;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-	public List<Post> findByType(Long postType);
+	public List<Post> findByType(String postType);
 }

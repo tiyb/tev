@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.tiyb</groupId>
 	<artifactId>tev</artifactId>
-	<version>v4.2.0</version>
+	<version>v4.2.1-SNAPSHOT</version>
 	<name>tev</name>
 	<description>Tumblr Export Viewer</description>
 

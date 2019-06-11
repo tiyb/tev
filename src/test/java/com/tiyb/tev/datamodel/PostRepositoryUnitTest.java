@@ -48,7 +48,7 @@ public class PostRepositoryUnitTest {
 		post.setReblogKey("abc");
 		post.setSlug("slug");
 		post.setTags("tag 1, tag 2");
-		post.setType(1L);
+		post.setType("regular");
 		post.setUrl("http://url.com");
 		post.setUrlWithSlug("http://url.com/slug");
 
@@ -118,17 +118,17 @@ public class PostRepositoryUnitTest {
 	public void findPostsByType() {
 		Post post1 = new Post();
 		post1.setId(1L);
-		post1.setType(1L);
+		post1.setType("answer");
 		post1.setDate("Jan 1, 2019");
 		entityManager.persist(post1);
 		Post post2 = new Post();
 		post2.setId(2L);
-		post2.setType(1L);
+		post2.setType("answer");
 		post2.setDate("Jan 2, 2019");
 		entityManager.persist(post2);
 		Post post3 = new Post();
 		post3.setId(3L);
-		post3.setType(2L);
+		post3.setType("link");
 		post3.setDate("Jan 3, 2019");
 		entityManager.persist(post3);
 		entityManager.flush();
@@ -136,7 +136,7 @@ public class PostRepositoryUnitTest {
 		List<Post> returnedPosts = postRepo.findAll();
 		assertThat(returnedPosts.size()).isEqualTo(3);
 		
-		List<Post> answerPosts = postRepo.findByType(1L);
+		List<Post> answerPosts = postRepo.findByType("answer");
 		assertThat(answerPosts).isNotNull();
 		assertThat(answerPosts.size()).isEqualTo(2);
 		assertThat(answerPosts.get(0).getId()).isEqualTo(1L);
@@ -144,7 +144,7 @@ public class PostRepositoryUnitTest {
 		assertThat(answerPosts.get(1).getId()).isEqualTo(2L);
 		assertThat(answerPosts.get(1).getDate()).isEqualTo("Jan 2, 2019");
 		
-		List<Post> linkPosts = postRepo.findByType(2L);
+		List<Post> linkPosts = postRepo.findByType("link");
 		assertThat(linkPosts).isNotNull();
 		assertThat(linkPosts.size()).isEqualTo(1);
 		assertThat(linkPosts.get(0).getId()).isEqualTo(3L);

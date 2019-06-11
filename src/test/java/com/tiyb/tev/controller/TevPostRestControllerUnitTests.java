@@ -17,7 +17,6 @@ import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.Photo;
 import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
-import com.tiyb.tev.datamodel.Type;
 import com.tiyb.tev.datamodel.Video;
 
 /**
@@ -303,7 +302,7 @@ public class TevPostRestControllerUnitTests {
 	 */
 	@Test
 	public void getTypes() {
-		List<Type> originalTypes = mdRestController.getAllTypes();
+		List<String> originalTypes = mdRestController.getAllTypes();
 		assertThat(originalTypes).isNotNull();
 		assertThat(originalTypes.size()).isEqualTo(5);
 	}

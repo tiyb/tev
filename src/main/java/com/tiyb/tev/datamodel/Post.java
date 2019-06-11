@@ -37,7 +37,7 @@ public class Post implements Serializable {
 	private String slug;
 	private Boolean isReblog;
 	private String tumblelog;
-	private Long type;
+	private String type;
 	private Boolean isRead = false;
 	@Lob
 	@Column(name="tags", length=50000)
@@ -225,11 +225,11 @@ public class Post implements Serializable {
 		this.tumblelog = tumblelog;
 	}
 
-	public Long getType() {
+	public String getType() {
 		return type;
 	}
 
-	public void setType(Long type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 

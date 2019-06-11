@@ -1,5 +1,7 @@
 package com.tiyb.tev.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,28 +13,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tiyb.tev.datamodel.Metadata;
-import com.tiyb.tev.datamodel.Type;
 import com.tiyb.tev.datamodel.helpers.StaticListData;
 import com.tiyb.tev.repository.MetadataRepository;
-import com.tiyb.tev.repository.TypeRepository;
 
 /**
  * REST controller for working with the application's Metadata -- it's settings.
  * 
  * @author tiyb
  * @apiviz.landmark
- * @apiviz.uses com.tiyb.tev.repository.TypeRepository
  * @apiviz.uses com.tiyb.tev.repository.MetadataRepository
  */
 @RestController
 @RequestMapping("/api")
 public class TEVMetadataRestController {
-
-	/**
-	 * The repo for working with Type data
-	 */
-	@Autowired
-	private TypeRepository typeRepo;
 
 	/**
 	 * The repo for working with Metadata
@@ -41,51 +34,22 @@ public class TEVMetadataRestController {
 	private MetadataRepository metadataRepo;
 
 	/**
-	 * GET to return all Types stored in the system. If there are no types, a
-	 * hard-coded list of types is created. This implementation is <i>very</i>
-	 * hard-coded, because there are only a specific number of types actually
-	 * supported by Tumblr.
+	 * List of all post types available from Tumblr/TEV
+	 */
+	public final static List<String> POST_TYPES = new ArrayList<String>(
+			Arrays.asList("answer", "link", "photo", "regular", "video"));
+
+	/**
+	 * GET to return all Types stored in the system. This implementation is
+	 * <i>very</i> hard-coded, because there are only a specific number of types
+	 * actually supported by Tumblr. The {@link #POST_TYPES} member is public, but
+	 * this API is still useful for JavaScript uses.
 	 * 
-	 * @return {@link java.util.List List} of {@link com.tiyb.tev.datamodel.Type
-	 *         Type} objects
+	 * @return {@link java.util.List List} of type strings
 	 */
 	@GetMapping("/types")
-	public List<Type> getAllTypes() {
-		List<Type> types = typeRepo.findAll();
-
-		if (types.size() == 0) {
-			Type type1 = new Type();
-			type1.setId(1L);
-			type1.setType("answer");
-			typeRepo.save(type1);
-			types.add(type1);
-
-			Type type2 = new Type();
-			type2.setId(2L);
-			type2.setType("link");
-			typeRepo.save(type2);
-			types.add(type2);
-
-			Type type3 = new Type();
-			type3.setId(3L);
-			type3.setType("photo");
-			typeRepo.save(type3);
-			types.add(type3);
-
-			Type type4 = new Type();
-			type4.setId(4L);
-			type4.setType("regular");
-			typeRepo.save(type4);
-			types.add(type4);
-
-			Type type5 = new Type();
-			type5.setId(5L);
-			type5.setType("video");
-			typeRepo.save(type5);
-			types.add(type5);
-		}
-
-		return types;
+	public List<String> getAllTypes() {
+		return POST_TYPES;
 	}
 
 	/**
@@ -166,7 +130,7 @@ public class TEVMetadataRestController {
 		}
 
 		md.updateData(metadataDetails);
-		
+
 		Metadata returnValue = metadataRepo.save(md);
 
 		return returnValue;

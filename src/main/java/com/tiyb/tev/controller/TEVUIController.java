@@ -33,7 +33,6 @@ import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.Photo;
 import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
-import com.tiyb.tev.datamodel.Type;
 import com.tiyb.tev.datamodel.Video;
 import com.tiyb.tev.exception.InvalidTypeException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
@@ -184,12 +183,12 @@ public class TEVUIController {
 		Post post = postController.getPostById(postID);
 		model.addAttribute("post", post);
 		model.addAttribute("tags", pullOutTagValues(post.getTags()));
-		List<Type> availableTypes = mdController.getAllTypes();
+		List<String> availableTypes = mdController.getAllTypes();
 		String postType = "";
 
-		for (Type type : availableTypes) {
-			if (type.getId().equals(post.getType())) {
-				postType = type.getType();
+		for (String type : availableTypes) {
+			if (type.equals(post.getType())) {
+				postType = type;
 				break;
 			}
 		}

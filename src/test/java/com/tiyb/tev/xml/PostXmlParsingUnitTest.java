@@ -140,7 +140,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getState()).isEqualTo("published");
 		assertThat(post.getTags()).isEqualTo("tag2");
 		assertThat(post.getTumblelog()).isEqualTo("mainblog");
-		assertThat(post.getType()).isEqualTo(1L);
+		assertThat(post.getType()).isEqualTo("answer");
 		assertThat(post.getUnixtimestamp()).isEqualTo(1542875185L);
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180371366195");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180371366195/slug-slug-slug");
@@ -171,7 +171,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getState()).isEqualTo("published");
 		assertThat(post.getTags()).isEqualTo("tag1");
 		assertThat(post.getTumblelog()).isEqualTo("mainblog");
-		assertThat(post.getType()).isEqualTo(2L);
+		assertThat(post.getType()).isEqualTo("link");
 		assertThat(post.getUnixtimestamp()).isEqualTo(1542607748L);
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180265557725");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180265557725/tumblr");
@@ -203,7 +203,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getState()).isEqualTo("published");
 		assertThat(post.getTags()).isEqualTo("tag1, tag2");
 		assertThat(post.getTumblelog()).isEqualTo("mainblog");
-		assertThat(post.getType()).isEqualTo(4L);
+		assertThat(post.getType()).isEqualTo("regular");
 		assertThat(post.getUnixtimestamp()).isEqualTo(1544201323L);
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180894436671");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180894436671/first-post");
@@ -250,7 +250,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getState()).isEqualTo("published");
 		assertThat(post.getTags()).isEqualTo("tag5, tag6, tag7, tag8, tag9, tag10");
 		assertThat(post.getTumblelog()).isEqualTo("mainblog");
-		assertThat(post.getType()).isEqualTo(5L);
+		assertThat(post.getType()).isEqualTo("video");
 		assertThat(post.getUnixtimestamp()).isEqualTo(1543903761L);
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180782992914");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180782992914/another-slug");
@@ -286,7 +286,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getState()).isEqualTo("published");
 		assertThat(post.getTags()).isEqualTo("tag3, tag4");
 		assertThat(post.getTumblelog()).isEqualTo("mainblog");
-		assertThat(post.getType()).isEqualTo(3L);
+		assertThat(post.getType()).isEqualTo("photo");
 		assertThat(post.getUnixtimestamp()).isEqualTo(1543907872L);
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180784644740");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180784644740/new-slug");
@@ -303,7 +303,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getState()).isEqualTo("published");
 		assertThat(post.getTags()).isEqualTo("tag11, tag12, tag13, tag14, tag15");
 		assertThat(post.getTumblelog()).isEqualTo("mainblog");
-		assertThat(post.getType()).isEqualTo(3L);
+		assertThat(post.getType()).isEqualTo("photo");
 		assertThat(post.getUnixtimestamp()).isEqualTo(1542583056L);
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180254465582");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180254465582/slugs-are-delicious");
