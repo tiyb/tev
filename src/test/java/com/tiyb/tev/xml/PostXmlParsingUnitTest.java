@@ -26,6 +26,7 @@ import com.tiyb.tev.datamodel.Photo;
 import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
 import com.tiyb.tev.datamodel.Video;
+import com.tiyb.tev.exception.InvalidTypeException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.exception.XMLParsingException;
 
@@ -88,7 +89,37 @@ public class PostXmlParsingUnitTest {
 	public void testAllPosts() {
 		List<Post> posts = postController.getAllPosts();
 		assertThat(posts).isNotNull();
-		assertThat(posts.size()).isEqualTo(6);		
+		assertThat(posts.size()).isEqualTo(6);
+		
+		List<Post> answerPosts = postController.getPostsByType("answer");
+		assertThat(answerPosts).isNotNull();
+		assertThat(answerPosts.size()).isEqualTo(1);
+		
+		List<Post> photoPosts = postController.getPostsByType("photo");
+		assertThat(photoPosts).isNotNull();
+		assertThat(photoPosts.size()).isEqualTo(2);
+		
+		List<Post> regularPosts = postController.getPostsByType("regular");
+		assertThat(regularPosts).isNotNull();
+		assertThat(regularPosts.size()).isEqualTo(1);
+		
+		List<Post> linkPosts = postController.getPostsByType("link");
+		assertThat(linkPosts).isNotNull();
+		assertThat(linkPosts.size()).isEqualTo(1);
+		
+		List<Post> videoPosts = postController.getPostsByType("video");
+		assertThat(videoPosts).isNotNull();
+		assertThat(videoPosts.size()).isEqualTo(1);
+	}
+	
+	/**
+	 * Tests that a proper exception is thrown when an invalid type is passed to
+	 * {@link com.tiyb.tev.controller.TEVPostRestController#getPostsByType(String)
+	 * TEVPostRestController#getPostsByType(String)}
+	 */
+	@Test(expected = InvalidTypeException.class)
+	public void testInvalidPostType() {
+		postController.getPostsByType("blah");
 	}
 
 	/**

@@ -3,6 +3,7 @@ package com.tiyb.tev.controller;
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -23,7 +24,9 @@ import com.tiyb.tev.datamodel.Link;
 import com.tiyb.tev.datamodel.Photo;
 import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
+import com.tiyb.tev.datamodel.Type;
 import com.tiyb.tev.datamodel.Video;
+import com.tiyb.tev.exception.InvalidTypeException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.repository.AnswerRepository;
 import com.tiyb.tev.repository.LinkRepository;
@@ -128,6 +131,65 @@ public class TEVPostRestController {
 	}
 
 	/**
+	 * Returns all posts of a particular type
+	 * 
+	 * @param postType One of the 5 post types supported by Tumblr/TEV
+	 * @return List of posts of that type
+	 */
+	@GetMapping("/posts/type/{type}")
+	public List<Post> getPostsByType(@PathVariable(value = "type") String postType) {
+		List<Type> types = mdController.getAllTypes();
+		List<String> allTypeNames = new ArrayList<String>();
+
+		for (Type type : types) {
+			allTypeNames.add(type.getType());
+		}
+		if (!isValidType(postType, allTypeNames)) {
+			throw new InvalidTypeException();
+		}
+		long typeId = getTypeFromName(postType, types);
+
+		return postRepo.findByType(typeId);
+	}
+
+	/**
+	 * Helper function to determine if a type (based on String) is one of the valid
+	 * Tumblr post types
+	 * 
+	 * @param typeName       String containing the type
+	 * @param validTypeNames {@link java.util.List List} of all valid type names
+	 *                       (would be retrieved from the Metadata REST controller)
+	 * @return True if it's one of the 5 valid types; false otherwise
+	 */
+	private boolean isValidType(String typeName, List<String> validTypeNames) {
+		for (String validType : validTypeNames) {
+			if (typeName.equals(validType)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Helper function to get the ID of a type, given its String name
+	 * 
+	 * @param typeName The name for which to retrieve the ID
+	 * @param allTypes List of all of the types supported by the system (would be
+	 *                 retrieved from the Metadata REST controller)
+	 * @return ID for the type
+	 */
+	private long getTypeFromName(String typeName, List<Type> allTypes) {
+		for (Type type : allTypes) {
+			if (typeName.equals(type.getType())) {
+				return type.getId();
+			}
+		}
+
+		throw new InvalidTypeException();
+	}
+
+	/**
 	 * PUT to update a Post
 	 * 
 	 * @param postId      The ID of the post to be updated
@@ -140,7 +202,7 @@ public class TEVPostRestController {
 		Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
 
 		post.updateData(postDetails);
-		
+
 		Post updatedPost = postRepo.save(post);
 
 		return updatedPost;
@@ -338,7 +400,7 @@ public class TEVPostRestController {
 				.orElseThrow(() -> new ResourceNotFoundException("Answer", "id", postId));
 
 		ans.updateData(answerDetails);
-		
+
 		Answer updatedAns = answerRepo.save(ans);
 
 		return updatedAns;
@@ -422,7 +484,7 @@ public class TEVPostRestController {
 		Link link = linkRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Link", "id", postId));
 
 		link.updateData(linkDetails);
-		
+
 		Link updatedLink = linkRepo.save(link);
 
 		return updatedLink;
@@ -504,7 +566,7 @@ public class TEVPostRestController {
 				.orElseThrow(() -> new ResourceNotFoundException("Photo", "id", postId));
 
 		photo.updateData(photoDetails);
-		
+
 		Photo updatedPhoto = photoRepo.save(photo);
 
 		return updatedPhoto;
@@ -590,7 +652,7 @@ public class TEVPostRestController {
 				.orElseThrow(() -> new ResourceNotFoundException("Regular", "id", postId));
 
 		reg.updateData(regularDetails);
-		
+
 		Regular updatedReg = regularRepo.save(reg);
 
 		return updatedReg;
@@ -675,7 +737,7 @@ public class TEVPostRestController {
 				.orElseThrow(() -> new ResourceNotFoundException("Video", "id", postId));
 
 		video.updateData(videoDetails);
-		
+
 		Video updatedVideo = videoRepo.save(video);
 
 		return updatedVideo;

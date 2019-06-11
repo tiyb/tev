@@ -110,6 +110,46 @@ public class PostRepositoryUnitTest {
 
 		assertThat(returnedPosts.size()).isEqualTo(2);
 	}
+	
+	/**
+	 * Tests that posts can be properly retrieved by type
+	 */
+	@Test
+	public void findPostsByType() {
+		Post post1 = new Post();
+		post1.setId(1L);
+		post1.setType(1L);
+		post1.setDate("Jan 1, 2019");
+		entityManager.persist(post1);
+		Post post2 = new Post();
+		post2.setId(2L);
+		post2.setType(1L);
+		post2.setDate("Jan 2, 2019");
+		entityManager.persist(post2);
+		Post post3 = new Post();
+		post3.setId(3L);
+		post3.setType(2L);
+		post3.setDate("Jan 3, 2019");
+		entityManager.persist(post3);
+		entityManager.flush();
+		
+		List<Post> returnedPosts = postRepo.findAll();
+		assertThat(returnedPosts.size()).isEqualTo(3);
+		
+		List<Post> answerPosts = postRepo.findByType(1L);
+		assertThat(answerPosts).isNotNull();
+		assertThat(answerPosts.size()).isEqualTo(2);
+		assertThat(answerPosts.get(0).getId()).isEqualTo(1L);
+		assertThat(answerPosts.get(0).getDate()).isEqualTo("Jan 1, 2019");
+		assertThat(answerPosts.get(1).getId()).isEqualTo(2L);
+		assertThat(answerPosts.get(1).getDate()).isEqualTo("Jan 2, 2019");
+		
+		List<Post> linkPosts = postRepo.findByType(2L);
+		assertThat(linkPosts).isNotNull();
+		assertThat(linkPosts.size()).isEqualTo(1);
+		assertThat(linkPosts.get(0).getId()).isEqualTo(3L);
+		assertThat(linkPosts.get(0).getDate()).isEqualTo("Jan 3, 2019");
+	}
 
 	/**
 	 * Verifies that the post repo's "delete all" functionality works
