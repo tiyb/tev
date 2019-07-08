@@ -229,6 +229,7 @@ $(document).ready(function() {
 			metadata.filter = "Do not Filter";
 		}
 		
+		postTable.ajax.reload();
 		$('#displayPaneIFrame').height($('#contentDisplayTable').height());
 		postTable.draw();
 		updateMDAPI();
@@ -243,6 +244,7 @@ $(document).ready(function() {
 			metadata.favFilter = "Show Everything";
 		}
 		
+		postTable.ajax.reload();
 		$('#displayPaneIFrame').height($('#contentDisplayTable').height());
 		postTable.draw();
 		updateMDAPI();
