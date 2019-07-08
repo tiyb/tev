@@ -35,6 +35,10 @@ $(document).ready(function () {
 			var divData = "<option value='" + obj + "'>" + getTranslatedPageLength(obj) + "</option>";
 			$(divData).appendTo('#pageLengthDropdown');
 		});
+		$.each(data.conversationStyles, function(i, obj) {
+			var divData = "<option value='" + obj + "'>" + getTranslatedConversationStyle(obj) + "</option>";
+			$(divData).appendTo('#conversationDisplayDropdown');
+		});
 		var divData = "<option value='true'>" + $.i18n.prop('md_showReadingPaneYes') + "</option>";
 		$(divData).appendTo('#showReadingPaneDropdown');
 		divData = "<option value='false'>" + $.i18n.prop('md_showReadingPaneNo') + "</option>";
@@ -61,6 +65,7 @@ $(document).ready(function () {
 			$('#filterDropdown').val(metadataObject.filter);
 			$('#favsDropdown').val(metadataObject.favFilter);
 			$('#pageLengthDropdown').val(metadataObject.pageLength);
+			$('#conversationDisplayDropdown').val(metaataObject.conversationDisplayStyle);
 			$('#mainUser').val(metadataObject.mainTumblrUser);
 			$('#mainUserAvatarUrl').val(metadataObject.mainTumblrUserAvatarUrl);
 			if(metadataObject.showReadingPane) {
@@ -96,6 +101,7 @@ $(document).ready(function () {
 		metadataObject.showReadingPane = $('#showReadingPaneDropdown').val();
 		metadataObject.overwritePostData = $('#overwritePostsDropdown').val();
 		metadataObject.overwriteConvoData = $('#overwriteConvosDropdown').val();
+		metadataObject.conversationDisplayStyle = $('#conversationDisplayDropdown').val();
 		
 		$.ajax({
 			url: '/api/metadata',
@@ -196,6 +202,17 @@ function getTranslatedPageLength(pageLength) {
 		break;
 	case -1:
 		return $.i18n.prop('md_pagelengths_all');
+		break;
+	}
+}
+
+function getTranslatedConversationStyle(conversationStyle) {
+	switch(conversationStyle) {
+	case "cloud":
+		return $.i18n.prop('md_conversationStyles_cloud');
+		break;
+	case "table":
+		return $.i18n.prop('md_conversationStyles_table');
 		break;
 	}
 }

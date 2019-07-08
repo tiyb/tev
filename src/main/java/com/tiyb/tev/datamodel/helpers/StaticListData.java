@@ -20,6 +20,7 @@ public class StaticListData implements Serializable {
 	private List<String> sortOrders = new ArrayList<String>();
 	private List<String> favFilters = new ArrayList<String>();
 	private List<Integer> pageLengths = new ArrayList<Integer>();
+	private List<String> conversationStyles = new ArrayList<String>();
 
 	public List<String> getFilterTypes() {
 		return filterTypes;
@@ -59,5 +60,13 @@ public class StaticListData implements Serializable {
 
 	public void setPageLengths(List<Integer> pageLengths) {
 		this.pageLengths = pageLengths;
+	}
+
+	public List<String> getConversationStyles() {
+		return conversationStyles;
+	}
+
+	public void setConversationStyles(List<String> conversationStyles) {
+		this.conversationStyles = conversationStyles;
 	}
 }

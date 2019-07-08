@@ -9,6 +9,7 @@
           href="webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/css/jqcloud.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/datatables.min.css}"/>
 </head>
 <body>
 
@@ -18,12 +19,34 @@
 <h1 th:text="#{conversations.title}"></h1>
 <p th:text="#{conversations.explanatoryText(${metadata.mainTumblrUser})}"></p>
 <div id="radioContainer">
-	<input type="radio" name="showReadingPaneRadio" id="showReadingPaneSelected" th:text="#{main.radios.showReadingPane}"></input>
-	<input type="radio" name="showReadingPaneRadio" id="showPopupsSelected" th:text="#{main.radios.showPopUps}"></input>
+	<div>
+		<input type="radio" name="showReadingPaneRadio" id="showReadingPaneSelected" th:text="#{main.radios.showReadingPane}"></input>
+		<input type="radio" name="showReadingPaneRadio" id="showPopupsSelected" th:text="#{main.radios.showPopUps}"></input>
+	</div>
+	<div>
+		<input type="radio" name="chooseDisplayStyle" id="showCloudSelected" th:text="#{conversations.conversationDisplay.showCloud}"></input>
+		<input type="radio" name="chooseDisplayStyle" id="showTableSelected" th:text="#{conversations.conversationDisplay.showTable}"></input>
+	</div>
 </div>
 <table id="contentDisplayContainer"><tr>
 	<td id="contentDisplayTable">
-		<div id="conversationWordCloudContainer"></div>
+		<div id="conversationWordCloudContainerContainer"><div id="conversationWordCloudContainer"></div></div>
+		<div id="conversationTableContainer"><table id="conversationTable" class="display" style="table-layout:fixed">
+			<thead>
+				<tr>
+					<th th:text="#{conversations.conversationTable.participantName}"></th>
+					<th th:text="#{conversations.conversationTable.numMessages}"></th>
+					<th th:text="#{conversations.conversationTable.hiddenIndicator}"></th>
+				</tr>
+			</thead>
+			<tfoot>
+				<tr>
+					<th th:text="#{conversations.conversationTable.participantName}"></th>
+					<th th:text="#{conversations.conversationTable.numMessages}"></th>
+					<th th:text="#{conversations.conversationTable.hiddenIndicator}"></th>
+				</tr>
+			</tfoot>
+		</table></div>
 	</td>
 	<td id="contentDisplayReadingPane">
 		<iframe id="displayPaneIFrame"></iframe>

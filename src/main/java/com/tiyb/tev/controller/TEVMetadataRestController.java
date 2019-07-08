@@ -105,6 +105,9 @@ public class TEVMetadataRestController {
 		for (Integer i : Metadata.PAGE_LENGTHS) {
 			sld.getPageLengths().add(i);
 		}
+		for (String s : Metadata.CONVERSATION_DISPLAY_STYLES) {
+			sld.getConversationStyles().add(s);
+		}
 
 		return sld;
 	}

@@ -64,6 +64,11 @@ public class Metadata implements Serializable {
 	 * Static list of lengths the "number of records shown" drop-down can be set to
 	 */
 	public static final List<Integer> PAGE_LENGTHS = Arrays.asList(10, 25, 50, 100, -1);
+	
+	/**
+	 * Static list of different display style options for the Conversations page
+	 */
+	public static final List<String> CONVERSATION_DISPLAY_STYLES = Arrays.asList("cloud", "table");
 
 	@Id
 	private Integer id;
@@ -78,6 +83,7 @@ public class Metadata implements Serializable {
 	private Boolean showReadingPane;
 	private Boolean overwritePostData;
 	private Boolean overwriteConvoData;
+	private String conversationDisplayStyle;
 
 	/**
 	 * Helper function to generate a new Metadata object, with some defaults filled
@@ -98,6 +104,7 @@ public class Metadata implements Serializable {
 		md.setShowReadingPane(false);
 		md.setOverwritePostData(false);
 		md.setOverwriteConvoData(false);
+		md.setConversationDisplayStyle(CONVERSATION_DISPLAY_STYLES.get(0));
 
 		return md;
 	}
@@ -115,6 +122,7 @@ public class Metadata implements Serializable {
 		this.showReadingPane = newDataObject.showReadingPane;
 		this.sortColumn = newDataObject.sortColumn;
 		this.sortOrder = newDataObject.sortOrder;
+		this.conversationDisplayStyle = newDataObject.conversationDisplayStyle;
 	}
 
 	@Override
@@ -179,6 +187,11 @@ public class Metadata implements Serializable {
 		if (overwriteConvoData != null) {
 			builder.append("overwriteConvoData=");
 			builder.append(overwriteConvoData);
+			builder.append(", ");
+		}
+		if (conversationDisplayStyle != null) {
+			builder.append("conversationDisplayStyle=");
+			builder.append(conversationDisplayStyle);
 		}
 		builder.append("]");
 		return builder.toString();
@@ -278,6 +291,14 @@ public class Metadata implements Serializable {
 
 	public void setOverwriteConvoData(Boolean overwriteConvoData) {
 		this.overwriteConvoData = overwriteConvoData;
+	}
+
+	public String getConversationDisplayStyle() {
+		return conversationDisplayStyle;
+	}
+
+	public void setConversationDisplayStyle(String conversationDisplayStyle) {
+		this.conversationDisplayStyle = conversationDisplayStyle;
 	}
 
 }
