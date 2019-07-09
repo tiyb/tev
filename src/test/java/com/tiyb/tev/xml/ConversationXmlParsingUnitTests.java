@@ -79,7 +79,7 @@ public class ConversationXmlParsingUnitTests {
 		postRestController.deleteAllConvoMsgs();
 		ConversationXmlReader.parseDocument(mockFile, mdRestController, postRestController);
 	}
-
+	
 	/**
 	 * Verifies that all of the conversations in the test XML input file have been
 	 * properly imported into the database. Since it is known how many conversation
@@ -91,8 +91,8 @@ public class ConversationXmlParsingUnitTests {
 		List<Conversation> convos = postRestController.getAllConversations();
 
 		assertThat(convos).isNotNull();
-		assertThat(convos.size()).isEqualTo(6);
-
+		assertThat(convos.size()).isEqualTo(7);
+		
 		Conversation firstConvo = postRestController.getConversationByParticipant(convo1Participant);
 		assertThat(firstConvo).isNotNull();
 		assertThat(firstConvo.getNumMessages()).isEqualTo(9);
@@ -122,6 +122,23 @@ public class ConversationXmlParsingUnitTests {
 		assertThat(toBeDeactConvo.getNumMessages()).isEqualTo(2);
 		assertThat(toBeDeactConvo.getParticipant()).isEqualTo("goingtobedeactivated");
 		assertThat(toBeDeactConvo.getParticipantAvatarUrl()).isEqualTo("http://goingtobedeac/avatar");
+	}
+
+	/**
+	 * Verifies that cases where a participant is blank (which happens sometimes)
+	 * are handled correctly; the solution <i>should</i> insert a default name for
+	 * that participant name.
+	 */
+	@Test
+	public void checkBlankParticipantLoading() {
+		List<Conversation> convos = postRestController.getAllConversations();
+
+		assertThat(convos).isNotNull();
+		assertThat(convos.size()).isEqualTo(7);
+
+		for (Conversation c : convos) {
+			assertThat(c.getParticipant()).isNotBlank();
+		}
 	}
 
 	/**
@@ -311,7 +328,7 @@ public class ConversationXmlParsingUnitTests {
 	@Test
 	public void testAddingConvos() throws IOException {
 		List<Conversation> convos = postRestController.getAllConversations();
-		assertThat(convos.size()).isEqualTo(6);
+		assertThat(convos.size()).isEqualTo(7);
 
 		for (Conversation convo : convos) {
 			convo.setHideConversation(true);
@@ -329,7 +346,7 @@ public class ConversationXmlParsingUnitTests {
 
 		convos = postRestController.getAllConversations();
 		assertThat(convos).isNotNull();
-		assertThat(convos.size()).isEqualTo(7);
+		assertThat(convos.size()).isEqualTo(8);
 
 		Conversation convo = postRestController.getConversationByParticipant(convo1Participant);
 		assertThat(convo).isNotNull();

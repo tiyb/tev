@@ -505,6 +505,9 @@ public class ConversationXmlReader extends TEVXmlReader {
 				EndElement ee = event.asEndElement();
 
 				if (ee.getName().getLocalPart().equals("participants")) {
+					if(participant.name.equals("")) {
+						participant.name = "NO NAME";
+					}
 					return participant;
 				}
 			}
