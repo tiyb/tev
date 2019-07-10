@@ -45,7 +45,7 @@ import com.tiyb.tev.exception.XMLParsingException;
 public class ConversationXmlParsingUnitTests {
 
 	@Autowired
-	private TEVConvoRestController postRestController;
+	private TEVConvoRestController convoRestController;
 	@Autowired
 	private TEVMetadataRestController mdRestController;
 
@@ -56,6 +56,10 @@ public class ConversationXmlParsingUnitTests {
 	private static final String convo5Participant = "participant5";
 	private static final String oldNameParticipantId = "foaiehoihafoei";
 	private static final String tobeDeactivatedId = "afoiehaifeh";
+	private static final String blankParticipant = "NO NAME";
+	private static final String duplicateParticipant = "participant1 1";
+	
+	private static final int TOTAL_NUM_CONVOS = 8;
 
 	/**
 	 * Run before each test to populate the DB fresh, so that the Unit Tests can
@@ -75,9 +79,9 @@ public class ConversationXmlParsingUnitTests {
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
 		MockMultipartFile mockFile = new MockMultipartFile("testmessages", xmlFile);
 
-		postRestController.deleteAllConversations();
-		postRestController.deleteAllConvoMsgs();
-		ConversationXmlReader.parseDocument(mockFile, mdRestController, postRestController);
+		convoRestController.deleteAllConversations();
+		convoRestController.deleteAllConvoMsgs();
+		ConversationXmlReader.parseDocument(mockFile, mdRestController, convoRestController);
 	}
 	
 	/**
@@ -88,40 +92,52 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test
 	public void checkConversations() {
-		List<Conversation> convos = postRestController.getAllConversations();
+		List<Conversation> convos = convoRestController.getAllConversations();
 
 		assertThat(convos).isNotNull();
-		assertThat(convos.size()).isEqualTo(7);
+		assertThat(convos.size()).isEqualTo(TOTAL_NUM_CONVOS);
 		
-		Conversation firstConvo = postRestController.getConversationByParticipant(convo1Participant);
+		Conversation firstConvo = convoRestController.getConversationByParticipant(convo1Participant);
 		assertThat(firstConvo).isNotNull();
 		assertThat(firstConvo.getNumMessages()).isEqualTo(9);
 		assertThat(firstConvo.getParticipantAvatarUrl()).isEqualTo("http://participant1/avatar");
 
-		Conversation secondConvo = postRestController.getConversationByParticipant(convo2Participant);
+		Conversation secondConvo = convoRestController.getConversationByParticipant(convo2Participant);
 		assertThat(secondConvo).isNotNull();
 		assertThat(secondConvo.getNumMessages()).isEqualTo(9);
 		assertThat(secondConvo.getParticipantAvatarUrl()).isEqualTo("http://participant2/avatar");
 
-		Conversation thirdConvo = postRestController.getConversationByParticipant(convo3Participant);
+		Conversation thirdConvo = convoRestController.getConversationByParticipant(convo3Participant);
 		assertThat(thirdConvo).isNotNull();
 		assertThat(thirdConvo.getNumMessages()).isEqualTo(1);
 
-		Conversation fourthConvo = postRestController.getConversationByParticipant(convo4Participant);
+		Conversation fourthConvo = convoRestController.getConversationByParticipant(convo4Participant);
 		assertThat(fourthConvo).isNotNull();
 		assertThat(fourthConvo.getNumMessages()).isEqualTo(1);
 
-		Conversation changedConvo = postRestController.getConversationByParticipantIdOrName(oldNameParticipantId, "");
+		Conversation changedConvo = convoRestController.getConversationByParticipantIdOrName(oldNameParticipantId, "");
 		assertThat(changedConvo).isNotNull();
 		assertThat(changedConvo.getNumMessages()).isEqualTo(1);
 		assertThat(changedConvo.getParticipant()).isEqualTo("participant-oldname");
 		assertThat(changedConvo.getParticipantAvatarUrl()).isEqualTo("http://participanton/avatar");
 
-		Conversation toBeDeactConvo = postRestController.getConversationByParticipantIdOrName(tobeDeactivatedId, "");
+		Conversation toBeDeactConvo = convoRestController.getConversationByParticipantIdOrName(tobeDeactivatedId, "");
 		assertThat(toBeDeactConvo).isNotNull();
 		assertThat(toBeDeactConvo.getNumMessages()).isEqualTo(2);
 		assertThat(toBeDeactConvo.getParticipant()).isEqualTo("goingtobedeactivated");
 		assertThat(toBeDeactConvo.getParticipantAvatarUrl()).isEqualTo("http://goingtobedeac/avatar");
+		
+		Conversation blankParticipantConvo = convoRestController.getConversationByParticipant(blankParticipant);
+		assertThat(blankParticipantConvo).isNotNull();
+		assertThat(blankParticipantConvo.getNumMessages()).isEqualTo(1);
+		assertThat(blankParticipantConvo.getParticipant()).isEqualTo("NO NAME");
+		assertThat(blankParticipantConvo.getParticipantAvatarUrl()).isEmpty();
+		
+		Conversation dupNameConvo = convoRestController.getConversationByParticipant(duplicateParticipant);
+		assertThat(dupNameConvo).isNotNull();
+		assertThat(dupNameConvo.getNumMessages()).isEqualTo(1);
+		assertThat(dupNameConvo.getParticipant()).isEqualTo("participant1 1");
+		assertThat(dupNameConvo.getParticipantAvatarUrl()).isEqualTo("http://duplicatename/avatar");
 	}
 
 	/**
@@ -131,10 +147,10 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test
 	public void checkBlankParticipantLoading() {
-		List<Conversation> convos = postRestController.getAllConversations();
+		List<Conversation> convos = convoRestController.getAllConversations();
 
 		assertThat(convos).isNotNull();
-		assertThat(convos.size()).isEqualTo(7);
+		assertThat(convos.size()).isEqualTo(TOTAL_NUM_CONVOS);
 
 		for (Conversation c : convos) {
 			assertThat(c.getParticipant()).isNotBlank();
@@ -152,7 +168,7 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test
 	public void testRetrieveConvoWithNoId() {
-		Conversation returnedConvo = postRestController.getConversationByParticipantIdOrName("", convo3Participant);
+		Conversation returnedConvo = convoRestController.getConversationByParticipantIdOrName("", convo3Participant);
 		assertThat(returnedConvo).isNotNull();
 		assertThat(returnedConvo.getNumMessages()).isEqualTo(1);
 		assertThat(returnedConvo.getParticipant()).isEqualTo(convo3Participant);
@@ -168,8 +184,8 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test
 	public void checkConvo1Messages() {
-		Conversation convo = postRestController.getConversationByParticipant(convo1Participant);
-		List<ConversationMessage> msgs = postRestController.getConvoMsgByConvoID(convo.getId());
+		Conversation convo = convoRestController.getConversationByParticipant(convo1Participant);
+		List<ConversationMessage> msgs = convoRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(msgs).isNotNull();
 		assertThat(msgs.size()).isEqualTo(9);
 
@@ -227,8 +243,8 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test
 	public void checkConvo2Messages() {
-		Conversation convo = postRestController.getConversationByParticipant(convo2Participant);
-		List<ConversationMessage> msgs = postRestController.getConvoMsgByConvoID(convo.getId());
+		Conversation convo = convoRestController.getConversationByParticipant(convo2Participant);
+		List<ConversationMessage> msgs = convoRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(msgs).isNotNull();
 		assertThat(msgs.size()).isEqualTo(9);
 
@@ -286,8 +302,8 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test
 	public void checkConvo3Messages() {
-		Conversation convo = postRestController.getConversationByParticipant(convo3Participant);
-		List<ConversationMessage> msgs = postRestController.getConvoMsgByConvoID(convo.getId());
+		Conversation convo = convoRestController.getConversationByParticipant(convo3Participant);
+		List<ConversationMessage> msgs = convoRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(msgs).isNotNull();
 		assertThat(msgs.size()).isEqualTo(1);
 
@@ -305,8 +321,8 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test
 	public void checkConvo4Messages() {
-		Conversation convo = postRestController.getConversationByParticipant(convo4Participant);
-		List<ConversationMessage> msgs = postRestController.getConvoMsgByConvoID(convo.getId());
+		Conversation convo = convoRestController.getConversationByParticipant(convo4Participant);
+		List<ConversationMessage> msgs = convoRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(msgs).isNotNull();
 		assertThat(msgs.size()).isEqualTo(1);
 
@@ -327,12 +343,12 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test
 	public void testAddingConvos() throws IOException {
-		List<Conversation> convos = postRestController.getAllConversations();
-		assertThat(convos.size()).isEqualTo(7);
+		List<Conversation> convos = convoRestController.getAllConversations();
+		assertThat(convos.size()).isEqualTo(TOTAL_NUM_CONVOS);
 
 		for (Conversation convo : convos) {
 			convo.setHideConversation(true);
-			postRestController.updateConversation(convo.getId(), convo);
+			convoRestController.updateConversation(convo.getId(), convo);
 		}
 
 		Metadata md = mdRestController.getMetadata();
@@ -342,39 +358,39 @@ public class ConversationXmlParsingUnitTests {
 		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-messages-extended-xml.xml");
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
 		MockMultipartFile mockFile = new MockMultipartFile("testmessages", xmlFile);
-		ConversationXmlReader.parseDocument(mockFile, mdRestController, postRestController);
+		ConversationXmlReader.parseDocument(mockFile, mdRestController, convoRestController);
 
-		convos = postRestController.getAllConversations();
+		convos = convoRestController.getAllConversations();
 		assertThat(convos).isNotNull();
-		assertThat(convos.size()).isEqualTo(8);
+		assertThat(convos.size()).isEqualTo(TOTAL_NUM_CONVOS + 1);
 
-		Conversation convo = postRestController.getConversationByParticipant(convo1Participant);
+		Conversation convo = convoRestController.getConversationByParticipant(convo1Participant);
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(false);
-		List<ConversationMessage> messages = postRestController.getConvoMsgByConvoID(convo.getId());
+		List<ConversationMessage> messages = convoRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(messages).isNotNull();
 		assertThat(messages.size()).isEqualTo(10);
 
-		convo = postRestController.getConversationByParticipant(convo2Participant);
+		convo = convoRestController.getConversationByParticipant(convo2Participant);
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(true);
 
-		convo = postRestController.getConversationByParticipant(convo3Participant);
+		convo = convoRestController.getConversationByParticipant(convo3Participant);
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(false);
 		assertThat(convo.getNumMessages()).isEqualTo(2);
-		messages = postRestController.getConvoMsgByConvoID(convo.getId());
+		messages = convoRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(messages).isNotNull();
 		assertThat(messages.size()).isEqualTo(2);
 
-		convo = postRestController.getConversationByParticipant(convo4Participant);
+		convo = convoRestController.getConversationByParticipant(convo4Participant);
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(true);
 
-		convo = postRestController.getConversationByParticipant(convo5Participant);
+		convo = convoRestController.getConversationByParticipant(convo5Participant);
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(false);
-		messages = postRestController.getConvoMsgByConvoID(convo.getId());
+		messages = convoRestController.getConvoMsgByConvoID(convo.getId());
 		assertThat(messages).isNotNull();
 		assertThat(messages.size()).isEqualTo(1);
 
@@ -384,14 +400,14 @@ public class ConversationXmlParsingUnitTests {
 		assertThat(message.getReceived()).isEqualTo(true);
 		assertThat(message.getTimestamp()).isEqualTo(1544012468L);
 
-		convo = postRestController.getConversationByParticipantIdOrName(oldNameParticipantId, "");
+		convo = convoRestController.getConversationByParticipantIdOrName(oldNameParticipantId, "");
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(false);
 		assertThat(convo.getNumMessages()).isEqualTo(1);
 		assertThat(convo.getParticipant()).isEqualTo("participant-newname");
 		assertThat(convo.getParticipantAvatarUrl()).isEqualTo("http://participantnn/avatar");
 
-		convo = postRestController.getConversationByParticipantIdOrName(tobeDeactivatedId, "");
+		convo = convoRestController.getConversationByParticipantIdOrName(tobeDeactivatedId, "");
 		assertThat(convo).isNotNull();
 		assertThat(convo.getHideConversation()).isEqualTo(true);
 		assertThat(convo.getNumMessages()).isEqualTo(2);
@@ -410,6 +426,6 @@ public class ConversationXmlParsingUnitTests {
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
 		MockMultipartFile mockFile = new MockMultipartFile("testmessages", xmlFile);
 
-		ConversationXmlReader.parseDocument(mockFile, mdRestController, postRestController);
+		ConversationXmlReader.parseDocument(mockFile, mdRestController, convoRestController);
 	}
 }

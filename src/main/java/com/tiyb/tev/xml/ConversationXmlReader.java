@@ -226,7 +226,10 @@ public class ConversationXmlReader extends TEVXmlReader {
 	 * the main blog and non received from the Participant; 2) a new export is
 	 * uploaded (with overwrite turned off); 3) the conversation was augmented with
 	 * messages from the Participant; <i>and</i> 4) the Participant changed their
-	 * name, a duplicate conversation will be created.
+	 * name, a duplicate conversation will be created. This is made even more
+	 * confusing by the fact that participant <b>names</b> are sometimes reused, so
+	 * the code looks for duplicate names, and appends a "1" to the end. (i.e.
+	 * "blogname", "blogname 1", "blogname 1 1", etc.)
 	 * </p>
 	 * 
 	 * @param xmlFile            Stream containing the XML file to be parsed
@@ -240,6 +243,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 	private static void readConversations(InputStream xmlFile, String mainTumblrUserName, String mainTumblrUserId,
 			TEVMetadataRestController mdController, TEVConvoRestController convoController) throws XMLParsingException {
 		boolean isOverwriteConvos = mdController.getMetadata().getOverwriteConvoData();
+		List<String> allParticipants = new ArrayList<String>();
 
 		if (isOverwriteConvos) {
 			convoController.deleteAllConvoMsgs();
@@ -261,6 +265,10 @@ public class ConversationXmlReader extends TEVXmlReader {
 
 					if (se.getName().getLocalPart().equals("conversation")) {
 						participant = getParticipantName(reader, mainTumblrUserName);
+						while(allParticipants.contains(participant.name)) {
+							participant.name = participant.name + " 1";
+						}
+						allParticipants.add(participant.name);
 						MessageSuperStructure messageData = getMessages(reader, mainTumblrUserId);
 						messages = messageData.messages;
 

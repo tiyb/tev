@@ -96,5 +96,27 @@
 				<message ts="1544012485" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 2</message>
 			</messages>
 		</conversation>
+		
+		<!-- no change -->
+		<conversation status="ACTIVE">
+			<participants>
+				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+				<participant avatar_url=""/>
+			</participants>
+			<messages>
+				<message ts="1544012485" participant="foae8yofeiu" type="TEXT">Message 1</message>
+			</messages>
+		</conversation>
+		
+		<!--  no change -->
+		<conversation status="ACTIVE">
+			<participants>
+				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+				<participant avatar_url="http://duplicatename/avagar">participant1</participant>
+			</participants>
+			<messages>
+				<message ts="1544012485" participant="lihkg" type="TEXT">Message 1</message>
+			</messages>
+		</conversation>
 	</conversations>
 </tumblr>
