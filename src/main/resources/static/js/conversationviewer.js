@@ -11,6 +11,16 @@ $(document).ready(function() {
 			dataSrc: "",
 			type: "PUT"
 		}).then(function(data) {
+			window.close();
+		});
+	});
+	
+	$('#hideConvoAndRefreshBtn').click(function() {
+		$.ajax({
+			url: "/api/conversations/" + participant + "/ignoreConvo",
+			dataSrc: "",
+			type: "PUT"
+		}).then(function(data) {
 			opener.location.reload();
 			window.close();
 		});

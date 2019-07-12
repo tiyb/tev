@@ -11,7 +11,10 @@
 
 <div class="contentContainer">
 <h1 th:utext="'Conversation with ' + ${conversation.participant}"></h1>
-<p><button id="hideConvoBtn" th:text="#{conversation.hideConvoBtn}"></button></p>
+<p>
+	<button id="hideConvoBtn" th:text="#{conversation.hideConvoBtn}"></button>
+	<button id="hideConvoAndRefreshBtn" th:text="#{conversation.hideConvoAndRefreshBtn}"></button>
+</p>
 <table id="messagesTable">
 <tr th:each="message: ${messages}">
 	<td>
