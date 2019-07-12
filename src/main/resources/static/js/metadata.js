@@ -65,10 +65,10 @@ $(document).ready(function () {
 			$('#filterDropdown').val(metadataObject.filter);
 			$('#favsDropdown').val(metadataObject.favFilter);
 			$('#pageLengthDropdown').val(metadataObject.pageLength);
-			$('#conversationDisplayDropdown').val(metaataObject.conversationDisplayStyle);
+			$('#conversationDisplayDropdown').val(metadataObject.conversationDisplayStyle);
 			$('#mainUser').val(metadataObject.mainTumblrUser);
 			$('#mainUserAvatarUrl').val(metadataObject.mainTumblrUserAvatarUrl);
-			if(metadataObject.showReadingPane) {
+			if(metadataObject.showReadingPane == "true") {
 				$('#showReadingPaneDropdown').val('true');
 			} else {
 				$('#showReadingPaneDropdown').val('false');
