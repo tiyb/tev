@@ -28,6 +28,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.tiyb.tev.datamodel.Answer;
 import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.ConversationMessage;
+import com.tiyb.tev.datamodel.Hashtag;
 import com.tiyb.tev.datamodel.Link;
 import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.Photo;
@@ -228,6 +229,20 @@ public class TEVUIController {
 		}
 
 		return "viewers/" + postType;
+	}
+
+	/**
+	 * This request is used to populate the hashtag viewer.
+	 * 
+	 * @param model The model to be populated with post data, for use by Thymeleaf
+	 *              in the HTML template
+	 * @return The name of the template to use for rendering the output
+	 */
+	@RequestMapping(value = { "/hashtagViewer" }, method = RequestMethod.GET)
+	public String showHashtagViewer(Model model) {
+		List<Hashtag> hashtags = postController.getAllHashtags();
+		model.addAttribute("hashtags", hashtags);
+		return "viewers/hashtags";
 	}
 
 	/**

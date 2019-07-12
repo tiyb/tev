@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tiyb.tev.datamodel.Answer;
+import com.tiyb.tev.datamodel.Hashtag;
 import com.tiyb.tev.datamodel.Link;
 import com.tiyb.tev.datamodel.Photo;
 import com.tiyb.tev.datamodel.Post;
@@ -27,6 +28,7 @@ import com.tiyb.tev.datamodel.Video;
 import com.tiyb.tev.exception.InvalidTypeException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.repository.AnswerRepository;
+import com.tiyb.tev.repository.HashtagRepository;
 import com.tiyb.tev.repository.LinkRepository;
 import com.tiyb.tev.repository.PhotoRepository;
 import com.tiyb.tev.repository.PostRepository;
@@ -58,6 +60,12 @@ public class TEVPostRestController {
 	 */
 	@Autowired
 	PostRepository postRepo;
+
+	/**
+	 * Repo for working with hashtag data
+	 */
+	@Autowired
+	HashtagRepository hashtagRepo;
 
 	/**
 	 * Repo for working with "regular" post data
@@ -106,6 +114,16 @@ public class TEVPostRestController {
 	}
 
 	/**
+	 * GET request for listing all hashtags stored in the system
+	 * 
+	 * @return {@link java.util.List List} of all hashtags in the database
+	 */
+	@GetMapping("/hashtags")
+	public List<Hashtag> getAllHashtags() {
+		return hashtagRepo.findAll();
+	}
+
+	/**
 	 * POST request to submit a Tumblr post into the system
 	 * 
 	 * @param post The Post object (in JSON format) to be saved into the database
@@ -115,6 +133,31 @@ public class TEVPostRestController {
 	@PostMapping("/posts")
 	public Post createPost(@Valid @RequestBody Post post) {
 		return postRepo.save(post);
+	}
+
+	/**
+	 * POST request to insert a new hashtag into the system. If it already exists
+	 * the existing hashtag is simply returned (no error is thrown).
+	 * 
+	 * @param hashtag The hashtag to be entered into the system
+	 * @return The new/existing hashtag object (with ID)
+	 */
+	@PostMapping("/hashtags")
+	public Hashtag createHashtag(@Valid @RequestBody String hashtag) {
+		Hashtag existingTag = hashtagRepo.findByTag(hashtag);
+
+		if (existingTag != null) {
+			existingTag.setCount(existingTag.getCount() + 1);
+			existingTag = hashtagRepo.save(existingTag);
+			return existingTag;
+		}
+
+		Hashtag newTag = new Hashtag();
+		newTag.setTag(hashtag);
+		newTag.setCount(1);
+
+		newTag = hashtagRepo.save(newTag);
+		return newTag;
 	}
 
 	/**

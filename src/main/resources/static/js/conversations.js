@@ -89,7 +89,7 @@ $(document).ready(function() {
 			}
 		}));
 		
-		$('#conversationWordCloudContainer').jQCloud(words, {width:900,height:500,fontSize:{from:0.1,to:0.02},autoResize:false,removeOverflowing:false});
+		$('#conversationWordCloudContainer').jQCloud(words, {width:900,height:500,fontSize:{from:0.01,to:0.002},autoResize:true,removeOverflowing:true});
 		
 		var convoTable = $('#conversationTable').DataTable( {
 			"language": {

@@ -20,6 +20,7 @@ import org.springframework.util.ResourceUtils;
 import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.controller.TEVPostRestController;
 import com.tiyb.tev.datamodel.Answer;
+import com.tiyb.tev.datamodel.Hashtag;
 import com.tiyb.tev.datamodel.Link;
 import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.Photo;
@@ -81,37 +82,38 @@ public class PostXmlParsingUnitTest {
 
 		BlogXmlReader.parseDocument(xmlFile, postController, mdController);
 	}
-	
+
 	/**
-	 * Simple check that all posts have been loaded; details are checked in other unit tests
+	 * Simple check that all posts have been loaded; details are checked in other
+	 * unit tests
 	 */
 	@Test
 	public void testAllPosts() {
 		List<Post> posts = postController.getAllPosts();
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(6);
-		
+
 		List<Post> answerPosts = postController.getPostsByType("answer");
 		assertThat(answerPosts).isNotNull();
 		assertThat(answerPosts.size()).isEqualTo(1);
-		
+
 		List<Post> photoPosts = postController.getPostsByType("photo");
 		assertThat(photoPosts).isNotNull();
 		assertThat(photoPosts.size()).isEqualTo(2);
-		
+
 		List<Post> regularPosts = postController.getPostsByType("regular");
 		assertThat(regularPosts).isNotNull();
 		assertThat(regularPosts.size()).isEqualTo(1);
-		
+
 		List<Post> linkPosts = postController.getPostsByType("link");
 		assertThat(linkPosts).isNotNull();
 		assertThat(linkPosts.size()).isEqualTo(1);
-		
+
 		List<Post> videoPosts = postController.getPostsByType("video");
 		assertThat(videoPosts).isNotNull();
 		assertThat(videoPosts.size()).isEqualTo(1);
 	}
-	
+
 	/**
 	 * Tests that a proper exception is thrown when an invalid type is passed to
 	 * {@link com.tiyb.tev.controller.TEVPostRestController#getPostsByType(String)
@@ -144,7 +146,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getUnixtimestamp()).isEqualTo(1542875185L);
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180371366195");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180371366195/slug-slug-slug");
-		
+
 		assertThat(postController.getAllAnswers().size()).isEqualTo(1);
 		Answer answer = postController.getAnswerById(answerPostID);
 		assertThat(answer).isNotNull();
@@ -175,7 +177,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getUnixtimestamp()).isEqualTo(1542607748L);
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180265557725");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180265557725/tumblr");
-		
+
 		assertThat(postController.getAllLinks().size()).isEqualTo(1);
 		Link link = postController.getLinkById(linkPostID);
 		assertThat(link).isNotNull();
@@ -207,7 +209,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getUnixtimestamp()).isEqualTo(1544201323L);
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180894436671");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180894436671/first-post");
-		
+
 		assertThat(postController.getAllRegulars().size()).isEqualTo(1);
 		Regular regular = postController.getRegularById(regularPostID);
 		assertThat(regular).isNotNull();
@@ -215,7 +217,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(regular.getBody()).isEqualTo("post body text here");
 		assertThat(regular.getTitle()).isEqualTo("First Post");
 	}
-	
+
 	/**
 	 * Tests that a draft post was skipped during the import process
 	 */
@@ -223,7 +225,7 @@ public class PostXmlParsingUnitTest {
 	public void testIgnoredDraft() {
 		postController.getPostById(draftRegularPostID);
 	}
-	
+
 	/**
 	 * Tests that a queued post was skipped during the import process
 	 */
@@ -254,7 +256,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getUnixtimestamp()).isEqualTo(1543903761L);
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180782992914");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180782992914/another-slug");
-		
+
 		assertThat(postController.getAllVideos().size()).isEqualTo(1);
 		Video video = postController.getVideoById(videoPostID);
 		assertThat(video).isNotNull();
@@ -290,7 +292,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getUnixtimestamp()).isEqualTo(1543907872L);
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180784644740");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180784644740/new-slug");
-		
+
 		post = postController.getPostById(secondPhotoPostID);
 		assertThat(post).isNotNull();
 		assertThat(post.getDate()).isEqualTo("Sun, 18 Nov 2018 18:17:36");
@@ -306,8 +308,9 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getType()).isEqualTo("photo");
 		assertThat(post.getUnixtimestamp()).isEqualTo(1542583056L);
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180254465582");
-		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180254465582/slugs-are-delicious");
-		
+		assertThat(post.getUrlWithSlug())
+				.isEqualTo("https://mainblog.tumblr.com/post/180254465582/slugs-are-delicious");
+
 		List<Photo> photos = postController.getPhotoById(secondPhotoPostID);
 		assertThat(photos.size()).isEqualTo(2);
 
@@ -433,13 +436,52 @@ public class PostXmlParsingUnitTest {
 
 	/**
 	 * Tests that parsing of invalid XML throws the proper exception
+	 * 
 	 * @throws FileNotFoundException
 	 */
-	@Test(expected=XMLParsingException.class)
+	@Test(expected = XMLParsingException.class)
 	public void testBadXmlUpload() throws FileNotFoundException {
 		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-badxml.xml");
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
 
 		BlogXmlReader.parseDocument(xmlFile, postController, mdController);
 	}
+	
+	/**
+	 * Simple check that all hashtags have been loaded
+	 */
+	@Test
+	public void testHashtagInitialLoad() {
+		List<Hashtag> tags = postController.getAllHashtags();
+
+		assertThat(tags).isNotNull();
+		assertThat(tags.size()).isEqualTo(15);
+	}
+
+	/**
+	 * Test adding a new hashtag, after the initial load
+	 */
+	@Test
+	public void testAddHashtag() {
+		postController.createHashtag("tag16");
+
+		List<Hashtag> tags = postController.getAllHashtags();
+
+		assertThat(tags).isNotNull();
+		assertThat(tags.size()).isEqualTo(16);
+	}
+
+	/**
+	 * Test adding a hashtag that already exists in the system
+	 */
+	@Test
+	public void testAddExistingHashtag() {
+		postController.createHashtag("tag1");
+
+		List<Hashtag> tags = postController.getAllHashtags();
+
+		assertThat(tags).isNotNull();
+		assertThat(tags.size()).isEqualTo(15);
+	}
+
 }

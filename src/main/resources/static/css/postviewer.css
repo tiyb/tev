@@ -125,3 +125,11 @@ h2 {
 .hashtagspan {
 	cursor: pointer;
 }
+
+#hashtagWordCloudContainer {
+	width:100%;
+}
+
+.jqcloud-word {
+	cursor: pointer;
+}

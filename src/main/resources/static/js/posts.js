@@ -218,6 +218,14 @@ $(document).ready(function() {
 			}
 		});
 		
+		var urlParams = new URLSearchParams(window.location.search);
+		if(urlParams.has("hashsearch")) {
+			$('#postTable tfoot tr:eq(1) th:eq(3) input').val(urlParams.get("hashsearch"));
+			$('#postTable tfoot tr:eq(1) th:eq(3) input').change();
+		}
+		
+
+		
 	});
 	
 	$('input[type=radio][name=filterRead]').change(function() {
@@ -260,12 +268,6 @@ $(document).ready(function() {
 		
 		updateMDAPI();
 	});
-	
-	var urlParams = new URLSearchParams(window.location.search);
-	if(urlParams.has("hashsearch")) {
-		$('#postTable thead tr:eq(1) th:eq(3) input').val(urlParams.get("hashsearch"));
-		$('#postTable thead tr:eq(1) th:eq(3) input').change();
-	}
 	
 	var iframeOffset = $('#displayPaneIFrame').offset();
 	$(window).scroll(function() {

@@ -198,25 +198,25 @@ public class BlogXmlReader extends TEVXmlReader {
 						}
 						switch (post.getType()) {
 						case "regular":
-							Regular regular = readRegular(reader, post);
+							Regular regular = readRegular(reader, post, postRestController);
 							if (isSubmitablePost) {
 								postRestController.createRegular(post.getId(), regular);
 							}
 							break;
 						case "answer":
-							Answer answer = readAnswer(reader, post);
+							Answer answer = readAnswer(reader, post, postRestController);
 							if (isSubmitablePost) {
 								postRestController.createAnswer(post.getId(), answer);
 							}
 							break;
 						case "link":
-							Link link = readLink(reader, post);
+							Link link = readLink(reader, post, postRestController);
 							if (isSubmitablePost) {
 								postRestController.createLink(post.getId(), link);
 							}
 							break;
 						case "photo":
-							List<Photo> photos = readPhotos(reader, post);
+							List<Photo> photos = readPhotos(reader, post, postRestController);
 							if (isSubmitablePost) {
 								for (Photo p : photos) {
 									postRestController.createPhoto(p);
@@ -224,7 +224,7 @@ public class BlogXmlReader extends TEVXmlReader {
 							}
 							break;
 						case "video":
-							Video video = readVideos(reader, post);
+							Video video = readVideos(reader, post, postRestController);
 							if (isSubmitablePost) {
 								postRestController.createVideo(post.getId(), video);
 							}
@@ -311,15 +311,19 @@ public class BlogXmlReader extends TEVXmlReader {
 	 * content related to a "regular" post. The content is very simple, containing
 	 * only "regular-title" and "regular-body" elements.
 	 * 
-	 * @param reader The {@link javax.xml.stream.XMLEventReader XMLEventReader}
-	 *               object for the XML document being parsed.
-	 * @param post   The current post, for use as the primary key of the Regular
-	 *               object and for setting tags
+	 * @param reader             The {@link javax.xml.stream.XMLEventReader
+	 *                           XMLEventReader} object for the XML document being
+	 *                           parsed.
+	 * @param post               The current post, for use as the primary key of the
+	 *                           Regular object and for setting tags
+	 * @param postRestControlelr The REST controller for working with posts, used
+	 *                           for inserting Hashtags into the DB
 	 * @return A {@link com.tiyb.tev.datamodel.Regular Regular} object with the data
 	 *         read
 	 * @throws XMLStreamException
 	 */
-	private static Regular readRegular(XMLEventReader reader, Post post) throws XMLStreamException {
+	private static Regular readRegular(XMLEventReader reader, Post post, TEVPostRestController postRestController)
+			throws XMLStreamException {
 		Regular regular = new Regular();
 		regular.setPostId(post.getId());
 
@@ -334,7 +338,9 @@ public class BlogXmlReader extends TEVXmlReader {
 				} else if (se.getName().getLocalPart().equals("regular-body")) {
 					regular.setBody(readCharacters(reader));
 				} else if (se.getName().getLocalPart().equals("tag")) {
-					post.setTags(addTagToString(post.getTags(), readCharacters(reader)));
+					String hashtag = readCharacters(reader);
+					post.setTags(addTagToString(post.getTags(), hashtag));
+					postRestController.createHashtag(hashtag);
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
@@ -353,13 +359,16 @@ public class BlogXmlReader extends TEVXmlReader {
 	 * content related to an "answer" post. The content is very simple, containing
 	 * only "question" and "answer" elements.
 	 * 
-	 * @param reader The event reader parsing the current document
-	 * @param post   The current post, for use as the primary key of the Answer
-	 *               object and for setting tags
+	 * @param reader             The event reader parsing the current document
+	 * @param post               The current post, for use as the primary key of the
+	 *                           Answer object and for setting tags
+	 * @param postRestController The REST controller for working with posts, for
+	 *                           inserting hashtags
 	 * @return The "answer" data
 	 * @throws XMLStreamException
 	 */
-	private static Answer readAnswer(XMLEventReader reader, Post post) throws XMLStreamException {
+	private static Answer readAnswer(XMLEventReader reader, Post post, TEVPostRestController postRestController)
+			throws XMLStreamException {
 		Answer answer = new Answer();
 		answer.setPostId(post.getId());
 
@@ -374,7 +383,9 @@ public class BlogXmlReader extends TEVXmlReader {
 				} else if (se.getName().getLocalPart().equals("answer")) {
 					answer.setAnswer(readCharacters(reader));
 				} else if (se.getName().getLocalPart().equals("tag")) {
-					post.setTags(addTagToString(post.getTags(), readCharacters(reader)));
+					String tag = readCharacters(reader);
+					post.setTags(addTagToString(post.getTags(), tag));
+					postRestController.createHashtag(tag);
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
@@ -393,12 +404,15 @@ public class BlogXmlReader extends TEVXmlReader {
 	 * content related to a "link" post. The content contains only three elements:
 	 * "link-description", "link-text", and "link-url".
 	 * 
-	 * @param reader The event parser
-	 * @param post   The currently processed post
+	 * @param reader             The event parser
+	 * @param post               The currently processed post
+	 * @param postRestController The REST controller for working with posts, for
+	 *                           inserting hashtags
 	 * @return The link data
 	 * @throws XMLStreamException
 	 */
-	private static Link readLink(XMLEventReader reader, Post post) throws XMLStreamException {
+	private static Link readLink(XMLEventReader reader, Post post, TEVPostRestController postRestController)
+			throws XMLStreamException {
 		Link link = new Link();
 		link.setPostId(post.getId());
 
@@ -415,7 +429,9 @@ public class BlogXmlReader extends TEVXmlReader {
 				} else if (se.getName().getLocalPart().equals("link-url")) {
 					link.setUrl(readCharacters(reader));
 				} else if (se.getName().getLocalPart().equals("tag")) {
-					post.setTags(addTagToString(post.getTags(), readCharacters(reader)));
+					String tag = readCharacters(reader);
+					post.setTags(addTagToString(post.getTags(), tag));
+					postRestController.createHashtag(tag);
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
@@ -484,12 +500,15 @@ public class BlogXmlReader extends TEVXmlReader {
 	 * duplicated in the "photoset", and have therefore already been added.</li>
 	 * </ol>
 	 * 
-	 * @param reader The event reader being used to parse the XML
-	 * @param post   The currently processed post
+	 * @param reader             The event reader being used to parse the XML
+	 * @param post               The currently processed post
+	 * @param postRestController The REST controller for working with posts, for
+	 *                           inserting hashtags
 	 * @return A list of {@link com.tiyb.tev.datamodel.Photo Photo} objects
 	 * @throws XMLStreamException
 	 */
-	private static List<Photo> readPhotos(XMLEventReader reader, Post post) throws XMLStreamException {
+	private static List<Photo> readPhotos(XMLEventReader reader, Post post, TEVPostRestController postRestController)
+			throws XMLStreamException {
 		List<Photo> photos = new ArrayList<Photo>();
 		String caption = "";
 		String url1280 = "";
@@ -532,7 +551,9 @@ public class BlogXmlReader extends TEVXmlReader {
 				} else if (se.getName().getLocalPart().equals("photoset")) {
 					readPhotoStream(reader, post.getId(), caption, photos);
 				} else if (se.getName().getLocalPart().equals("tag")) {
-					post.setTags(addTagToString(post.getTags(), readCharacters(reader)));
+					String tag = readCharacters(reader);
+					post.setTags(addTagToString(post.getTags(), tag));
+					postRestController.createHashtag(tag);
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
@@ -646,12 +667,15 @@ public class BlogXmlReader extends TEVXmlReader {
 	 * are ignored</li>
 	 * </ul>
 	 * 
-	 * @param reader The event parser
-	 * @param post   The currently processed post
+	 * @param reader             The event parser
+	 * @param post               The currently processed post
+	 * @param postRestController The REST controller for working with posts, for
+	 *                           inserting hashtags
 	 * @return The video data
 	 * @throws XMLStreamException
 	 */
-	private static Video readVideos(XMLEventReader reader, Post post) throws XMLStreamException {
+	private static Video readVideos(XMLEventReader reader, Post post, TEVPostRestController postRestController)
+			throws XMLStreamException {
 		Video video = new Video();
 		video.setPostId(post.getId());
 
@@ -676,7 +700,9 @@ public class BlogXmlReader extends TEVXmlReader {
 				} else if (se.getName().getLocalPart().equals("video-caption")) {
 					video.setVideoCaption(readCharacters(reader));
 				} else if (se.getName().getLocalPart().equals("tag")) {
-					post.setTags(addTagToString(post.getTags(), readCharacters(reader)));
+					String tag = readCharacters(reader);
+					post.setTags(addTagToString(post.getTags(), tag));
+					postRestController.createHashtag(tag);
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
