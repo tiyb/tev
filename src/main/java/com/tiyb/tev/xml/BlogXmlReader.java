@@ -316,7 +316,7 @@ public class BlogXmlReader extends TEVXmlReader {
 	 *                           parsed.
 	 * @param post               The current post, for use as the primary key of the
 	 *                           Regular object and for setting tags
-	 * @param postRestControlelr The REST controller for working with posts, used
+	 * @param postRestController The REST controller for working with posts, used
 	 *                           for inserting Hashtags into the DB
 	 * @return A {@link com.tiyb.tev.datamodel.Regular Regular} object with the data
 	 *         read
