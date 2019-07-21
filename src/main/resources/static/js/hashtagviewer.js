@@ -31,7 +31,6 @@ $(document).ready(function() {
 			"url": "api/hashtags",
 			"dataSrc": ""
 		},
-		"scrollY": "500px",
 		"scrollCollapse": true,
 		"paging": false,
 		"columns": [
