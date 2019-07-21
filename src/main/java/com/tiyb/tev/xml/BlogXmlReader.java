@@ -102,6 +102,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			postController.deleteAllPhotos();
 			postController.deleteAllVideos();
 			postController.deleteAllPosts();
+			postController.deleteAllHashtags();
 		}
 
 		readPosts(xmlFile, postController, isOverwritePosts);
@@ -718,13 +719,15 @@ public class BlogXmlReader extends TEVXmlReader {
 
 	/**
 	 * Helper function to add a tag to a list of tags; the resultant list is
-	 * comma-separated.
+	 * comma-separated. Hashtagas are always converted to lowercase.
 	 * 
 	 * @param original The existing list of tags (which could be empty)
 	 * @param tag      The tag to be added
 	 * @return Amended string
 	 */
 	private static String addTagToString(String original, String tag) {
+		tag = tag.toLowerCase();
+		
 		if (original.length() == 0) {
 			return tag;
 		}

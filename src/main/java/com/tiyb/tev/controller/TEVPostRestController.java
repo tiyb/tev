@@ -114,16 +114,6 @@ public class TEVPostRestController {
 	}
 
 	/**
-	 * GET request for listing all hashtags stored in the system
-	 * 
-	 * @return {@link java.util.List List} of all hashtags in the database
-	 */
-	@GetMapping("/hashtags")
-	public List<Hashtag> getAllHashtags() {
-		return hashtagRepo.findAll();
-	}
-
-	/**
 	 * POST request to submit a Tumblr post into the system
 	 * 
 	 * @param post The Post object (in JSON format) to be saved into the database
@@ -133,31 +123,6 @@ public class TEVPostRestController {
 	@PostMapping("/posts")
 	public Post createPost(@Valid @RequestBody Post post) {
 		return postRepo.save(post);
-	}
-
-	/**
-	 * POST request to insert a new hashtag into the system. If it already exists
-	 * the existing hashtag is simply returned (no error is thrown).
-	 * 
-	 * @param hashtag The hashtag to be entered into the system
-	 * @return The new/existing hashtag object (with ID)
-	 */
-	@PostMapping("/hashtags")
-	public Hashtag createHashtag(@Valid @RequestBody String hashtag) {
-		Hashtag existingTag = hashtagRepo.findByTag(hashtag);
-
-		if (existingTag != null) {
-			existingTag.setCount(existingTag.getCount() + 1);
-			existingTag = hashtagRepo.save(existingTag);
-			return existingTag;
-		}
-
-		Hashtag newTag = new Hashtag();
-		newTag.setTag(hashtag);
-		newTag.setCount(1);
-
-		newTag = hashtagRepo.save(newTag);
-		return newTag;
 	}
 
 	/**
@@ -313,7 +278,7 @@ public class TEVPostRestController {
 	/**
 	 * DEL to delete all posts in the DB
 	 * 
-	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
+	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity<>} with
 	 *         the response details
 	 */
 	@DeleteMapping("/posts")
@@ -367,6 +332,54 @@ public class TEVPostRestController {
 			}
 		}
 		return response;
+	}
+
+	/**
+	 * GET request for listing all hashtags stored in the system
+	 * 
+	 * @return {@link java.util.List List} of all hashtags in the database
+	 */
+	@GetMapping("/hashtags")
+	public List<Hashtag> getAllHashtags() {
+		return hashtagRepo.findAll();
+	}
+
+	/**
+	 * POST request to insert a new hashtag into the system. If it already exists
+	 * the existing hashtag is simply returned (no error is thrown).
+	 * 
+	 * @param hashtag The hashtag to be entered into the system
+	 * @return The new/existing hashtag object (with ID)
+	 */
+	@PostMapping("/hashtags")
+	public Hashtag createHashtag(@Valid @RequestBody String hashtag) {
+		Hashtag existingTag = hashtagRepo.findByTag(hashtag);
+
+		if (existingTag != null) {
+			existingTag.setCount(existingTag.getCount() + 1);
+			existingTag = hashtagRepo.save(existingTag);
+			return existingTag;
+		}
+
+		Hashtag newTag = new Hashtag();
+		newTag.setTag(hashtag);
+		newTag.setCount(1);
+
+		newTag = hashtagRepo.save(newTag);
+		return newTag;
+	}
+
+	/**
+	 * DEL to delete all hashtags in the DB
+	 * 
+	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity<>} with
+	 *         the response details
+	 */
+	@DeleteMapping("/hashtags")
+	public ResponseEntity<?> deleteAllHashtags() {
+		hashtagRepo.deleteAll();
+
+		return ResponseEntity.ok().build();
 	}
 
 	/**
