@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.tiyb.tev.repository.HashtagRepository;
 import com.tiyb.tev.repository.PostRepository;
 
 /**
@@ -30,6 +31,9 @@ public class PostRepositoryUnitTest {
 
 	@Autowired
 	private PostRepository postRepo;
+
+	@Autowired
+	private HashtagRepository hashtagRepo;
 
 	/**
 	 * Verify that posts, once in the DB, can be retrieved via the Post Repo
@@ -110,7 +114,7 @@ public class PostRepositoryUnitTest {
 
 		assertThat(returnedPosts.size()).isEqualTo(2);
 	}
-	
+
 	/**
 	 * Tests that posts can be properly retrieved by type
 	 */
@@ -132,10 +136,10 @@ public class PostRepositoryUnitTest {
 		post3.setDate("Jan 3, 2019");
 		entityManager.persist(post3);
 		entityManager.flush();
-		
+
 		List<Post> returnedPosts = postRepo.findAll();
 		assertThat(returnedPosts.size()).isEqualTo(3);
-		
+
 		List<Post> answerPosts = postRepo.findByType("answer");
 		assertThat(answerPosts).isNotNull();
 		assertThat(answerPosts.size()).isEqualTo(2);
@@ -143,7 +147,7 @@ public class PostRepositoryUnitTest {
 		assertThat(answerPosts.get(0).getDate()).isEqualTo("Jan 1, 2019");
 		assertThat(answerPosts.get(1).getId()).isEqualTo(2L);
 		assertThat(answerPosts.get(1).getDate()).isEqualTo("Jan 2, 2019");
-		
+
 		List<Post> linkPosts = postRepo.findByType("link");
 		assertThat(linkPosts).isNotNull();
 		assertThat(linkPosts.size()).isEqualTo(1);
@@ -171,6 +175,25 @@ public class PostRepositoryUnitTest {
 		List<Post> returnedPosts = postRepo.findAll();
 
 		assertThat(returnedPosts.size()).isEqualTo(0);
+	}
+
+	/**
+	 * Verifies that the Hashtag repo's "delete all" functionality works. Didn't
+	 * bother creating a whole new class just for this one test.
+	 */
+	@Test
+	public void deleteAllHashtags() {
+		Hashtag tag1 = new Hashtag("tag1", 1);
+		entityManager.persist(tag1);
+		Hashtag tag2 = new Hashtag("tag2", 2);
+		entityManager.persist(tag2);
+		entityManager.flush();
+
+		hashtagRepo.deleteAll();
+
+		List<Hashtag> hashtags = hashtagRepo.findAll();
+
+		assertThat(hashtags.size()).isEqualTo(0);
 	}
 
 }

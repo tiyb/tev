@@ -2,6 +2,7 @@ package com.tiyb.tev.xml;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -233,6 +234,11 @@ public class BlogXmlReader extends TEVXmlReader {
 						}
 						if (isSubmitablePost) {
 							post = postRestController.updatePost(post.getId(), post);
+							List<String> individualTags = Arrays.asList(post.getTags().split(","));
+							for (String tag : individualTags) {
+								tag = tag.trim();
+								postRestController.createHashtag(tag);
+							}
 						}
 					}
 				}
@@ -341,7 +347,6 @@ public class BlogXmlReader extends TEVXmlReader {
 				} else if (se.getName().getLocalPart().equals("tag")) {
 					String hashtag = readCharacters(reader);
 					post.setTags(addTagToString(post.getTags(), hashtag));
-					postRestController.createHashtag(hashtag);
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
@@ -386,7 +391,6 @@ public class BlogXmlReader extends TEVXmlReader {
 				} else if (se.getName().getLocalPart().equals("tag")) {
 					String tag = readCharacters(reader);
 					post.setTags(addTagToString(post.getTags(), tag));
-					postRestController.createHashtag(tag);
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
@@ -432,7 +436,6 @@ public class BlogXmlReader extends TEVXmlReader {
 				} else if (se.getName().getLocalPart().equals("tag")) {
 					String tag = readCharacters(reader);
 					post.setTags(addTagToString(post.getTags(), tag));
-					postRestController.createHashtag(tag);
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
@@ -554,7 +557,6 @@ public class BlogXmlReader extends TEVXmlReader {
 				} else if (se.getName().getLocalPart().equals("tag")) {
 					String tag = readCharacters(reader);
 					post.setTags(addTagToString(post.getTags(), tag));
-					postRestController.createHashtag(tag);
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
@@ -703,7 +705,6 @@ public class BlogXmlReader extends TEVXmlReader {
 				} else if (se.getName().getLocalPart().equals("tag")) {
 					String tag = readCharacters(reader);
 					post.setTags(addTagToString(post.getTags(), tag));
-					postRestController.createHashtag(tag);
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
@@ -727,7 +728,7 @@ public class BlogXmlReader extends TEVXmlReader {
 	 */
 	private static String addTagToString(String original, String tag) {
 		tag = tag.toLowerCase();
-		
+
 		if (original.length() == 0) {
 			return tag;
 		}

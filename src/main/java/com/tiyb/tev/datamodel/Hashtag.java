@@ -20,13 +20,24 @@ import javax.validation.constraints.NotBlank;
 public class Hashtag implements Serializable {
 
 	private static final long serialVersionUID = 5295937621643057029L;
-	
+
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
 	private Long id;
 	@NotBlank
 	private String tag;
 	private Integer count = 0;
+
+	public Hashtag(String tag, Integer count) {
+		super();
+		this.tag = tag;
+		this.count = count;
+	}
+
+	public Hashtag() {
+		this.tag = "";
+		this.count = 0;
+	}
 
 	@Override
 	public String toString() {

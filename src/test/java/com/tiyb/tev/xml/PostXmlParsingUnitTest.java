@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -64,6 +65,18 @@ public class PostXmlParsingUnitTest {
 	private static final long addedRegularPostID = 180894436672L;
 	private static final long draftRegularPostID = 190097591599L;
 	private static final long queuedRegularPostID = 778563537472L;
+
+	private static final List<Hashtag> INITIAL_HASHTAGS = Arrays.asList(new Hashtag("tag1", 2), new Hashtag("tag2", 2),
+			new Hashtag("tag3", 1), new Hashtag("tag4", 1), new Hashtag("tag5", 1), new Hashtag("tag6", 1),
+			new Hashtag("tag7", 1), new Hashtag("tag8", 1), new Hashtag("tag9", 1), new Hashtag("tag10", 1),
+			new Hashtag("tag11", 1), new Hashtag("tag12", 1), new Hashtag("tag13", 1), new Hashtag("tag14", 1),
+			new Hashtag("tag15", 1));
+
+	private static final List<Hashtag> REVISED_HASHTAGS = Arrays.asList(new Hashtag("tag1", 3), new Hashtag("tag2", 3),
+			new Hashtag("tag3", 1), new Hashtag("tag4", 1), new Hashtag("tag5", 1), new Hashtag("tag6", 1),
+			new Hashtag("tag7", 1), new Hashtag("tag8", 1), new Hashtag("tag9", 1), new Hashtag("tag10", 1),
+			new Hashtag("tag11", 1), new Hashtag("tag12", 1), new Hashtag("tag13", 1), new Hashtag("tag14", 1),
+			new Hashtag("tag15", 1));
 
 	/**
 	 * Called before each unit test to properly reset the data back to an original
@@ -432,6 +445,47 @@ public class PostXmlParsingUnitTest {
 		assertThat(post).isNotNull();
 		assertThat(post.getIsRead()).isEqualTo(true);
 
+		List<Hashtag> hashtags = postController.getAllHashtags();
+		assertThat(hashtags).isNotNull();
+		assertThat(hashtags.size()).isEqualTo(15);
+
+		hashtagTestHelper(hashtags, REVISED_HASHTAGS);
+
+	}
+
+	/**
+	 * Tests that the initial load of posts generated the right number and count of
+	 * hashtags
+	 */
+	@Test
+	public void testInitialHashtags() {
+		List<Hashtag> hashtags = postController.getAllHashtags();
+		assertThat(hashtags).isNotNull();
+		assertThat(hashtags.size()).isEqualTo(INITIAL_HASHTAGS.size());
+
+		hashtagTestHelper(hashtags, INITIAL_HASHTAGS);
+	}
+
+	/**
+	 * Helper function for testing that the tags coming from the API equal the
+	 * <i>expected</i> tags
+	 * 
+	 * @param tagsFromAPI The tags returned from the Post API
+	 * @param masterList  The set of expected tags
+	 */
+	private void hashtagTestHelper(List<Hashtag> tagsFromAPI, List<Hashtag> masterList) {
+		assertThat(tagsFromAPI.size()).isEqualTo(masterList.size());
+
+		for (Hashtag tagFromAPI : tagsFromAPI) {
+			boolean tagFound = false;
+			for (Hashtag tagFromList : masterList) {
+				if (tagFromAPI.getTag().equals(tagFromList.getTag())) {
+					assertThat(tagFromAPI.getCount()).isEqualTo(tagFromList.getCount());
+					tagFound = true;
+				}
+			}
+			assertThat(tagFound).isTrue();
+		}
 	}
 
 	/**
@@ -446,7 +500,7 @@ public class PostXmlParsingUnitTest {
 
 		BlogXmlReader.parseDocument(xmlFile, postController, mdController);
 	}
-	
+
 	/**
 	 * Simple check that all hashtags have been loaded
 	 */
