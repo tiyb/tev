@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.annotation.PreDestroy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -37,6 +39,8 @@ import com.tiyb.tev.datamodel.Post;
 @RestController
 @RequestMapping("/admintools")
 public class TEVAdminToolsController {
+	
+	Logger logger = LoggerFactory.getLogger(TEVAdminToolsController.class);
 
 	/**
 	 * The JDBC template to be used for operations within the controller
@@ -65,7 +69,7 @@ public class TEVAdminToolsController {
 		try {
 			jdbcTemplate.execute("SHUTDOWN COMPACT");
 		} catch (DataAccessException e) {
-			// do nothing
+			logger.error("Error encountered in preDestroy methodL ", e);
 		}
 	}
 
@@ -116,6 +120,7 @@ public class TEVAdminToolsController {
 	public String cleanImagesOnHD() {
 		String imageDirectory = mdController.getMetadata().getBaseMediaPath();
 		if (imageDirectory == null || imageDirectory.equals("")) {
+			logger.error("Invalid image directory used for cleanImagesOnHD: " + imageDirectory);
 			return "Invalid image directory";
 		}
 

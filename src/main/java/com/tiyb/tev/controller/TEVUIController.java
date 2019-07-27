@@ -12,6 +12,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -52,6 +54,8 @@ import com.tiyb.tev.xml.ConversationXmlReader;
  */
 @Controller
 public class TEVUIController {
+	
+	Logger logger = LoggerFactory.getLogger(TEVUIController.class);
 
 	/**
 	 * REST controller for working with posts
@@ -129,6 +133,7 @@ public class TEVUIController {
 		try {
 			BlogXmlReader.parseDocument(file.getInputStream(), postController, mdController);
 		} catch (XMLParsingException | IOException e) {
+			logger.error("UI Controller failing in handlePostFileUpload due to XML parsing error: ", e);
 			return "redirect:/errorbadxml";
 		}
 
@@ -154,6 +159,7 @@ public class TEVUIController {
 		try {
 			ConversationXmlReader.parseDocument(file, mdController, convoController);
 		} catch (XMLParsingException e) {
+			logger.error("UI Controller failing in handleConversationFileUpload due to XML parsing error: ", e);
 			return "redirect:/errorbadxml";
 		}
 
@@ -195,6 +201,7 @@ public class TEVUIController {
 		}
 
 		if (postType == "") {
+			logger.error("Post found in DB with an invalid type");
 			throw new InvalidTypeException();
 		}
 
@@ -294,6 +301,7 @@ public class TEVUIController {
 		try {
 			return Files.readAllBytes(file.toPath());
 		} catch (IOException e) {
+			logger.error("IO exception reading file " + imageName + ": ", e);
 			throw new ResourceNotFoundException(fullName, fullName, e);
 		}
 	}
@@ -307,8 +315,6 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/viewerVideo/{videoName}" }, method = RequestMethod.GET, produces = { "video/mp4" })
 	public void getVideo(HttpServletResponse response, HttpServletRequest request) {
-		// String ext =
-		// photo.getUrl1280().substring(photo.getUrl1280().lastIndexOf('.'));
 		String fullName = mdController.getMetadata().getBaseMediaPath() + "/"
 				+ request.getRequestURI().substring(request.getRequestURI().lastIndexOf('/'));
 
@@ -328,6 +334,7 @@ public class TEVUIController {
 			in.close();
 			out.close();
 		} catch (IOException e) {
+			logger.error("IO exception reading video file: ", e);
 			throw new ResourceNotFoundException(fullName, fullName, e);
 		}
 	}

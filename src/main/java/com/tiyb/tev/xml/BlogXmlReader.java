@@ -104,6 +104,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			postController.deleteAllVideos();
 			postController.deleteAllPosts();
 			postController.deleteAllHashtags();
+			logger.debug("previous content deleted as part of post XML import");
 		}
 
 		readPosts(xmlFile, postController, isOverwritePosts);
@@ -244,6 +245,7 @@ public class BlogXmlReader extends TEVXmlReader {
 				}
 			}
 		} catch (XMLStreamException e) {
+			logger.error("XML parser threw error: ", e);
 			throw new XMLParsingException();
 		} finally {
 
@@ -357,6 +359,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			}
 		}
 
+		logger.error("Unexpected end of file reached in readRegular");
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -401,6 +404,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			}
 		}
 
+		logger.error("Unexpected end of file reached in readAnswer");
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -446,6 +450,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			}
 		}
 
+		logger.error("Unexpected end of file reached in readLink");
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -581,6 +586,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			}
 		}
 
+		logger.error("Unexpected end of file reached in readPhotos");
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -649,6 +655,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			}
 		}
 
+		logger.error("Unexpected end of file reached in readPhotoStream");
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -715,6 +722,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			}
 		}
 
+		logger.error("Unexpected end of file reached in readVideos");
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 

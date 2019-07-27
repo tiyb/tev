@@ -46,7 +46,7 @@ import com.tiyb.tev.exception.XMLParsingException;
  *
  */
 public class ConversationXmlReader extends TEVXmlReader {
-
+	
 	/**
 	 * <p>
 	 * Main method. There are multiple steps to parsing the XML file:
@@ -92,6 +92,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 			xmlStream = xmlFile.getInputStream();
 			readConversations(xmlStream, md.getMainTumblrUser(), mainParticipantID, mdController, convoController);
 		} catch (IOException e) {
+			logger.error("Error parsing XML file: ", e);
 			throw new XMLParsingException();
 		}
 	}
@@ -185,9 +186,11 @@ public class ConversationXmlReader extends TEVXmlReader {
 				}
 			}
 		} catch (Exception e) {
+			logger.error("Exception thrown by XML parser: ", e);
 			throw new XMLParsingException();
 		}
 
+		logger.error("Unexpected end of file found in getMainParticipant()");
 		throw new XMLParsingException();
 	}
 
@@ -318,6 +321,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 				}
 			}
 		} catch (XMLStreamException e) {
+			logger.error("Error thrown by XML parser: ", e);
 			throw new XMLParsingException();
 		} finally {
 
@@ -386,6 +390,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 			}
 		}
 
+		logger.error("Unexpected end of file reached in getMessages");
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -421,6 +426,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 			}
 		}
 
+		logger.error("Unexpected end of file reached in readImageMessage");
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -521,6 +527,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 			}
 		}
 
+		logger.error("Unexpected end of file reached in getParticipantName");
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 

@@ -5,6 +5,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.XMLEvent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Super-class used by all XML-reading classes of the application, to reduce
  * redundant code.
@@ -13,6 +16,8 @@ import javax.xml.stream.events.XMLEvent;
  * @apiviz.landmark
  */
 public class TEVXmlReader {
+	
+	protected static Logger logger = LoggerFactory.getLogger(TEVXmlReader.class);
 
 	/**
 	 * Value used for the exception encountered when XML parsing fails because of
@@ -55,6 +60,7 @@ public class TEVXmlReader {
 			}
 		}
 
+		logger.error("Unexpected end of file reached in readCharacters");
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 }

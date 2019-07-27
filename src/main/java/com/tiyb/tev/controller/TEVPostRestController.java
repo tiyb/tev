@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -54,6 +56,8 @@ import com.tiyb.tev.repository.VideoRepository;
 @RestController
 @RequestMapping("/api")
 public class TEVPostRestController {
+	
+	Logger logger = LoggerFactory.getLogger(TEVPostRestController.class);
 
 	/**
 	 * Repo for working with Post data
@@ -147,6 +151,7 @@ public class TEVPostRestController {
 		List<String> allTypeNames = mdController.getAllTypes();
 
 		if (!isValidType(postType, allTypeNames)) {
+			logger.error("Invalid type passed to getPostsByType: " + postType);
 			throw new InvalidTypeException();
 		}
 
