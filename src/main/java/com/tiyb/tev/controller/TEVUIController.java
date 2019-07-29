@@ -301,7 +301,7 @@ public class TEVUIController {
 		try {
 			return Files.readAllBytes(file.toPath());
 		} catch (IOException e) {
-			logger.error("IO exception reading file " + imageName + ": ", e);
+			logger.error("File " + imageName + " not found.");
 			throw new ResourceNotFoundException(fullName, fullName, e);
 		}
 	}
@@ -334,7 +334,7 @@ public class TEVUIController {
 			in.close();
 			out.close();
 		} catch (IOException e) {
-			logger.error("IO exception reading video file: ", e);
+			logger.error("IO exception reading video file");
 			throw new ResourceNotFoundException(fullName, fullName, e);
 		}
 	}
