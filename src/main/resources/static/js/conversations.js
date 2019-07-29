@@ -89,7 +89,7 @@ $(document).ready(function() {
 			}
 		}));
 		
-		$('#conversationWordCloudContainer').jQCloud(words, {width:900,height:500,fontSize:{from:0.01,to:0.002},autoResize:true,removeOverflowing:true});
+		$('#conversationWordCloudContainer').jQCloud(words, {width:900,height:500,fontSize:{from:0.01,to:0.002},autoResize:false,removeOverflowing:true});
 		
 		var convoTable = $('#conversationTable').DataTable( {
 			"language": {
@@ -117,10 +117,6 @@ $(document).ready(function() {
 		    "lengthMenu": [[10, 25, 50, 100, -1], [$.i18n.prop('md_pagelengths_10'), $.i18n.prop('md_pagelengths_25'), $.i18n.prop('md_pagelengths_50'), $.i18n.prop('md_pagelengths_100'), $.i18n.prop('md_pagelengths_all')]],
 			"orderCellsTop": true,
 			"data": data,
-//			"ajax": {
-//				"url": "/api/conversations/unhidden",
-//				"dataSrc": ""
-//			},
 			"columns": [
 				{
 					"data": "participant",
@@ -130,9 +126,6 @@ $(document).ready(function() {
 				},
 				{
 					"data": "numMessages"
-				},
-				{
-					"data": "hideConversation"
 				}
 			],
 			"initComplete": function() {
