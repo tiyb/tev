@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tumblr version="1.0">
 	<posts>
+		<!--  Regular post -->
 		<post id="180894436671" url="https://mainblog.tumblr.com/post/180894436671" url-with-slug="https://mainblog.tumblr.com/post/180894436671/first-post" type="regular" date-gmt="2018-12-07 16:48:43 GMT" date="Fri, 07 Dec 2018 11:48:43" unix-timestamp="1544201323" format="html" reblog-key="O6pLVlp1" slug="first-post" state="published" is_reblog="true" tumblelog="mainblog">
 			<regular-title>First Post</regular-title>
 			<regular-body>post body text here</regular-body>
 			<tag>tag1</tag>
 			<tag>tag2</tag>
 		</post>
+		
+		<!-- draft post -->
 		<post id="190097591599" url="https://mainblog.tumblr.com/post/190097591599" url-with-slug="https://mainblog.tumblr.com/post/190097591599/draft-post" type="regular" date-gmt="2018-12-07 16:48:43 GMT" date="Fri, 07 Dec 2018 11:48:43" unix-timestamp="1544201323" format="html" reblog-key="O6pLVlp1" slug="draft-post" state="draft" is_reblog="true" tumblelog="mainblog">
 			<regular-title>Draft Post</regular-title>
 			<regular-body>post body text here</regular-body>
 			<tag>tag1</tag>
 			<tag>tag2</tag>
 		</post>
+		
+		<!-- queued post -->
 		<post id="778563537472" url="https://mainblog.tumblr.com/post/778563537472" url-with-slug="https://mainblog.tumblr.com/post/778563537472/queued-post" type="regular" date-gmt="2018-12-07 16:48:43 GMT" date="Fri, 07 Dec 2018 11:48:43" unix-timestamp="1544201323" format="html" reblog-key="O6pLVlp1" slug="queued-post" state="queued" is_reblog="true" tumblelog="mainblog">
 			<regular-title>Queued Post</regular-title>
 			<regular-body>post body text here</regular-body>
 			<tag>tag1</tag>
 			<tag>tag2</tag>
 		</post>
+		
+		<!-- photo post; single photo -->
 		<post id="180784644740" url="https://mainblog.tumblr.com/post/180784644740" url-with-slug="https://mainblog.tumblr.com/post/180784644740/new-slug" type="photo" date-gmt="2018-12-04 07:17:52 GMT" date="Tue, 04 Dec 2018 02:17:52" unix-timestamp="1543907872" format="html" reblog-key="Pius5FOw" slug="new-slug" state="published" is_reblog="true" tumblelog="mainblog" width="500" height="750">
 			<photo-caption>This is the caption for a photo post</photo-caption>
 			<photo-link-url>http://bit.ly/some-photo</photo-link-url>
@@ -31,6 +38,8 @@
 			<tag>tag3</tag>
 			<tag>tag4</tag>
 		</post>
+		
+		<!--  video post -->
 		<post id="180782992914" url="https://mainblog.tumblr.com/post/180782992914" url-with-slug="https://mainblog.tumblr.com/post/180782992914/another-slug" type="video" date-gmt="2018-12-04 06:09:21 GMT" date="Tue, 04 Dec 2018 01:09:21" unix-timestamp="1543903761" format="html" reblog-key="IPc1CZyV" slug="another-slug" state="published" is_reblog="true" tumblelog="mainblog" direct-video="true">
 			<video-source>
 				<content-type>video/mp4</content-type>
@@ -63,17 +72,23 @@
 			<tag>tag9</tag>
 			<tag>tag10</tag>
 		</post>
+		
+		<!-- Answer post -->
 		<post id="180371366195" url="https://mainblog.tumblr.com/post/180371366195" url-with-slug="https://mainblog.tumblr.com/post/180371366195/slug-slug-slug" type="answer" date-gmt="2018-11-22 08:26:25 GMT" date="Thu, 22 Nov 2018 03:26:25" unix-timestamp="1542875185" format="html" reblog-key="OQqor1Zh" slug="slug-slug-slug" state="published" is_reblog="true" tumblelog="mainblog">
 			<question>Question text</question>
 			<answer>Answer text</answer>
 			<tag>tag2</tag>
 		</post>
+		
+		<!-- Link post -->
 		<post id="180265557725" url="https://mainblog.tumblr.com/post/180265557725" url-with-slug="https://mainblog.tumblr.com/post/180265557725/tumblr" type="link" date-gmt="2018-11-19 06:09:08 GMT" date="Mon, 19 Nov 2018 01:09:08" unix-timestamp="1542607748" format="html" reblog-key="6pFgAxH2" slug="tumblr" state="published" is_reblog="false" tumblelog="mainblog">
 			<link-text>Tumblr</link-text>
 			<link-url>https://someblog.tumblr.com/</link-url>
 			<link-description>This is the link description</link-description>
 			<tag>tag1</tag>
 		</post>
+		
+		<!--  photo post; multiple photos -->
 		<post id="180254465582" url="https://mainblog.tumblr.com/post/180254465582" url-with-slug="https://mainblog.tumblr.com/post/180254465582/slugs-are-delicious" type="photo" date-gmt="2018-11-18 23:17:36 GMT" date="Sun, 18 Nov 2018 18:17:36" unix-timestamp="1542583056" format="html" reblog-key="jTxuwC0o" slug="slugs-are-delicious" state="published" is_reblog="true" tumblelog="mainblog" width="692" height="583">
 			<photo-caption>This is hte photo caption</photo-caption>
 			<photo-url max-width="1280">photo 2 1280</photo-url>
@@ -106,5 +121,11 @@
 			<tag>tag14</tag>
 			<tag>tag15</tag>
 		</post>
+		
+		<!--  Regular post with no hashtags -->
+		<post id="190894436671" url="https://mainblog.tumblr.com/post/190894436671" url-with-slug="https://mainblog.tumblr.com/post/190894436671/no-tags" type="regular" date-gmt="2018-12-07 16:48:43 GMT" date="Fri, 07 Dec 2018 11:48:43" unix-timestamp="1544201323" format="html" reblog-key="O6pLVlp1" slug="no-tags" state="published" is_reblog="true" tumblelog="mainblog">
+			<regular-title>Post with no tags</regular-title>
+			<regular-body>post body text here</regular-body>
+		</post>		
 	</posts>
 </tumblr>

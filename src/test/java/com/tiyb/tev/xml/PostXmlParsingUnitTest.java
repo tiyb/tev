@@ -65,6 +65,11 @@ public class PostXmlParsingUnitTest {
 	private static final long addedRegularPostID = 180894436672L;
 	private static final long draftRegularPostID = 190097591599L;
 	private static final long queuedRegularPostID = 778563537472L;
+	
+	private static final int ORIGINAL_NUM_POSTS = 7;
+	private static final int ORIGINAL_NUM_REG_POSTS = 2;
+	private static final int EXTENDED_NUM_POSTS = 8;
+	private static final int EXTENDED_NUM_REG_POSTS = 3;
 
 	private static final List<Hashtag> INITIAL_HASHTAGS = Arrays.asList(new Hashtag("tag1", 2), new Hashtag("tag2", 2),
 			new Hashtag("tag3", 1), new Hashtag("tag4", 1), new Hashtag("tag5", 1), new Hashtag("tag6", 1),
@@ -104,7 +109,7 @@ public class PostXmlParsingUnitTest {
 	public void testAllPosts() {
 		List<Post> posts = postController.getAllPosts();
 		assertThat(posts).isNotNull();
-		assertThat(posts.size()).isEqualTo(6);
+		assertThat(posts.size()).isEqualTo(ORIGINAL_NUM_POSTS);
 
 		List<Post> answerPosts = postController.getPostsByType("answer");
 		assertThat(answerPosts).isNotNull();
@@ -116,7 +121,7 @@ public class PostXmlParsingUnitTest {
 
 		List<Post> regularPosts = postController.getPostsByType("regular");
 		assertThat(regularPosts).isNotNull();
-		assertThat(regularPosts.size()).isEqualTo(1);
+		assertThat(regularPosts.size()).isEqualTo(ORIGINAL_NUM_REG_POSTS);
 
 		List<Post> linkPosts = postController.getPostsByType("link");
 		assertThat(linkPosts).isNotNull();
@@ -223,7 +228,7 @@ public class PostXmlParsingUnitTest {
 		assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180894436671");
 		assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180894436671/first-post");
 
-		assertThat(postController.getAllRegulars().size()).isEqualTo(1);
+		assertThat(postController.getAllRegulars().size()).isEqualTo(ORIGINAL_NUM_REG_POSTS);
 		Regular regular = postController.getRegularById(regularPostID);
 		assertThat(regular).isNotNull();
 		assertThat(regular.getPostId()).isEqualTo(regularPostID);
@@ -393,7 +398,7 @@ public class PostXmlParsingUnitTest {
 	@Test
 	public void testAddingPosts() throws FileNotFoundException {
 		List<Post> posts = postController.getAllPosts();
-		assertThat(posts.size()).isEqualTo(6);
+		assertThat(posts.size()).isEqualTo(ORIGINAL_NUM_POSTS);
 
 		for (Post post : posts) {
 			postController.markPostRead(post.getId());
@@ -408,9 +413,9 @@ public class PostXmlParsingUnitTest {
 		BlogXmlReader.parseDocument(xmlFile, postController, mdController);
 
 		posts = postController.getAllPosts();
-		assertThat(posts.size()).isEqualTo(7);
+		assertThat(posts.size()).isEqualTo(EXTENDED_NUM_POSTS);
 
-		assertThat(postController.getAllRegulars().size()).isEqualTo(2);
+		assertThat(postController.getAllRegulars().size()).isEqualTo(EXTENDED_NUM_REG_POSTS);
 		Regular regular = postController.getRegularById(addedRegularPostID);
 		assertThat(regular).isNotNull();
 		assertThat(regular.getPostId()).isEqualTo(addedRegularPostID);
