@@ -235,10 +235,15 @@ public class BlogXmlReader extends TEVXmlReader {
 						}
 						if (isSubmitablePost) {
 							post = postRestController.updatePost(post.getId(), post);
-							List<String> individualTags = Arrays.asList(post.getTags().split(","));
-							for (String tag : individualTags) {
-								tag = tag.trim();
-								postRestController.createHashtag(tag);
+							if(post.getTags().length() > 0) {
+								List<String> individualTags = Arrays.asList(post.getTags().split(","));
+								for (String tag : individualTags) {
+									tag = tag.trim();
+									if(tag.equals("")) {
+										logger.error("A hashtag was empty from this list: " + post.getTags());
+									}
+									postRestController.createHashtag(tag);
+								}
 							}
 						}
 					}
