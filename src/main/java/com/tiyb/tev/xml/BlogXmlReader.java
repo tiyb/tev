@@ -270,14 +270,13 @@ public class BlogXmlReader extends TEVXmlReader {
 	 *                     which the data from each element should be added
 	 */
 	private static void readPostAttributes(StartElement startElement, Post post) {
-		@SuppressWarnings("unchecked")
 		Iterator<Attribute> atts = startElement.getAttributes();
 		while (atts.hasNext()) {
 			Attribute att = atts.next();
 			String attName = att.getName().getLocalPart();
 			switch (attName) {
 			case "id":
-				post.setId(new Long(att.getValue()));
+				post.setId(Long.parseLong(att.getValue()));
 				break;
 			case "url":
 				post.setUrl(att.getValue());
@@ -295,7 +294,7 @@ public class BlogXmlReader extends TEVXmlReader {
 				post.setDate(att.getValue());
 				break;
 			case "unix-timestamp":
-				post.setUnixtimestamp(new Long(att.getValue()));
+				post.setUnixtimestamp(Long.parseLong(att.getValue()));
 				break;
 			case "format":
 				// attribute not used
@@ -310,7 +309,7 @@ public class BlogXmlReader extends TEVXmlReader {
 				post.setState(att.getValue());
 				break;
 			case "is_reblog":
-				post.setIsReblog(new Boolean(att.getValue()));
+				post.setIsReblog(Boolean.parseBoolean(att.getValue()));
 				break;
 			case "tumblelog":
 				post.setTumblelog(att.getValue());
@@ -705,11 +704,11 @@ public class BlogXmlReader extends TEVXmlReader {
 				} else if (se.getName().getLocalPart().equals("extension")) {
 					video.setExtension(readCharacters(reader));
 				} else if (se.getName().getLocalPart().equals("width")) {
-					video.setWidth(new Integer(readCharacters(reader)));
+					video.setWidth(Integer.parseInt(readCharacters(reader)));
 				} else if (se.getName().getLocalPart().equals("height")) {
-					video.setHeight(new Integer(readCharacters(reader)));
+					video.setHeight(Integer.parseInt(readCharacters(reader)));
 				} else if (se.getName().getLocalPart().equals("duration")) {
-					video.setDuration(new Integer(readCharacters(reader)));
+					video.setDuration(Integer.parseInt(readCharacters(reader)));
 				} else if (se.getName().getLocalPart().equals("revision")) {
 					video.setRevision(readCharacters(reader));
 				} else if (se.getName().getLocalPart().equals("video-caption")) {
