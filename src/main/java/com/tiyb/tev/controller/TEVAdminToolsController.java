@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -79,14 +81,14 @@ public class TEVAdminToolsController {
 	 * @return Success indicator
 	 */
 	@GetMapping("/posts/markAllRead")
-	public String markAllPostsRead() {
+	public ResponseEntity<String> markAllPostsRead() {
 		List<Post> posts = postController.getAllPosts();
 
 		for (Post post : posts) {
 			postController.markPostRead(post.getId());
 		}
 
-		return "Success";
+		return new ResponseEntity<String>("Success", null, HttpStatus.OK);
 	}
 
 	/**
@@ -95,14 +97,14 @@ public class TEVAdminToolsController {
 	 * @return Success indicator
 	 */
 	@GetMapping("/posts/markAllUnread")
-	public String markAllPostsUnread() {
+	public ResponseEntity<String> markAllPostsUnread() {
 		List<Post> posts = postController.getAllPosts();
 
 		for (Post post : posts) {
 			postController.markPostUnread(post.getId());
 		}
 
-		return "Success";
+		return new ResponseEntity<String>("Success", null, HttpStatus.OK);
 	}
 
 	/**
@@ -117,11 +119,11 @@ public class TEVAdminToolsController {
 	 * @return String indicating the success or failure of the process
 	 */
 	@GetMapping("/posts/cleanImagesOnHD")
-	public String cleanImagesOnHD() {
+	public ResponseEntity<String> cleanImagesOnHD() {
 		String imageDirectory = mdController.getMetadata().getBaseMediaPath();
 		if (imageDirectory == null || imageDirectory.equals("")) {
 			logger.error("Invalid image directory used for cleanImagesOnHD: " + imageDirectory);
-			return "Invalid image directory";
+			return new ResponseEntity<String>("Invalid image directory", null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		if (imageDirectory.charAt(imageDirectory.length() - 1) != '/') {
@@ -147,7 +149,7 @@ public class TEVAdminToolsController {
 				}
 			}
 		}
-		return "success";
+		return new ResponseEntity<String>("success", null, HttpStatus.OK);
 	}
 
 }
