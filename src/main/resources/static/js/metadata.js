@@ -109,13 +109,52 @@ $(document).ready(function () {
 			data: JSON.stringify(metadataObject),
 			contentType: 'application/json',
 			success: function(data, textStatus, xhr) {
-				alert("data successfully submitted");
+				alert($.i18n.prop('md_submit_success'));
 			},
 			error: function(xhr, textStatus, errorThrown) {
-				alert("error submitting data");
+				alert($.i18n.prop('md_submit_failure'));
 			}
 		});
-	});	
+	});
+	
+	$('#markAllPostsReadButton').click(function() {
+		$.ajax({
+			url: '/admintools/posts/markAllRead',
+			type: 'GET',
+			success: function(data, textStatus, xhr) {
+				alert($.i18n.prop('md_admintools_markAllReadSuccess'));
+			},
+			error: function(xhr, textStatus, errorThrown) {
+				alert($.i18n.prop('md_admintools_markAllReadFailure'));
+			}
+		});
+	});
+	
+	$('#markAllPostsUnreadButton').click(function() {
+		$.ajax({
+			url: '/admintools/posts/markAllUnread',
+			type: 'GET',
+			success: function(data, textStatus, xhr) {
+				alert($.i18n.prop('md_admintools_markAllUnreadSuccess'));
+			},
+			error: function(xhr, textStatus, errorThrown) {
+				alert($.i18n.prop('md_admintools_markAllUnreadFailure'));
+			}
+		});
+	});
+	
+	$('#cleanImagesButton').click(function() {
+		$.ajax({
+			url: '/admintools/posts/cleanImagesOnHD',
+			type: 'GET',
+			success: function(data, textStatus, xhr) {
+				alert($.i18n.prop('md_admintools_cleanImagesSuccess'));
+			},
+			error: function(xhr, textStatus, errorThrown) {
+				alert($.i18n.prop('md_admintools_cleanImagesFailure'));
+			}
+		});
+	});
 });
 
 function getTranslatedNameForColumn(columnName) {
