@@ -28,4 +28,4 @@
 /hsql/
 
 ### other ###
-*.log
+*.log*
