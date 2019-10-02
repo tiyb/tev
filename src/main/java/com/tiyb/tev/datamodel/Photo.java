@@ -220,4 +220,8 @@ public class Photo implements Serializable {
 	public void setUrl75(String url75) {
 		this.url75 = url75;
 	}
+
+	public Long getId() {
+		return id;
+	}
 }
