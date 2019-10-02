@@ -2,6 +2,7 @@ package com.tiyb.tev.controller;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PreDestroy;
@@ -120,6 +121,7 @@ public class TEVAdminToolsController {
 	 */
 	@GetMapping("/posts/cleanImagesOnHD")
 	public ResponseEntity<String> cleanImagesOnHD() {
+		ArrayList<String> allCleanFiles = new ArrayList<String>();
 		String imageDirectory = mdController.getMetadata().getBaseMediaPath();
 		if (imageDirectory == null || imageDirectory.equals("")) {
 			logger.error("Invalid image directory used for cleanImagesOnHD: " + imageDirectory);
@@ -129,13 +131,14 @@ public class TEVAdminToolsController {
 		if (imageDirectory.charAt(imageDirectory.length() - 1) != '/') {
 			imageDirectory = imageDirectory + "/";
 		}
+		
+		File folder = new File(imageDirectory);
 
 		List<Post> photoPosts = postController.getPostsByType("photo");
 		for (Post post : photoPosts) {
 			List<Photo> photosForPost = postController.getPhotoById(post.getId());
 			int numPhotos = photosForPost.size();
 
-			File folder = new File(imageDirectory);
 			File[] imagesForPost = folder.listFiles(new FilenameFilter() {
 				@Override
 				public boolean accept(File dir, String name) {
@@ -147,6 +150,16 @@ public class TEVAdminToolsController {
 				for (int i = numPhotos; i < imagesForPost.length; i++) {
 					imagesForPost[i].delete();
 				}
+			}
+			for(int i = 0; i < imagesForPost.length; i++) {
+				allCleanFiles.add(imagesForPost[i].getName());
+			}
+		}
+		
+		File[] remainingImages = folder.listFiles();
+		for(int i = 0; i < remainingImages.length; i++) {
+			if(!allCleanFiles.contains(remainingImages[i].getName())) {
+				remainingImages[i].delete();
 			}
 		}
 		return new ResponseEntity<String>("success", null, HttpStatus.OK);
