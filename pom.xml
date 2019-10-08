@@ -95,9 +95,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<!-- downgrading to a previous version of the plugin, since the apiviz 
-					plugin doesn't seem to work with the newer maven-javadoc-plugin -->
-				<version>2.5</version><!--$NO-MVN-MAN-VER$ -->
 				<configuration>
 					<doclet>org.jboss.apiviz.APIviz</doclet>
 					<docletArtifact>
