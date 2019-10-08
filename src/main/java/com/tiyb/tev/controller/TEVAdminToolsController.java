@@ -2,6 +2,9 @@ package com.tiyb.tev.controller;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,7 +47,7 @@ import com.tiyb.tev.datamodel.Post;
 @RestController
 @RequestMapping("/admintools")
 public class TEVAdminToolsController {
-	
+
 	Logger logger = LoggerFactory.getLogger(TEVAdminToolsController.class);
 
 	/**
@@ -125,13 +130,13 @@ public class TEVAdminToolsController {
 		String imageDirectory = mdController.getMetadata().getBaseMediaPath();
 		if (imageDirectory == null || imageDirectory.equals("")) {
 			logger.error("Invalid image directory used for cleanImagesOnHD: " + imageDirectory);
-			return new ResponseEntity<String>("Invalid image directory", null, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<String>("Invalid image directory", null, HttpStatus.BAD_REQUEST);
 		}
 
 		if (imageDirectory.charAt(imageDirectory.length() - 1) != '/') {
 			imageDirectory = imageDirectory + "/";
 		}
-		
+
 		File folder = new File(imageDirectory);
 
 		List<Post> photoPosts = postController.getPostsByType("photo");
@@ -151,18 +156,65 @@ public class TEVAdminToolsController {
 					imagesForPost[i].delete();
 				}
 			}
-			for(int i = 0; i < imagesForPost.length; i++) {
+			for (int i = 0; i < imagesForPost.length; i++) {
 				allCleanFiles.add(imagesForPost[i].getName());
 			}
 		}
-		
+
 		File[] remainingImages = folder.listFiles();
-		for(int i = 0; i < remainingImages.length; i++) {
-			if(!allCleanFiles.contains(remainingImages[i].getName())) {
+		for (int i = 0; i < remainingImages.length; i++) {
+			if (!allCleanFiles.contains(remainingImages[i].getName())) {
 				remainingImages[i].delete();
 			}
 		}
 		return new ResponseEntity<String>("success", null, HttpStatus.OK);
+	}
+
+	/**
+	 * Copies all files from a source directory (posted as the body of the request)
+	 * to the images directory stored in the metadata. Calls the
+	 * {@link #cleanImagesOnHD()} method when it's done, to clean the directory back
+	 * up.
+	 * 
+	 * @param imagePath The path of the source directory, from whence images should
+	 *                  be retrieved.
+	 * @return Success/failure message
+	 */
+	@PostMapping("/posts/importImages")
+	public ResponseEntity<String> importImages(@RequestBody String imagePath) {
+		String imageDirectory = mdController.getMetadata().getBaseMediaPath();
+		if (imageDirectory == null || imageDirectory.equals("")) {
+			logger.error("Invalid image directory used for importImages: " + imageDirectory);
+			return new ResponseEntity<String>("Invalid image directory in metadata", null, HttpStatus.BAD_REQUEST);
+		}
+
+		if (imageDirectory.charAt(imageDirectory.length() - 1) != '/') {
+			imageDirectory = imageDirectory + "/";
+		}
+
+		File destinationFolder = new File(imageDirectory);
+		if (!destinationFolder.isDirectory()) {
+			return new ResponseEntity<String>("Invalid image direcory in metadata", null, HttpStatus.BAD_REQUEST);
+		}
+		Path destinationFolderPath = destinationFolder.toPath();
+
+		File sourceFolder = new File(imagePath);
+		if (!sourceFolder.isDirectory()) {
+			return new ResponseEntity<String>("Invalid source image direcory", null, HttpStatus.BAD_REQUEST);
+		}
+
+		File[] sourceFiles = sourceFolder.listFiles();
+		for (File inputFile : sourceFiles) {
+			Path inputFilePath = inputFile.toPath();
+			try {
+				Files.copy(inputFilePath, destinationFolderPath.resolve(inputFilePath.getFileName()));
+			} catch (IOException e) {
+				logger.error("Error copying file from source to destination: " + inputFilePath.getFileName());
+				return new ResponseEntity<String>("Error copying files", null, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+
+		return cleanImagesOnHD();
 	}
 
 }
