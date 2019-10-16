@@ -40,9 +40,6 @@ import com.tiyb.tev.datamodel.Post;
  * </p>
  * 
  * @author tiyb
- * @apiviz.landmark
- * @apiviz.uses org.springframework.jdbc.core.JdbcTemplate
- * @apiviz.uses com.tiyb.tev.controller.TEVPostRestController
  */
 @RestController
 @RequestMapping("/admintools")

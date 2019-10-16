@@ -15,8 +15,6 @@ import javax.persistence.Table;
  * system.
  * 
  * @author tiyb
- * @apiviz.landmark
- *
  */
 @Entity
 @Table(name = "conversation_message")

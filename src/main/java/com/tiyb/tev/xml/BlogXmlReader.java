@@ -67,8 +67,6 @@ import com.tiyb.tev.exception.XMLParsingException;
  * </p>
  * 
  * @author tiyb
- * @apiviz.landmark
- * @apiviz.uses javax.xml.stream.XMLEventReader
  */
 public class BlogXmlReader extends TEVXmlReader {
 

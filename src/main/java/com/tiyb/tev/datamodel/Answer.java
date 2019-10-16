@@ -12,8 +12,6 @@ import javax.persistence.Table;
  * Encapsulates the data needed for a Tumblr "Answer" style of post
  * 
  * @author tiyb
- * @apiviz.landmark
- *
  */
 @Entity
 @Table(name = "answer")

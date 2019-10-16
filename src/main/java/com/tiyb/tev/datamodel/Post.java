@@ -14,8 +14,6 @@ import javax.persistence.Table;
  * the posts' content.
  * 
  * @author tiyb
- * @apiviz.landmark
- *
  */
 @Entity
 @Table(name = "post")

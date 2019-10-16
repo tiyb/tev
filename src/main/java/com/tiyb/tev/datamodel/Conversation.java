@@ -12,8 +12,6 @@ import javax.persistence.Table;
  * Entity representing a conversation, from Tumblr's messaging system
  * 
  * @author tiyb
- * @apiviz.landmark
- *
  */
 @Entity
 @Table(name = "conversation")

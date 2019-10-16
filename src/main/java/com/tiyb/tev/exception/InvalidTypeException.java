@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * Tumblr/TEV
  * 
  * @author tiyb
- * @apiviz.landmark
  */
 @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
 public class InvalidTypeException extends RuntimeException {

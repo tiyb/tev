@@ -44,14 +44,6 @@ import com.tiyb.tev.repository.VideoRepository;
  * </p>
  * 
  * @author tiyb
- * @apiviz.landmark
- * @apiviz.uses com.tiyb.tev.repository.AnswerRepository
- * @apiviz.uses com.tiyb.tev.repository.LinkRepository
- * @apiviz.uses com.tiyb.tev.repository.PhotoRepository
- * @apiviz.uses com.tiyb.tev.repository.PostRepository
- * @apiviz.uses com.tiyb.tev.repository.RegularRepository
- * @apiviz.uses com.tiyb.tev.repository.VideoRepository
- *
  */
 @RestController
 @RequestMapping("/api")

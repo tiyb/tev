@@ -12,8 +12,6 @@ import javax.persistence.Table;
  * Encapsulates the data needed for a Tumblr "Video" style of post
  * 
  * @author tiyb
- * @apiviz.landmark
- *
  */
 @Entity
 @Table(name = "video")

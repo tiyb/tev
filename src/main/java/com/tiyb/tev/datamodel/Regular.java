@@ -13,8 +13,6 @@ import javax.persistence.Table;
  * normal text post)
  * 
  * @author tiyb
- * @apiviz.landmark
- *
  */
 @Entity
 @Table(name = "regular")

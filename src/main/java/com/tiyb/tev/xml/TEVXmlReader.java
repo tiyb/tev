@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
  * redundant code.
  * 
  * @author tiyb
- * @apiviz.landmark
  */
 public class TEVXmlReader {
 	

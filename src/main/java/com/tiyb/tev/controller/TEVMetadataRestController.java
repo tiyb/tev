@@ -20,8 +20,6 @@ import com.tiyb.tev.repository.MetadataRepository;
  * REST controller for working with the application's Metadata -- it's settings.
  * 
  * @author tiyb
- * @apiviz.landmark
- * @apiviz.uses com.tiyb.tev.repository.MetadataRepository
  */
 @RestController
 @RequestMapping("/api")

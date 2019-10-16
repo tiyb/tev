@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * for cases where XML file uploads have failed.
  * 
  * @author tiyb
- * @apiviz.landmark
  */
 @Controller
 public class TEVErrorController implements ErrorController {

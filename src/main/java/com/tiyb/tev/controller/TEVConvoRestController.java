@@ -26,9 +26,6 @@ import com.tiyb.tev.repository.ConversationRepository;
  * REST controller for working with Conversations.
  * 
  * @author tiyb
- * @apiviz.landmark
- * @apiviz.uses com.tiyb.tev.repository.ConversationRepository
- * @apiviz.uses com.tiyb.tev.repository.ConversationMessageRepository
  */
 @RestController
 @RequestMapping("/api")

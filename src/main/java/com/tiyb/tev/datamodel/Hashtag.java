@@ -13,7 +13,6 @@ import javax.validation.constraints.NotBlank;
  * Entity for storing hashtags in the DB
  * 
  * @author tiyb
- * @apiviz.landmark
  */
 @Entity
 @Table(name = "hashtag")

@@ -27,8 +27,6 @@ import javax.persistence.Table;
  * values.
  * 
  * @author tiyb
- * @apiviz.landmark
- *
  */
 @Entity
 @Table(name = "metadata")

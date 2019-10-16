@@ -13,8 +13,6 @@ import javax.validation.constraints.NotBlank;
  * Encapsulates the data needed for a Tumblr "Link" style of post
  * 
  * @author tiyb
- * @apiviz.landmark
- *
  */
 @Entity
 @Table(name = "link")

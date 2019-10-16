@@ -41,9 +41,6 @@ import com.tiyb.tev.exception.XMLParsingException;
  * </ul>
  * 
  * @author tiyb
- * @apiviz.landmark
- * @apiviz.uses javax.xml.stream.XMLEventReader
- *
  */
 public class ConversationXmlReader extends TEVXmlReader {
 	

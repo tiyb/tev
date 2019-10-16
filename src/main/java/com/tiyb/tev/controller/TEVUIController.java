@@ -47,10 +47,6 @@ import com.tiyb.tev.xml.ConversationXmlReader;
  * Controller for all UI (HTML pages / jQuery-enabled) for the TEV application.
  * 
  * @author tiyb
- * @apiviz.landmark
- * @apiviz.uses com.tiyb.tev.controller.TEVPostRestController
- * @apiviz.uses com.tiyb.tev.controller.TEVConvoRestController
- * @apiviz.uses com.tiyb.tev.controller.TEVMetadataRestController
  */
 @Controller
 public class TEVUIController {

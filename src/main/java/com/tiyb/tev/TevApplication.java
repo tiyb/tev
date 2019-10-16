@@ -46,7 +46,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * </p>
  * 
  * @author tiyb
- * @apiviz.landmark
  */
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
