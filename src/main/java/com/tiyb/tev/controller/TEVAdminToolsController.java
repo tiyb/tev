@@ -13,6 +13,7 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,6 +65,28 @@ public class TEVAdminToolsController {
 	 */
 	@Autowired
 	private TEVMetadataRestController mdController;
+	
+	/**
+	 * Success message returned from the API. Not actually a "constant," it's
+	 * injected at runtime by Spring Boot, but named like one because it's being
+	 * treated like one in the code.
+	 */
+	@Value("${controllers.admintools.success}")
+	private String SUCCESS_MESSAGE;
+	
+	/**
+	 * Message returned from the API when the images directory in metadata is
+	 * invalid. Not actually a "constant," it's injected at runtime by Spring Boot,
+	 * but named like one because it's being treated like one in the code.
+	 */
+	@Value("${controllers.admintools.invalidImagesDirectory}")
+	private String INVALID_IMAGES_MESSAGE;
+	
+	@Value("${controllers.admintools.invalidSourceImagesDirectory}")
+	private String INVALID_SOURCEIMAGES_MESSAGE;
+	
+	@Value("${controllers.admintools.errorCopyingFiles}")
+	private String ERROR_COPYINGFILES_MESSAGE;
 
 	/**
 	 * Used to compact the database upon shutdown. This causes shutdown to take
@@ -91,7 +114,7 @@ public class TEVAdminToolsController {
 			postController.markPostRead(post.getId());
 		}
 
-		return new ResponseEntity<String>("Success", null, HttpStatus.OK);
+		return new ResponseEntity<String>(SUCCESS_MESSAGE, null, HttpStatus.OK);
 	}
 
 	/**
@@ -107,7 +130,7 @@ public class TEVAdminToolsController {
 			postController.markPostUnread(post.getId());
 		}
 
-		return new ResponseEntity<String>("Success", null, HttpStatus.OK);
+		return new ResponseEntity<String>(SUCCESS_MESSAGE, null, HttpStatus.OK);
 	}
 
 	/**
@@ -127,7 +150,7 @@ public class TEVAdminToolsController {
 		String imageDirectory = mdController.getMetadata().getBaseMediaPath();
 		if (imageDirectory == null || imageDirectory.equals("")) {
 			logger.error("Invalid image directory used for cleanImagesOnHD: " + imageDirectory);
-			return new ResponseEntity<String>("Invalid image directory", null, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<String>(INVALID_IMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
 		}
 
 		if (imageDirectory.charAt(imageDirectory.length() - 1) != '/') {
@@ -164,7 +187,7 @@ public class TEVAdminToolsController {
 				remainingImages[i].delete();
 			}
 		}
-		return new ResponseEntity<String>("success", null, HttpStatus.OK);
+		return new ResponseEntity<String>(SUCCESS_MESSAGE, null, HttpStatus.OK);
 	}
 
 	/**
@@ -182,7 +205,7 @@ public class TEVAdminToolsController {
 		String imageDirectory = mdController.getMetadata().getBaseMediaPath();
 		if (imageDirectory == null || imageDirectory.equals("")) {
 			logger.error("Invalid image directory used for importImages: " + imageDirectory);
-			return new ResponseEntity<String>("Invalid image directory in metadata", null, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<String>(INVALID_IMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
 		}
 
 		if (imageDirectory.charAt(imageDirectory.length() - 1) != '/') {
@@ -191,13 +214,13 @@ public class TEVAdminToolsController {
 
 		File destinationFolder = new File(imageDirectory);
 		if (!destinationFolder.isDirectory()) {
-			return new ResponseEntity<String>("Invalid image direcory in metadata", null, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<String>(INVALID_IMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
 		}
 		Path destinationFolderPath = destinationFolder.toPath();
 
 		File sourceFolder = new File(imagePath);
 		if (!sourceFolder.isDirectory()) {
-			return new ResponseEntity<String>("Invalid source image direcory", null, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<String>(INVALID_SOURCEIMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
 		}
 
 		File[] sourceFiles = sourceFolder.listFiles();
@@ -207,7 +230,7 @@ public class TEVAdminToolsController {
 				Files.copy(inputFilePath, destinationFolderPath.resolve(inputFilePath.getFileName()));
 			} catch (IOException e) {
 				logger.error("Error copying file from source to destination: " + inputFilePath.getFileName());
-				return new ResponseEntity<String>("Error copying files", null, HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ResponseEntity<String>(ERROR_COPYINGFILES_MESSAGE, null, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 
