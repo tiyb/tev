@@ -129,9 +129,12 @@
 					<td colspan="2">
 						<h2 th:text="#{metadata.adminButtonsTitle}"></h2>
 						<p th:utext="#{metadata.adminButtonsExplanatoryText}"></p>
-						<input type="submit" th:value="#{metadata.adminButtonsMarkAllPostReadButton}" id="markAllPostsReadButton"/>
+						<p><input type="submit" th:value="#{metadata.adminButtonsMarkAllPostReadButton}" id="markAllPostsReadButton"/>
 						<input type="submit" th:value="#{metadata.adminButtonsMarkAllPostUnreadButton}" id="markAllPostsUnreadButton"/>
-						<input type="submit" th:value="#{metadata.adminButtonsCleanImagesButton}" id="cleanImagesButton"/>
+						<input type="submit" th:value="#{metadata.adminButtonsCleanImagesButton}" id="cleanImagesButton"/></p>
+						<p>
+						<input type="text" id="importImagesPath" />
+						<input type="submit" th:value="#{metadata.adminButtonsImportImagesButton}" id="importImagesButton"/></p>
 					</td>
 				</tr>
 			</table>

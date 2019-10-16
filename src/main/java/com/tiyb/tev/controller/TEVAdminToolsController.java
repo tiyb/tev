@@ -214,12 +214,14 @@ public class TEVAdminToolsController {
 
 		File destinationFolder = new File(imageDirectory);
 		if (!destinationFolder.isDirectory()) {
+			logger.error("Images directory in metadata is not a valid directory: " + imageDirectory);
 			return new ResponseEntity<String>(INVALID_IMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
 		}
 		Path destinationFolderPath = destinationFolder.toPath();
 
 		File sourceFolder = new File(imagePath);
 		if (!sourceFolder.isDirectory()) {
+			logger.error("Invalid source directory passed to import images: " + imagePath);
 			return new ResponseEntity<String>(INVALID_SOURCEIMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
 		}
 

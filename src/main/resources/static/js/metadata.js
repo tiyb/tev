@@ -155,6 +155,27 @@ $(document).ready(function () {
 			}
 		});
 	});
+	
+	$('#importImagesButton').click(function() {
+		if($('#importImagesPath').val().length < 1) {
+			alert($.i18n.prop('md_admintools_importImagesBadPath'));
+			return;
+		}
+		
+		$.ajax({
+			url: '/admintools/posts/importImages',
+			type: 'POST',
+			data: $('#importImagesPath').val(),
+			async: false,
+			contentType: 'text/plain',
+			success: function(data, textStatus, xhr) {
+				alert($.i18n.prop('md_admintools_importImagesSuccess'));
+			},
+			error: function(xhr, textStatus, errorThrown) {
+				alert($.i18n.prop('md_admintools_importImagesFailure'));
+			}
+		});
+	});
 });
 
 function getTranslatedNameForColumn(columnName) {
