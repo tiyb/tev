@@ -3,6 +3,7 @@ package com.tiyb.tev.controller;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -97,7 +98,7 @@ public class TEVAdminToolsController {
 		try {
 			jdbcTemplate.execute("SHUTDOWN COMPACT");
 		} catch (DataAccessException e) {
-			logger.error("Error encountered in preDestroy methodL ", e);
+			logger.error("Error encountered in preDestroy method: ", e);
 		}
 	}
 
@@ -230,8 +231,12 @@ public class TEVAdminToolsController {
 			Path inputFilePath = inputFile.toPath();
 			try {
 				Files.copy(inputFilePath, destinationFolderPath.resolve(inputFilePath.getFileName()));
+			} catch(FileAlreadyExistsException e) {
+				logger.debug("File already exists: " + inputFilePath.getFileName());
+				// Skip copying files that don't exist
 			} catch (IOException e) {
 				logger.error("Error copying file from source to destination: " + inputFilePath.getFileName());
+				logger.debug("File Copy Error:", e);
 				return new ResponseEntity<String>(ERROR_COPYINGFILES_MESSAGE, null, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}

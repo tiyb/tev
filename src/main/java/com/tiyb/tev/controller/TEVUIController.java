@@ -330,7 +330,7 @@ public class TEVUIController {
 			in.close();
 			out.close();
 		} catch (IOException e) {
-			logger.error("IO exception reading video file");
+			logger.error("IO exception reading video file", e);
 			throw new ResourceNotFoundException(fullName, fullName, e);
 		}
 	}
