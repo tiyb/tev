@@ -2,12 +2,12 @@ var metadata;
 
 var ID_COLUMN_NO = 0;
 var TYPE_COLUMN_NO = 1;
-var STATE_COLUMN_NO = -1;
-var SLUG_COLUMN_NO = 2;
-var HASHTAGS_COLUMN_NO = 3;
-var DATE_COLUMN_NO = 4;
-var FAV_COLUMN_NO = 5;
-var READ_COLUMN_NO = 6;
+var STATE_COLUMN_NO = 2;
+var SLUG_COLUMN_NO = 3;
+var HASHTAGS_COLUMN_NO = 4;
+var DATE_COLUMN_NO = 5;
+var FAV_COLUMN_NO = 6;
+var READ_COLUMN_NO = 7;
 
 $.i18n.properties({
 	name: 'messages',
