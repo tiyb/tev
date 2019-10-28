@@ -110,7 +110,7 @@ $(document).ready(function() {
 				{
 					"data": "date",
 					"render": function(data,type,row,meta) {
-						return "<div class='clickableTableValue'>" + data + "</div>";
+						return "<div class='clickableTableValue'>" + getFormattedDate(data) + "</div>";
 					}
 				},
 				{
@@ -456,3 +456,18 @@ function getReadableType(typeValue) {
 		break;
 	}
 } 
+
+
+
+
+
+function getFormattedDate(inputDate) {
+	var newDate = new Date(inputDate);
+	var formattedDate = newDate.getFullYear() + "-"
+			+ new String(newDate.getMonth() + 1).padStart(2, '0') + "-"
+			+ new String(newDate.getDate() + 1).padStart(2, '0') + " "
+			+ new String(newDate.getHours() + 1).padStart(2, '0') + ":"
+			+ new String(newDate.getMinutes() + 1).padStart(2, '0') + ":"
+			+ new String(newDate.getSeconds() + 1).padStart(2, '0');
+	return formattedDate;
+}
