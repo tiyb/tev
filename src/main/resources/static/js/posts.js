@@ -90,6 +90,12 @@ $(document).ready(function() {
 					}
 				},
 				{
+					"data": "state",
+					"render": function(data,type,row,meta) {
+						return "<div class='clickableTableValue'>" + data + "</div>";
+					}
+				},
+				{
 					"data": "slug",
 					"render": function(data,type,row,meta) {
 						return "<div class='clickableTableValue'>" + data.replace(/\-/g, ' ') + "</div>";

@@ -175,10 +175,8 @@ public class BlogXmlReader extends TEVXmlReader {
 						post = new Post();
 						boolean isSubmitablePost = true;
 						readPostAttributes(se, post);
-						if (isOverwritePosts && post.getState().equals("published")) {
+						if (isOverwritePosts) {
 							postRestController.createPost(post);
-						} else if (!post.getState().equals("published")) {
-							isSubmitablePost = false;
 						} else {
 							try {
 								Post serverPost = postRestController.getPostById(post.getId());

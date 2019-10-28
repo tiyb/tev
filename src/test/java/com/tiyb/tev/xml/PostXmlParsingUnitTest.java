@@ -66,18 +66,18 @@ public class PostXmlParsingUnitTest {
 	private static final long draftRegularPostID = 190097591599L;
 	private static final long queuedRegularPostID = 778563537472L;
 	
-	private static final int ORIGINAL_NUM_POSTS = 7;
-	private static final int ORIGINAL_NUM_REG_POSTS = 2;
-	private static final int EXTENDED_NUM_POSTS = 8;
-	private static final int EXTENDED_NUM_REG_POSTS = 3;
+	private static final int ORIGINAL_NUM_POSTS = 9;
+	private static final int ORIGINAL_NUM_REG_POSTS = 4;
+	private static final int EXTENDED_NUM_POSTS = 10;
+	private static final int EXTENDED_NUM_REG_POSTS = 5;
 
-	private static final List<Hashtag> INITIAL_HASHTAGS = Arrays.asList(new Hashtag("tag1", 2), new Hashtag("tag2", 2),
+	private static final List<Hashtag> INITIAL_HASHTAGS = Arrays.asList(new Hashtag("tag1", 4), new Hashtag("tag2", 4),
 			new Hashtag("tag3", 1), new Hashtag("tag4", 1), new Hashtag("tag5", 1), new Hashtag("tag6", 1),
 			new Hashtag("tag7", 1), new Hashtag("tag8", 1), new Hashtag("tag9", 1), new Hashtag("tag10", 1),
 			new Hashtag("tag11", 1), new Hashtag("tag12", 1), new Hashtag("tag13", 1), new Hashtag("tag14", 1),
 			new Hashtag("tag15", 1));
 
-	private static final List<Hashtag> REVISED_HASHTAGS = Arrays.asList(new Hashtag("tag1", 3), new Hashtag("tag2", 3),
+	private static final List<Hashtag> REVISED_HASHTAGS = Arrays.asList(new Hashtag("tag1", 5), new Hashtag("tag2", 5),
 			new Hashtag("tag3", 1), new Hashtag("tag4", 1), new Hashtag("tag5", 1), new Hashtag("tag6", 1),
 			new Hashtag("tag7", 1), new Hashtag("tag8", 1), new Hashtag("tag9", 1), new Hashtag("tag10", 1),
 			new Hashtag("tag11", 1), new Hashtag("tag12", 1), new Hashtag("tag13", 1), new Hashtag("tag14", 1),
@@ -237,19 +237,27 @@ public class PostXmlParsingUnitTest {
 	}
 
 	/**
-	 * Tests that a draft post was skipped during the import process
+	 * Holdover from when non-published posts used to be skipped by the import
+	 * process; import process now imports non-published posts, but the test was
+	 * left in anyway.
 	 */
-	@Test(expected = ResourceNotFoundException.class)
+	@Test
 	public void testIgnoredDraft() {
-		postController.getPostById(draftRegularPostID);
+		Post post = postController.getPostById(draftRegularPostID);
+		
+		assertThat(post).isNotNull();
 	}
 
 	/**
-	 * Tests that a queued post was skipped during the import process
+	 * The import process used to skip non-published posts, but has been updated to
+	 * accept all types. This test <i>used</i> to test that non-published posts were
+	 * skipped, which is no longer relevant; it was kept nonetheless.
 	 */
-	@Test(expected = ResourceNotFoundException.class)
+	@Test
 	public void testIgnoredQueued() {
-		postController.getPostById(queuedRegularPostID);
+		Post post = postController.getPostById(queuedRegularPostID);
+		
+		assertThat(post).isNotNull();
 	}
 
 	/**
