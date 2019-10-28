@@ -19,17 +19,22 @@
    	<div id="radioContainer">
    		<table id="radioContainerLayoutTable"><tr>
    			<td>
-		   		<input type="radio" name="filterRead" id="filterUnread" th:text="#{main.radios.read}"></input> 
-		   		<input type="radio" name="filterRead" id="filterRead" th:text="#{main.radios.unread}"></input> 
-		   		<input type="radio" name="filterRead" id="filterNoValues" th:text="#{main.radios.showAll}"></input>
-		   		<br />
-		   		<input type="radio" name="showFavs" id="showFavourites" th:text="#{main.radios.showFavourites}"></input>
-		   		<input type="radio" name="showFavs" id="showNonFavourites" th:text="#{main.radios.showNonFavourites}"></input>
-		   		<input type="radio" name="showFavs" id="showAll" th:text="#{main.radios.showAllFavs}"></input>
-   			</td>
-   			<td>
-   				<input type="radio" name="showReadingPaneRadio" id="showReadingPaneSelected" th:text="#{main.radios.showReadingPane}"></input>
-   				<input type="radio" name="showReadingPaneRadio" id="showPopupsSelected" th:text="#{main.radios.showPopUps}"></input>
+   				<a href="#" th:text="#{main.showOtherOptions}" id="additionalOptionsLink"></a>
+   				<table id="additionalOptionsTable" style="display:none;"><tr>
+   					<td>
+				   		<input type="radio" name="filterRead" id="filterUnread" th:text="#{main.radios.read}"></input> 
+				   		<input type="radio" name="filterRead" id="filterRead" th:text="#{main.radios.unread}"></input> 
+				   		<input type="radio" name="filterRead" id="filterNoValues" th:text="#{main.radios.showAll}"></input>
+				   		<br />
+				   		<input type="radio" name="showFavs" id="showFavourites" th:text="#{main.radios.showFavourites}"></input>
+				   		<input type="radio" name="showFavs" id="showNonFavourites" th:text="#{main.radios.showNonFavourites}"></input>
+				   		<input type="radio" name="showFavs" id="showAll" th:text="#{main.radios.showAllFavs}"></input>
+   					</td>
+   					<td>
+		   				<input type="radio" name="showReadingPaneRadio" id="showReadingPaneSelected" th:text="#{main.radios.showReadingPane}"></input>
+		   				<input type="radio" name="showReadingPaneRadio" id="showPopupsSelected" th:text="#{main.radios.showPopUps}"></input>
+   					</td>
+   				</tr></table>
    			</td>
    			<td>
    				<a href="/hashtagViewer" target="viewer" th:text="#{main.showhashtags}"></a>

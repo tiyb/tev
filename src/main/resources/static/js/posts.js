@@ -286,6 +286,11 @@ $(document).ready(function() {
 		}
 	});
 	
+	$('#additionalOptionsLink').click(function() {
+		$('#additionalOptionsTable').show();
+		$('#additionalOptionsLink').hide();
+	});
+	
 });
 
 $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
