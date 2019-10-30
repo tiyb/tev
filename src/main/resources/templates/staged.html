@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="#{staged.title}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" type="text/css"
+          href="webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/datatables.min.css}"/>
+</head>
+<body>
+
+<div id="header"></div>
+
+<div class="container-fluid">
+	<table id="stagedPostsTable" class="display">
+		<thead>
+			<tr>
+				<th th:text="#{staged.table.id}"></th>
+				<th th:text="#{staged.table.type}"></th>
+				<th th:text="#{staged.table.slug}"></th>
+				<th th:text="#{staged.table.downloadImages}"></th>
+				<th th:text="#{staged.table.remove}"></th>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+				<th th:text="#{staged.table.id}"></th>
+				<th th:text="#{staged.table.type}"></th>
+				<th th:text="#{staged.table.slug}"></th>
+				<th th:text="#{staged.table.downloadImages}"></th>
+				<th th:text="#{staged.table.remove}"></th>
+			</tr>
+		</tfoot>
+	</table>
+	
+	<button id="downloadButton" th:text="#{staged.downloadButton}"></button>
+	<button id="downloadAndClearButton" th:text="#{staged.downloadAndClearButton}"></button>
+	<button id="removeAllButton" th:text="#{staged.removeAllButton}"></button>
+</div>
+
+<div id="footer" class="container"></div>
+
+<script type="text/javascript"
+        src="webjars/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" 
+        src="webjars/jquery-i18n-properties/1.10.2/jquery.i18n.properties.min.js"></script>
+
+
+<script type="text/javascript" th:src="@{/js/datatables.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/js/staged.js}"></script>
+
+</body>
+</html>

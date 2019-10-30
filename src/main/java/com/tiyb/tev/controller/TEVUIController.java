@@ -38,9 +38,11 @@ import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
 import com.tiyb.tev.datamodel.Video;
 import com.tiyb.tev.exception.InvalidTypeException;
+import com.tiyb.tev.exception.NoStagedPostsException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.exception.XMLParsingException;
 import com.tiyb.tev.xml.BlogXmlReader;
+import com.tiyb.tev.xml.BlogXmlWriter;
 import com.tiyb.tev.xml.ConversationXmlReader;
 
 /**
@@ -50,7 +52,7 @@ import com.tiyb.tev.xml.ConversationXmlReader;
  */
 @Controller
 public class TEVUIController {
-	
+
 	Logger logger = LoggerFactory.getLogger(TEVUIController.class);
 
 	/**
@@ -70,6 +72,12 @@ public class TEVUIController {
 	 */
 	@Autowired
 	private TEVMetadataRestController mdController;
+
+	/**
+	 * REST controller for working with staged data
+	 */
+	@Autowired
+	private TEVStagingController stagingController;
 
 	/**
 	 * Returns the main (or index) page, at either / or /index
@@ -249,6 +257,18 @@ public class TEVUIController {
 	}
 
 	/**
+	 * This request is to show the Staged Post viewer
+	 * 
+	 * @param model The model to be populated with a list of IDs, for use by
+	 *              Thymeleaf
+	 * @return The name of the template to use for rendering the output
+	 */
+	@RequestMapping(value = { "/staged" }, method = RequestMethod.GET)
+	public String showStagedPosts(Model model) {
+		return "staged";
+	}
+
+	/**
 	 * Request used to populate conversation viewer
 	 * 
 	 * @param participantName Name of the conversation
@@ -297,7 +317,7 @@ public class TEVUIController {
 		try {
 			return Files.readAllBytes(file.toPath());
 		} catch (IOException e) {
-			logger.error("File " + imageName + " not found.");
+			logger.warn("File " + imageName + " not found.");
 			throw new ResourceNotFoundException(fullName, fullName, e);
 		}
 	}
@@ -323,7 +343,6 @@ public class TEVUIController {
 			FileInputStream in = new FileInputStream(file);
 			OutputStream out = response.getOutputStream();
 			byte[] buf = new byte[1024];
-			// int len = 0;
 			while (in.read(buf) >= 0) {
 				out.write(buf);
 			}
@@ -333,6 +352,39 @@ public class TEVUIController {
 			logger.error("IO exception reading video file", e);
 			throw new ResourceNotFoundException(fullName, fullName, e);
 		}
+	}
+
+	/**
+	 * Used to request the XML export file, for any posts that have been "staged"
+	 * for export. Returns the data as a file, not just data to be streamed to the
+	 * browser.
+	 * 
+	 * @param response The HTTP Response object (used for setting headers)
+	 * @param request  The HTTP Request object
+	 * @return The XML file, as a byte array
+	 */
+	@RequestMapping(value = { "/stagedPostsDownload" }, method = RequestMethod.GET, produces = { "application/xml" })
+	public @ResponseBody byte[] getStagedPostsFile(HttpServletResponse response, HttpServletRequest request) {
+		response.setContentType("application/xml");
+		response.setHeader("Pragma", "no-cache");
+		response.setHeader("Cache-Control", "no-cache");
+		response.setHeader("Content-Transfer-Encoding", "binary");
+		response.setHeader("Content-Disposition", "attachment; filename=\"stagedposts.xml\"");
+		List<Long> postIDs = stagingController.getAllPosts();
+
+		if (postIDs.size() < 1) {
+			logger.warn("No posts staged for download");
+			throw new NoStagedPostsException();
+		}
+
+		List<Post> posts = new ArrayList<Post>();
+		for (Long id : postIDs) {
+			Post post = postController.getPostById(id);
+			posts.add(post);
+		}
+
+		String xmlOutput = BlogXmlWriter.getStagedPostXML(postIDs, postController);
+		return xmlOutput.getBytes();
 	}
 
 	/**
@@ -355,6 +407,16 @@ public class TEVUIController {
 	@RequestMapping(value = { "/header" }, method = RequestMethod.GET)
 	public String header(Model model) {
 		return "header";
+	}
+
+	/**
+	 * Returns the viewer buttons used in all post viewer pages
+	 * 
+	 * @return name of the template to be used to render the page
+	 */
+	@RequestMapping(value = { "/viewerbuttons" }, method = RequestMethod.GET)
+	public String viewerButtons() {
+		return "viewers/viewerbuttons";
 	}
 
 	/**

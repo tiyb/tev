@@ -620,10 +620,14 @@ public class BlogXmlReader extends TEVXmlReader {
 					currentPhoto.setPostId(postID);
 					currentPhoto.setCaption(photoCaption);
 					String offset = se.getAttributeByName(new QName("offset")).getValue();
+					String width = se.getAttributeByName(new QName("width")).getValue();
+					String height = se.getAttributeByName(new QName("height")).getValue();
 					currentPhoto.setOffset(offset);
+					currentPhoto.setWidth(Integer.valueOf(width));
+					currentPhoto.setHeight(Integer.valueOf(height));
 				} else if (se.getName().getLocalPart().equals("photo-url")) {
-					String width = se.getAttributeByName(new QName("max-width")).getValue();
-					switch (width) {
+					String maxWidth = se.getAttributeByName(new QName("max-width")).getValue();
+					switch (maxWidth) {
 					case "1280":
 						currentPhoto.setUrl1280(readCharacters(reader));
 						break;
