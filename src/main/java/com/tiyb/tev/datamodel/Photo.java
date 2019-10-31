@@ -28,6 +28,7 @@ public class Photo implements Serializable {
 	@Lob
 	@Column(name="caption", length=50000)
 	private String caption;
+	@Column(name="photo_link_url", length=50000)
 	private String photoLinkUrl;
 	@Column(name="photo_offset")
 	private String offset;
