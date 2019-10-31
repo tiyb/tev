@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<tumblr version="1.0">
+	<posts>
+		<post id="180784644740"
+			url="https://mainblog.tumblr.com/post/180784644740"
+			url-with-slug="https://mainblog.tumblr.com/post/180784644740/new-slug"
+			type="photo" date-gmt="2018-12-04 07:17:52 GMT"
+			date="Tue, 04 Dec 2018 02:17:52" unix-timestamp="1543907872"
+			format="html" reblog-key="Pius5FOw" slug="new-slug" state="published"
+			is_reblog="true" tumblelog="mainblog" width="500" height="750">
+			<photo-caption>This is the caption for a photo post</photo-caption>
+			<photo-link-url>http://bit.ly/some-photo</photo-link-url>
+			<photo-url max-width="1280">photo 1 1280</photo-url>
+			<photo-url max-width="500">photo 1 500</photo-url>
+			<photo-url max-width="400">photo 1 400</photo-url>
+			<photo-url max-width="250">photo 1 250</photo-url>
+			<photo-url max-width="100">photo 1 100</photo-url>
+			<photo-url max-width="75">photo 1 75</photo-url>
+			<tag>tag3</tag>
+			<tag>tag4</tag>
+		</post>
+	</posts>
+</tumblr>

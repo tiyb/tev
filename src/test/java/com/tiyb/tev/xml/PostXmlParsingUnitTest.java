@@ -342,12 +342,12 @@ public class PostXmlParsingUnitTest {
 		Photo photo = photos.get(0);
 		assertThat(photo.getPostId()).isEqualTo(secondPhotoPostID);
 		assertThat(photo.getCaption()).isEqualTo("This is hte photo caption");
-		assertThat(photo.getUrl1280()).isEqualTo("photo 3 1280");
-		assertThat(photo.getUrl500()).isEqualTo("photo 3 500");
-		assertThat(photo.getUrl400()).isEqualTo("photo 3 400");
-		assertThat(photo.getUrl250()).isEqualTo("photo 3 250");
-		assertThat(photo.getUrl100()).isEqualTo("photo 3 100");
-		assertThat(photo.getUrl75()).isEqualTo("photo 3 75");
+		assertThat(photo.getUrl1280()).isEqualTo("photo 2 1280");
+		assertThat(photo.getUrl500()).isEqualTo("photo 2 500");
+		assertThat(photo.getUrl400()).isEqualTo("photo 2 400");
+		assertThat(photo.getUrl250()).isEqualTo("photo 2 250");
+		assertThat(photo.getUrl100()).isEqualTo("photo 2 100");
+		assertThat(photo.getUrl75()).isEqualTo("photo 2 75");
 
 		photo = photos.get(1);
 		assertThat(photo.getPostId()).isEqualTo(secondPhotoPostID);

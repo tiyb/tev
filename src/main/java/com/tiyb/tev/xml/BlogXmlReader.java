@@ -310,6 +310,12 @@ public class BlogXmlReader extends TEVXmlReader {
 			case "tumblelog":
 				post.setTumblelog(att.getValue());
 				break;
+			case "width":
+				post.setWidth(Integer.parseInt(att.getValue()));
+				break;
+			case "height":
+				post.setHeight(Integer.parseInt(att.getValue()));
+				break;
 			}
 		}
 
@@ -526,6 +532,7 @@ public class BlogXmlReader extends TEVXmlReader {
 		String url250 = "";
 		String url100 = "";
 		String url75 = "";
+		String photoLinkUrl = null;
 
 		while (reader.hasNext()) {
 			XMLEvent event = reader.nextEvent();
@@ -562,6 +569,8 @@ public class BlogXmlReader extends TEVXmlReader {
 				} else if (se.getName().getLocalPart().equals("tag")) {
 					String tag = readCharacters(reader);
 					post.setTags(addTagToString(post.getTags(), tag));
+				} else if(se.getName().getLocalPart().equals("photo-link-url")) {
+					photoLinkUrl = readCharacters(reader);
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
@@ -577,6 +586,7 @@ public class BlogXmlReader extends TEVXmlReader {
 						photo.setUrl400(url400);
 						photo.setUrl500(url500);
 						photo.setUrl75(url75);
+						photo.setPhotoLinkUrl(photoLinkUrl);
 
 						photos.add(photo);
 					}

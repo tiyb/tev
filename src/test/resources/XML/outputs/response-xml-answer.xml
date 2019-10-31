@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<tumblr version="1.0">
+	<posts>
+		<post id="180371366195"
+			url="https://mainblog.tumblr.com/post/180371366195"
+			url-with-slug="https://mainblog.tumblr.com/post/180371366195/slug-slug-slug"
+			type="answer" date-gmt="2018-11-22 08:26:25 GMT"
+			date="Thu, 22 Nov 2018 03:26:25" unix-timestamp="1542875185"
+			format="html" reblog-key="OQqor1Zh" slug="slug-slug-slug"
+			state="published" is_reblog="true" tumblelog="mainblog">
+			<question>Question text</question>
+			<answer>Answer text</answer>
+			<tag>tag2</tag>
+		</post>
+	</posts>
+</tumblr>

@@ -187,6 +187,12 @@ public class BlogXmlWriter {
 		writer.writeStartElement("photo-caption");
 		writer.writeCharacters(photos.get(0).getCaption());
 		writer.writeEndElement();
+		
+		if(photos.get(0).getPhotoLinkUrl() != null) {
+			writer.writeStartElement("photo-link-url");
+			writer.writeCharacters(photos.get(0).getPhotoLinkUrl());
+			writer.writeEndElement();
+		}
 
 		addPhotoWithSizes(photos.get(0), writer);
 
@@ -363,6 +369,10 @@ public class BlogXmlWriter {
 			throws XMLStreamException {
 		Regular regular = postController.getRegularById(post.getId());
 
+		writer.writeStartElement("regular-title");
+		writer.writeCharacters(regular.getTitle());
+		writer.writeEndElement();
+
 		writer.writeStartElement("regular-body");
 		writer.writeCharacters(regular.getBody());
 		writer.writeEndElement();
@@ -386,12 +396,16 @@ public class BlogXmlWriter {
 		writer.writeAttribute("date-gmt", post.getDateGmt());
 		writer.writeAttribute("date", post.getDate());
 		writer.writeAttribute("unix-timestamp", String.valueOf(post.getUnixtimestamp()));
-		// hard-coded
-		writer.writeAttribute("format", "html");
+		writer.writeAttribute("format", "html"); // hard-coded
 		writer.writeAttribute("reblog-key", post.getReblogKey());
 		writer.writeAttribute("slug", post.getSlug());
 		writer.writeAttribute("state", post.getState());
 		writer.writeAttribute("is_reblog", String.valueOf(post.getIsReblog()));
 		writer.writeAttribute("tumblelog", String.valueOf(post.getTumblelog()));
+		
+		if(post.getType().equals("photo")) {
+			writer.writeAttribute("width", String.valueOf(post.getWidth()));
+			writer.writeAttribute("height", String.valueOf(post.getHeight()));
+		}
 	}
 }

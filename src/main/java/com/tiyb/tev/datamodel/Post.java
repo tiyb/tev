@@ -42,6 +42,8 @@ public class Post implements Serializable {
 	private String tags = "";
 	private Boolean isFavourite = false;
 	private String state;
+	private Integer height;
+	private Integer width;
 	
 	public void updateData(Post newDataObject) {
 		//this.id = newDataObject.id;
@@ -59,6 +61,8 @@ public class Post implements Serializable {
 		this.tags = newDataObject.tags;
 		this.isFavourite = newDataObject.isFavourite;
 		this.state = newDataObject.state;
+		this.height = newDataObject.height;
+		this.width = newDataObject.width;
 	}
 
 	@Override
@@ -138,6 +142,16 @@ public class Post implements Serializable {
 		if (state != null) {
 			builder.append("state=");
 			builder.append(state);
+			builder.append(", ");
+		}
+		if (height != null) {
+			builder.append("height=");
+			builder.append(height);
+			builder.append(", ");
+		}
+		if (width != null) {
+			builder.append("width=");
+			builder.append(width);
 		}
 		builder.append("]");
 		return builder.toString();
@@ -261,5 +275,21 @@ public class Post implements Serializable {
 
 	public void setState(String state) {
 		this.state = state;
+	}
+
+	public Integer getHeight() {
+		return height;
+	}
+
+	public void setHeight(Integer height) {
+		this.height = height;
+	}
+
+	public Integer getWidth() {
+		return width;
+	}
+
+	public void setWidth(Integer width) {
+		this.width = width;
 	}
 }
