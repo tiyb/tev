@@ -10,28 +10,28 @@
 			state="published" is_reblog="true" tumblelog="mainblog" width="692"
 			height="583">
 			<photo-caption>This is hte photo caption</photo-caption>
-			<photo-url max-width="1280">photo 2 1280</photo-url>
-			<photo-url max-width="500">photo 2 500</photo-url>
-			<photo-url max-width="400">photo 2 400</photo-url>
-			<photo-url max-width="250">photo 2 250</photo-url>
-			<photo-url max-width="100">photo 2 100</photo-url>
-			<photo-url max-width="75">photo 2 75</photo-url>
+			<photo-url max-width="1280">photo 2 1280.jpg</photo-url>
+			<photo-url max-width="500">photo 2 500.jpg</photo-url>
+			<photo-url max-width="400">photo 2 400.jpg</photo-url>
+			<photo-url max-width="250">photo 2 250.jpg</photo-url>
+			<photo-url max-width="100">photo 2 100.jpg</photo-url>
+			<photo-url max-width="75">photo 2 75.jpg</photo-url>
 			<photoset>
 				<photo offset="o1" caption="" width="692" height="583">
-					<photo-url max-width="1280">photo 2 1280</photo-url>
-					<photo-url max-width="500">photo 2 500</photo-url>
-					<photo-url max-width="400">photo 2 400</photo-url>
-					<photo-url max-width="250">photo 2 250</photo-url>
-					<photo-url max-width="100">photo 2 100</photo-url>
-					<photo-url max-width="75">photo 2 75</photo-url>
+					<photo-url max-width="1280">photo 2 1280.jpg</photo-url>
+					<photo-url max-width="500">photo 2 500.jpg</photo-url>
+					<photo-url max-width="400">photo 2 400.jpg</photo-url>
+					<photo-url max-width="250">photo 2 250.jpg</photo-url>
+					<photo-url max-width="100">photo 2 100.jpg</photo-url>
+					<photo-url max-width="75">photo 2 75.jpg</photo-url>
 				</photo>
 				<photo offset="o2" caption="" width="990" height="532">
-					<photo-url max-width="1280">photo 4 1280</photo-url>
-					<photo-url max-width="500">photo 4 500</photo-url>
-					<photo-url max-width="400">photo 4 400</photo-url>
-					<photo-url max-width="250">photo 4 250</photo-url>
-					<photo-url max-width="100">photo 4 100</photo-url>
-					<photo-url max-width="75">photo 4 75</photo-url>
+					<photo-url max-width="1280">photo 4 1280.jpg</photo-url>
+					<photo-url max-width="500">photo 4 500.jpg</photo-url>
+					<photo-url max-width="400">photo 4 400.jpg</photo-url>
+					<photo-url max-width="250">photo 4 250.jpg</photo-url>
+					<photo-url max-width="100">photo 4 100.jpg</photo-url>
+					<photo-url max-width="75">photo 4 75.jpg</photo-url>
 				</photo>
 			</photoset>
 			<tag>tag11</tag>

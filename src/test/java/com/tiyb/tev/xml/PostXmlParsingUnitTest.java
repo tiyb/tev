@@ -342,34 +342,34 @@ public class PostXmlParsingUnitTest {
 		Photo photo = photos.get(0);
 		assertThat(photo.getPostId()).isEqualTo(secondPhotoPostID);
 		assertThat(photo.getCaption()).isEqualTo("This is hte photo caption");
-		assertThat(photo.getUrl1280()).isEqualTo("photo 2 1280");
-		assertThat(photo.getUrl500()).isEqualTo("photo 2 500");
-		assertThat(photo.getUrl400()).isEqualTo("photo 2 400");
-		assertThat(photo.getUrl250()).isEqualTo("photo 2 250");
-		assertThat(photo.getUrl100()).isEqualTo("photo 2 100");
-		assertThat(photo.getUrl75()).isEqualTo("photo 2 75");
+		assertThat(photo.getUrl1280()).isEqualTo("photo 2 1280.jpg");
+		assertThat(photo.getUrl500()).isEqualTo("photo 2 500.jpg");
+		assertThat(photo.getUrl400()).isEqualTo("photo 2 400.jpg");
+		assertThat(photo.getUrl250()).isEqualTo("photo 2 250.jpg");
+		assertThat(photo.getUrl100()).isEqualTo("photo 2 100.jpg");
+		assertThat(photo.getUrl75()).isEqualTo("photo 2 75.jpg");
 
 		photo = photos.get(1);
 		assertThat(photo.getPostId()).isEqualTo(secondPhotoPostID);
 		assertThat(photo.getCaption()).isEqualTo("This is hte photo caption");
-		assertThat(photo.getUrl1280()).isEqualTo("photo 4 1280");
-		assertThat(photo.getUrl500()).isEqualTo("photo 4 500");
-		assertThat(photo.getUrl400()).isEqualTo("photo 4 400");
-		assertThat(photo.getUrl250()).isEqualTo("photo 4 250");
-		assertThat(photo.getUrl100()).isEqualTo("photo 4 100");
-		assertThat(photo.getUrl75()).isEqualTo("photo 4 75");
+		assertThat(photo.getUrl1280()).isEqualTo("photo 4 1280.jpg");
+		assertThat(photo.getUrl500()).isEqualTo("photo 4 500.jpg");
+		assertThat(photo.getUrl400()).isEqualTo("photo 4 400.jpg");
+		assertThat(photo.getUrl250()).isEqualTo("photo 4 250.jpg");
+		assertThat(photo.getUrl100()).isEqualTo("photo 4 100.jpg");
+		assertThat(photo.getUrl75()).isEqualTo("photo 4 75.jpg");
 
 		photos = postController.getPhotoById(firstPhotoPostID);
 		assertThat(photos.size()).isEqualTo(1);
 		photo = photos.get(0);
 		assertThat(photo.getPostId()).isEqualTo(firstPhotoPostID);
 		assertThat(photo.getCaption()).isEqualTo("This is the caption for a photo post");
-		assertThat(photo.getUrl1280()).isEqualTo("photo 1 1280");
-		assertThat(photo.getUrl500()).isEqualTo("photo 1 500");
-		assertThat(photo.getUrl400()).isEqualTo("photo 1 400");
-		assertThat(photo.getUrl250()).isEqualTo("photo 1 250");
-		assertThat(photo.getUrl100()).isEqualTo("photo 1 100");
-		assertThat(photo.getUrl75()).isEqualTo("photo 1 75");
+		assertThat(photo.getUrl1280()).isEqualTo("photo 1 1280.jpg");
+		assertThat(photo.getUrl500()).isEqualTo("photo 1 500.jpg");
+		assertThat(photo.getUrl400()).isEqualTo("photo 1 400.jpg");
+		assertThat(photo.getUrl250()).isEqualTo("photo 1 250.jpg");
+		assertThat(photo.getUrl100()).isEqualTo("photo 1 100.jpg");
+		assertThat(photo.getUrl75()).isEqualTo("photo 1 75.jpg");
 
 	}
 
