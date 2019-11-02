@@ -4,6 +4,8 @@ $.i18n.properties({
 	mode: 'both'
 });
 
+var imagesExportPath;
+
 $(document).ready(function() {
 	$('#header').load("/header");
 	$('#footer').load("/footer");
@@ -46,12 +48,17 @@ $(document).ready(function() {
 			}).then(function(postData) {
 				var downloadImageButton;
 				if(postData.type == "photo") {
-					downloadImageButton = "<button class='downloadBtn'>" + $.i18n.prop('staging_downloadImagesButtonText') + "</button>";
+					downloadImageButton = "<button class='downloadImagesButton'>" + $.i18n.prop('staging_downloadImagesButtonText') + "</button>";
 				} else {
 					downloadImageButton = "";
 				}
-				stagedPostTable.row.add([postData.id, postData.type, postData.slug, downloadImageButton, "<button class='removeBtn'>" + $.i18n.prop('staging_removeButtonText') + "</button>"]).draw();
+				stagedPostTable.row.add([buildClickableItem(postData.id), buildClickableItem(postData.type), buildClickableItem(postData.slug), downloadImageButton, "<button class='removeBtn'>" + $.i18n.prop('staging_removeButtonText') + "</button>"]).draw();
 			});
+		});
+		
+		$('#stagedPostsTable tbody').on('click', 'div[class=clickableTableValue]', function () {
+			var postID = $(this).parent().parent().children('td:first-child').text();
+			window.open("/postViewer?id=" + postID, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
 		});
 		
 		$('#stagedPostsTable tbody').on('click', 'button[class=removeBtn]', function() {
@@ -67,17 +74,34 @@ $(document).ready(function() {
 			});
 		});
 		
-		$('#stagedPostsTable tbody').on('click', 'button[class=downloadBtn]', function() {
-			alert("not implemented");
+		$('#stagedPostsTable tbody').on('click', 'button[class=downloadImagesButton]', function() {
+			var data = stagedPostTable.row($(this).parents('tr')).data();
+			var postID = $(data[0]).first().text();
+			
+			imagesExportPath = prompt("Image Output Path:", imagesExportPath);
+			if((imagesExportPath == null) || (imagesExportPath.length < 1)) {
+				alert("please enter a destination");
+				return;
+			}
+			
+			$.ajax({
+				url: "/staging-api/posts/" + postID + "/exportImages",
+				type: "POST",
+				data: imagesExportPath,
+				contentType: "text/plain",
+				dataSrc: "",
+				success: function(data, textStatus, xhr) {
+					alert($.i18n.prop('staging_imageexport_success'));
+				},
+				error: function(xhr, textStatus, errorThrown) {
+					alert($.i18n.prop('staging_imageexport_failure', xhr.responseText));
+				}
+			});
 		});
 	});
 	
 	$('#downloadButton').click(function() {
-		alert('not yet implemented');
-	});
-	
-	$('#downloadAndClearButton').click(function() {
-		alert('not yet implemented');
+		window.open("/stagedPostsDownload");
 	});
 	
 	$('#removeAllButton').click(function() {
@@ -90,3 +114,7 @@ $(document).ready(function() {
 		});
 	});
 });
+
+function buildClickableItem(text) {
+	return "<div class='clickableTableValue'>" + text + "</div>";
+}
