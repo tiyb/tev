@@ -95,7 +95,7 @@ public class BlogXmlWriter {
 			XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 			XMLStreamWriter writer = outputFactory.createXMLStreamWriter(stringWriter);
 
-			writer.writeStartDocument();
+			writer.writeStartDocument("UTF-8", "1.0");
 			writer.writeStartElement("tumblr");
 			writer.writeAttribute("version", "1.0");
 
@@ -369,9 +369,11 @@ public class BlogXmlWriter {
 			throws XMLStreamException {
 		Regular regular = postController.getRegularById(post.getId());
 
-		writer.writeStartElement("regular-title");
-		writer.writeCharacters(regular.getTitle());
-		writer.writeEndElement();
+		if(regular.getTitle() != null && regular.getTitle().length() > 0) {
+			writer.writeStartElement("regular-title");
+			writer.writeCharacters(regular.getTitle());
+			writer.writeEndElement();
+		}
 
 		writer.writeStartElement("regular-body");
 		writer.writeCharacters(regular.getBody());
