@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.tiyb</groupId>
 	<artifactId>tev</artifactId>
-	<version>v6.1.0</version>
+	<version>v6.1.1</version>
 	<name>tev</name>
 	<description>Tumblr Export Viewer</description>
 
@@ -39,12 +39,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
 		

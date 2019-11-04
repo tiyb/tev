@@ -26,6 +26,7 @@
 
 ### HDB ###
 /hsql/
+/hsqltest/
 
 ### other ###
 *.log*

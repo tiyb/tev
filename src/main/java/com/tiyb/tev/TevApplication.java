@@ -2,6 +2,7 @@ package com.tiyb.tev;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -50,7 +51,19 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
 public class TevApplication {
-	
+
+	@Value("${spring.datasource.username}")
+	private String dsUserName;
+
+	@Value("${spring.datasource.password}")
+	private String dsPassword;
+
+	@Value("${spring.datasource.url}")
+	private String dsUrl;
+
+	@Value("${spring.datasource.driver-class-name}")
+	private String dsDriverClassName;
+
 	/**
 	 * The main function for starting the application, called by Spring Boot at
 	 * boot-up. No custom implementation, the standard implementation for Spring
@@ -63,27 +76,28 @@ public class TevApplication {
 	}
 
 	/**
-	 * Returns the {@link javax.sql.DataSource DataSource} bean for working with the database. This
-	 * is the only way the HSQL data source can be forced to use a file-based
-	 * database, instead of in-memory.
+	 * Returns the {@link javax.sql.DataSource DataSource} bean for working with the
+	 * database. This is the only way the HSQL data source can be forced to use a
+	 * file-based database, instead of in-memory.
 	 * 
 	 * @return Standard Java {@link javax.sql.DataSource DataSource}
 	 */
 	@Bean
 	public DataSource primaryDataSource() {
-		return DataSourceBuilder.create().username("sa").password("").url("jdbc:hsqldb:file:hsql/tev.db")
-				.driverClassName("org.hsqldb.jdbc.JDBCDriver").build();
+		return DataSourceBuilder.create().username(this.dsUserName).password(this.dsPassword).url(this.dsUrl)
+				.driverClassName(this.dsDriverClassName).build();
 	}
 
 	/**
 	 * Used for custom DB scripts that need to be executed by admin tools
 	 * 
 	 * @param dataSource The DS used by the application
-	 * @return a {@link org.springframework.jdbc.core.JdbcTemplate JdbcTemplate} for this application/data source
+	 * @return a {@link org.springframework.jdbc.core.JdbcTemplate JdbcTemplate} for
+	 *         this application/data source
 	 */
 	@Bean
 	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
 		return new JdbcTemplate(dataSource);
 	}
-	
+
 }
