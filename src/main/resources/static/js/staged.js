@@ -63,7 +63,7 @@ $(document).ready(function() {
 		
 		$('#stagedPostsTable tbody').on('click', 'button[class=removeBtn]', function() {
 			var data = stagedPostTable.row($(this).parents('tr')).data();
-			var postID = data[0];
+			var postID = $(data[0]).first().text();
 			
 			$.ajax({
 				url: "/staging-api/posts/" + postID,
