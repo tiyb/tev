@@ -11,4 +11,5 @@ import com.tiyb.tev.datamodel.Photo;
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
 	List<Photo> findByPostIdOrderByOffset(Long postId);
+	List<Photo> findByPostId(Long postId);
 }

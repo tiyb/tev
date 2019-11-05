@@ -577,7 +577,8 @@ public class TEVPostRestController {
 	 */
 	@GetMapping("/posts/{id}/photo")
 	public List<Photo> getPhotoById(@PathVariable(value = "id") Long postId) {
-		return photoRepo.findByPostIdOrderByOffset(postId);
+		//return photoRepo.findByPostIdOrderByOffset(postId);
+		return photoRepo.findByPostId(postId);
 	}
 
 	/**

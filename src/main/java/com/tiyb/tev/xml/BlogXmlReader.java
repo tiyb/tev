@@ -589,7 +589,7 @@ public class BlogXmlReader extends TEVXmlReader {
 						photo.setPhotoLinkUrl(photoLinkUrl);
 
 						photos.add(photo);
-					}
+					} 
 
 					return photos;
 				}

@@ -200,7 +200,7 @@ public class BlogXmlWriter {
 			writer.writeStartElement("photoset");
 			for (int i = 0; i < photos.size(); i++) {
 				writer.writeStartElement("photo");
-				writer.writeAttribute("offset", "o" + (i + 1));
+				writer.writeAttribute("offset", photos.get(i).getOffset());
 				writer.writeAttribute("caption", "");
 				writer.writeAttribute("width", String.valueOf(photos.get(i).getWidth()));
 				writer.writeAttribute("height", String.valueOf(photos.get(i).getHeight()));
