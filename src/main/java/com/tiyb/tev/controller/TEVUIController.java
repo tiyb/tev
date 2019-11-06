@@ -368,7 +368,8 @@ public class TEVUIController {
 		response.setContentType("application/xml");
 		response.setHeader("Pragma", "no-cache");
 		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Content-Transfer-Encoding", "binary");
+		//response.setHeader("Content-Transfer-Encoding", "binary");
+		response.setHeader("Content-Type", "application/xml; charset=utf-8"); 
 		response.setHeader("Content-Disposition", "attachment; filename=\"stagedposts.xml\"");
 		List<Long> postIDs = stagingController.getAllPosts();
 
