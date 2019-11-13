@@ -255,6 +255,11 @@ public class TEVUIController {
 		model.addAttribute("hashtags", hashtags);
 		return "viewers/hashtags";
 	}
+	
+	@RequestMapping(value = {"/exportViewer"}, method = RequestMethod.GET)
+	public String showExportViewer(Model model) {
+		return "viewers/exportedxml";
+	}
 
 	/**
 	 * This request is to show the Staged Post viewer
@@ -354,23 +359,56 @@ public class TEVUIController {
 		}
 	}
 
+//	/**
+//	 * Used to request the XML export file, for any posts that have been "staged"
+//	 * for export. Returns the data as a file, not just data to be streamed to the
+//	 * browser.
+//	 * 
+//	 * @param response The HTTP Response object (used for setting headers)
+//	 * @param request  The HTTP Request object
+//	 * @return The XML file, as a byte array
+//	 */
+//	@RequestMapping(value = { "/stagedPostsDownload" }, method = RequestMethod.GET, produces = { "application/xml" })
+//	public @ResponseBody byte[] getStagedPostsFile(HttpServletResponse response, HttpServletRequest request) {
+//		response.setContentType("application/xml");
+//		response.setHeader("Pragma", "no-cache");
+//		response.setHeader("Cache-Control", "no-cache");
+//		//response.setHeader("Content-Transfer-Encoding", "binary");
+//		response.setHeader("Content-Type", "application/xml; charset=utf-8"); 
+//		response.setHeader("Content-Disposition", "attachment; filename=\"stagedposts.xml\"");
+//		List<Long> postIDs = stagingController.getAllPosts();
+//
+//		if (postIDs.size() < 1) {
+//			logger.warn("No posts staged for download");
+//			throw new NoStagedPostsException();
+//		}
+//
+//		List<Post> posts = new ArrayList<Post>();
+//		for (Long id : postIDs) {
+//			Post post = postController.getPostById(id);
+//			posts.add(post);
+//		}
+//
+//		String xmlOutput = BlogXmlWriter.getStagedPostXML(postIDs, postController);
+//		return xmlOutput.getBytes();
+//	}
+//
 	/**
-	 * Used to request the XML export file, for any posts that have been "staged"
-	 * for export. Returns the data as a file, not just data to be streamed to the
-	 * browser.
+	 * Used to request the XML export, for any posts that have been "staged"
+	 * for export. Returns the data as a string, with the intent that it is displayed in the browser.
 	 * 
 	 * @param response The HTTP Response object (used for setting headers)
 	 * @param request  The HTTP Request object
-	 * @return The XML file, as a byte array
+	 * @return The XML file, as a String
 	 */
-	@RequestMapping(value = { "/stagedPostsDownload" }, method = RequestMethod.GET, produces = { "application/xml" })
-	public @ResponseBody byte[] getStagedPostsFile(HttpServletResponse response, HttpServletRequest request) {
+	@RequestMapping(value = { "/stagedPostsDownload" }, method = RequestMethod.GET, produces = { "text/plain" })
+	public @ResponseBody String getStagedPostsFile(HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("application/xml");
 		response.setHeader("Pragma", "no-cache");
 		response.setHeader("Cache-Control", "no-cache");
 		//response.setHeader("Content-Transfer-Encoding", "binary");
-		response.setHeader("Content-Type", "application/xml; charset=utf-8"); 
-		response.setHeader("Content-Disposition", "attachment; filename=\"stagedposts.xml\"");
+//		response.setHeader("Content-Type", "application/xml; charset=utf-8"); 
+//		response.setHeader("Content-Disposition", "attachment; filename=\"stagedposts.xml\"");
 		List<Long> postIDs = stagingController.getAllPosts();
 
 		if (postIDs.size() < 1) {
@@ -385,7 +423,7 @@ public class TEVUIController {
 		}
 
 		String xmlOutput = BlogXmlWriter.getStagedPostXML(postIDs, postController);
-		return xmlOutput.getBytes();
+		return xmlOutput;
 	}
 
 	/**

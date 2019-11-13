@@ -101,7 +101,7 @@ $(document).ready(function() {
 	});
 	
 	$('#downloadButton').click(function() {
-		window.open("/stagedPostsDownload");
+		window.open("/exportViewer");
 	});
 	
 	$('#removeAllButton').click(function() {

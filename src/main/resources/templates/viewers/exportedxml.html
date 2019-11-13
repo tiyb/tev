@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="#{exportedxml.title}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/postviewer.css}"/>
+</head>
+<body>
+
+<div class="contentContainer">
+<h1 th:text="#{exportedxml.title}"></h1>
+<textarea id="exportedXMLText" class="autoExpand" rows="3" data-min-rows="3"></textarea>
+</div>
+
+<script type="text/javascript"
+        src="webjars/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" 
+        src="webjars/jquery-i18n-properties/1.10.2/jquery.i18n.properties.min.js"></script>
+
+<script type="text/javascript" th:src="@{/js/exportedxml.js}"></script>
+
+
+</body>
+</html>

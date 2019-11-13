@@ -1,6 +1,7 @@
 package com.tiyb.tev.xml;
 
 import java.io.StringWriter;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import com.tiyb.tev.datamodel.Photo;
 import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
 import com.tiyb.tev.datamodel.Video;
+import com.tiyb.tev.xml.helper.PrettyPrintHandler;
 
 /**
  * <p>
@@ -73,7 +75,9 @@ public class BlogXmlWriter {
 	 * <p>
 	 * This method starts the work of creating the outer shell of the document. The
 	 * {@link #addPost(Post, XMLStreamWriter, TEVPostRestController) addPost()}
-	 * method starts adding in the detailed data, post-by-post.
+	 * method starts adding in the detailed data, post-by-post. The
+	 * {@link com.tiyb.tev.xml.helper.PrettyPrintHandler PrettyPrintHandler} helper
+	 * class is used to create a more readable version of the XML output.
 	 * </p>
 	 * 
 	 * <p>
@@ -94,6 +98,10 @@ public class BlogXmlWriter {
 
 			XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 			XMLStreamWriter writer = outputFactory.createXMLStreamWriter(stringWriter);
+			PrettyPrintHandler handler = new PrettyPrintHandler(writer);
+			XMLStreamWriter prettyPrintWriter = (XMLStreamWriter) Proxy.newProxyInstance(
+					XMLStreamWriter.class.getClassLoader(), new Class[] { XMLStreamWriter.class }, handler);
+			writer = prettyPrintWriter;
 
 			writer.writeStartDocument("UTF-8", "1.0");
 			writer.writeStartElement("tumblr");
@@ -187,8 +195,8 @@ public class BlogXmlWriter {
 		writer.writeStartElement("photo-caption");
 		writer.writeCharacters(photos.get(0).getCaption());
 		writer.writeEndElement();
-		
-		if(photos.get(0).getPhotoLinkUrl() != null) {
+
+		if (photos.get(0).getPhotoLinkUrl() != null) {
 			writer.writeStartElement("photo-link-url");
 			writer.writeCharacters(photos.get(0).getPhotoLinkUrl());
 			writer.writeEndElement();
@@ -369,7 +377,7 @@ public class BlogXmlWriter {
 			throws XMLStreamException {
 		Regular regular = postController.getRegularById(post.getId());
 
-		if(regular.getTitle() != null && regular.getTitle().length() > 0) {
+		if (regular.getTitle() != null && regular.getTitle().length() > 0) {
 			writer.writeStartElement("regular-title");
 			writer.writeCharacters(regular.getTitle());
 			writer.writeEndElement();
@@ -404,8 +412,8 @@ public class BlogXmlWriter {
 		writer.writeAttribute("state", post.getState());
 		writer.writeAttribute("is_reblog", String.valueOf(post.getIsReblog()));
 		writer.writeAttribute("tumblelog", String.valueOf(post.getTumblelog()));
-		
-		if(post.getType().equals("photo")) {
+
+		if (post.getType().equals("photo")) {
 			writer.writeAttribute("width", String.valueOf(post.getWidth()));
 			writer.writeAttribute("height", String.valueOf(post.getHeight()));
 		}
