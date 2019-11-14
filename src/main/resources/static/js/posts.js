@@ -9,6 +9,8 @@ var DATE_COLUMN_NO = 5;
 var FAV_COLUMN_NO = 6;
 var READ_COLUMN_NO = 7;
 
+var additionalOptionsShowing = false;
+
 $.i18n.properties({
 	name: 'messages',
 	path: 'js/i18n/',
@@ -286,9 +288,18 @@ $(document).ready(function() {
 		}
 	});
 	
+	$('#additionalOptionsLink').text($.i18n.prop('index_showOtherOptions'));
+	
 	$('#additionalOptionsLink').click(function() {
-		$('#additionalOptionsTable').show();
-		$('#additionalOptionsLink').hide();
+		if(additionalOptionsShowing) {
+			$('#additionalOptionsTable').hide();
+			$('#additionalOptionsLink').text($.i18n.prop('index_showOtherOptions'));
+			additionalOptionsShowing = false;
+		} else {
+			$('#additionalOptionsTable').show();
+			$('#additionalOptionsLink').text($.i18n.prop('index_hideOtherOptions'));
+			additionalOptionsShowing = true;
+		}
 	});
 	
 });
