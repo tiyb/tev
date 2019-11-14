@@ -9,7 +9,7 @@
 			format="html" reblog-key="O6pLVlp1" slug="first-post"
 			state="published" is_reblog="true" tumblelog="mainblog">
 			<regular-title>First Post</regular-title>
-			<regular-body>post body text here</regular-body>
+			<regular-body>“This is some quoted text,” she said, “so will it be interpreted correctly?” It was a great question &amp;ndash; and this JUnit test would settle it once and for all.</regular-body>
 			<tag>tag1</tag>
 			<tag>tag2</tag>
 		</post>

@@ -231,7 +231,7 @@ public class PostXmlParsingUnitTest {
 		Regular regular = postController.getRegularById(regularPostID);
 		assertThat(regular).isNotNull();
 		assertThat(regular.getPostId()).isEqualTo(regularPostID);
-		assertThat(regular.getBody()).isEqualTo("post body text here");
+		assertThat(regular.getBody()).isEqualTo("“This is some quoted text,” she said, “so will it be interpreted correctly?” It was a great question &ndash; and this JUnit test would settle it once and for all.");
 		assertThat(regular.getTitle()).isEqualTo("First Post");
 	}
 
