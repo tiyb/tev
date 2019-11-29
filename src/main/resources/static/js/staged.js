@@ -41,6 +41,10 @@ $(document).ready(function() {
 		url: "/staging-api/posts",
 		dataSrc: ""
 	}).then(function(data) {
+		if(data.length < 1) {
+			$('#downloadButton').attr('disabled', true).addClass('disabled');
+			$('#removeAllButton').attr('disabled', true).addClass('disabled');
+		}
 		data.forEach(function(element) {
 			$.ajax({
 				url: "/api/posts/" + element,
