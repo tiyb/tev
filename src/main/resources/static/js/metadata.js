@@ -18,10 +18,16 @@ $(document).ready(function () {
 		$.each(data.sortOrders, function(i, obj) {
 			var divData = "<option value='" + obj + "'>" + getTranslatedSortOrder(obj) + "</option>";
 			$(divData).appendTo('#sortOrderDropdown');
+			var divData2 = "<option value='" + obj + "'>" + getTranslatedSortOrder(obj) + "</option>";
+			$(divData2).appendTo('#conversationSortOrderDropdown');
 		});
 		$.each(data.sortColumns, function(i, obj) {
 			var divData = "<option value='" + obj + "'>" + getTranslatedNameForColumn(obj) + "</option>";
 			$(divData).appendTo('#sortByDropdown');
+		});
+		$.each(data.conversationSortColumns, function(i, obj) {
+			var divData = "<option value='" + obj + "'>" + getTranslatedNameForConversationColumn(obj) + "</option>";
+			$(divData).appendTo('#conversationSortColumnDropdown');
 		});
 		$.each(data.filterTypes, function(i, obj) {
 			var divData = "<option value='" + obj + "'>" + getTranslatedFilterTypes(obj) + "</option>";
@@ -61,7 +67,9 @@ $(document).ready(function () {
 			metadataObject = data;
 			$('#baseMediaPath').val(metadataObject.baseMediaPath);
 			$('#sortOrderDropdown').val(metadataObject.sortOrder);
+			$('#conversationSortOrderDropdown').val(metadataObject.conversationSortOrder);
 			$('#sortByDropdown').val(metadataObject.sortColumn);
+			$('#conversationSortColumnDropdown').val(metadataObject.conversationSortColumn);
 			$('#filterDropdown').val(metadataObject.filter);
 			$('#favsDropdown').val(metadataObject.favFilter);
 			$('#pageLengthDropdown').val(metadataObject.pageLength);
@@ -94,7 +102,9 @@ $(document).ready(function () {
 		metadataObject.mainTumblrUser = $('#mainUser').val();
 		metadataObject.mainTumblrUserAvatarUrl = $('#mainUserAvatarUrl').val();
 		metadataObject.sortOrder = $('#sortOrderDropdown').val();
+		metadataObject.conversationSortOrder = $('#conversationSortOrderDropdown').val();
 		metadataObject.sortColumn = $('#sortByDropdown').val();
+		metadataObject.conversationSortColumn = $('#conversationSortColumnDropdown').val();
 		metadataObject.filter = $('#filterDropdown').val();
 		metadataObject.favFilter = $('#favsDropdown').val();
 		metadataObject.pageLength = $('#pageLengthDropdown').val();
@@ -203,6 +213,17 @@ function getTranslatedNameForColumn(columnName) {
 		break;
 	case "Hashtags":
 		return $.i18n.prop('md_columnnames_hashtags');
+		break;
+	}
+}
+
+function getTranslatedNameForConversationColumn(columnName) {
+	switch(columnName) {
+	case "participantName":
+		return $.i18n.prop('md_convocolumnnames_participant');
+		break;
+	case "numMessages":
+		return $.i18n.prop('md_convocolumnnames_nummessages');
 		break;
 	}
 }

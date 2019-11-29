@@ -45,9 +45,11 @@ public class Metadata implements Serializable {
 	 */
 	public static final List<String> SORT_COLUMNS = Arrays.asList("ID", "Type", "State", "Slug", "Date", "Is Read",
 			"Is Favourite", "Hashtags");
+
 	/**
 	 * Static constant list of the different ways data can be sorted (ascending or
-	 * descending)
+	 * descending). Used for both Post column sort orders and Conversation column
+	 * sort orders.
 	 */
 	public static final List<String> SORT_ORDERS = Arrays.asList("Ascending", "Descending");
 
@@ -62,11 +64,16 @@ public class Metadata implements Serializable {
 	 * Static list of lengths the "number of records shown" drop-down can be set to
 	 */
 	public static final List<Integer> PAGE_LENGTHS = Arrays.asList(10, 25, 50, 100, -1);
-	
+
 	/**
 	 * Static list of different display style options for the Conversations page
 	 */
 	public static final List<String> CONVERSATION_DISPLAY_STYLES = Arrays.asList("cloud", "table");
+
+	/**
+	 * Static list of columns that can be sorted on the Conversations page
+	 */
+	public static final List<String> CONVERSATION_SORT_COLUMNS = Arrays.asList("participantName", "numMessages");
 
 	@Id
 	private Integer id;
@@ -82,6 +89,8 @@ public class Metadata implements Serializable {
 	private Boolean overwritePostData;
 	private Boolean overwriteConvoData;
 	private String conversationDisplayStyle;
+	private String conversationSortColumn;
+	private String conversationSortOrder;
 
 	/**
 	 * Helper function to generate a new Metadata object, with some defaults filled
@@ -103,15 +112,17 @@ public class Metadata implements Serializable {
 		md.setOverwritePostData(false);
 		md.setOverwriteConvoData(false);
 		md.setConversationDisplayStyle(CONVERSATION_DISPLAY_STYLES.get(0));
+		md.setConversationSortColumn(CONVERSATION_SORT_COLUMNS.get(0));
+		md.setConversationSortOrder(SORT_ORDERS.get(0));
 
 		return md;
 	}
-	
+
 	public void updateData(Metadata newDataObject) {
 		this.baseMediaPath = newDataObject.baseMediaPath;
 		this.favFilter = newDataObject.favFilter;
 		this.filter = newDataObject.filter;
-		//this.id = newDataObject.id;
+		// this.id = newDataObject.id;
 		this.mainTumblrUser = newDataObject.mainTumblrUser;
 		this.mainTumblrUserAvatarUrl = newDataObject.mainTumblrUserAvatarUrl;
 		this.overwriteConvoData = newDataObject.overwriteConvoData;
@@ -121,6 +132,8 @@ public class Metadata implements Serializable {
 		this.sortColumn = newDataObject.sortColumn;
 		this.sortOrder = newDataObject.sortOrder;
 		this.conversationDisplayStyle = newDataObject.conversationDisplayStyle;
+		this.conversationSortColumn = newDataObject.conversationSortColumn;
+		this.conversationSortOrder = newDataObject.conversationSortOrder;
 	}
 
 	@Override
@@ -190,6 +203,16 @@ public class Metadata implements Serializable {
 		if (conversationDisplayStyle != null) {
 			builder.append("conversationDisplayStyle=");
 			builder.append(conversationDisplayStyle);
+			builder.append(", ");
+		}
+		if (conversationSortColumn != null) {
+			builder.append("conversationSortColumn=");
+			builder.append(conversationSortColumn);
+			builder.append(", ");
+		}
+		if (conversationSortOrder != null) {
+			builder.append("conversationSortOrder=");
+			builder.append(conversationSortOrder);
 		}
 		builder.append("]");
 		return builder.toString();
@@ -297,6 +320,22 @@ public class Metadata implements Serializable {
 
 	public void setConversationDisplayStyle(String conversationDisplayStyle) {
 		this.conversationDisplayStyle = conversationDisplayStyle;
+	}
+
+	public String getConversationSortColumn() {
+		return conversationSortColumn;
+	}
+
+	public void setConversationSortColumn(String conversationSortColumn) {
+		this.conversationSortColumn = conversationSortColumn;
+	}
+
+	public String getConversationSortOrder() {
+		return conversationSortOrder;
+	}
+
+	public void setConversationSortOrder(String conversationSortOrder) {
+		this.conversationSortOrder = conversationSortOrder;
 	}
 
 }

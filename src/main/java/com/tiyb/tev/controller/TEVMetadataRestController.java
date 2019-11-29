@@ -106,6 +106,9 @@ public class TEVMetadataRestController {
 		for (String s : Metadata.CONVERSATION_DISPLAY_STYLES) {
 			sld.getConversationStyles().add(s);
 		}
+		for (String s : Metadata.CONVERSATION_SORT_COLUMNS) {
+			sld.getConversationSortColumns().add(s);
+		}
 
 		return sld;
 	}

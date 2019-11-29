@@ -1,5 +1,9 @@
 var metadata;
 
+var PARTICIPANT_COLUMN_NO = 0;
+var NUMMESSAGES_COLUMN_NO = 1;
+
+
 $.i18n.properties({
 	name: 'messages',
 	path: 'js/i18n/',
@@ -138,7 +142,12 @@ $(document).ready(function() {
 						window.open("/conversationViewer?participant=" + participant, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
 					}
 				});
-				
+				$('#conversationTable').on('order.dt', function() {
+					var dataTable = $('#conversationTable').DataTable();
+					var order = dataTable.order();
+					updateSortOrderInMD(order[0][0], order[0][1]);
+				});
+				sortTable();
 			}
 		});
 
@@ -155,6 +164,54 @@ $(document).ready(function() {
 		}
 	});
 });
+
+function sortTable() {
+	conversationTable = $('#conversationTable').DataTable();
+	
+	var sortOrder;
+	var sortColumn;
+	
+	if(metadata.conversationSortOrder == "Ascending") {
+		sortOrder = "asc";
+	} else {
+		sortOrder = "desc";
+	}
+	
+	switch(metadata.conversationSortColumn) {
+	case "participantName":
+		sortColumn = PARTICIPANT_COLUMN_NO;
+		break;
+	case "numMessages":
+		sortColumn = NUMMESSAGES_COLUMN_NO;
+		break;
+	default:
+		sortColumn = PARTICIPANT_COLUMN_NO;
+	}
+	
+	conversationTable.order([sortColumn, sortOrder]).draw();
+}
+
+function updateSortOrderInMD(column, order) {
+	switch(column) {
+	case PARTICIPANT_COLUMN_NO:
+		metadata.conversationSortColumn = "participantName";
+		break;
+	case NUMMESSAGES_COLUMN_NO:
+		metadata.conversationSortColumn = "numMessages";
+		break;
+	default:
+		metadata.sortColumn = "participantName";
+		break;
+	}
+	
+	if(order == "asc") {
+		metadata.conversationSortOrder = "Ascending";
+	} else {
+		metadata.conversationSortOrder = "Descending";
+	}
+	
+	updateMDAPI();
+}
 
 function updateMDAPI() {
 	$.ajax({

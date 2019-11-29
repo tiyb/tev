@@ -21,6 +21,7 @@ public class StaticListData implements Serializable {
 	private List<String> favFilters = new ArrayList<String>();
 	private List<Integer> pageLengths = new ArrayList<Integer>();
 	private List<String> conversationStyles = new ArrayList<String>();
+	private List<String> conversationSortColumns = new ArrayList<String>();
 
 	public List<String> getFilterTypes() {
 		return filterTypes;
@@ -68,5 +69,13 @@ public class StaticListData implements Serializable {
 
 	public void setConversationStyles(List<String> conversationStyles) {
 		this.conversationStyles = conversationStyles;
+	}
+
+	public List<String> getConversationSortColumns() {
+		return conversationSortColumns;
+	}
+
+	public void setConversationSortColumns(List<String> conversationSortColumns) {
+		this.conversationSortColumns = conversationSortColumns;
 	}
 }
