@@ -4,7 +4,7 @@ $.i18n.properties({
 	mode: 'both'
 });
 
-var imagesExportPath;
+var metadataObject;
 
 $(document).ready(function() {
 	$('#header').load("/header");
@@ -82,6 +82,8 @@ $(document).ready(function() {
 			var data = stagedPostTable.row($(this).parents('tr')).data();
 			var postID = $(data[0]).first().text();
 			
+			var imagesExportPath = metadataObject.exportImagesFilePath;
+			
 			imagesExportPath = prompt("Image Output Path:", imagesExportPath);
 			if((imagesExportPath == null) || (imagesExportPath.length < 1)) {
 				alert("please enter a destination");
@@ -101,7 +103,25 @@ $(document).ready(function() {
 					alert($.i18n.prop('staging_imageexport_failure', xhr.responseText));
 				}
 			});
+			
+			if(metadataObject.exportImagesFilePath != imagesExportPath) {
+				metadataObject.exportImagesFilePath = imagesExportPath;
+				
+				$.ajax({
+					url: '/api/metadata',
+					type: 'PUT',
+					data: JSON.stringify(metadataObject),
+					contentType: 'application/json'
+				});
+			}
 		});
+	});
+	
+	$.ajax({
+		url: "/api/metadata",
+		dataSrc: ""
+	}).then(function(data) {
+		metadataObject = data;
 	});
 	
 	$('#downloadButton').click(function() {

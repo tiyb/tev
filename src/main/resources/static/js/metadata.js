@@ -76,6 +76,7 @@ $(document).ready(function () {
 			$('#conversationDisplayDropdown').val(metadataObject.conversationDisplayStyle);
 			$('#mainUser').val(metadataObject.mainTumblrUser);
 			$('#mainUserAvatarUrl').val(metadataObject.mainTumblrUserAvatarUrl);
+			$('#imageExportPath').val(metadataObject.exportImagesFilePath);
 			if(metadataObject.showReadingPane == "true") {
 				$('#showReadingPaneDropdown').val('true');
 			} else {
@@ -112,6 +113,7 @@ $(document).ready(function () {
 		metadataObject.overwritePostData = $('#overwritePostsDropdown').val();
 		metadataObject.overwriteConvoData = $('#overwriteConvosDropdown').val();
 		metadataObject.conversationDisplayStyle = $('#conversationDisplayDropdown').val();
+		metadataObject.imageExportPath = $('#imageExportPath').val();
 		
 		$.ajax({
 			url: '/api/metadata',

@@ -91,6 +91,7 @@ public class Metadata implements Serializable {
 	private String conversationDisplayStyle;
 	private String conversationSortColumn;
 	private String conversationSortOrder;
+	private String exportImagesFilePath;
 
 	/**
 	 * Helper function to generate a new Metadata object, with some defaults filled
@@ -134,6 +135,7 @@ public class Metadata implements Serializable {
 		this.conversationDisplayStyle = newDataObject.conversationDisplayStyle;
 		this.conversationSortColumn = newDataObject.conversationSortColumn;
 		this.conversationSortOrder = newDataObject.conversationSortOrder;
+		this.exportImagesFilePath = newDataObject.exportImagesFilePath;
 	}
 
 	@Override
@@ -213,6 +215,11 @@ public class Metadata implements Serializable {
 		if (conversationSortOrder != null) {
 			builder.append("conversationSortOrder=");
 			builder.append(conversationSortOrder);
+			builder.append(", ");
+		}
+		if (exportImagesFilePath != null) {
+			builder.append("exportImagesFilePath=");
+			builder.append(exportImagesFilePath);
 		}
 		builder.append("]");
 		return builder.toString();
@@ -336,6 +343,14 @@ public class Metadata implements Serializable {
 
 	public void setConversationSortOrder(String conversationSortOrder) {
 		this.conversationSortOrder = conversationSortOrder;
+	}
+
+	public String getExportImagesFilePath() {
+		return exportImagesFilePath;
+	}
+
+	public void setExportImagesFilePath(String exportImagesFilePath) {
+		this.exportImagesFilePath = exportImagesFilePath;
 	}
 
 }
