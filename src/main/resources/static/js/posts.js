@@ -470,10 +470,6 @@ function getReadableType(typeValue) {
 	}
 } 
 
-
-
-
-
 function getFormattedDate(inputDate) {
 	var newDate = new Date(inputDate);
 	var formattedDate = newDate.getFullYear() + "-"

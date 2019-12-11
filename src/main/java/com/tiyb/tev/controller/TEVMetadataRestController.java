@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -109,7 +110,7 @@ public class TEVMetadataRestController {
 		for (String s : Metadata.CONVERSATION_SORT_COLUMNS) {
 			sld.getConversationSortColumns().add(s);
 		}
-		for(String s : Metadata.THEMES) {
+		for (String s : Metadata.THEMES) {
 			sld.getThemes().add(s);
 		}
 
@@ -117,10 +118,18 @@ public class TEVMetadataRestController {
 	}
 
 	/**
+	 * <p>
 	 * PUT to update metadata details in the database. Code always acts as if there
 	 * is one (and only one) record in the DB, even if it's empty; if no record
 	 * exists to be updated, a new one is created instead. For this reason, the ID
 	 * is always 1.
+	 * </p>
+	 * 
+	 * <p>
+	 * An assertion has been added that the theme must be one of the pre-defined
+	 * themes; it was determined that putting an invalid theme in the system causes
+	 * the application to fail non-gracefully.
+	 * </p>
 	 * 
 	 * @param metadataDetails The data to be updated in the DB
 	 * @return The updated {@link com.tiyb.tev.datamodel.Metadata Metadata} object
@@ -136,6 +145,9 @@ public class TEVMetadataRestController {
 			md.setId(1);
 		}
 
+		Assert.hasText(metadataDetails.getTheme(), "Theme must not be null");
+		Assert.isTrue(Metadata.THEMES.contains(metadataDetails.getTheme()),
+				"Theme must be one of the pre-defined values");
 		md.updateData(metadataDetails);
 
 		Metadata returnValue = metadataRepo.save(md);

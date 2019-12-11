@@ -501,8 +501,8 @@ public class TEVUIController {
 	private void updateModelWithTheme(Model model) {
 		Metadata md = mdController.getMetadata();
 		String theme = md.getTheme();
-		if (theme.equals("")) {
-			theme = "start";
+		if (theme == null || theme.equals("")) {
+			theme = "base";
 			md.setTheme(theme);
 			mdController.updateMetadata(md);
 		}

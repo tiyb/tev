@@ -17,54 +17,7 @@ $(document).ready(function () {
 		method: "GET",
 		data: ""
 	}).then(function(data) {
-		$.each(data.sortOrders, function(i, obj) {
-			var divData = "<option value='" + obj + "'>" + getTranslatedSortOrder(obj) + "</option>";
-			$(divData).appendTo('#sortOrderDropdown');
-			var divData2 = "<option value='" + obj + "'>" + getTranslatedSortOrder(obj) + "</option>";
-			$(divData2).appendTo('#conversationSortOrderDropdown');
-		});
-		$.each(data.sortColumns, function(i, obj) {
-			var divData = "<option value='" + obj + "'>" + getTranslatedNameForColumn(obj) + "</option>";
-			$(divData).appendTo('#sortByDropdown');
-		});
-		$.each(data.conversationSortColumns, function(i, obj) {
-			var divData = "<option value='" + obj + "'>" + getTranslatedNameForConversationColumn(obj) + "</option>";
-			$(divData).appendTo('#conversationSortColumnDropdown');
-		});
-		$.each(data.filterTypes, function(i, obj) {
-			var divData = "<option value='" + obj + "'>" + getTranslatedFilterTypes(obj) + "</option>";
-			$(divData).appendTo('#filterDropdown');
-		});
-		$.each(data.favFilters, function(i, obj) {
-			var divData = "<option value='" + obj + "'>" + getTranslatedFavFilters(obj) + "</option>";
-			$(divData).appendTo('#favsDropdown');
-		});
-		$.each(data.pageLengths, function(i, obj) {
-			var divData = "<option value='" + obj + "'>" + getTranslatedPageLength(obj) + "</option>";
-			$(divData).appendTo('#pageLengthDropdown');
-		});
-		$.each(data.conversationStyles, function(i, obj) {
-			var divData = "<option value='" + obj + "'>" + getTranslatedConversationStyle(obj) + "</option>";
-			$(divData).appendTo('#conversationDisplayDropdown');
-		});
-		$.each(data.themes, function(i, obj) {
-			var divData = "<option value='" + obj + "'>" + getTranslatedTheme(obj) + "</option>";
-			$(divData).appendTo('#themesDropdown');
-		});
-		var divData = "<option value='true'>" + $.i18n.prop('md_showReadingPaneYes') + "</option>";
-		$(divData).appendTo('#showReadingPaneDropdown');
-		divData = "<option value='false'>" + $.i18n.prop('md_showReadingPaneNo') + "</option>";
-		$(divData).appendTo('#showReadingPaneDropdown');
-		
-		divData = "<option value='true'>" + $.i18n.prop('md_overwritePostsYes') + "</option>";
-		$(divData).appendTo('#overwritePostsDropdown');
-		divData = "<option value='false'>" + $.i18n.prop('md_overwritePostsNo') + "</option>";
-		$(divData).appendTo('#overwritePostsDropdown');
-		
-		divData = "<option value='true'>" + $.i18n.prop('md_overwriteConvosYes') + "</option>";
-		$(divData).appendTo('#overwriteConvosDropdown');
-		divData = "<option value='false'>" + $.i18n.prop('md_overwriteConvosNo') + "</option>";
-		$(divData).appendTo('#overwriteConvosDropdown');
+		fillDropdownsWithValues(data);
 		
 		$.ajax({
 			url: "/api/metadata",
@@ -105,36 +58,7 @@ $(document).ready(function () {
 	});
 	
 	$('#submitButton').click(function() {
-		var dataObject = new Object();
-		metadataObject.baseMediaPath = $('#baseMediaPath').val();
-		metadataObject.mainTumblrUser = $('#mainUser').val();
-		metadataObject.mainTumblrUserAvatarUrl = $('#mainUserAvatarUrl').val();
-		metadataObject.sortOrder = $('#sortOrderDropdown').val();
-		metadataObject.conversationSortOrder = $('#conversationSortOrderDropdown').val();
-		metadataObject.sortColumn = $('#sortByDropdown').val();
-		metadataObject.conversationSortColumn = $('#conversationSortColumnDropdown').val();
-		metadataObject.filter = $('#filterDropdown').val();
-		metadataObject.favFilter = $('#favsDropdown').val();
-		metadataObject.pageLength = $('#pageLengthDropdown').val();
-		metadataObject.showReadingPane = $('#showReadingPaneDropdown').val();
-		metadataObject.overwritePostData = $('#overwritePostsDropdown').val();
-		metadataObject.overwriteConvoData = $('#overwriteConvosDropdown').val();
-		metadataObject.conversationDisplayStyle = $('#conversationDisplayDropdown').val();
-		metadataObject.imageExportPath = $('#imageExportPath').val();
-		metadataObject.theme = $('#themesDropdown').val();
-		
-		$.ajax({
-			url: '/api/metadata',
-			type: 'PUT',
-			data: JSON.stringify(metadataObject),
-			contentType: 'application/json',
-			success: function(data, textStatus, xhr) {
-				createAnInfoMessage($.i18n.prop('md_submit_success'));
-			},
-			error: function(xhr, textStatus, errorThrown) {
-				creaeAnErrorMessage($.i18n.prop('md_submit_failure'));
-			}
-		});
+		updateServer();
 	});
 	
 	$('#markAllPostsReadButton').click(function() {
@@ -328,3 +252,70 @@ function setUIWidgets() {
 	$('#conversationSortOrderDropdown').selectmenu();
 }
 
+function fillDropdownsWithValues(data) {
+	$.each(data.sortOrders, function(i, obj) {
+		addOptionToSelect(obj, "sortOrderDropdown", getTranslatedSortOrder(obj));
+		addOptionToSelect(obj, "conversationSortOrderDropdown", getTranslatedSortOrder(obj));
+	});
+	$.each(data.sortColumns, function(i, obj) {
+		addOptionToSelect(obj, "sortByDropdown", getTranslatedNameForColumn(obj));
+	});
+	$.each(data.conversationSortColumns, function(i, obj) {
+		addOptionToSelect(obj, "conversationSortColumnDropdown", getTranslatedNameForConversationColumn(obj));
+	});
+	$.each(data.filterTypes, function(i, obj) {
+		addOptionToSelect(obj, "filterDropdown", getTranslatedFilterTypes(obj));
+	});
+	$.each(data.favFilters, function(i, obj) {
+		addOptionToSelect(obj, "favsDropdown", getTranslatedFavFilters(obj));
+	});
+	$.each(data.pageLengths, function(i, obj) {
+		addOptionToSelect(obj, "pageLengthDropdown", getTranslatedPageLength(obj));
+	});
+	$.each(data.conversationStyles, function(i, obj) {
+		addOptionToSelect(obj, "conversationDisplayDropdown", getTranslatedConversationStyle(obj));
+	});
+	$.each(data.themes, function(i, obj) {
+		addOptionToSelect(obj, "themesDropdown", getTranslatedTheme(obj));
+	});
+	addOptionToSelect("true", "showReadingPaneDropdown", $.i18n.prop('md_showReadingPaneYes'))
+	addOptionToSelect("false", "showReadingPaneDropdown", $.i18n.prop('md_showReadingPaneNo'))
+	
+	addOptionToSelect("true", "overwritePostsDropdown", $.i18n.prop('md_overwritePostsYes'))
+	addOptionToSelect("false", "overwritePostsDropdown", $.i18n.prop('md_overwritePostsNo'))
+	
+	addOptionToSelect("true", "overwriteConvosDropdown", $.i18n.prop('md_overwriteConvosYes'));
+	addOptionToSelect("false", "overwriteConvosDropdown", $.i18n.prop('md_overwriteConvosNo'));	
+}
+
+function updateServer() {
+	metadataObject.baseMediaPath = $('#baseMediaPath').val();
+	metadataObject.mainTumblrUser = $('#mainUser').val();
+	metadataObject.mainTumblrUserAvatarUrl = $('#mainUserAvatarUrl').val();
+	metadataObject.sortOrder = $('#sortOrderDropdown').val();
+	metadataObject.conversationSortOrder = $('#conversationSortOrderDropdown').val();
+	metadataObject.sortColumn = $('#sortByDropdown').val();
+	metadataObject.conversationSortColumn = $('#conversationSortColumnDropdown').val();
+	metadataObject.filter = $('#filterDropdown').val();
+	metadataObject.favFilter = $('#favsDropdown').val();
+	metadataObject.pageLength = $('#pageLengthDropdown').val();
+	metadataObject.showReadingPane = $('#showReadingPaneDropdown').val();
+	metadataObject.overwritePostData = $('#overwritePostsDropdown').val();
+	metadataObject.overwriteConvoData = $('#overwriteConvosDropdown').val();
+	metadataObject.conversationDisplayStyle = $('#conversationDisplayDropdown').val();
+	metadataObject.imageExportPath = $('#imageExportPath').val();
+	metadataObject.theme = $('#themesDropdown').val();
+	
+	$.ajax({
+		url: '/api/metadata',
+		type: 'PUT',
+		data: JSON.stringify(metadataObject),
+		contentType: 'application/json',
+		success: function(data, textStatus, xhr) {
+			createAnInfoMessage($.i18n.prop('md_submit_success'));
+		},
+		error: function(xhr, textStatus, errorThrown) {
+			creaeAnErrorMessage($.i18n.prop('md_submit_failure'));
+		}
+	});	
+}
