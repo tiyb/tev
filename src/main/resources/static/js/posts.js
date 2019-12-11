@@ -442,7 +442,7 @@ function updateMDAPI() {
 		data: JSON.stringify(metadata),
 		contentType: 'application/json',
 		error: function(xhr, textStatus, errorThrown) {
-			alert($.i18n.prop('index_errorsubmittingdata'));
+			createAnErrorMessage($.i18n.prop('index_errorsubmittingdata'));
 		}
 	});	
 }

@@ -134,12 +134,3 @@ h2 {
 	cursor: pointer;
 }
 
-#exportedXMLText {
-	display: block;
-	box-sizing: padding-box;
-	overflow: hidden;
-	padding: 10px;
-	width: 98%;
-	font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
-	background-color:#EEEEEE;
-}

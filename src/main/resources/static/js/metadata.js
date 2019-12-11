@@ -129,10 +129,10 @@ $(document).ready(function () {
 			data: JSON.stringify(metadataObject),
 			contentType: 'application/json',
 			success: function(data, textStatus, xhr) {
-				alert($.i18n.prop('md_submit_success'));
+				createAnInfoMessage($.i18n.prop('md_submit_success'));
 			},
 			error: function(xhr, textStatus, errorThrown) {
-				alert($.i18n.prop('md_submit_failure'));
+				creaeAnErrorMessage($.i18n.prop('md_submit_failure'));
 			}
 		});
 	});
@@ -142,10 +142,10 @@ $(document).ready(function () {
 			url: '/admintools/posts/markAllRead',
 			type: 'GET',
 			success: function(data, textStatus, xhr) {
-				alert($.i18n.prop('md_admintools_markAllReadSuccess'));
+				createAnInfoMessage($.i18n.prop('md_admintools_markAllReadSuccess'));
 			},
 			error: function(xhr, textStatus, errorThrown) {
-				alert($.i18n.prop('md_admintools_markAllReadFailure'));
+				createAnErrorMessage($.i18n.prop('md_admintools_markAllReadFailure'));
 			}
 		});
 	});
@@ -155,10 +155,10 @@ $(document).ready(function () {
 			url: '/admintools/posts/markAllUnread',
 			type: 'GET',
 			success: function(data, textStatus, xhr) {
-				alert($.i18n.prop('md_admintools_markAllUnreadSuccess'));
+				createAnInfoMessage($.i18n.prop('md_admintools_markAllUnreadSuccess'));
 			},
 			error: function(xhr, textStatus, errorThrown) {
-				alert($.i18n.prop('md_admintools_markAllUnreadFailure'));
+				createAnErrorMessage($.i18n.prop('md_admintools_markAllUnreadFailure'));
 			}
 		});
 	});
@@ -168,17 +168,17 @@ $(document).ready(function () {
 			url: '/admintools/posts/cleanImagesOnHD',
 			type: 'GET',
 			success: function(data, textStatus, xhr) {
-				alert($.i18n.prop('md_admintools_cleanImagesSuccess'));
+				createAnInfoMessage($.i18n.prop('md_admintools_cleanImagesSuccess'));
 			},
 			error: function(xhr, textStatus, errorThrown) {
-				alert($.i18n.prop('md_admintools_cleanImagesFailure'));
+				createAnErrorMessage($.i18n.prop('md_admintools_cleanImagesFailure'));
 			}
 		});
 	});
 	
 	$('#importImagesButton').click(function() {
 		if($('#importImagesPath').val().length < 1) {
-			alert($.i18n.prop('md_admintools_importImagesBadPath'));
+			createAnErrorMessage($.i18n.prop('md_admintools_importImagesBadPath'));
 			return;
 		}
 		
@@ -189,10 +189,10 @@ $(document).ready(function () {
 			async: false,
 			contentType: 'text/plain',
 			success: function(data, textStatus, xhr) {
-				alert($.i18n.prop('md_admintools_importImagesSuccess'));
+				createAnInfoMessage($.i18n.prop('md_admintools_importImagesSuccess'));
 			},
 			error: function(xhr, textStatus, errorThrown) {
-				alert($.i18n.prop('md_admintools_importImagesFailure'));
+				createAnErrorMessage($.i18n.prop('md_admintools_importImagesFailure'));
 			}
 		});
 	});
@@ -327,3 +327,4 @@ function setUIWidgets() {
 	$('#conversationSortColumnDropdown').selectmenu();
 	$('#conversationSortOrderDropdown').selectmenu();
 }
+

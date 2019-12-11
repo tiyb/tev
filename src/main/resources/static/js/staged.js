@@ -86,7 +86,7 @@ $(document).ready(function() {
 			
 			imagesExportPath = prompt("Image Output Path:", imagesExportPath);
 			if((imagesExportPath == null) || (imagesExportPath.length < 1)) {
-				alert("please enter a destination");
+				createAnErrorMessage("please enter a destination");
 				return;
 			}
 			
@@ -97,10 +97,10 @@ $(document).ready(function() {
 				contentType: "text/plain",
 				dataSrc: "",
 				success: function(data, textStatus, xhr) {
-					alert($.i18n.prop('staging_imageexport_success'));
+					createAnInfoMessage($.i18n.prop('staging_imageexport_success'));
 				},
 				error: function(xhr, textStatus, errorThrown) {
-					alert($.i18n.prop('staging_imageexport_failure', xhr.responseText));
+					createAnErrorMessage($.i18n.prop('staging_imageexport_failure', xhr.responseText));
 				}
 			});
 			

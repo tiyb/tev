@@ -5,11 +5,16 @@
     <title th:text="#{exportedxml.title}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <link rel="stylesheet" type="text/css" th:href="@{/css/postviewer.css}"/>
+    <link rel="stylesheet" type="text/css"
+          href="webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/jquery-ui.min.css'}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/tev.css'}"/>    
+    <link rel="stylesheet" type="text/css" th:href="@{/css/datatables.min.css}"/>
 </head>
 <body>
 
-<div class="contentContainer">
+<div class="container-fluid">
 <h1 th:text="#{exportedxml.title}"></h1>
 <textarea id="exportedXMLText" class="autoExpand" rows="3" data-min-rows="3"></textarea>
 </div>
@@ -20,6 +25,7 @@
         src="webjars/jquery-i18n-properties/1.10.2/jquery.i18n.properties.min.js"></script>
 
 <script type="text/javascript" th:src="@{/js/exportedxml.js}"></script>
+	<script type="text/javascript" th:src="@{/js/jquery-ui.min.js}"></script>
 
 
 </body>

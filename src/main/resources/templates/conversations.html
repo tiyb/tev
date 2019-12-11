@@ -18,6 +18,7 @@
 <div id="header"></div>
 
 <div class="container-fluid">
+<div id="messageAreas"></div>
 <h1 th:text="#{conversations.title}"></h1>
 <p th:text="#{conversations.explanatoryText(${metadata.mainTumblrUser})}"></p>
 <div id="radioContainer">
@@ -79,6 +80,7 @@
 <script type="text/javascript" th:src="@{/js/datatables.min.js}"></script>
 
 <script type="text/javascript" th:src="@{/js/conversations.js}"></script>
+<script type="text/javascript" th:src="@{/js/message-areas.js}"></script>
 
 </body>
 </html>
