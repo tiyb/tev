@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -20,6 +21,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 
 import com.tiyb.tev.datamodel.Metadata;
+import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.xml.BlogXmlReader;
 
 /**
@@ -190,5 +192,61 @@ public class TevAdminToolsUnitTests {
 
 		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
 	}
-
+	
+	/**
+	 * Tests functionality for marking all posts read
+	 */
+	@Test
+	public void testMarkingAllPostsRead() {
+		List<Post> allPosts = postController.getAllPosts();
+		assertThat(allPosts).isNotNull();
+		
+		for(Post p : allPosts) {
+			p.setIsRead(false);
+			postController.updatePost(p.getId(), p);
+		}
+		
+		allPosts = postController.getAllPosts();
+		assertThat(allPosts).isNotNull();
+		for(Post p : allPosts) {
+			assertThat(p.getIsRead()).isEqualTo(false);
+		}
+		
+		adminRestController.markAllPostsRead();
+		
+		allPosts = postController.getAllPosts();
+		assertThat(allPosts).isNotNull();
+		for(Post p : allPosts) {
+			assertThat(p.getIsRead()).isEqualTo(true);
+		}
+	}
+	
+	/**
+	 * Tests functionality for marking all posts unread
+	 */
+	@Test
+	public void testMarkingAllPostsUnread() {
+		List<Post> allPosts = postController.getAllPosts();
+		assertThat(allPosts).isNotNull();
+		
+		for(Post p : allPosts) {
+			p.setIsRead(true);
+			postController.updatePost(p.getId(), p);
+		}
+		
+		allPosts = postController.getAllPosts();
+		assertThat(allPosts).isNotNull();
+		for(Post p : allPosts) {
+			assertThat(p.getIsRead()).isEqualTo(true);
+		}
+		
+		adminRestController.markAllPostsUnread();
+		
+		allPosts = postController.getAllPosts();
+		assertThat(allPosts).isNotNull();
+		for(Post p : allPosts) {
+			assertThat(p.getIsRead()).isEqualTo(false);
+		}
+	}
+	
 }
