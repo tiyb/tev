@@ -8,7 +8,6 @@
  * @param optionText
  *            The value that should be shown for the item (only used if
  *            translationFunction is null)
- * @returns
  */
 function addOptionToSelect(optionValue, selectName, optionText) {
 	var optionData = "<option value='" + optionValue + "'>" + optionText

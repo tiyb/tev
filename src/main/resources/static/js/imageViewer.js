@@ -1,3 +1,7 @@
+/**
+ * For the post viewer for Photo posts, adds the event handler for the "fix
+ * images" button
+ */
 $(document).ready(function() {
 	$('#fixImagesButton').click(function() {
 		$.ajax({

@@ -1,3 +1,6 @@
+/**
+ * Initializes the auto-expanding text area, where the XML sets
+ */
 $(document).ready(function() {
 	$(document).one('focus.autoExpand', 'textarea.autoExpand', function() {
 		var savedValue = this.value;
@@ -16,6 +19,13 @@ $(document).ready(function() {
 	});
 });
 
+/**
+ * Called when the text area has new content added, for re-expansion as
+ * necessary
+ * 
+ * @param te
+ *            The text area to be expanded
+ */
 function resizeTextArea(te) {
 	var minRows = te.getAttribute('data-min-rows')|0, rows;
 	te.rows = minRows;

@@ -1,6 +1,11 @@
 var messageCounter = 0;
 var TIMEOUT_VALUE = 10000;
 
+/**
+ * Initializes the containing page by finding the "messageAreas" div on the
+ * containing page, and adding content holders for informational and error
+ * messages. They are not shown unless and until they are needed.
+ */
 $(document).ready(function() {
 	var messageAreas = "<div class='ui-widget' id='infoMessageContent' style='display:none;'>"
 		+ "<div class='ui-state-highlight ui-corner-all' id='infoMessageText'>"
@@ -14,6 +19,15 @@ $(document).ready(function() {
 	$(messageAreas).appendTo('#messageAreas');
 });
 
+/**
+ * Creates an informational message in a message area (wherever the containing
+ * page put it), using Themeroller styles. Once the message has been created, a
+ * timer is set to remove it again; when messages are removed, the code checks
+ * to see if the container is now empty (in which case it is hidden).
+ * 
+ * @param message
+ *            The message to be displayed
+ */
 function createAnInfoMessage(message) {
 	$('#infoMessageContent').show();
 	messageCounter++;
@@ -32,6 +46,15 @@ function createAnInfoMessage(message) {
 	setTimeout(removeMsg, TIMEOUT_VALUE);
 }
 
+/**
+ * Creates an error message in a message area (wherever the containing page put
+ * it), using Themeroller styles. Once the message has been created, a timer is
+ * set to remove it again; when messages are removed, the code checks to see if
+ * the container is now empty (in which case it is hidden).
+ * 
+ * @param message
+ *            The message to be displayed
+ */
 function createAnErrorMessage(message) {
 	$('#errorMessageContent').show();
 	messageCounter++;

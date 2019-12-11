@@ -1,5 +1,11 @@
+/**
+ * Holder variable for metadata information
+ */
 var metadata;
 
+/**
+ * Columns in the conversation table
+ */
 var PARTICIPANT_COLUMN_NO = 0;
 var NUMMESSAGES_COLUMN_NO = 1;
 
@@ -26,6 +32,8 @@ $(document).ready(function() {
 		});
 	});
 
+	// load the metadata from the server, populate the radio buttons, and show
+	// the table or reading pane accordingly
 	$.ajax({
 		url: "/api/metadata",
 		dataSrc: ""
@@ -74,6 +82,7 @@ $(document).ready(function() {
 		updateMDAPI();
 	});
 	
+	// load the conversations from the server
 	$.ajax({
 		url: "/api/conversations/unhidden",
 		dataSrc: ""
@@ -167,6 +176,9 @@ $(document).ready(function() {
 	});
 });
 
+/**
+ * Used to sort the table, based on metadata and/or user selection
+ */
 function sortTable() {
 	conversationTable = $('#conversationTable').DataTable();
 	
@@ -193,6 +205,14 @@ function sortTable() {
 	conversationTable.order([sortColumn, sortOrder]).draw();
 }
 
+/**
+ * Update server metadata with updated sort order (based on user selection)
+ * 
+ * @param column
+ *            The ID of the column to be sorted
+ * @param order
+ *            The sort order (ascending or descending)
+ */
 function updateSortOrderInMD(column, order) {
 	switch(column) {
 	case PARTICIPANT_COLUMN_NO:
@@ -215,6 +235,9 @@ function updateSortOrderInMD(column, order) {
 	updateMDAPI();
 }
 
+/**
+ * Send updated metadata to the server
+ */
 function updateMDAPI() {
 	$.ajax({
 		url: '/api/metadata',
@@ -227,6 +250,9 @@ function updateMDAPI() {
 	});	
 }
 
+/**
+ * Sets up any Themeroller widgets that need to be pre-set
+ */
 function setUIWidgets() {
 	$("input[type='radio']").checkboxradio();
 }

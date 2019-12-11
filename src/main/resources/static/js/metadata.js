@@ -6,6 +6,10 @@ $.i18n.properties({
 	mode: 'both'
 });
 
+/**
+ * Download the static data to populate drop-downs; download metadata to
+ * populate the form, set up event handlers
+ */
 $(document).ready(function () {
 	$('#header').load("/header");
 	$('#footer').load("/footer");
@@ -123,6 +127,13 @@ $(document).ready(function () {
 	
 });
 
+/**
+ * Returns a translated name for a column
+ * 
+ * @param columnName
+ *            ID / code name of column
+ * @returns User-friendly column name
+ */
 function getTranslatedNameForColumn(columnName) {
 	switch(columnName) {
 	case "ID":
@@ -152,6 +163,13 @@ function getTranslatedNameForColumn(columnName) {
 	}
 }
 
+/**
+ * Returns a translated name for a conversation column
+ * 
+ * @param columnName
+ *            ID / code name of column
+ * @returns User-friendly column name
+ */
 function getTranslatedNameForConversationColumn(columnName) {
 	switch(columnName) {
 	case "participantName":
@@ -163,6 +181,13 @@ function getTranslatedNameForConversationColumn(columnName) {
 	}
 }
 
+/**
+ * Returns a translated text for a sort order value
+ * 
+ * @param sortOrder
+ *            ID / code name of value
+ * @returns User-friendly value
+ */
 function getTranslatedSortOrder(sortOrder) {
 	switch(sortOrder) {
 	case "Ascending":
@@ -174,6 +199,13 @@ function getTranslatedSortOrder(sortOrder) {
 	}
 }
 
+/**
+ * Returns a translated text for a filter type
+ * 
+ * @param filterType
+ *            ID / code name of value
+ * @returns User-friendly value
+ */
 function getTranslatedFilterTypes(filterType) {
 	switch(filterType) {
 	case "Filter Read Posts":
@@ -188,6 +220,13 @@ function getTranslatedFilterTypes(filterType) {
 	}
 }
 
+/**
+ * Returns a translated text for a favourite filter
+ * 
+ * @param favFilter
+ *            ID / code name of value
+ * @returns User-friendly value
+ */
 function getTranslatedFavFilters(favFilter) {
 	switch(favFilter) {
 	case "Show Favourites":
@@ -202,6 +241,13 @@ function getTranslatedFavFilters(favFilter) {
 	}
 }
 
+/**
+ * Returns a translated text for a page length value
+ * 
+ * @param pageLength
+ *            ID / code name of value
+ * @returns User-friendly value
+ */
 function getTranslatedPageLength(pageLength) {
 	switch(pageLength) {
 	case 10:
@@ -222,6 +268,13 @@ function getTranslatedPageLength(pageLength) {
 	}
 }
 
+/**
+ * Returns a translated text for a conversation display style
+ * 
+ * @param conversationStyle
+ *            ID / code name of value
+ * @returns User-friendly value
+ */
 function getTranslatedConversationStyle(conversationStyle) {
 	switch(conversationStyle) {
 	case "cloud":
@@ -233,10 +286,21 @@ function getTranslatedConversationStyle(conversationStyle) {
 	}
 }
 
+/**
+ * Returns a translated text for a theme name
+ * 
+ * @param themeID
+ *            ID / code name of value
+ * @returns User-friendly value
+ */
 function getTranslatedTheme(themeID) {
 	return $.i18n.prop('md_themes_' + themeID);
 }
 
+/**
+ * Sets any Themeroller widgets that need to be instantiated (in this case, just
+ * select menus)
+ */
 function setUIWidgets() {
 	$('#filterDropdown').selectmenu();
 	$('#sortByDropdown').selectmenu();
@@ -252,6 +316,13 @@ function setUIWidgets() {
 	$('#conversationSortOrderDropdown').selectmenu();
 }
 
+/**
+ * Goes through the static data and uses it to populate all of the drop-downs on
+ * the page
+ * 
+ * @param data
+ *            The static list data
+ */
 function fillDropdownsWithValues(data) {
 	$.each(data.sortOrders, function(i, obj) {
 		addOptionToSelect(obj, "sortOrderDropdown", getTranslatedSortOrder(obj));
@@ -288,6 +359,9 @@ function fillDropdownsWithValues(data) {
 	addOptionToSelect("false", "overwriteConvosDropdown", $.i18n.prop('md_overwriteConvosNo'));	
 }
 
+/**
+ * Sends values from the form to the server to update the Metadata
+ */
 function updateServer() {
 	metadataObject.baseMediaPath = $('#baseMediaPath').val();
 	metadataObject.mainTumblrUser = $('#mainUser').val();

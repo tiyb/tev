@@ -1,5 +1,8 @@
 var metadata;
 
+/**
+ * IDs for the columns in the table; used for various purposes
+ */
 var ID_COLUMN_NO = 0;
 var TYPE_COLUMN_NO = 1;
 var STATE_COLUMN_NO = 2;
@@ -9,6 +12,9 @@ var DATE_COLUMN_NO = 5;
 var FAV_COLUMN_NO = 6;
 var READ_COLUMN_NO = 7;
 
+/**
+ * Indicator as to whether the "additional options" are showing
+ */
 var additionalOptionsShowing = false;
 
 $.i18n.properties({
@@ -17,6 +23,12 @@ $.i18n.properties({
 	mode: 'both'
 });
 
+/**
+ * Set up Themeroller widgets; load metadata from the server (to set radio
+ * buttons to their defaults); initialize DataTable (which will download its own
+ * data, via REST); set up event handlers; check to see if an external search
+ * was performed (via URL) and filter table accordingly.
+ */
 $(document).ready(function() {
 	$('#header').load("/header");
 	$('#footer').load("/footer");
@@ -234,8 +246,6 @@ $(document).ready(function() {
 			$('#postTable tfoot tr:eq(1) th:eq(3) input').change();
 		}
 		
-
-		
 	});
 	
 	$('input[type=radio][name=filterRead]').change(function() {
@@ -306,6 +316,10 @@ $(document).ready(function() {
 	
 });
 
+/**
+ * Logic for filtering the data in the table, by read/unread and
+ * favourite/non-favourite.
+ */
 $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
 	var filterVal = metadata.filter;
 	var favFilterVal = metadata.favFilter;
@@ -350,6 +364,10 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
 	return false;
 });
 
+/**
+ * Figures out the correct sort order, and then has the DataTable sort itself
+ * accordingly
+ */
 function sortTable() {
 	postTable = $('#postTable').DataTable();
 	
@@ -395,6 +413,15 @@ function sortTable() {
 	postTable.order([sortColumn, sortOrder]).draw();
 }
 
+/**
+ * Updates Metadata with new sort order, and then sends the update to the server
+ * via REST
+ * 
+ * @param column
+ *            The new column chosen for sorting
+ * @param order
+ *            The order (asc/desc) for sorting the column
+ */
 function updateSortOrderInMD(column, order) {
 	switch(column) {
 	case ID_COLUMN_NO:
@@ -435,6 +462,9 @@ function updateSortOrderInMD(column, order) {
 	updateMDAPI();
 }
 
+/**
+ * Sends updated metadata to the server via REST
+ */
 function updateMDAPI() {
 	$.ajax({
 		url: '/api/metadata',
@@ -447,6 +477,13 @@ function updateMDAPI() {
 	});	
 }
 
+/**
+ * Gets a user-friendly value for a post type
+ * 
+ * @param typeValue
+ *            The ID/code for the post type
+ * @returns A user-friendly string of the post type
+ */
 function getReadableType(typeValue) {
 	switch(typeValue) {
 	case "answer":
@@ -470,6 +507,17 @@ function getReadableType(typeValue) {
 	}
 } 
 
+
+
+/**
+ * Helper function for getting a formatted date, appropriate for sorting the
+ * data in the table (which is different from a date in the user's locale). Very
+ * manual in nature, but a good JavaScript-based alternative wasn't found.
+ * 
+ * @param inputDate
+ *            The date to be formatted
+ * @returns A date formatted as YYYY-MM-DD HH:MM:SS, in that specific order
+ */
 function getFormattedDate(inputDate) {
 	var newDate = new Date(inputDate);
 	var formattedDate = newDate.getFullYear() + "-"
@@ -481,6 +529,9 @@ function getFormattedDate(inputDate) {
 	return formattedDate;
 }
 
+/**
+ * Sets any Themeroller widgets that need to be instantiated
+ */
 function setUIWidgets() {
 	$("input[type='radio']").checkboxradio();
 }
