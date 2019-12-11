@@ -52,11 +52,11 @@ $(document).ready(function() {
 			}).then(function(postData) {
 				var downloadImageButton;
 				if(postData.type == "photo") {
-					downloadImageButton = "<button class='downloadImagesButton'>" + $.i18n.prop('staging_downloadImagesButtonText') + "</button>";
+					downloadImageButton = "<button class='downloadImagesButton ui-button ui-widget ui-corner-all'>" + $.i18n.prop('staging_downloadImagesButtonText') + "</button>";
 				} else {
 					downloadImageButton = "";
 				}
-				stagedPostTable.row.add([buildClickableItem(postData.id), buildClickableItem(postData.type), buildClickableItem(postData.slug), downloadImageButton, "<button class='removeBtn'>" + $.i18n.prop('staging_removeButtonText') + "</button>"]).draw();
+				stagedPostTable.row.add([buildClickableItem(postData.id), buildClickableItem(postData.type), buildClickableItem(postData.slug), downloadImageButton, "<button class='removeBtn ui-button ui-widget ui-corner-all'>" + $.i18n.prop('staging_removeButtonText') + "</button>"]).draw();
 			});
 		});
 		
@@ -65,7 +65,7 @@ $(document).ready(function() {
 			window.open("/postViewer?id=" + postID, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
 		});
 		
-		$('#stagedPostsTable tbody').on('click', 'button[class=removeBtn]', function() {
+		$('#stagedPostsTable tbody').on('click', 'button.removeBtn', function() {
 			var data = stagedPostTable.row($(this).parents('tr')).data();
 			var postID = $(data[0]).first().text();
 			
@@ -78,7 +78,7 @@ $(document).ready(function() {
 			});
 		});
 		
-		$('#stagedPostsTable tbody').on('click', 'button[class=downloadImagesButton]', function() {
+		$('#stagedPostsTable tbody').on('click', 'button.downloadImagesButton', function() {
 			var data = stagedPostTable.row($(this).parents('tr')).data();
 			var postID = $(data[0]).first().text();
 			

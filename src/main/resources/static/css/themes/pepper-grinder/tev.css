@@ -1,0 +1,26 @@
+.favSpan {
+	color: rgb(101, 75, 36);
+	font-weight: bold;
+}
+
+.readSpan {
+	color: rgb(101, 75, 36);
+	font-weight: bold;
+}
+
+a {
+	color: rgb(101, 75, 36);
+}
+
+#postTable_length label {
+	color: rgb(69, 56, 33);
+}
+
+#postTable_length option {
+	color: rgb(101, 75, 36);
+}
+
+#postTable_length label select {
+	color: rgb(101, 75, 36);
+}
+

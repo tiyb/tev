@@ -1,0 +1,26 @@
+.favSpan {
+	color: #2191c0;
+	font-weight: bold;
+}
+
+.readSpan {
+	color: #2191c0;
+	font-weight: bold;
+}
+
+a {
+	color: #2191c0;
+}
+
+#postTable_length label {
+	color: rgb(234, 245, 247);
+}
+
+#postTable_length option {
+	color: #2191c0;
+}
+
+#postTable_length label select {
+	color: #2191c0;
+}
+

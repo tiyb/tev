@@ -8,6 +8,8 @@
 <link rel="stylesheet" type="text/css"
 	href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/jquery-ui.min.css'}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/tev.css'}"/>    
 <link rel="stylesheet" type="text/css"
 	th:href="@{/css/datatables.min.css}" />
 </head>
@@ -32,39 +34,43 @@
 							</tr>
 							<tr>
 								<th th:text="#{metadata.filter}"></th>
-								<td><select id="filterDropdown"></select></td>
+								<td><select id="filterDropdown" class="ui-selectmenu-text"></select></td>
 							</tr>
 							<tr>
 								<th th:text="#{metadata.sortColumn}"></th>
-								<td><select id="sortByDropdown"></select></td>
+								<td><select id="sortByDropdown" class="ui-selectmenu-text"></select></td>
 							</tr>
 							<tr>
 								<th th:text="#{metadata.sortOrder}"></th>
-								<td><select id="sortOrderDropdown"></select></td>
+								<td><select id="sortOrderDropdown" class="ui-selectmenu-text"></select></td>
 							</tr>
 							<tr>
 								<th th:text="#{metadata.showFavs}"></th>
-								<td><select id="favsDropdown"></select></td>
+								<td><select id="favsDropdown" class="ui-selectmenu-text"></select></td>
 							</tr>
 							<tr>
 								<th th:text="#{metadata.defaultPageLength}"></th>
-								<td><select id="pageLengthDropdown"></select></td>
+								<td><select id="pageLengthDropdown" class="ui-selectmenu-text"></select></td>
 							</tr>
 							<tr>
 								<th th:text="#{metadata.showReadingPane}"></th>
-								<td><select id="showReadingPaneDropdown"></select></td>
+								<td><select id="showReadingPaneDropdown" class="ui-selectmenu-text"></select></td>
 							</tr>
 							<tr>
 								<th th:text="#{metadata.overwritePosts}"></th>
-								<td><select id="overwritePostsDropdown"></select></td>
+								<td><select id="overwritePostsDropdown" class="ui-selectmenu-text"></select></td>
 							</tr>
 							<tr>
 								<th th:text="#{metadata.overwriteConvos}"></th>
-								<td><select id="overwriteConvosDropdown"></select></td>
+								<td><select id="overwriteConvosDropdown" class="ui-selectmenu-text"></select></td>
 							</tr>
 							<tr>
 								<th th:text="#{metadata.imageExportPath}"></th>
 								<td><input type="text" id="imageExportPath"></input></td>
+							</tr>
+							<tr>
+								<th th:text="#{metadata.themes}"></th>
+								<td><select id="themesDropdown" class="ui-selectmenu-text"></select></td>
 							</tr>
 						</table>
 
@@ -84,22 +90,22 @@
 							</tr>
 							<tr>
 								<th th:text="#{metadata.conversationDisplayStyle}"></th>
-								<td><select id="conversationDisplayDropdown"></select></td>
+								<td><select id="conversationDisplayDropdown" class="ui-selectmenu-text"></select></td>
 							</tr>
 							<tr>
 								<th th:text="#{metadata.conversationSortColumn}"></th>
-								<td><select id="conversationSortColumnDropdown"></select></td>
+								<td><select id="conversationSortColumnDropdown" class="ui-selectmenu-text"></select></td>
 							</tr>
 							<tr>
 								<th th:text="#{metadata.conversationSordOrder}"></th>
-								<td><select id="conversationSortOrderDropdown"></select></td>
+								<td><select id="conversationSortOrderDropdown" class="ui-selectmenu-text"></select></td>
 							</tr>
 						</table>
 					</td>
 				</tr>
 				<tr>
 					<td colspan="2" id="submitButtonTD"><input id="submitButton" type="submit"
-						th:value="#{metadata.submitButton}"></input></td>
+						th:value="#{metadata.submitButton}" class="ui-button ui-widget ui-corner-all"></input></td>
 				</tr>
 				<tr>
 					<td>
@@ -110,12 +116,12 @@
 							<table class="display">
 								<tr>
 									<td th:text="#{metadata.uploadFile}"></td>
-									<td><input type="file" name="file" /></td>
+									<td><input type="file" name="file" class="ui-button ui-widget ui-corner-all" /></td>
 								</tr>
 								<tr>
 									<td></td>
 									<td><input type="submit"
-										th:value="#{metadata.uploadSubmitButton}" /></td>
+										th:value="#{metadata.uploadSubmitButton}" class="ui-button ui-widget ui-corner-all" /></td>
 								</tr>
 							</table>
 						</form>
@@ -127,11 +133,11 @@
 							<table class="display">
 								<tr>
 									<td th:text="#{metadata.uploadConversationFile}"></td>
-									<td><input type="file" name="file"/></td>
+									<td><input type="file" name="file" class="ui-button ui-widget ui-corner-all"/></td>
 								</tr>
 								<tr>
 									<td></td>
-									<td><input type="submit" th:value="#{metadata.uploadConversationSubmitButton}"/></td>
+									<td><input type="submit" th:value="#{metadata.uploadConversationSubmitButton}" class="ui-button ui-widget ui-corner-all"/></td>
 								</tr>
 							</table>
 						</form>
@@ -141,12 +147,12 @@
 					<td colspan="2">
 						<h2 th:text="#{metadata.adminButtonsTitle}"></h2>
 						<p th:utext="#{metadata.adminButtonsExplanatoryText}"></p>
-						<p><input type="submit" th:value="#{metadata.adminButtonsMarkAllPostReadButton}" id="markAllPostsReadButton"/>
-						<input type="submit" th:value="#{metadata.adminButtonsMarkAllPostUnreadButton}" id="markAllPostsUnreadButton"/>
-						<input type="submit" th:value="#{metadata.adminButtonsCleanImagesButton}" id="cleanImagesButton"/></p>
+						<p><input type="submit" th:value="#{metadata.adminButtonsMarkAllPostReadButton}" id="markAllPostsReadButton" class="ui-button ui-widget ui-corner-all"/>
+						<input type="submit" th:value="#{metadata.adminButtonsMarkAllPostUnreadButton}" id="markAllPostsUnreadButton" class="ui-button ui-widget ui-corner-all"/>
+						<input type="submit" th:value="#{metadata.adminButtonsCleanImagesButton}" id="cleanImagesButton" class="ui-button ui-widget ui-corner-all"/></p>
 						<p>
 						<input type="text" id="importImagesPath" />
-						<input type="submit" th:value="#{metadata.adminButtonsImportImagesButton}" id="importImagesButton"/></p>
+						<input type="submit" th:value="#{metadata.adminButtonsImportImagesButton}" id="importImagesButton" class="ui-button ui-widget ui-corner-all"/></p>
 					</td>
 				</tr>
 			</table>
@@ -157,6 +163,7 @@
 	<div id="footer" class="container"></div>
 
 	<script type="text/javascript" src="webjars/jquery/3.3.1/jquery.min.js"></script>
+	<script type="text/javascript" th:src="@{/js/jquery-ui.min.js}"></script>
 	<script type="text/javascript" 
         src="webjars/jquery-i18n-properties/1.10.2/jquery.i18n.properties.min.js"></script>
 

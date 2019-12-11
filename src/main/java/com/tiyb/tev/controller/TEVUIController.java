@@ -87,6 +87,7 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
 	public String index(Model model) {
+		updateModelWithTheme(model);
 		return "index";
 	}
 
@@ -104,6 +105,8 @@ public class TEVUIController {
 		model.addAttribute("metadata", md);
 		List<Conversation> conversations = convoController.getAllConversations();
 		model.addAttribute("conversations", conversations);
+		
+		updateModelWithTheme(model);
 
 		return "conversations";
 	}
@@ -116,6 +119,7 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/metadata" }, method = RequestMethod.GET)
 	public String metadata(Model model) {
+		updateModelWithTheme(model);
 		return "metadata";
 	}
 
@@ -253,11 +257,13 @@ public class TEVUIController {
 	public String showHashtagViewer(Model model) {
 		List<Hashtag> hashtags = postController.getAllHashtags();
 		model.addAttribute("hashtags", hashtags);
+		updateModelWithTheme(model);
 		return "viewers/hashtags";
 	}
-	
-	@RequestMapping(value = {"/exportViewer"}, method = RequestMethod.GET)
+
+	@RequestMapping(value = { "/exportViewer" }, method = RequestMethod.GET)
 	public String showExportViewer(Model model) {
+		updateModelWithTheme(model);
 		return "viewers/exportedxml";
 	}
 
@@ -270,6 +276,7 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/staged" }, method = RequestMethod.GET)
 	public String showStagedPosts(Model model) {
+		updateModelWithTheme(model);
 		return "staged";
 	}
 
@@ -288,6 +295,8 @@ public class TEVUIController {
 		model.addAttribute("conversation", convo);
 		List<ConversationMessage> messages = convoController.getConvoMsgByConvoID(convo.getId());
 		model.addAttribute("messages", messages);
+		
+		updateModelWithTheme(model);
 
 		return "viewers/conversation";
 	}
@@ -302,6 +311,7 @@ public class TEVUIController {
 	@RequestMapping(value = { "/viewers/imageViewer/{imageName}" }, method = RequestMethod.GET)
 	public String showSingleImageViewer(@PathVariable("imageName") String imageName, Model model) {
 		model.addAttribute("imageName", imageName);
+		updateModelWithTheme(model);
 		return "viewers/singleimageviewer";
 	}
 
@@ -394,8 +404,9 @@ public class TEVUIController {
 //	}
 //
 	/**
-	 * Used to request the XML export, for any posts that have been "staged"
-	 * for export. Returns the data as a string, with the intent that it is displayed in the browser.
+	 * Used to request the XML export, for any posts that have been "staged" for
+	 * export. Returns the data as a string, with the intent that it is displayed in
+	 * the browser.
 	 * 
 	 * @param response The HTTP Response object (used for setting headers)
 	 * @param request  The HTTP Request object
@@ -406,7 +417,7 @@ public class TEVUIController {
 		response.setContentType("application/xml");
 		response.setHeader("Pragma", "no-cache");
 		response.setHeader("Cache-Control", "no-cache");
-		//response.setHeader("Content-Transfer-Encoding", "binary");
+		// response.setHeader("Content-Transfer-Encoding", "binary");
 //		response.setHeader("Content-Type", "application/xml; charset=utf-8"); 
 //		response.setHeader("Content-Disposition", "attachment; filename=\"stagedposts.xml\"");
 		List<Long> postIDs = stagingController.getAllPosts();
@@ -481,4 +492,23 @@ public class TEVUIController {
 
 		return builder.toString();
 	}
+	
+	/**
+	 * Used to set the theme, so that Thymeleaf pages can set the correct CSS
+	 * 
+	 * @param model The model to be updated
+	 */
+	private void updateModelWithTheme(Model model) {
+		Metadata md = mdController.getMetadata();
+		String theme = md.getTheme();
+		if (theme.equals("")) {
+			theme = "start";
+			md.setTheme(theme);
+			mdController.updateMetadata(md);
+		}
+
+		model.addAttribute("theme", theme);
+	}
+
+
 }

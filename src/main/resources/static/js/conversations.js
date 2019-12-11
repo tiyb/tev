@@ -14,6 +14,8 @@ $(document).ready(function() {
 	$('#header').load("/header");
 	$('#footer').load("/footer");
 	
+	setUIWidgets();
+	
 	$('#unhideAllConversationsBtn').click(function() {
 		$.ajax({
 			url: "/api/conversations/unignoreAllConversations",
@@ -31,16 +33,16 @@ $(document).ready(function() {
 		metadata = data;
 		
 		if(metadata.showReadingPane) {
-			$('#showReadingPaneSelected').prop('checked', true);
+			$('#showReadingPaneSelected').prop('checked', true).checkboxradio("refresh");
 		} else {
-			$('#showPopupsSelected').prop('checked', true);
+			$('#showPopupsSelected').prop('checked', true).checkboxradio("refresh");
 		}
 		if(metadata.conversationDisplayStyle == "cloud") {
-			$('#showCloudSelected').prop('checked', true);
+			$('#showCloudSelected').prop('checked', true).checkboxradio("refresh");
 			$('#conversationWordCloudContainerContainer').show();
 			$('#conversationTableContainer').hide();
 		} else {
-			$('#showTableSelected').prop('checked', true);
+			$('#showTableSelected').prop('checked', true).checkboxradio("refresh");
 			$('#conversationWordCloudContainerContainer').hide();
 			$('#conversationTableContainer').show();
 		}
@@ -225,3 +227,6 @@ function updateMDAPI() {
 	});	
 }
 
+function setUIWidgets() {
+	$("input[type='radio']").checkboxradio();
+}

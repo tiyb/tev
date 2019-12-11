@@ -10,6 +10,8 @@ $(document).ready(function () {
 	$('#header').load("/header");
 	$('#footer').load("/footer");
 	
+	setUIWidgets();
+
 	$.ajax({
 		url: "/api/metadata/staticListData",
 		method: "GET",
@@ -45,6 +47,10 @@ $(document).ready(function () {
 			var divData = "<option value='" + obj + "'>" + getTranslatedConversationStyle(obj) + "</option>";
 			$(divData).appendTo('#conversationDisplayDropdown');
 		});
+		$.each(data.themes, function(i, obj) {
+			var divData = "<option value='" + obj + "'>" + getTranslatedTheme(obj) + "</option>";
+			$(divData).appendTo('#themesDropdown');
+		});
 		var divData = "<option value='true'>" + $.i18n.prop('md_showReadingPaneYes') + "</option>";
 		$(divData).appendTo('#showReadingPaneDropdown');
 		divData = "<option value='false'>" + $.i18n.prop('md_showReadingPaneNo') + "</option>";
@@ -66,31 +72,32 @@ $(document).ready(function () {
 		}).then(function(data) {
 			metadataObject = data;
 			$('#baseMediaPath').val(metadataObject.baseMediaPath);
-			$('#sortOrderDropdown').val(metadataObject.sortOrder);
-			$('#conversationSortOrderDropdown').val(metadataObject.conversationSortOrder);
-			$('#sortByDropdown').val(metadataObject.sortColumn);
-			$('#conversationSortColumnDropdown').val(metadataObject.conversationSortColumn);
-			$('#filterDropdown').val(metadataObject.filter);
-			$('#favsDropdown').val(metadataObject.favFilter);
-			$('#pageLengthDropdown').val(metadataObject.pageLength);
-			$('#conversationDisplayDropdown').val(metadataObject.conversationDisplayStyle);
+			$('#sortOrderDropdown').val(metadataObject.sortOrder).selectmenu('refresh');
+			$('#conversationSortOrderDropdown').val(metadataObject.conversationSortOrder).selectmenu('refresh');
+			$('#sortByDropdown').val(metadataObject.sortColumn).selectmenu('refresh');
+			$('#conversationSortColumnDropdown').val(metadataObject.conversationSortColumn).selectmenu('refresh');
+			$('#filterDropdown').val(metadataObject.filter).selectmenu('refresh');
+			$('#favsDropdown').val(metadataObject.favFilter).selectmenu('refresh');
+			$('#pageLengthDropdown').val(metadataObject.pageLength).selectmenu('refresh');
+			$('#conversationDisplayDropdown').val(metadataObject.conversationDisplayStyle).selectmenu('refresh');
+			$('#themesDropdown').val(metadataObject.theme).selectmenu('refresh');
 			$('#mainUser').val(metadataObject.mainTumblrUser);
 			$('#mainUserAvatarUrl').val(metadataObject.mainTumblrUserAvatarUrl);
 			$('#imageExportPath').val(metadataObject.exportImagesFilePath);
 			if(metadataObject.showReadingPane == "true") {
-				$('#showReadingPaneDropdown').val('true');
+				$('#showReadingPaneDropdown').val('true').selectmenu('refresh');
 			} else {
-				$('#showReadingPaneDropdown').val('false');
+				$('#showReadingPaneDropdown').val('false').selectmenu('refresh');
 			}
 			if(metadataObject.overwritePostData) {
-				$('#overwritePostsDropdown').val('true');
+				$('#overwritePostsDropdown').val('true').selectmenu('refresh');
 			} else {
-				$('#overwritePostsDropdown').val('false');
+				$('#overwritePostsDropdown').val('false').selectmenu('refresh');
 			}
 			if(metadataObject.overwriteConvoData) {
-				$('#overwriteConvosDropdown').val('true');
+				$('#overwriteConvosDropdown').val('true').selectmenu('refresh');
 			} else {
-				$('#overwriteConvosDropdown').val('false');
+				$('#overwriteConvosDropdown').val('false').selectmenu('refresh');
 			}
 			
 		});
@@ -114,6 +121,7 @@ $(document).ready(function () {
 		metadataObject.overwriteConvoData = $('#overwriteConvosDropdown').val();
 		metadataObject.conversationDisplayStyle = $('#conversationDisplayDropdown').val();
 		metadataObject.imageExportPath = $('#imageExportPath').val();
+		metadataObject.theme = $('#themesDropdown').val();
 		
 		$.ajax({
 			url: '/api/metadata',
@@ -188,6 +196,7 @@ $(document).ready(function () {
 			}
 		});
 	});
+	
 });
 
 function getTranslatedNameForColumn(columnName) {
@@ -298,4 +307,23 @@ function getTranslatedConversationStyle(conversationStyle) {
 		return $.i18n.prop('md_conversationStyles_table');
 		break;
 	}
+}
+
+function getTranslatedTheme(themeID) {
+	return $.i18n.prop('md_themes_' + themeID);
+}
+
+function setUIWidgets() {
+	$('#filterDropdown').selectmenu();
+	$('#sortByDropdown').selectmenu();
+	$('#sortOrderDropdown').selectmenu();
+	$('#favsDropdown').selectmenu();
+	$('#pageLengthDropdown').selectmenu();
+	$('#showReadingPaneDropdown').selectmenu();
+	$('#overwritePostsDropdown').selectmenu();
+	$('#overwriteConvosDropdown').selectmenu();
+	$('#themesDropdown').selectmenu();
+	$('#conversationDisplayDropdown').selectmenu();
+	$('#conversationSortColumnDropdown').selectmenu();
+	$('#conversationSortOrderDropdown').selectmenu();
 }

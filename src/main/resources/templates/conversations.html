@@ -8,6 +8,8 @@
     <link rel="stylesheet" type="text/css"
           href="webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/jquery-ui.min.css'}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/tev.css'}"/>    
     <link rel="stylesheet" type="text/css" th:href="@{/css/jqcloud.min.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/css/datatables.min.css}"/>
 </head>
@@ -19,15 +21,24 @@
 <h1 th:text="#{conversations.title}"></h1>
 <p th:text="#{conversations.explanatoryText(${metadata.mainTumblrUser})}"></p>
 <div id="radioContainer">
-	<div>
-		<input type="radio" name="showReadingPaneRadio" id="showReadingPaneSelected" th:text="#{main.radios.showReadingPane}"></input>
-		<input type="radio" name="showReadingPaneRadio" id="showPopupsSelected" th:text="#{main.radios.showPopUps}"></input>
+	<div class="ui-widget-content">
+		<fieldset>
+			<label for="showReadingPaneSelected" th:text="#{main.radios.showReadingPane}" class="ui-checkboxradio-label"></label>
+			<input type="radio" name="showReadingPaneRadio" id="showReadingPaneSelected" class="ui-checkboxradio"></input>
+			<label for="showPopupsSelected" th:text="#{main.radios.showPopUps}" class="ui-checkboxradio-label"></label>
+			<input type="radio" name="showReadingPaneRadio" id="showPopupsSelected" class="ui-checkboxradio"></input>
+		</fieldset>
 	</div>
-	<div>
-		<input type="radio" name="chooseDisplayStyle" id="showCloudSelected" th:text="#{conversations.conversationDisplay.showCloud}"></input>
-		<input type="radio" name="chooseDisplayStyle" id="showTableSelected" th:text="#{conversations.conversationDisplay.showTable}"></input>
+	<div class="ui-widget-content">
+		<fieldset>
+			<label for="showCloudSelected" th:text="#{conversations.conversationDisplay.showCloud}" class="ui-checkboxradio-label"></label>
+			<input type="radio" name="chooseDisplayStyle" id="showCloudSelected" class="ui-checkboxradio"></input>
+			<label for="showTableSelected" th:text="#{main.radios.showPopUps}" class="ui-checkboxradio-label"></label>
+			<input type="radio" name="chooseDisplayStyle" id="showTableSelected" class="ui-checkboxradio"></input>
+		</fieldset>
 	</div>
 </div>
+<div class="ui-widget-content">
 <table id="contentDisplayContainer"><tr>
 	<td id="contentDisplayTable">
 		<div id="conversationWordCloudContainerContainer"><div id="conversationWordCloudContainer"></div></div>
@@ -50,15 +61,16 @@
 		<iframe id="displayPaneIFrame"></iframe>
 	</td>
 </tr></table>
-
+</div>
 </div>
 
-<p><button id="unhideAllConversationsBtn" th:text="#{conversations.unhideAllBtn}"></button></p>
+<p><button id="unhideAllConversationsBtn" th:text="#{conversations.unhideAllBtn}" class="ui-button ui-widget ui-corner-all"></button></p>
 
 <div id="footer" class="container"></div>
 
 <script type="text/javascript"
         src="webjars/jquery/3.3.1/jquery.min.js"></script>
+	<script type="text/javascript" th:src="@{/js/jquery-ui.min.js}"></script>
 <script type="text/javascript" 
         src="webjars/jquery-i18n-properties/1.10.2/jquery.i18n.properties.min.js"></script>
 

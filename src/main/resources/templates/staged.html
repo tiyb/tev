@@ -8,6 +8,8 @@
     <link rel="stylesheet" type="text/css"
           href="webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/jquery-ui.min.css'}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/tev.css'}"/>    
     <link rel="stylesheet" type="text/css" th:href="@{/css/datatables.min.css}"/>
 </head>
 <body>
@@ -36,8 +38,8 @@
 		</tfoot>
 	</table>
 	
-	<button id="downloadButton" th:text="#{staged.downloadButton}"></button>
-	<button id="removeAllButton" th:text="#{staged.removeAllButton}"></button>
+	<button id="downloadButton" th:text="#{staged.downloadButton}" class="ui-button ui-widget ui-corner-all"></button>
+	<button id="removeAllButton" th:text="#{staged.removeAllButton}" class="ui-button ui-widget ui-corner-all"></button>
 </div>
 
 <div id="footer" class="container"></div>

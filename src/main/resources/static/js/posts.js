@@ -21,6 +21,8 @@ $(document).ready(function() {
 	$('#header').load("/header");
 	$('#footer').load("/footer");
 	
+	setUIWidgets();
+	
 	$.ajax({
 		url: "/api/metadata",
 		dataSrc: ""
@@ -28,25 +30,25 @@ $(document).ready(function() {
 		metadata = data;
 		
 		if(metadata.filter == "Filter Read Posts") {
-			$("#filterRead").prop('checked', true);
+			$("#filterRead").prop('checked', true).checkboxradio("refresh");
 		} else if(metadata.filter == "Filter Unread Posts") {
-			$("#filterUnread").prop('checked', true);
+			$("#filterUnread").prop('checked', true).checkboxradio("refresh");
 		} else {
-			$("#filterNoValues").prop('checked', true);
+			$("#filterNoValues").prop('checked', true).checkboxradio("refresh");
 		}
 		
 		if(metadata.favFilter == "Show Favourites") {
-			$('#showFavourites').prop('checked', true);
+			$('#showFavourites').prop('checked', true).checkboxradio("refresh");
 		} else if(metadata.favFilter == "Show Non Favourites") {
-			$('#showNonFavourites').prop('checked', true);
+			$('#showNonFavourites').prop('checked', true).checkboxradio("refresh");
 		} else {
-			$('#showAll').prop('checked', true);
+			$('#showAll').prop('checked', true).checkboxradio("refresh");
 		}
 		
 		if(metadata.showReadingPane) {
-			$('#showReadingPaneSelected').prop('checked', true);
+			$('#showReadingPaneSelected').prop('checked', true).checkboxradio("refresh");
 		} else {
-			$('#showPopupsSelected').prop('checked', true);
+			$('#showPopupsSelected').prop('checked', true).checkboxradio("refresh");
 		}
 		
 		var postTable = $('#postTable').DataTable( {
@@ -481,4 +483,8 @@ function getFormattedDate(inputDate) {
 			+ new String(newDate.getMinutes() + 1).padStart(2, '0') + ":"
 			+ new String(newDate.getSeconds() + 1).padStart(2, '0');
 	return formattedDate;
+}
+
+function setUIWidgets() {
+	$("input[type='radio']").checkboxradio();
 }

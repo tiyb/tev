@@ -8,6 +8,8 @@
     <link rel="stylesheet" type="text/css"
           href="webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/jquery-ui.min.css'}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/tev.css'}"/>    
     <link rel="stylesheet" type="text/css" th:href="@{/css/datatables.min.css}"/>
 </head>
 <body>
@@ -20,21 +22,39 @@
    		<table id="radioContainerLayoutTable"><tr>
    			<td>
    				<a href="#" id="additionalOptionsLink"></a>
-   				<table id="additionalOptionsTable" style="display:none;"><tr>
-   					<td>
-				   		<input type="radio" name="filterRead" id="filterUnread" th:text="#{main.radios.read}"></input> 
-				   		<input type="radio" name="filterRead" id="filterRead" th:text="#{main.radios.unread}"></input> 
-				   		<input type="radio" name="filterRead" id="filterNoValues" th:text="#{main.radios.showAll}"></input>
-				   		<br />
-				   		<input type="radio" name="showFavs" id="showFavourites" th:text="#{main.radios.showFavourites}"></input>
-				   		<input type="radio" name="showFavs" id="showNonFavourites" th:text="#{main.radios.showNonFavourites}"></input>
-				   		<input type="radio" name="showFavs" id="showAll" th:text="#{main.radios.showAllFavs}"></input>
-   					</td>
-   					<td>
-		   				<input type="radio" name="showReadingPaneRadio" id="showReadingPaneSelected" th:text="#{main.radios.showReadingPane}"></input>
-		   				<input type="radio" name="showReadingPaneRadio" id="showPopupsSelected" th:text="#{main.radios.showPopUps}"></input>
-   					</td>
-   				</tr></table>
+   				<div id="additionalOptionsTable" style="display:none;">
+   				<div class="ui-widget-content">
+   					<p class="ui-widget-header" th:text="#{main.radios.readunread}"></p>
+					<fieldset>
+						<label for="filterUnread" th:text="#{main.radios.read}" class="ui-checkboxradio-label"></label>
+						<input type="radio" name="filterRead" id="filterUnread" class="ui-checkboxradio"></input>
+						<label for="filterRead" th:text="#{main.radios.unread}" class="ui-checkboxradio-label"></label>
+						<input type="radio" name="filterRead" id="filterRead" class="ui-checkboxradio"></input>
+						<label for="filterNoValues" th:text="#{main.radios.showAll}" class="ui-checkboxradio-label"></label>
+						<input type="radio" name="filterRead" id="filterNoValues" class="ui-checkboxradio"></input>
+					</fieldset>
+   				</div>
+   				<div class="ui-widget-content">
+   					<p class="ui-widget-header" th:text="#{main.radios.favnonfav}"></p>
+					<fieldset class="ui-widget-content">
+						<label for="showFavourites" th:text="#{main.radios.showFavourites}" class="ui-checkboxradio-label"></label>
+						<input type="radio" name="showFavs" id="showFavourites" class="ui-checkboxradio"></input>
+						<label for="showNonFavourites" th:text="#{main.radios.showNonFavourites}" class="ui-checkboxradio-label"></label>
+						<input type="radio" name="showFavs" id="showNonFavourites" class="ui-checkboxradio"></input>
+						<label for="showAll" th:text="#{main.radios.showAll}" class="ui-checkboxradio-label"></label>
+						<input type="radio" name="showFavs" id="showAll" class="ui-checkboxradio"></input>
+					</fieldset>
+   				</div>
+   				<div class="ui-widget-content">
+   					<p class="ui-widget-header" th:text="#{main.radios.readingpane}"></p>
+ 					<fieldset class="ui-widget-content">
+ 						<label for="showReadingPaneSelected" th:text="#{main.radios.showReadingPane}" class="ui-checkboxradio-label"></label>
+ 						<input type="radio" name="showReadingPaneRadio" id="showReadingPaneSelected" class="ui-checkboxradio"></input>
+ 						<label for="showPopupsSelected" th:text="#{main.radios.showPopUps}" class="ui-checkboxradio-label"></label>
+ 						<input type="radio" name="showReadingPaneRadio" id="showPopupsSelected" class="ui-checkboxradio"></input>
+ 					</fieldset>
+   				</div>
+   				</div>
    			</td>
    			<td>
    				<a href="/hashtagViewer" target="viewer" th:text="#{main.showhashtags}"></a>
@@ -81,6 +101,7 @@
 
 <script type="text/javascript"
         src="webjars/jquery/3.3.1/jquery.min.js"></script>
+	<script type="text/javascript" th:src="@{/js/jquery-ui.min.js}"></script>
 <script type="text/javascript" 
         src="webjars/jquery-i18n-properties/1.10.2/jquery.i18n.properties.min.js"></script>
 

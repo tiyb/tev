@@ -74,6 +74,14 @@ public class Metadata implements Serializable {
 	 * Static list of columns that can be sorted on the Conversations page
 	 */
 	public static final List<String> CONVERSATION_SORT_COLUMNS = Arrays.asList("participantName", "numMessages");
+	
+	/**
+	 * Static list of theme names
+	 */
+	public static final List<String> THEMES = Arrays.asList("base", "black-tie", "blitzer", "cupertino", "dark-hive",
+			"dot-luv", "eggplant", "excite-bike", "flick", "hot-sneaks", "humanity", "le-frog", "mint-choc", "overcast",
+			"pepper-grinder", "redmond", "smoothness", "south-street", "start", "sunny", "swanky-purse", "trontastic",
+			"ui-darkness", "ui-lightness", "vader");
 
 	@Id
 	private Integer id;
@@ -92,6 +100,7 @@ public class Metadata implements Serializable {
 	private String conversationSortColumn;
 	private String conversationSortOrder;
 	private String exportImagesFilePath;
+	private String theme;
 
 	/**
 	 * Helper function to generate a new Metadata object, with some defaults filled
@@ -115,6 +124,7 @@ public class Metadata implements Serializable {
 		md.setConversationDisplayStyle(CONVERSATION_DISPLAY_STYLES.get(0));
 		md.setConversationSortColumn(CONVERSATION_SORT_COLUMNS.get(0));
 		md.setConversationSortOrder(SORT_ORDERS.get(0));
+		md.setTheme("base");
 
 		return md;
 	}
@@ -136,6 +146,7 @@ public class Metadata implements Serializable {
 		this.conversationSortColumn = newDataObject.conversationSortColumn;
 		this.conversationSortOrder = newDataObject.conversationSortOrder;
 		this.exportImagesFilePath = newDataObject.exportImagesFilePath;
+		this.theme = newDataObject.theme;
 	}
 
 	@Override
@@ -220,6 +231,11 @@ public class Metadata implements Serializable {
 		if (exportImagesFilePath != null) {
 			builder.append("exportImagesFilePath=");
 			builder.append(exportImagesFilePath);
+			builder.append(", ");
+		}
+		if (theme != null) {
+			builder.append("theme=");
+			builder.append(theme);
 		}
 		builder.append("]");
 		return builder.toString();
@@ -351,6 +367,14 @@ public class Metadata implements Serializable {
 
 	public void setExportImagesFilePath(String exportImagesFilePath) {
 		this.exportImagesFilePath = exportImagesFilePath;
+	}
+
+	public String getTheme() {
+		return theme;
+	}
+
+	public void setTheme(String theme) {
+		this.theme = theme;
 	}
 
 }

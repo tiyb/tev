@@ -109,6 +109,9 @@ public class TEVMetadataRestController {
 		for (String s : Metadata.CONVERSATION_SORT_COLUMNS) {
 			sld.getConversationSortColumns().add(s);
 		}
+		for(String s : Metadata.THEMES) {
+			sld.getThemes().add(s);
+		}
 
 		return sld;
 	}

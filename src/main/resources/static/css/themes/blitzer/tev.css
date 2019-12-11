@@ -1,0 +1,24 @@
+.favSpan {
+	color: rgb(204, 0, 0);
+}
+
+.readSpan {
+	color: rgb(204, 0, 0);
+}
+
+a {
+	color: rgb(204, 0, 0);
+}
+
+#postTable_length label {
+	color: rgb(227, 227, 227);
+}
+
+#postTable_length option {
+	color: rgb(69, 69, 69);
+}
+
+#postTable_length label select {
+	color: rgb(69, 69, 69);
+}
+
