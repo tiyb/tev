@@ -5,7 +5,7 @@
     <title th:text="${conversation.participant}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <link rel="stylesheet" type="text/css" th:href="@{/css/postviewer.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/owr/postviewers.css}"/>
 </head>
 <body>
 
@@ -45,11 +45,7 @@
 </table>
 </div>
 <script type="text/javascript">var participant = '[[${conversation.participant}]]';</script>
-<script type="text/javascript"
-        src="webjars/jquery/3.3.1/jquery.min.js"></script>
-<script type="text/javascript" 
-        src="webjars/jquery-i18n-properties/1.10.2/jquery.i18n.properties.min.js"></script>
-<script type="text/javascript" th:src="@{/js/taghandler.js}"></script>
-<script type="text/javascript" th:src="@{/js/conversationviewer.js}"></script>
+<script type="text/javascript" th:src="@{/owr/jquery.js}"></script>
+<script type="text/javascript" th:src="@{/owr/postviewers.js}"></script>
 </body>
 </html>

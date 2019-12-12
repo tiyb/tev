@@ -5,7 +5,7 @@
     <title th:text="Photo"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <link rel="stylesheet" type="text/css" th:href="@{/css/postviewer.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/owr/postviewers.css}"/>
 </head>
 <body>
 
@@ -28,8 +28,6 @@
 
 
 <script type="text/javascript" th:text="'var postId = ' + ${post.Id} + ';'"></script>
-<script type="text/javascript" th:src="@{/js/taghandler.js}"></script>
-<script type="text/javascript" th:src="@{/js/imageViewer.js}"></script>
-<script type="text/javascript" th:src="@{/js/viewerbuttonshandler.js}"></script>
+<script type="text/javascript" th:src="@{/owr/postviewers.js}"></script>
 </body>
 </html>

@@ -11,12 +11,13 @@
 	</parent>
 	<groupId>com.tiyb</groupId>
 	<artifactId>tev</artifactId>
-	<version>v7.0.1</version>
+	<version>v7.0.2</version>
 	<name>tev</name>
 	<description>Tumblr Export Viewer</description>
 
 	<properties>
 		<java.version>1.8</java.version>
+		<wro4j.version>1.8.0</wro4j.version>
 	</properties>
 
 	<dependencies>
@@ -76,6 +77,13 @@
 			<artifactId>hsqldb</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>eu.michael-simons</groupId>
+			<artifactId>wro4j-spring-boot-starter</artifactId>
+			<version>0.5.1</version>
+		</dependency>
+		
 	</dependencies>
 
 	<build>

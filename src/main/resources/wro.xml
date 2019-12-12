@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<groups xmlns="http://www.isdc.ro/wro">
+	<group name="posts">
+		<css>/css/style.css</css>
+		
+		<js>/js/posts.js</js>
+		<js>/js/message-areas.js</js>
+	</group>
+	
+	<group name="conversations">
+		<css>/css/style.css</css>
+		
+		<js>/js/conversations.js</js>
+		<js>/js/message-areas.js</js>
+	</group>
+	
+	<group name="staged">
+		<css>/css/style.css</css>
+		
+		<js>/js/staged.js</js>
+		<js>/js/message-areas.js</js>
+	</group>
+	
+	<group name="md">
+		<css>/css/style.css</css>
+		
+		<js>/js/helper-functions.js</js>
+		<js>/js/message-areas.js</js>
+		<js>/js/metadata.js</js>
+	</group>
+	
+	<group name="postviewers">
+		<css>/css/postviewer.css</css>
+		
+		<js>/js/taghandler.js</js>
+		<js>/js/viewerbuttonshandler.js</js>
+		<js>/js/imageViewer.js</js>
+		<js>/js/conversationviewer.js</js>
+	</group>
+	
+	<group name="hashtags">
+		<css>/css/postviewer.css</css>
+		
+		<js>/js/hashtagviewer.js</js>
+		<js>/js/taghandler.js</js>
+	</group>
+	
+	<group name="singleimageviewer">
+		<css>/css/singleimageviewer.css</css>
+		
+		<js>/js/taghandler.js</js>
+	</group>
+	
+	<group name="exportedxml">
+		<css>/css/style.css</css>
+		<js>/js/exportedxml.js</js>
+	</group>
+	
+	<group name="errorpage">
+		<css>/css/style.css</css>
+		<js>/js/errorpage.js</js>
+	</group>
+	
+	<group name="jquery">
+		<css minimize="false">classpath:META-INF/resources/webjars/bootstrap/3.3.7/css/bootstrap.min.css</css>
+		<css minimize="false">/css/datatables.min.css</css>
+		<css minimize="false">/css/jqcloud.min.css</css>
+		
+		<js minimize="false">classpath:META-INF/resources/webjars/jquery/3.3.1/jquery.min.js</js>
+		<js minimize="false">/js/jquery-ui.min.js</js>
+		<js minimize="false">classpath:META-INF/resources/webjars/jquery-i18n-properties/1.10.2/jquery.i18n.properties.min.js</js>
+		<js minimize="false">/js/datatables.min.js</js>
+		<js minimize="false">/js/jqcloud.min.js</js>
+	</group>
+</groups>
