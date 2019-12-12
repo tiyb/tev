@@ -5,10 +5,9 @@
     <title th:text="#{main.title}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <link rel="stylesheet" type="text/css" href="webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/owr/jquery.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/jquery-ui.min.css'}"/>
     <link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/tev.css'}"/>    
-    <link rel="stylesheet" type="text/css" th:href="@{/css/datatables.min.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/owr/posts.css}"/>
 </head>
 <body>
@@ -98,10 +97,7 @@
 
 <div id="footer" class="container"></div>
 
-<script type="text/javascript" src="webjars/jquery/3.3.1/jquery.min.js"></script>
-<script type="text/javascript" th:src="@{/js/jquery-ui.min.js}"></script>
-<script type="text/javascript" src="webjars/jquery-i18n-properties/1.10.2/jquery.i18n.properties.min.js"></script>
-<script type="text/javascript" th:src="@{/js/datatables.min.js}"></script>
+<script type="text/javascript" th:src="@{/owr/jquery.js}"></script>
 <script type="text/javascript" th:src="@{/owr/posts.js}"></script>
 </body>
 </html>
