@@ -224,7 +224,8 @@ $(document).ready(function() {
 		$('#postTable tfoot tr:eq(1) th').each(function(i) {
 			if(i < FAV_COLUMN_NO) {
 				var title = $(this).text();
-				$(this).html('<input type="text" placeholder="' + $.i18n.prop('index_search') + title + '" />');
+				$(this).addClass('postFilterBoxContainer');
+				$(this).html('<input type="text" class="postFilterBox" placeholder="' + $.i18n.prop('index_search') + title + '" />');
 				
 				$('input', this).on('keyup change', function() {
 					if(postTable.column(i).search() !== this.value) {

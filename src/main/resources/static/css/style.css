@@ -75,6 +75,20 @@
 	opacity: 0.5;
 }
 
+.postFilterBoxContainer {
+	padding: none;
+}
+
+.postFilterBox {
+	display: inline;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	border: none;
+}
+
 
 /* settings page */
 
