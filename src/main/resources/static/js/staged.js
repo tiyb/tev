@@ -7,9 +7,6 @@ $.i18n.properties({
 var metadataObject;
 
 $(document).ready(function() {
-	$('#header').load("/header");
-	$('#footer').load("/footer");
-	
 	var stagedPostTable = $('#stagedPostsTable').DataTable({
 		"language": {
 			"emptyTable": 	  $.i18n.prop('staging_posttable_emptytable'),

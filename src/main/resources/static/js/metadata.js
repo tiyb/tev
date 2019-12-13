@@ -11,9 +11,6 @@ $.i18n.properties({
  * populate the form, set up event handlers
  */
 $(document).ready(function () {
-	$('#header').load("/header");
-	$('#footer').load("/footer");
-	
 	setUIWidgets();
 
 	$.ajax({

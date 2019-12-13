@@ -30,9 +30,6 @@ $.i18n.properties({
  * was performed (via URL) and filter table accordingly.
  */
 $(document).ready(function() {
-	$('#header').load("/header");
-	$('#footer').load("/footer");
-	
 	setUIWidgets();
 	
 	$.ajax({
