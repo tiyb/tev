@@ -5,6 +5,7 @@
 		
 		<js>/js/posts.js</js>
 		<js>/js/message-areas.js</js>
+		<js>/js/header-footer.js</js>
 	</group>
 	
 	<group name="conversations">
@@ -12,6 +13,7 @@
 		
 		<js>/js/conversations.js</js>
 		<js>/js/message-areas.js</js>
+		<js>/js/header-footer.js</js>
 	</group>
 	
 	<group name="staged">
@@ -19,6 +21,7 @@
 		
 		<js>/js/staged.js</js>
 		<js>/js/message-areas.js</js>
+		<js>/js/header-footer.js</js>
 	</group>
 	
 	<group name="md">
@@ -27,6 +30,7 @@
 		<js>/js/helper-functions.js</js>
 		<js>/js/message-areas.js</js>
 		<js>/js/metadata.js</js>
+		<js>/js/header-footer.js</js>
 	</group>
 	
 	<group name="postviewers">
@@ -39,10 +43,11 @@
 	</group>
 	
 	<group name="hashtags">
-		<css>/css/postviewer.css</css>
+		<css>/css/style.css</css>
 		
 		<js>/js/hashtagviewer.js</js>
 		<js>/js/taghandler.js</js>
+		<js>/js/header-footer.js</js>
 	</group>
 	
 	<group name="singleimageviewer">
@@ -58,7 +63,7 @@
 	
 	<group name="errorpage">
 		<css>/css/style.css</css>
-		<js>/js/errorpage.js</js>
+		<js>/js/header-footer.js</js>
 	</group>
 	
 	<group name="jquery">

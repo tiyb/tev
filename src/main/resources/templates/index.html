@@ -17,23 +17,22 @@
 <div class="container-fluid">
 	<div id="messageAreas"></div>
    	<div id="radioContainer">
-   		<table id="radioContainerLayoutTable"><tr>
-   			<td>
-   				<a href="#" id="additionalOptionsLink"></a>
-   				<div id="additionalOptionsTable" style="display:none;">
-   				<div class="ui-widget-content">
-   					<p class="ui-widget-header" th:text="#{main.radios.readunread}"></p>
-					<fieldset>
-						<label for="filterUnread" th:text="#{main.radios.read}" class="ui-checkboxradio-label"></label>
-						<input type="radio" name="filterRead" id="filterUnread" class="ui-checkboxradio"></input>
-						<label for="filterRead" th:text="#{main.radios.unread}" class="ui-checkboxradio-label"></label>
-						<input type="radio" name="filterRead" id="filterRead" class="ui-checkboxradio"></input>
-						<label for="filterNoValues" th:text="#{main.radios.showAll}" class="ui-checkboxradio-label"></label>
-						<input type="radio" name="filterRead" id="filterNoValues" class="ui-checkboxradio"></input>
-					</fieldset>
-   				</div>
-   				<div class="ui-widget-content">
-   					<p class="ui-widget-header" th:text="#{main.radios.favnonfav}"></p>
+   		<div id="radioContainerLayoutTable">
+  			<a href="#" id="additionalOptionsLink"></a>
+  			<div id="additionalOptionsTable" style="display:none;">
+  			<div class="ui-widget-content">
+  				<p class="ui-widget-header" th:text="#{main.radios.readunread}"></p>
+				<fieldset>
+					<label for="filterUnread" th:text="#{main.radios.read}" class="ui-checkboxradio-label"></label>
+					<input type="radio" name="filterRead" id="filterUnread" class="ui-checkboxradio"></input>
+					<label for="filterRead" th:text="#{main.radios.unread}" class="ui-checkboxradio-label"></label>
+					<input type="radio" name="filterRead" id="filterRead" class="ui-checkboxradio"></input>
+					<label for="filterNoValues" th:text="#{main.radios.showAll}" class="ui-checkboxradio-label"></label>
+					<input type="radio" name="filterRead" id="filterNoValues" class="ui-checkboxradio"></input>
+				</fieldset>
+  			</div>
+  			<div class="ui-widget-content">
+  				<p class="ui-widget-header" th:text="#{main.radios.favnonfav}"></p>
 					<fieldset class="ui-widget-content">
 						<label for="showFavourites" th:text="#{main.radios.showFavourites}" class="ui-checkboxradio-label"></label>
 						<input type="radio" name="showFavs" id="showFavourites" class="ui-checkboxradio"></input>
@@ -42,22 +41,18 @@
 						<label for="showAll" th:text="#{main.radios.showAll}" class="ui-checkboxradio-label"></label>
 						<input type="radio" name="showFavs" id="showAll" class="ui-checkboxradio"></input>
 					</fieldset>
-   				</div>
-   				<div class="ui-widget-content">
-   					<p class="ui-widget-header" th:text="#{main.radios.readingpane}"></p>
- 					<fieldset class="ui-widget-content">
- 						<label for="showReadingPaneSelected" th:text="#{main.radios.showReadingPane}" class="ui-checkboxradio-label"></label>
- 						<input type="radio" name="showReadingPaneRadio" id="showReadingPaneSelected" class="ui-checkboxradio"></input>
- 						<label for="showPopupsSelected" th:text="#{main.radios.showPopUps}" class="ui-checkboxradio-label"></label>
- 						<input type="radio" name="showReadingPaneRadio" id="showPopupsSelected" class="ui-checkboxradio"></input>
- 					</fieldset>
-   				</div>
-   				</div>
-   			</td>
-   			<td>
-   				<a href="/hashtagViewer" target="viewer" th:text="#{main.showhashtags}"></a>
-   			</td>
-   		</tr></table>
+  			</div>
+  			<div class="ui-widget-content">
+  				<p class="ui-widget-header" th:text="#{main.radios.readingpane}"></p>
+				<fieldset class="ui-widget-content">
+					<label for="showReadingPaneSelected" th:text="#{main.radios.showReadingPane}" class="ui-checkboxradio-label"></label>
+					<input type="radio" name="showReadingPaneRadio" id="showReadingPaneSelected" class="ui-checkboxradio"></input>
+					<label for="showPopupsSelected" th:text="#{main.radios.showPopUps}" class="ui-checkboxradio-label"></label>
+					<input type="radio" name="showReadingPaneRadio" id="showPopupsSelected" class="ui-checkboxradio"></input>
+				</fieldset>
+  			</div>
+  			</div>
+		</div>
  	</div>
  	<table id="contentDisplayContainer"><tr>
  		<td id="contentDisplayTable">
