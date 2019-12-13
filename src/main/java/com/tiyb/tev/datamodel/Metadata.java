@@ -82,6 +82,11 @@ public class Metadata implements Serializable {
 			"dot-luv", "eggplant", "excite-bike", "flick", "hot-sneaks", "humanity", "le-frog", "mint-choc", "overcast",
 			"pepper-grinder", "redmond", "smoothness", "south-street", "start", "sunny", "swanky-purse", "trontastic",
 			"ui-darkness", "ui-lightness", "vader");
+	
+	/**
+	 * Default theme to use, when one isn't supplied
+	 */
+	public static final String DEFAULT_THEME = "base";
 
 	@Id
 	private Integer id;
@@ -124,7 +129,7 @@ public class Metadata implements Serializable {
 		md.setConversationDisplayStyle(CONVERSATION_DISPLAY_STYLES.get(0));
 		md.setConversationSortColumn(CONVERSATION_SORT_COLUMNS.get(0));
 		md.setConversationSortOrder(SORT_ORDERS.get(0));
-		md.setTheme("base");
+		md.setTheme(DEFAULT_THEME);
 
 		return md;
 	}

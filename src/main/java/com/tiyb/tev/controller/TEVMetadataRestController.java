@@ -61,7 +61,9 @@ public class TEVMetadataRestController {
 	 * <p>
 	 * If there is no data in the database, a default object is returned based on
 	 * {@link com.tiyb.tev.datamodel.Metadata#newDefaultMetadata()
-	 * Metadata#newDefaultMetadata()}
+	 * Metadata#newDefaultMetadata()}. If an object is found but doesn't have a
+	 * valid <b>theme</b> one is supplied, because not having a valid theme causes
+	 * major problems for the application's UI.
 	 * </p>
 	 * 
 	 * @return The {@link com.tiyb.tev.datamodel.Metadata Metadata} object stored in
@@ -72,6 +74,9 @@ public class TEVMetadataRestController {
 		List<Metadata> list = metadataRepo.findAll();
 
 		if (list.size() > 0) {
+			if (!Metadata.THEMES.contains(list.get(0).getTheme())) {
+				list.get(0).setTheme(Metadata.DEFAULT_THEME);
+			}
 			return list.get(0);
 		} else {
 			Metadata md = Metadata.newDefaultMetadata();
