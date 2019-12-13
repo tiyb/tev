@@ -59,6 +59,7 @@
 	<group name="exportedxml">
 		<css>/css/style.css</css>
 		<js>/js/exportedxml.js</js>
+		<js>/js/header-footer.js</js>
 	</group>
 	
 	<group name="errorpage">

@@ -11,11 +11,13 @@
     <link rel="stylesheet" type="text/css" th:href="@{/owr/exportedxml.css}"/>
 </head>
 <body>
-
+<div id="header"></div>
 <div class="container-fluid">
 <h1 th:text="#{exportedxml.title}"></h1>
 <textarea id="exportedXMLText" class="autoExpand" rows="3" data-min-rows="3"></textarea>
 </div>
+
+<div id="footer"></div>
 
 <script type="text/javascript" th:src="@{/owr/jquery.js}"></script>
 
