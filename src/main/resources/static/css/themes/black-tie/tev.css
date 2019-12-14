@@ -26,3 +26,11 @@ a {
 	font-weight: bold;
 }
 
+.navbar-selected {
+	background-color: rgb(17, 17, 17);
+	background-image: url(images/ui-bg_glass_40_111111_1x400.png);
+	color: #e3e3e3;
+	border-top-style: solid;
+	border-top-color: rgb(227, 227, 227);
+	border-top-width: 2px;
+}

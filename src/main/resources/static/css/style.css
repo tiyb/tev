@@ -1,3 +1,17 @@
+/* navbar */
+.navbar-selected {
+	box-sizing: border-box;
+	display: block;
+	margin: -15px;
+	padding: 15px;
+	background-attachment: scroll;
+	background-clip: border-box;
+	background-origin: padding-box;
+	background-position-x: 50%;
+	background-position-y: 50%;
+	background-size: auto;
+}
+
 /* posts page */
 
 #radioContainerLayoutTable td {

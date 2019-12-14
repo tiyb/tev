@@ -24,3 +24,8 @@ a {
 	color: rgb(230, 151, 0);
 }
 
+.navbar-selected {
+	background-color: rgb(20, 132, 230);
+	background-image: url(images/ui-bg_diagonals-thick_22_1484e6_40x40.png);
+	color: rgb(255, 255, 255);
+}

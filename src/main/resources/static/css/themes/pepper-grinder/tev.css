@@ -24,3 +24,8 @@ a {
 	color: rgb(101, 75, 36);
 }
 
+.navbar-selected {
+	background-color: rgb(248, 247, 246);
+	background-image: url(images/ui-bg_fine-grain_10_f8f7f6_60x60.png);
+	color: #654b24;
+}

@@ -24,3 +24,8 @@ a {
 	color: rgb(79, 66, 33);
 }
 
+.navbar-selected {
+	background-color: rgb(79, 66, 33);
+	background-image: url(images/ui-bg_diamond_10_4f4221_10x8.png);
+	color: #f8eec9;
+}

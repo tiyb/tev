@@ -22,3 +22,8 @@ a {
 	color: rgb(69, 69, 69);
 }
 
+.navbar-selected {
+	background-color: rgb(238, 238, 238);
+	background-image: url(images/ui-bg_highlight-hard_100_eeeeee_1x100.png);
+	color: #004276;
+}

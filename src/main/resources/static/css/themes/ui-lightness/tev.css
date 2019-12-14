@@ -24,3 +24,8 @@ a {
 	color: rgb(28, 148, 196);
 }
 
+.navbar-selected {
+	background-color: rgb(246, 246, 246);
+	background-image: url(images/ui-bg_glass_100_f6f6f6_1x400.png);
+	color: #1c94c4;
+}

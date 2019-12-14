@@ -13,3 +13,8 @@ a {
 	font-weight: bold;
 }
 
+.navbar-selected {
+	background-color: rgb(246, 246, 246);
+	background-image: none;
+	color: #454545;
+}

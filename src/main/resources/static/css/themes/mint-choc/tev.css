@@ -24,3 +24,8 @@ a {
 	color: rgb(155, 204, 96);
 }
 
+.navbar-selected {
+	background-color: rgb(28, 22, 13);
+	background-image: url(images/ui-bg_gloss-wave_20_1c160d_500x100.png);
+	color: #9bcc60;
+}
