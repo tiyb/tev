@@ -29,3 +29,7 @@ a {
 	background-image: url(images/ui-bg_highlight-soft_35_adadad_1x100.png);
 	color: #333;
 }
+
+input[type=text] {
+	color: rgb(18, 18, 18);
+}

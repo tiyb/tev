@@ -29,3 +29,8 @@ a {
 	background-image: url(images/ui-bg_glass_80_d7ebf9_1x400.png);
 	color: #2779aa;
 }
+
+input[type=text] {
+	color: rgb(39, 121, 170);
+	font-weight: 700;
+}

@@ -29,3 +29,7 @@ a {
 	background-image: url(images/ui-bg_highlight-soft_60_4ca20b_1x100.png);
 	color: #fff;
 }
+
+input[type=text] {
+	color: rgb(40, 92, 0);
+}

@@ -29,3 +29,8 @@ a {
 	background-image: url(images/ui-bg_fine-grain_10_f8f7f6_60x60.png);
 	color: #654b24;
 }
+
+input[type=text] {
+	color: rgb(101, 75, 36);
+	font-weight: 700;
+}

@@ -27,3 +27,8 @@ a {
 	background-image: url(images/ui-bg_highlight-hard_100_eeeeee_1x100.png);
 	color: #004276;
 }
+
+input[type=text] {
+	color: rgb(0, 66, 118);
+	font-weight: 700;
+}

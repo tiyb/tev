@@ -29,3 +29,8 @@ a {
 	background-image: url(images/ui-bg_diagonals-small_50_93c3cd_40x40.png);
 	color: rgb(51, 51, 51);
 }
+
+input[type=text] {
+	color: rgb(51, 51, 51);
+	font-weight: 700;
+}

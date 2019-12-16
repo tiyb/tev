@@ -29,3 +29,8 @@ a {
 	background-image: url(images/ui-bg_diamond_10_4f4221_10x8.png);
 	color: #f8eec9;
 }
+
+input[type=text] {
+	color: rgb(68, 49, 19);
+	font-weight: 700;
+}

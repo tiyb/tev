@@ -29,3 +29,8 @@ a {
 	background-image: url(images/ui-bg_gloss-wave_20_1c160d_500x100.png);
 	color: #9bcc60;
 }
+
+input[type=text] {
+	color: rgb(32, 25, 19);
+	font-weight: 700;
+}

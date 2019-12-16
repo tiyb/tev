@@ -29,3 +29,8 @@ a {
 	background-image: url(images/ui-bg_dots-small_20_333333_2x2.png);
 	color: rgb(255, 255, 255);
 }
+
+input[type=text] {
+	color: rgb(51, 51, 51);
+	font-weight: 700;
+}

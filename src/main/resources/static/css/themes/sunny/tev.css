@@ -31,3 +31,8 @@ a:hover {
 	background-image: url(images/ui-bg_gloss-wave_60_fece2f_500x100.png);
 	color: #4c3000;
 }
+
+input[type=text] {
+	color: rgb(76, 48, 0);
+	font-weight: 700;
+}
