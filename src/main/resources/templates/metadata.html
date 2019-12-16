@@ -23,50 +23,83 @@
 					<fieldset class="ui-widget-content">
 						<legend th:text="#{metadata.viewSettings}" class="ui-widget-header"></legend>
 						<p th:text="#{metadata.explanatoryText}"></p>
-						<p><label for="baseMediaPath" th:text="#{metadata.baseMediaPath}" class="ui-checkboxradio-label"></label>
-						<input type="text" id="baseMediaPath"></input></p>
-						<p><label for="filterDropdown" th:text="#{metadata.filter}" class="ui-checkboxradio-label"></label>
-						<select id="filterDropdown" class="ui-selectmenu-text"></select></p>
-						<p><label for="sortByDropdown" th:text="#{metadata.sortColumn}" class="ui-checkboxradio-label"></label>
-						<select id="sortByDropdown" class="ui-selectmenu-text"></select></p>
-						<p><label for="sortOrderDropdown" th:text="#{metadata.sortOrder}" class="ui-checkboxradio-label"></label>
-						<select id="sortOrderDropdown" class="ui-selectmenu-text"></select></p>
-						<p><label for="favsDropdown" th:text="#{metadata.showFavs}" class="ui-checkboxradio-label"></label>
-						<select id="favsDropdown" class="ui-selectmenu-text"></select></p>
-						<p><label for="pageLengthDropdown" th:text="#{metadata.defaultPageLength}" class="ui-checkboxradio-label"></label>
-						<select id="pageLengthDropdown" class="ui-selectmenu-text"></select></p>
-						<p><label for="showReadingPaneDropdown" th:text="#{metadata.showReadingPane}" class="ui-checkboxradio-label"></label>
-						<select id="showReadingPaneDropdown" class="ui-selectmenu-text"></select></p>
-						<p><label for="overwritePostsDropdown" th:text="#{metadata.overwritePosts}" class="ui-checkboxradio-label"></label>
-						<select id="overwritePostsDropdown" class="ui-selectmenu-text"></select></p>
-						<p><label for="imageExportPath" th:text="#{metadata.imageExportPath}" class="ui-checkboxradio-label"></label>
-						<input type="text" id="imageExportPath"></input></p>
-						<p><label for="themesDropdown" th:text="#{metadata.themes}" class="ui-checkboxradio-label"></label>
-						<select id="themesDropdown" class="ui-selectmenu-text"></select></p>
+						<table>
+							<tr>
+								<td class="settingsLabel"><label for="baseMediaPath" th:text="#{metadata.baseMediaPath}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><input type="text" id="baseMediaPath" class="autoUpdateSetting"></input></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="filterDropdown" th:text="#{metadata.filter}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="filterDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="sortByDropdown" th:text="#{metadata.sortColumn}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="sortByDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="sortOrderDropdown" th:text="#{metadata.sortOrder}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="sortOrderDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="favsDropdown" th:text="#{metadata.showFavs}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="favsDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="pageLengthDropdown" th:text="#{metadata.defaultPageLength}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="pageLengthDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="showReadingPaneDropdown" th:text="#{metadata.showReadingPane}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="showReadingPaneDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="overwritePostsDropdown" th:text="#{metadata.overwritePosts}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="overwritePostsDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="imageExportPath" th:text="#{metadata.imageExportPath}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><input type="text" id="imageExportPath" class="autoUpdateSetting"></input></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="themesDropdown" th:text="#{metadata.themes}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="themesDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+						</table>
 					</fieldset>
 				</td>
 				<td width="50%">
 					<fieldset class="ui-widget-content">
 						<legend th:text="#{metadata.conversationTitle}" class="ui-widget-header"></legend>
 						<p th:utext="#{metadata.conversationExplanatoryText}"></p>
-						<p><label for="mainUser" th:text="#{metadata.mainTumblrUser}" class="ui-checkboxradio-label"></label>
-						<input type="text" id="mainUser" readonly="readonly"></input></p>
-						<p><label for="mainUserAvatarUrl" th:text="#{metadata.mainTumblrUserAvatar}" class="ui-checkboxradio-label"></label>
-						<input type="text" id="mainUserAvatarUrl" readonly="readonly"></input></p>
-						<p><label for="conversationDisplayDropdown" th:text="#{metadata.conversationDisplayStyle}" class="ui-checkboxradio-label"></label>
-						<select id="conversationDisplayDropdown" class="ui-selectmenu-text"></select></p>
-						<p><label for="conversationSortColumnDropdown" th:text="#{metadata.conversationSortColumn}" class="ui-checkboxradio-label"></label>
-						<select id="conversationSortColumnDropdown" class="ui-selectmenu-text"></select></p>
-						<p><label for="conversationSortOrderDropdown" th:text="#{metadata.conversationSordOrder}" class="ui-checkboxradio-label"></label>
-						<select id="conversationSortOrderDropdown" class="ui-selectmenu-text"></select></p>
-						<p><label for="overwriteConvosDropdown" th:text="#{metadata.overwriteConvos}" class="ui-checkboxradio-label"></label>
-						<select id="overwriteConvosDropdown" class="ui-selectmenu-text"></select></p>
+						<table>
+							<tr>
+								<td class="settingsLabel"><label for="mainUser" th:text="#{metadata.mainTumblrUser}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><input type="text" id="mainUser" readonly="readonly"></input></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="mainUserAvatarUrl" th:text="#{metadata.mainTumblrUserAvatar}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><input type="text" id="mainUserAvatarUrl" readonly="readonly"></input></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="conversationDisplayDropdown" th:text="#{metadata.conversationDisplayStyle}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="conversationDisplayDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="conversationSortColumnDropdown" th:text="#{metadata.conversationSortColumn}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="conversationSortColumnDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="conversationSortOrderDropdown" th:text="#{metadata.conversationSordOrder}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="conversationSortOrderDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="overwriteConvosDropdown" th:text="#{metadata.overwriteConvos}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="overwriteConvosDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+						</table>
 					</fieldset>
 				</td>
 			</tr></table>
-			<div>
-				<input id="submitButton" type="submit" th:value="#{metadata.submitButton}" class="ui-button ui-widget ui-corner-all"></input>
-			</div>
 			<table><tr>
 				<td width="50%">
 					<fieldset class="ui-widget-content">

@@ -58,10 +58,6 @@ $(document).ready(function () {
 				
 	});
 	
-	$('#submitButton').click(function() {
-		updateServer();
-	});
-	
 	$('#markAllPostsReadButton').click(function() {
 		$.ajax({
 			url: '/admintools/posts/markAllRead',
@@ -120,6 +116,10 @@ $(document).ready(function () {
 				createAnErrorMessage($.i18n.prop('md_admintools_importImagesFailure'));
 			}
 		});
+	});
+	
+	$('.autoUpdateSetting').change(function() {
+		updateServer();
 	});
 	
 });
@@ -296,21 +296,26 @@ function getTranslatedTheme(themeID) {
 
 /**
  * Sets any Themeroller widgets that need to be instantiated (in this case, just
- * select menus)
+ * select menus), and sets their change event to automatically update the
+ * server. Special case is the Themes drop-down, which causes the page to
+ * instantly refresh.
  */
 function setUIWidgets() {
-	$('#filterDropdown').selectmenu();
-	$('#sortByDropdown').selectmenu();
-	$('#sortOrderDropdown').selectmenu();
-	$('#favsDropdown').selectmenu();
-	$('#pageLengthDropdown').selectmenu();
-	$('#showReadingPaneDropdown').selectmenu();
-	$('#overwritePostsDropdown').selectmenu();
-	$('#overwriteConvosDropdown').selectmenu();
-	$('#themesDropdown').selectmenu();
-	$('#conversationDisplayDropdown').selectmenu();
-	$('#conversationSortColumnDropdown').selectmenu();
-	$('#conversationSortOrderDropdown').selectmenu();
+	$('#filterDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+	$('#sortByDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+	$('#sortOrderDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+	$('#favsDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+	$('#pageLengthDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+	$('#showReadingPaneDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+	$('#overwritePostsDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+	$('#overwriteConvosDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+	$('#conversationDisplayDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+	$('#conversationSortColumnDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+	$('#conversationSortOrderDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+	$('#themesDropdown').selectmenu({change: function(event,ui) {
+		updateServer();
+		setTimeout(function() {location.reload();}, 1500);
+	}});
 }
 
 /**
