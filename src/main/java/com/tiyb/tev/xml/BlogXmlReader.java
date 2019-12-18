@@ -266,6 +266,7 @@ public class BlogXmlReader extends TEVXmlReader {
 	 *                     which the data from each element should be added
 	 */
 	private static void readPostAttributes(StartElement startElement, Post post) {
+		@SuppressWarnings("unchecked")
 		Iterator<Attribute> atts = startElement.getAttributes();
 		while (atts.hasNext()) {
 			Attribute att = atts.next();
