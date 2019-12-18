@@ -16,5 +16,8 @@ a {
 .navbar-selected {
 	background-color: rgb(246, 246, 246);
 	background-image: none;
+}
+
+.navbar-selected a {
 	color: #454545;
 }

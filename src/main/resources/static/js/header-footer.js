@@ -10,37 +10,37 @@ $(document).ready(function() {
 		var currentPath = window.location.pathname;
 		
 		if(currentPath.includes("/metadata")) {
-			addSelectedTextToHeader("navbar-link-md", $.i18n.prop('header_metadataTitle'));
+			addLinkToHeader('navbar-link-md', $.i18n.prop('header_metadataTitle'), '/metadata', true);
 			isIndexPage = false;
 		} else {
-			addLinkToHeader('navbar-link-md', $.i18n.prop('header_metadataTitle'), '/metadata');
+			addLinkToHeader('navbar-link-md', $.i18n.prop('header_metadataTitle'), '/metadata', false);
 		}
 		
 		if(currentPath.includes("/hashtagViewer")) {
-			addSelectedTextToHeader("navbar-link-hashtags", $.i18n.prop('header_hashtags'));
+			addLinkToHeader('navbar-link-hashtags', $.i18n.prop('header_hashtags'), '/hashtagViewer', true);
 			isIndexPage = false;
 		} else {
-			addLinkToHeader('navbar-link-hashtags', $.i18n.prop('header_hashtags'), '/hashtagViewer');
+			addLinkToHeader('navbar-link-hashtags', $.i18n.prop('header_hashtags'), '/hashtagViewer', false);
 		}
 		
 		if(currentPath.includes("/staged")) {
-			addSelectedTextToHeader("navbar-link-staged", $.i18n.prop('header_stagedPosts'));
+			addLinkToHeader('navbar-link-staged', $.i18n.prop('header_stagedPosts'), '/staged', true);
 			isIndexPage = false;
 		} else {
-			addLinkToHeader('navbar-link-staged', $.i18n.prop('header_stagedPosts'), '/staged');
+			addLinkToHeader('navbar-link-staged', $.i18n.prop('header_stagedPosts'), '/staged', false);
 		}
 		
 		if(currentPath.includes("/conversations")) {
-			addSelectedTextToHeader("navbar-link-conversations", $.i18n.prop('header_conversationsTitle'));
+			addLinkToHeader('navbar-link-conversations', $.i18n.prop('header_conversationsTitle'), '/conversations', true);
 			isIndexPage = false;
 		} else {
-			addLinkToHeader('navbar-link-conversations', $.i18n.prop('header_conversationsTitle'), '/conversations');
+			addLinkToHeader('navbar-link-conversations', $.i18n.prop('header_conversationsTitle'), '/conversations', false);
 		}
 		
 		if(isIndexPage) {
-			addSelectedTextToHeader("navbar-link-index", $.i18n.prop('header_indexTitle'));
+			addLinkToHeader('navbar-link-index', $.i18n.prop('header_indexTitle'), '/', true);
 		} else {
-			addLinkToHeader('navbar-link-index', $.i18n.prop('header_indexTitle'), '/');
+			addLinkToHeader('navbar-link-index', $.i18n.prop('header_indexTitle'), '/', false);
 		}
 	});
 	$('#footer').load("/footer");
@@ -56,9 +56,17 @@ $(document).ready(function() {
  *            The text to display
  * @param linkUrl
  *            The URL for the link
+ * @param isSelected
+ *            Indicates whether the link should be shown as 'selected' or not
  */
-function addLinkToHeader(spanName, linkText, linkUrl) {
-	var linkContent = "<a href='" + linkUrl + "'>" + linkText + "</a>";
+function addLinkToHeader(spanName, linkText, linkUrl, isSelected) {
+	var linkContent = "";
+	if(isSelected) {
+		linkContent = "<span class='navbar-selected'><a href='" + linkUrl + "'>" + linkText + "</a></span>";
+	} else {
+		var linkContent = "<a href='" + linkUrl + "'>" + linkText + "</a>";
+	}
+	
 	$(linkContent).appendTo('#' + spanName);
 }
 

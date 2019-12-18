@@ -29,6 +29,9 @@ a:hover {
 .navbar-selected {
 	background-color: rgb(254, 206, 47);
 	background-image: url(images/ui-bg_gloss-wave_60_fece2f_500x100.png);
+}
+
+.navbar-selected a {
 	color: #4c3000;
 }
 
