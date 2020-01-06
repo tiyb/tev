@@ -1,3 +1,10 @@
+$.i18n.properties({
+	name: 'messages',
+	path: 'js/i18n/',
+	mode: 'both'
+});
+
+
 /**
  * Initializes the auto-expanding text area, where the XML sets
  */

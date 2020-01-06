@@ -17,6 +17,10 @@ fieldset {
 	margin: 10px;
 }
 
+#footer {
+	margin-top: 20px;
+}
+
 /* posts page */
 
 #radioContainerLayoutTable td {

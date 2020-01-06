@@ -69,17 +69,3 @@ function addLinkToHeader(spanName, linkText, linkUrl, isSelected) {
 	
 	$(linkContent).appendTo('#' + spanName);
 }
-
-/**
- * Creates a span within the header for the current page, with a navbar-selected
- * class applied to it.
- * 
- * @param spanName
- *            The span to which this text should be added
- * @param textValue
- *            The text to display
- */
-function addSelectedTextToHeader(spanName, textValue) {
-	var textContent = "<span class='navbar-selected'>" + textValue + "</span>";
-	$(textContent).appendTo('#' + spanName);
-}
