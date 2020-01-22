@@ -37,6 +37,10 @@ $(document).ready(function() {
 			addLinkToHeader('navbar-link-conversations', $.i18n.prop('header_conversationsTitle'), '/conversations', false);
 		}
 		
+		if(currentPath.includes("/exportViewer")) {
+			isIndexPage = false;
+		}
+		
 		if(isIndexPage) {
 			addLinkToHeader('navbar-link-index', $.i18n.prop('header_indexTitle'), '/', true);
 		} else {
