@@ -261,6 +261,13 @@ public class TEVUIController {
 		return "viewers/hashtags";
 	}
 
+	/**
+	 * This request is used to view the XML for export purposes.
+	 * 
+	 * @param model The model to be populated with post data, for use by Thymeleaf
+	 *              (in this case, just theme information)
+	 * @return The name of the template to use for rendering the output
+	 */
 	@RequestMapping(value = { "/exportViewer" }, method = RequestMethod.GET)
 	public String showExportViewer(Model model) {
 		updateModelWithTheme(model);
@@ -417,9 +424,6 @@ public class TEVUIController {
 		response.setContentType("application/xml");
 		response.setHeader("Pragma", "no-cache");
 		response.setHeader("Cache-Control", "no-cache");
-		// response.setHeader("Content-Transfer-Encoding", "binary");
-//		response.setHeader("Content-Type", "application/xml; charset=utf-8"); 
-//		response.setHeader("Content-Disposition", "attachment; filename=\"stagedposts.xml\"");
 		List<Long> postIDs = stagingController.getAllPosts();
 
 		if (postIDs.size() < 1) {
