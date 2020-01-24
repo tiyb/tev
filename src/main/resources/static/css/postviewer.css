@@ -49,7 +49,7 @@ h2 {
 #tagContainer {
 	background-color: rgba(255, 255, 255, 0.05);
 	color: rgba(255, 255, 255, 0.46);
-	font-family: ""Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
+	font-family: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
 	font-size: 12px;
 	font-weight: 400;
 	
@@ -67,7 +67,7 @@ h2 {
 #photoLinks {
 	background-color: rgba(255, 255, 255, 0.05);
 	color: rgba(255, 255, 255, 0.46);
-	font-family: ""Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
+	font-family: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
 	font-size: 12px;
 	font-weight: 400;
 	
@@ -84,7 +84,7 @@ h2 {
 
 .photoLinks a, .photoLinks a:active, .photoLinks a:hover, .photoLinks a:link, .photoLinks a:visited {
 	color: rgba(255, 255, 255, 0.46);
-	font-family: ""Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
+	font-family: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
 	font-size: 12px;
 	font-weight: 400;
 }
