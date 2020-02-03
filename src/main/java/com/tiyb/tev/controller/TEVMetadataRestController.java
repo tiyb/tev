@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,10 @@ import com.tiyb.tev.repository.MetadataRepository;
 
 /**
  * REST controller for working with the application's Metadata -- it's settings.
+ * Settings are kept on a blog-by-blog basis. Whenever a Metadata object is
+ * encountered that doesn't have a valid <b>theme</b> set, the default is
+ * applied; not having a theme is a fatal bug for the application, so extra care
+ * is taken to guard agaisnt that eventuality.
  * 
  * @author tiyb
  */
@@ -52,36 +57,152 @@ public class TEVMetadataRestController {
 	}
 
 	/**
+	 * Helper function to determine if a "type" is valid or not, per Tumblr/TEV list
+	 * of types. Though it is only used within this class, it was made public just
+	 * in case other code ever needs it.
+	 * 
+	 * @param typeName       Name of the type to be validated
+	 * @param validTypeNames List of all of the valid types in the system
+	 * @return True/False
+	 */
+	public static boolean isValidType(String typeName, List<String> validTypeNames) {
+		if (validTypeNames.contains(typeName)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * <p>
-	 * GET to return the metadata stored in the system. Only one record will ever be
-	 * stored in the <code>metadata</code> table, so the API assumes one and only
-	 * one {@link com.tiyb.tev.datamodel.Metadata Metadata} object.
+	 * GET to return all metadata objects stored in the system, for all blogs.
 	 * </p>
 	 * 
 	 * <p>
 	 * If there is no data in the database, a default object is returned based on
 	 * {@link com.tiyb.tev.datamodel.Metadata#newDefaultMetadata()
-	 * Metadata#newDefaultMetadata()}. If an object is found but doesn't have a
-	 * valid <b>theme</b> one is supplied, because not having a valid theme causes
-	 * major problems for the application's UI.
+	 * Metadata#newDefaultMetadata()}.
 	 * </p>
 	 * 
 	 * @return The {@link com.tiyb.tev.datamodel.Metadata Metadata} object stored in
 	 *         the database, or an empty object if the table has no data.
 	 */
 	@GetMapping("/metadata")
-	public Metadata getMetadata() {
+	public List<Metadata> getAllMetadata() {
 		List<Metadata> list = metadataRepo.findAll();
 
-		if (list.size() > 0) {
-			if (!Metadata.THEMES.contains(list.get(0).getTheme())) {
-				list.get(0).setTheme(Metadata.DEFAULT_THEME);
-			}
-			return list.get(0);
-		} else {
-			Metadata md = Metadata.newDefaultMetadata();
-			return md;
+		if (list.size() < 1) {
+			list.add(Metadata.newDefaultMetadata());
+			return list;
 		}
+
+		for (Metadata md : list) {
+			if (!Metadata.THEMES.contains(md.getTheme())) {
+				md.setTheme(Metadata.DEFAULT_THEME);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * GET to return the metadata for a particular blog based on the Metadata ID.
+	 * 
+	 * @param blog The name of the blog for which to return metadata
+	 * @return {@link com.tiyb.tev.datamodel.Metadata Metadata} object containing
+	 *         the settings for the blog in question
+	 */
+	@GetMapping("/metadata/{id}")
+	public Metadata getMetadataByID(@PathVariable("id") Integer id) {
+		Optional<Metadata> response = metadataRepo.findById(id);
+		if (!response.isPresent()) {
+			return null;
+		}
+
+		Metadata md = response.get();
+
+		if (!Metadata.THEMES.contains(md.getTheme())) {
+			md.setTheme(Metadata.DEFAULT_THEME);
+		}
+
+		return md;
+	}
+
+	/**
+	 * PUT to mark a blog as the default blog by setting <code>isDefault</code> to
+	 * true for its MD, and false to all other MDs.
+	 * 
+	 * @param id ID of the Metadata objec to be marked as the default
+	 * @return The updated Metadata object
+	 */
+	@PutMapping("/metadata/{id}/markAsDefault")
+	public Metadata markBlogAsDefault(@PathVariable("id") Integer id) {
+		List<Metadata> allMDs = metadataRepo.findAll();
+		Metadata response = null;
+
+		for (Metadata md : allMDs) {
+			if (id.equals(md.getId())) {
+				md.setIsDefault(true);
+				metadataRepo.save(md);
+				response = md;
+			} else {
+				md.setIsDefault(false);
+				metadataRepo.save(md);
+			}
+		}
+
+		return response;
+	}
+
+	/**
+	 * Gets the default Metadata object. If none is set as the default, the first is
+	 * set as the default (and saved), then returned. If no MD exists at <i>all,</i>
+	 * one is created and saved and returned.
+	 * 
+	 * @return The default MD object
+	 */
+	@GetMapping("/metadata/default")
+	public Metadata getDefaultMetadata() {
+		List<Metadata> allMD = metadataRepo.findAll();
+
+		if (allMD == null || allMD.size() < 1) {
+			Metadata newMD = Metadata.newDefaultMetadata();
+			newMD.setIsDefault(true);
+			return metadataRepo.save(newMD);
+		}
+
+		for (Metadata md : allMD) {
+			if (md.getIsDefault()) {
+				return md;
+			}
+		}
+
+		allMD.get(0).setIsDefault(true);
+		metadataRepo.save(allMD.get(0));
+
+		return allMD.get(0);
+	}
+
+	/**
+	 * GET to return the Metadata for a given blog, by name, or the default MD if
+	 * none found
+	 * 
+	 * @param blog Name of the blog in question
+	 * @return Metadata for the blog, or default if none
+	 */
+	@GetMapping("/metadata/byBlog/{blog}")
+	public Metadata getMetadataForBlogOrDefault(@PathVariable("blog") String blog) {
+		List<Metadata> all = metadataRepo.findAll();
+
+		for (Metadata md : all) {
+			if (blog.equals(md.getBlog())) {
+				return md;
+			}
+		}
+
+		Metadata defaultMD = Metadata.newDefaultMetadata();
+		defaultMD.setBlog(blog);
+		return metadataRepo.save(defaultMD);
 	}
 
 	/**
@@ -123,41 +244,20 @@ public class TEVMetadataRestController {
 	}
 
 	/**
-	 * <p>
-	 * PUT to update metadata details in the database. Code always acts as if there
-	 * is one (and only one) record in the DB, even if it's empty; if no record
-	 * exists to be updated, a new one is created instead. For this reason, the ID
-	 * is always 1.
-	 * </p>
+	 * PUT to update metadata details in the database. Assertions have been added
+	 * around ensuring proper themes are saved.
 	 * 
-	 * <p>
-	 * An assertion has been added that the theme must be one of the pre-defined
-	 * themes; it was determined that putting an invalid theme in the system causes
-	 * the application to fail non-gracefully.
-	 * </p>
-	 * 
+	 * @param id              The ID of the MD being saved
 	 * @param metadataDetails The data to be updated in the DB
 	 * @return The updated {@link com.tiyb.tev.datamodel.Metadata Metadata} object
 	 */
-	@PutMapping("/metadata")
-	public Metadata updateMetadata(@RequestBody Metadata metadataDetails) {
-		Metadata md;
-		Optional<Metadata> omd = metadataRepo.findById(1);
-		if (omd.isPresent()) {
-			md = omd.get();
-		} else {
-			md = new Metadata();
-			md.setId(1);
-		}
-
+	@PutMapping("/metadata/{id}")
+	public Metadata updateMetadata(@PathVariable("id") Integer id, @RequestBody Metadata metadataDetails) {
 		Assert.hasText(metadataDetails.getTheme(), "Theme must not be null");
 		Assert.isTrue(Metadata.THEMES.contains(metadataDetails.getTheme()),
 				"Theme must be one of the pre-defined values");
-		md.updateData(metadataDetails);
 
-		Metadata returnValue = metadataRepo.save(md);
-
-		return returnValue;
+		return metadataRepo.save(metadataDetails);
 	}
 
 }

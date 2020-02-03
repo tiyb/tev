@@ -41,11 +41,12 @@ public class ConversationRepositoryUnitTest {
 		convo.setParticipant("convo participant");
 		convo.setParticipantAvatarUrl("http://www.participant1.com");
 		convo.setParticipantId("pid123");
+		convo.setBlog("blogname");
 
 		entityManager.persist(convo);
 		entityManager.flush();
 
-		Conversation foundConvo = convoRepo.findByParticipant("convo participant");
+		Conversation foundConvo = convoRepo.findByBlogAndParticipant("blogname", "convo participant");
 
 		assertThat(foundConvo).isNotNull();
 		assertThat(foundConvo.getId()).isEqualTo(convo.getId());
@@ -63,11 +64,12 @@ public class ConversationRepositoryUnitTest {
 		convo.setParticipant("convo participant");
 		convo.setParticipantAvatarUrl("http://www.participant1.com");
 		convo.setParticipantId("pid123");
+		convo.setBlog("blogname");
 		
 		entityManager.persist(convo);
 		entityManager.flush();
 		
-		List<Conversation> conversations = convoRepo.findByParticipantId("pid123");
+		List<Conversation> conversations = convoRepo.findByBlogAndParticipantId("blogname", "pid123");
 		assertThat(conversations).isNotNull();
 		assertThat(conversations.size()).isEqualTo(1);
 		

@@ -29,9 +29,9 @@ public class TevStagingControllerUnitTests {
 	 */
 	@Test
 	public void testCreatingPostForStaging() {
-		controller.createStagedPost(1L);
+		controller.createStagedPostForBlog("blogname", 1L);
 		
-		List<Long> posts = controller.getAllPosts();
+		List<Long> posts = controller.getAllPostsForBlog("blogname");
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(1);
 		assertThat(posts.get(0)).isEqualTo(1L);
@@ -42,10 +42,10 @@ public class TevStagingControllerUnitTests {
 	 */
 	@Test
 	public void testCreatingMultiplePostsForStaging() {
-		controller.createStagedPost(1L);
-		controller.createStagedPost(2L);
+		controller.createStagedPostForBlog("blogname", 1L);
+		controller.createStagedPostForBlog("blogname", 2L);
 		
-		List<Long> posts = controller.getAllPosts();
+		List<Long> posts = controller.getAllPostsForBlog("blogname");
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(2);
 		assertThat(posts.get(0)).isEqualTo(1L);
@@ -57,12 +57,12 @@ public class TevStagingControllerUnitTests {
 	 */
 	@Test
 	public void testDeletingAStagedost() {
-		controller.createStagedPost(1L);
-		controller.createStagedPost(2L);
+		controller.createStagedPostForBlog("blogname", 1L);
+		controller.createStagedPostForBlog("blogname", 2L);
 		
-		controller.deleteStagedPost(2L);
+		controller.deleteStagedPostForBlog("blogname", 2L);
 		
-		List<Long> posts = controller.getAllPosts();
+		List<Long> posts = controller.getAllPostsForBlog("blogname");
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(1);
 		assertThat(posts.get(0)).isEqualTo(1L);
@@ -73,12 +73,12 @@ public class TevStagingControllerUnitTests {
 	 */
 	@Test
 	public void testDeletingAllStagedPosts() {
-		controller.createStagedPost(1L);
-		controller.createStagedPost(2L);
+		controller.createStagedPostForBlog("blogname", 1L);
+		controller.createStagedPostForBlog("blogname", 2L);
 		
-		controller.deleteAllStagedPosts();
+		controller.deleteAllStagedPostsForBlog("blogname");
 		
-		List<Long> posts = controller.getAllPosts();
+		List<Long> posts = controller.getAllPostsForBlog("blogname");
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(0);
 	}

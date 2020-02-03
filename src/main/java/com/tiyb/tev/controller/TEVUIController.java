@@ -96,16 +96,18 @@ public class TEVUIController {
 	 * /conversations. Retrieves metadata and conversations, which are added to the
 	 * model, before returning the location of the conversations viewer.
 	 * 
+	 * TODO what to do about getting the right blog
+	 * 
 	 * @param model not used
 	 * @return name of the template to be used to render the page
 	 */
 	@RequestMapping(value = { "/conversations" }, method = RequestMethod.GET)
 	public String conversations(Model model) {
-		Metadata md = mdController.getMetadata();
+		Metadata md = mdController.getDefaultMetadata();
 		model.addAttribute("metadata", md);
-		List<Conversation> conversations = convoController.getAllConversations();
+		List<Conversation> conversations = convoController.getAllConversationsForBlog(md.getBlog());
 		model.addAttribute("conversations", conversations);
-		
+
 		updateModelWithTheme(model);
 
 		return "conversations";
@@ -124,8 +126,8 @@ public class TEVUIController {
 	}
 
 	/**
-	 * Handles file uploads, for reading in the Tumblr Post XML Export. Actual logic
-	 * is handled by the
+	 * Handles file uploads, for reading in the Tumblr Post XML Export for a given
+	 * blog. Actual logic is handled by the
 	 * {@link com.tiyb.tev.xml.BlogXmlReader#parseDocument(java.io.InputStream, TEVPostRestController, TEVMetadataRestController)
 	 * BlogXmlReader#parseDocument()} method; this method simply calls that class
 	 * and then (upon success) redirects to the index. Failure redirects to the "bad
@@ -135,11 +137,11 @@ public class TEVUIController {
 	 * @param redirectAttributes not used
 	 * @return The page to which the successful upload should be redirected
 	 */
-	@PostMapping("/postDataUpload")
-	public String handlePostFileUpload(@RequestParam("file") MultipartFile file,
-			RedirectAttributes redirectAttributes) {
+	@PostMapping("/postDataUpload/{blog}")
+	public String handlePostFileUploadForBlog(@PathVariable(value = "blog") String blog,
+			@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
 		try {
-			BlogXmlReader.parseDocument(file.getInputStream(), postController, mdController);
+			BlogXmlReader.parseDocument(file.getInputStream(), postController, mdController, blog);
 		} catch (XMLParsingException | IOException e) {
 			logger.error("UI Controller failing in handlePostFileUpload due to XML parsing error: ", e);
 			return "redirect:/errorbadxml";
@@ -156,16 +158,19 @@ public class TEVUIController {
 	 * class and then (upon success) redirects to the index. Failure redirects to
 	 * the "bad XML" error page.
 	 * 
+	 * TODO UI won't be passing this param
+	 * 
+	 * @param blog               Blog for which conversation should be read
 	 * @param file               the XML file to be parsed
 	 * @param redirectAttributes not used
 	 * @return The page to which the application should be redirected after upload
 	 */
-	@PostMapping("/conversationDataUpload")
-	public String handleConversationFileUpload(@RequestParam("file") MultipartFile file,
-			RedirectAttributes redirectAttributes) {
+	@PostMapping("/conversationDataUpload/{blog}")
+	public String handleConversationFileUpload(@PathVariable("blog") String blog,
+			@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
 
 		try {
-			ConversationXmlReader.parseDocument(file, mdController, convoController);
+			ConversationXmlReader.parseDocument(file, mdController, convoController, blog);
 		} catch (XMLParsingException e) {
 			logger.error("UI Controller failing in handleConversationFileUpload due to XML parsing error: ", e);
 			return "redirect:/errorbadxml";
@@ -188,14 +193,15 @@ public class TEVUIController {
 	 * the tags in the post.
 	 * </p>
 	 * 
+	 * @param blog   The blog for which this post should be retrieved
 	 * @param postID The ID of the post to be viewed (regardless of type)
 	 * @param model  The model to be populated with post data, for use by Thymeleaf
 	 *               in the HTML template
 	 * @return The name of the template to use for rendering the output
 	 */
-	@RequestMapping(value = { "/postViewer" }, method = RequestMethod.GET)
-	public String showViewer(@RequestParam("id") Long postID, Model model) {
-		Post post = postController.getPostById(postID);
+	@RequestMapping(value = { "/postViewer/{blog}" }, method = RequestMethod.GET)
+	public String showViewer(@PathVariable(value = "blog") String blog, @RequestParam("id") Long postID, Model model) {
+		Post post = postController.getPostForBlogById(blog, postID);
 		model.addAttribute("post", post);
 		model.addAttribute("tags", pullOutTagValues(post.getTags()));
 		List<String> availableTypes = mdController.getAllTypes();
@@ -215,20 +221,20 @@ public class TEVUIController {
 
 		switch (postType) {
 		case "regular":
-			Regular reg = postController.getRegularById(postID);
+			Regular reg = postController.getRegularForBlogById(post.getTumblelog(), postID);
 			model.addAttribute("regular", reg);
 			return "viewers/regular";
 		case "link":
-			Link ln = postController.getLinkById(postID);
+			Link ln = postController.getLinkForBlogById(blog, postID);
 			model.addAttribute("link", ln);
 			return "viewers/link";
 		case "answer":
-			Answer ans = postController.getAnswerById(postID);
+			Answer ans = postController.getAnswerForBlogById(blog, postID);
 			model.addAttribute("answer", ans);
 			return "viewers/answer";
 		case "photo":
 			List<String> images = new ArrayList<String>();
-			List<Photo> photos = postController.getPhotoById(postID);
+			List<Photo> photos = postController.getPhotoForBlogById(post.getTumblelog(), postID);
 			for (int i = 0; i < photos.size(); i++) {
 				Photo photo = photos.get(i);
 				String ext = photo.getUrl1280().substring(photo.getUrl1280().lastIndexOf('.'));
@@ -238,7 +244,7 @@ public class TEVUIController {
 			model.addAttribute("caption", photos.get(0).getCaption());
 			return "viewers/photo";
 		case "video":
-			Video vid = postController.getVideoById(postID);
+			Video vid = postController.getVideoForBlogById(post.getTumblelog(), postID);
 			model.addAttribute("video", vid);
 			return "viewers/video";
 		}
@@ -249,13 +255,14 @@ public class TEVUIController {
 	/**
 	 * This request is used to populate the hashtag viewer.
 	 * 
+	 * @param blog  The blog for which hashtags are being retrieved
 	 * @param model The model to be populated with post data, for use by Thymeleaf
 	 *              in the HTML template
 	 * @return The name of the template to use for rendering the output
 	 */
-	@RequestMapping(value = { "/hashtagViewer" }, method = RequestMethod.GET)
-	public String showHashtagViewer(Model model) {
-		List<Hashtag> hashtags = postController.getAllHashtags();
+	@RequestMapping(value = { "/hashtagViewer/{blog}" }, method = RequestMethod.GET)
+	public String showHashtagViewerForBlog(@PathVariable(value = "blog") String blog, Model model) {
+		List<Hashtag> hashtags = postController.getAllHashtagsForBlog(blog);
 		model.addAttribute("hashtags", hashtags);
 		updateModelWithTheme(model);
 		return "viewers/hashtags";
@@ -290,19 +297,24 @@ public class TEVUIController {
 	/**
 	 * Request used to populate conversation viewer
 	 * 
+	 * TODO UI won't be passing blog name
+	 * 
+	 * @param blog            Name of the blog
 	 * @param participantName Name of the conversation
 	 * @param model           Populated with information from this conversation
 	 * @return Name of the viewer to load
 	 */
 	@RequestMapping(value = { "/conversationViewer" }, method = RequestMethod.GET)
-	public String showConversationViewer(@RequestParam("participant") String participantName, Model model) {
-		Metadata md = mdController.getMetadata();
+	public String showConversationViewer(@RequestParam("blog") String blog,
+			@RequestParam("participant") String participantName, Model model) {
+		Metadata md = mdController.getMetadataForBlogOrDefault(blog);
 		model.addAttribute("metadata", md);
-		Conversation convo = convoController.getConversationByParticipant(participantName);
+		Conversation convo = convoController.getConversationForBlogByParticipant(md.getBlog(), participantName);
 		model.addAttribute("conversation", convo);
-		List<ConversationMessage> messages = convoController.getConvoMsgByConvoID(convo.getId());
+		List<ConversationMessage> messages = convoController.getConvoMsgForBlogByConvoID(convo.getBlog(),
+				convo.getId());
 		model.addAttribute("messages", messages);
-		
+
 		updateModelWithTheme(model);
 
 		return "viewers/conversation";
@@ -333,7 +345,8 @@ public class TEVUIController {
 	@RequestMapping(value = { "/viewerMedia/{imageName}" }, method = RequestMethod.GET, produces = {
 			MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_PNG_VALUE })
 	public @ResponseBody byte[] getMedia(@PathVariable("imageName") String imageName, Model model) {
-		String fullName = mdController.getMetadata().getBaseMediaPath() + "/" + imageName;
+		// TODO may need something better than just the default MD
+		String fullName = mdController.getDefaultMetadata().getBaseMediaPath() + "/" + imageName;
 
 		File file = new File(fullName);
 		try {
@@ -353,7 +366,8 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/viewerVideo/{videoName}" }, method = RequestMethod.GET, produces = { "video/mp4" })
 	public void getVideo(HttpServletResponse response, HttpServletRequest request) {
-		String fullName = mdController.getMetadata().getBaseMediaPath() + "/"
+		// TODO may need something better than just the default MD
+		String fullName = mdController.getDefaultMetadata().getBaseMediaPath() + "/"
 				+ request.getRequestURI().substring(request.getRequestURI().lastIndexOf('/'));
 
 		response.setContentType("video/mp4");
@@ -376,55 +390,23 @@ public class TEVUIController {
 		}
 	}
 
-//	/**
-//	 * Used to request the XML export file, for any posts that have been "staged"
-//	 * for export. Returns the data as a file, not just data to be streamed to the
-//	 * browser.
-//	 * 
-//	 * @param response The HTTP Response object (used for setting headers)
-//	 * @param request  The HTTP Request object
-//	 * @return The XML file, as a byte array
-//	 */
-//	@RequestMapping(value = { "/stagedPostsDownload" }, method = RequestMethod.GET, produces = { "application/xml" })
-//	public @ResponseBody byte[] getStagedPostsFile(HttpServletResponse response, HttpServletRequest request) {
-//		response.setContentType("application/xml");
-//		response.setHeader("Pragma", "no-cache");
-//		response.setHeader("Cache-Control", "no-cache");
-//		//response.setHeader("Content-Transfer-Encoding", "binary");
-//		response.setHeader("Content-Type", "application/xml; charset=utf-8"); 
-//		response.setHeader("Content-Disposition", "attachment; filename=\"stagedposts.xml\"");
-//		List<Long> postIDs = stagingController.getAllPosts();
-//
-//		if (postIDs.size() < 1) {
-//			logger.warn("No posts staged for download");
-//			throw new NoStagedPostsException();
-//		}
-//
-//		List<Post> posts = new ArrayList<Post>();
-//		for (Long id : postIDs) {
-//			Post post = postController.getPostById(id);
-//			posts.add(post);
-//		}
-//
-//		String xmlOutput = BlogXmlWriter.getStagedPostXML(postIDs, postController);
-//		return xmlOutput.getBytes();
-//	}
-//
 	/**
 	 * Used to request the XML export, for any posts that have been "staged" for
 	 * export. Returns the data as a string, with the intent that it is displayed in
 	 * the browser.
 	 * 
+	 * @param blog     The blog for which staged downloads should be retrieved
 	 * @param response The HTTP Response object (used for setting headers)
 	 * @param request  The HTTP Request object
 	 * @return The XML file, as a String
 	 */
-	@RequestMapping(value = { "/stagedPostsDownload" }, method = RequestMethod.GET, produces = { "text/plain" })
-	public @ResponseBody String getStagedPostsFile(HttpServletResponse response, HttpServletRequest request) {
+	@RequestMapping(value = { "/stagedPostsDownload/{blog}" }, method = RequestMethod.GET, produces = { "text/plain" })
+	public @ResponseBody String getStagedPostsFileForBlog(@PathVariable(value = "blog") String blog,
+			HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("application/xml");
 		response.setHeader("Pragma", "no-cache");
 		response.setHeader("Cache-Control", "no-cache");
-		List<Long> postIDs = stagingController.getAllPosts();
+		List<Long> postIDs = stagingController.getAllPostsForBlog(blog);
 
 		if (postIDs.size() < 1) {
 			logger.warn("No posts staged for download");
@@ -433,11 +415,11 @@ public class TEVUIController {
 
 		List<Post> posts = new ArrayList<Post>();
 		for (Long id : postIDs) {
-			Post post = postController.getPostById(id);
+			Post post = postController.getPostForBlogById(blog, id);
 			posts.add(post);
 		}
 
-		String xmlOutput = BlogXmlWriter.getStagedPostXML(postIDs, postController);
+		String xmlOutput = BlogXmlWriter.getStagedPostXMLForBlog(postIDs, postController, blog);
 		return xmlOutput;
 	}
 
@@ -496,23 +478,24 @@ public class TEVUIController {
 
 		return builder.toString();
 	}
-	
+
 	/**
 	 * Used to set the theme, so that Thymeleaf pages can set the correct CSS
+	 * 
+	 * TODO definitely need to get the proper blog, not just pass the default
 	 * 
 	 * @param model The model to be updated
 	 */
 	private void updateModelWithTheme(Model model) {
-		Metadata md = mdController.getMetadata();
+		Metadata md = mdController.getDefaultMetadata();
 		String theme = md.getTheme();
 		if (theme == null || theme.equals("")) {
 			theme = "base";
 			md.setTheme(theme);
-			mdController.updateMetadata(md);
+			mdController.updateMetadata(md.getId(), md);
 		}
 
 		model.addAttribute("theme", theme);
 	}
-
 
 }

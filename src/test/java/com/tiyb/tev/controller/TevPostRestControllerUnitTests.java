@@ -54,8 +54,9 @@ public class TevPostRestControllerUnitTests {
 	public void updatePost() {
 		Post originalEmptyPost = new Post();
 		originalEmptyPost.setId(1L);
+		originalEmptyPost.setTumblelog("blog");
 
-		Post modifiedPost = restController.createPost(originalEmptyPost);
+		Post modifiedPost = restController.createPostForBlog("blog", originalEmptyPost);
 		assertThat(modifiedPost).isNotNull();
 
 		modifiedPost.setDate("Jan 1, 2019");
@@ -74,9 +75,9 @@ public class TevPostRestControllerUnitTests {
 		modifiedPost.setUrlWithSlug("URL with slug");
 		modifiedPost.setState("published");
 
-		restController.updatePost(1L, modifiedPost);
+		restController.updatePostForBlog("blog", 1L, modifiedPost);
 
-		Post finalPostFromServer = restController.getPostById(1L);
+		Post finalPostFromServer = restController.getPostForBlogById("blog", 1L);
 
 		assertThat(finalPostFromServer).isNotNull();
 		assertThat(finalPostFromServer).isEqualToComparingFieldByField(modifiedPost);
@@ -90,15 +91,16 @@ public class TevPostRestControllerUnitTests {
 		Post originalPost = new Post();
 		originalPost.setId(1L);
 		originalPost.setIsRead(false);
+		originalPost.setTumblelog("blog");
 
-		originalPost = restController.createPost(originalPost);
+		originalPost = restController.createPostForBlog("blog", originalPost);
 		assertThat(originalPost).isNotNull();
 
-		Post newPost = restController.markPostRead(1L);
+		Post newPost = restController.markPostReadForBlog("blog", 1L);
 		assertThat(newPost).isNotNull();
 		assertThat(newPost.getIsRead()).isEqualTo(true);
 
-		Post finalPost = restController.getPostById(1L);
+		Post finalPost = restController.getPostForBlogById("blog", 1L);
 		assertThat(finalPost).isNotNull();
 		assertThat(finalPost.getIsRead()).isEqualTo(true);
 	}
@@ -111,15 +113,16 @@ public class TevPostRestControllerUnitTests {
 		Post originalPost = new Post();
 		originalPost.setId(1L);
 		originalPost.setIsRead(true);
+		originalPost.setTumblelog("blog");
 
-		originalPost = restController.createPost(originalPost);
+		originalPost = restController.createPostForBlog("blog", originalPost);
 		assertThat(originalPost).isNotNull();
 
-		Post newPost = restController.markPostUnread(1L);
+		Post newPost = restController.markPostUnreadForBlog("blog", 1L);
 		assertThat(newPost).isNotNull();
 		assertThat(newPost.getIsRead()).isEqualTo(false);
 
-		Post finalPost = restController.getPostById(1L);
+		Post finalPost = restController.getPostForBlogById("blog", 1L);
 		assertThat(finalPost).isNotNull();
 		assertThat(finalPost.getIsRead()).isEqualTo(false);
 	}
@@ -133,15 +136,16 @@ public class TevPostRestControllerUnitTests {
 		Post originalPost = new Post();
 		originalPost.setId(1L);
 		originalPost.setIsFavourite(false);
+		originalPost.setTumblelog("blog");
 
-		originalPost = restController.createPost(originalPost);
+		originalPost = restController.createPostForBlog("blog", originalPost);
 		assertThat(originalPost).isNotNull();
 
-		Post newPost = restController.markPostFavourite(1L);
+		Post newPost = restController.markPostFavouriteForBlog("blog", 1L);
 		assertThat(newPost).isNotNull();
 		assertThat(newPost.getIsFavourite()).isEqualTo(true);
 
-		Post finalPost = restController.getPostById(1L);
+		Post finalPost = restController.getPostForBlogById("blog", 1L);
 		assertThat(finalPost).isNotNull();
 		assertThat(finalPost.getIsFavourite()).isEqualTo(true);
 	}
@@ -155,15 +159,16 @@ public class TevPostRestControllerUnitTests {
 		Post originalPost = new Post();
 		originalPost.setId(1L);
 		originalPost.setIsFavourite(true);
+		originalPost.setTumblelog("blog");
 
-		originalPost = restController.createPost(originalPost);
+		originalPost = restController.createPostForBlog("blog", originalPost);
 		assertThat(originalPost).isNotNull();
 
-		Post newPost = restController.markPostNonFavourite(1L);
+		Post newPost = restController.markPostNonFavouriteForBlog("blog", 1L);
 		assertThat(newPost).isNotNull();
 		assertThat(newPost.getIsFavourite()).isEqualTo(false);
 
-		Post finalPost = restController.getPostById(1L);
+		Post finalPost = restController.getPostForBlogById("blog", 1L);
 		assertThat(finalPost).isNotNull();
 		assertThat(finalPost.getIsFavourite()).isEqualTo(false);
 	}
@@ -173,20 +178,24 @@ public class TevPostRestControllerUnitTests {
 	 */
 	@Test
 	public void updateAnswer() {
+		Post parentPost = new Post();
+		parentPost.setId(1L);
+		parentPost.setTumblelog("blog");
+		restController.createPostForBlog("blog", parentPost);
 		Answer originalAns = new Answer();
 		originalAns.setPostId(1L);
 		originalAns.setQuestion("original question");
 		originalAns.setAnswer("original answer");
 
-		Answer modifiedAnswer = restController.createAnswer(1L, originalAns);
+		Answer modifiedAnswer = restController.createAnswerForBlog("blog", 1L, originalAns);
 		assertThat(modifiedAnswer).isNotNull();
 
 		modifiedAnswer.setAnswer("new answer");
 		modifiedAnswer.setQuestion("new question");
 
-		restController.updateAnswer(1L, modifiedAnswer);
+		restController.updateAnswerForBlog("blog", 1L, modifiedAnswer);
 
-		Answer finalFromServer = restController.getAnswerById(1L);
+		Answer finalFromServer = restController.getAnswerForBlogById("blog", 1L);
 
 		assertThat(finalFromServer).isNotNull();
 		assertThat(finalFromServer).isEqualToComparingFieldByField(modifiedAnswer);
@@ -197,20 +206,24 @@ public class TevPostRestControllerUnitTests {
 	 */
 	@Test
 	public void updateLink() {
+		Post parentPost = new Post();
+		parentPost.setId(1L);
+		parentPost.setTumblelog("blog");
+		restController.createPostForBlog(parentPost.getTumblelog(), parentPost);
 		Link original = new Link();
 		original.setPostId(1L);
 		original.setUrl("original url");
 
-		Link modifiedLink = restController.createLink(1L, original);
+		Link modifiedLink = restController.createLinkForBlog("blog", 1L, original);
 		assertThat(modifiedLink).isNotNull();
 
 		modifiedLink.setDescription("new description");
 		modifiedLink.setText("new link text");
 		modifiedLink.setUrl("new url");
 
-		restController.updateLink(1L, modifiedLink);
+		restController.updateLinkForBlog("blog",1L, modifiedLink);
 
-		Link finalFromServer = restController.getLinkById(1L);
+		Link finalFromServer = restController.getLinkForBlogById("blog", 1L);
 
 		assertThat(finalFromServer).isNotNull();
 		assertThat(finalFromServer).isEqualToComparingFieldByField(modifiedLink);
@@ -221,10 +234,14 @@ public class TevPostRestControllerUnitTests {
 	 */
 	@Test
 	public void updatePhoto() {
+		Post parentPost = new Post();
+		parentPost.setId(1L);
+		parentPost.setTumblelog("blog");
+		restController.createPostForBlog(parentPost.getTumblelog(), parentPost);
 		Photo original = new Photo();
 		original.setPostId(1L);
 
-		Photo modifiedPhoto = restController.createPhoto(original);
+		Photo modifiedPhoto = restController.createPhotoForBlog("blog", original);
 		assertThat(modifiedPhoto).isNotNull();
 
 		modifiedPhoto.setCaption("new caption");
@@ -239,9 +256,9 @@ public class TevPostRestControllerUnitTests {
 		modifiedPhoto.setUrl75("url 75");
 		modifiedPhoto.setWidth(3);
 
-		restController.updatePhoto(modifiedPhoto.getId(), modifiedPhoto);
+		restController.updatePhotoForBlog("blog", modifiedPhoto.getId(), modifiedPhoto);
 
-		List<Photo> finalFromServer = restController.getPhotoById(1L);
+		List<Photo> finalFromServer = restController.getPhotoForBlogById("blog", 1L);
 		assertThat(finalFromServer).isNotNull();
 		assertThat(finalFromServer.size()).isEqualTo(1);
 		assertThat(finalFromServer.get(0)).isEqualToComparingFieldByField(modifiedPhoto);
@@ -252,18 +269,22 @@ public class TevPostRestControllerUnitTests {
 	 */
 	@Test
 	public void updateRegular() {
+		Post parentPost = new Post();
+		parentPost.setId(1L);
+		parentPost.setTumblelog("blog");
+		restController.createPostForBlog(parentPost.getTumblelog(), parentPost);
 		Regular original = new Regular();
 		original.setPostId(1L);
 
-		Regular modified = restController.createRegular(1L, original);
+		Regular modified = restController.createRegularForBlog("blog", 1L, original);
 		assertThat(modified).isNotNull();
 
 		modified.setBody("new body");
 		modified.setTitle("new title");
 
-		restController.updateRegular(1L, modified);
+		restController.updateRegularForBlog("blog", 1L, modified);
 
-		Regular finalFromServer = restController.getRegularById(1L);
+		Regular finalFromServer = restController.getRegularForBlogById("blog", 1L);
 
 		assertThat(finalFromServer).isNotNull();
 		assertThat(finalFromServer).isEqualToComparingFieldByField(modified);
@@ -274,10 +295,14 @@ public class TevPostRestControllerUnitTests {
 	 */
 	@Test
 	public void updateVideo() {
+		Post parentPost = new Post();
+		parentPost.setId(1L);
+		parentPost.setTumblelog("blog");
+		restController.createPostForBlog(parentPost.getTumblelog(), parentPost);
 		Video original = new Video();
 		original.setPostId(1L);
 
-		Video modified = restController.createVideo(1L, original);
+		Video modified = restController.createVideoForBlog(parentPost.getTumblelog(), 1L, original);
 		assertThat(modified).isNotNull();
 
 		modified.setContentType("content Type");
@@ -288,9 +313,9 @@ public class TevPostRestControllerUnitTests {
 		modified.setVideoCaption("video caption");
 		modified.setWidth(40);
 
-		restController.updateVideo(1L, modified);
+		restController.updateVideoForBlog(parentPost.getTumblelog(), 1L, modified);
 
-		Video finalFromServer = restController.getVideoById(1L);
+		Video finalFromServer = restController.getVideoForBlogById(parentPost.getTumblelog(), 1L);
 
 		assertThat(finalFromServer).isNotNull();
 		assertThat(finalFromServer).isEqualToComparingFieldByField(modified);
@@ -312,9 +337,8 @@ public class TevPostRestControllerUnitTests {
 	 */
 	@Test
 	public void updateMetadata() {
-		Metadata md = mdRestController.getMetadata();
+		Metadata md = mdRestController.getDefaultMetadata();
 		assertThat(md).isNotNull();
-		//assertThat(md).isEqualToComparingFieldByField(Metadata.newDefaultMetadata());
 
 		md.setBaseMediaPath("new base media path");
 		md.setFavFilter("new fav filter");
@@ -327,9 +351,9 @@ public class TevPostRestControllerUnitTests {
 		md.setOverwritePostData(true);
 		md.setOverwriteConvoData(true);
 
-		mdRestController.updateMetadata(md);
+		mdRestController.updateMetadata(md.getId(), md);
 
-		Metadata finalFromServer = mdRestController.getMetadata();
+		Metadata finalFromServer = mdRestController.getMetadataByID(md.getId());
 
 		assertThat(finalFromServer).isNotNull();
 		assertThat(finalFromServer).isEqualToComparingFieldByField(md);

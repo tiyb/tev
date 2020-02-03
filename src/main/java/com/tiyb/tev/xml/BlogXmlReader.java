@@ -91,21 +91,21 @@ public class BlogXmlReader extends TEVXmlReader {
 	 * @throws XMLParsingException
 	 */
 	public static void parseDocument(InputStream xmlFile, TEVPostRestController postController,
-			TEVMetadataRestController mdController) throws XMLParsingException {
-		boolean isOverwritePosts = mdController.getMetadata().getOverwritePostData();
+			TEVMetadataRestController mdController, String blogName) throws XMLParsingException {
+		boolean isOverwritePosts = mdController.getMetadataForBlogOrDefault(blogName).getOverwritePostData();
 
 		if (isOverwritePosts) {
-			postController.deleteAllRegulars();
-			postController.deleteAllAnswers();
-			postController.deleteAllLinks();
-			postController.deleteAllPhotos();
-			postController.deleteAllVideos();
-			postController.deleteAllPosts();
-			postController.deleteAllHashtags();
+			postController.deleteAllRegularsForBlog(blogName);
+			postController.deleteAllAnswersForBlog(blogName);
+			postController.deleteAllLinksForBlog(blogName);
+			postController.deleteAllPhotosForBlog(blogName);
+			postController.deleteAllVideosForBlog(blogName);
+			postController.deleteAllPostsForBlog(blogName);
+			postController.deleteAllHashtagsForBlog(blogName);
 			logger.debug("previous content deleted as part of post XML import");
 		}
 
-		readPosts(xmlFile, postController, isOverwritePosts);
+		readPosts(xmlFile, postController, isOverwritePosts, blogName);
 	}
 
 	/**
@@ -154,10 +154,11 @@ public class BlogXmlReader extends TEVXmlReader {
 	 *                           to determine this, but since the calling method
 	 *                           needed to figure it out anyway, it was just as easy
 	 *                           to pass it as a parameter.
+	 * @param blogName           Name of the blog which is being read in
 	 * @throws XMLParsingException
 	 */
 	private static void readPosts(InputStream xmlFile, TEVPostRestController postRestController,
-			boolean isOverwritePosts) throws XMLParsingException {
+			boolean isOverwritePosts, String blogName) throws XMLParsingException {
 
 		try {
 			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -175,11 +176,13 @@ public class BlogXmlReader extends TEVXmlReader {
 						post = new Post();
 						boolean isSubmitablePost = true;
 						readPostAttributes(se, post);
+						assert blogName.equals(post.getTumblelog());
 						if (isOverwritePosts) {
-							postRestController.createPost(post);
+							postRestController.createPostForBlog(post.getTumblelog(), post);
 						} else {
 							try {
-								Post serverPost = postRestController.getPostById(post.getId());
+								Post serverPost = postRestController.getPostForBlogById(post.getTumblelog(),
+										post.getId());
 								if (!serverPost.getState().equals(post.getState())) {
 									isSubmitablePost = true;
 								} else if (!serverPost.getDate().equals(post.getDate())) {
@@ -192,53 +195,53 @@ public class BlogXmlReader extends TEVXmlReader {
 									isSubmitablePost = false;
 								}
 							} catch (ResourceNotFoundException e) {
-								postRestController.createPost(post);
+								postRestController.createPostForBlog(post.getTumblelog(), post);
 							}
 						}
 						switch (post.getType()) {
 						case "regular":
 							Regular regular = readRegular(reader, post, postRestController);
 							if (isSubmitablePost) {
-								postRestController.createRegular(post.getId(), regular);
+								postRestController.createRegularForBlog(post.getTumblelog(), post.getId(), regular);
 							}
 							break;
 						case "answer":
 							Answer answer = readAnswer(reader, post, postRestController);
 							if (isSubmitablePost) {
-								postRestController.createAnswer(post.getId(), answer);
+								postRestController.createAnswerForBlog(post.getTumblelog(), post.getId(), answer);
 							}
 							break;
 						case "link":
 							Link link = readLink(reader, post, postRestController);
 							if (isSubmitablePost) {
-								postRestController.createLink(post.getId(), link);
+								postRestController.createLinkForBlog(post.getTumblelog(), post.getId(), link);
 							}
 							break;
 						case "photo":
 							List<Photo> photos = readPhotos(reader, post, postRestController);
 							if (isSubmitablePost) {
 								for (Photo p : photos) {
-									postRestController.createPhoto(p);
+									postRestController.createPhotoForBlog(post.getTumblelog(), p);
 								}
 							}
 							break;
 						case "video":
 							Video video = readVideos(reader, post, postRestController);
 							if (isSubmitablePost) {
-								postRestController.createVideo(post.getId(), video);
+								postRestController.createVideoForBlog(post.getTumblelog(), post.getId(), video);
 							}
 							break;
 						}
 						if (isSubmitablePost) {
-							post = postRestController.updatePost(post.getId(), post);
-							if(post.getTags().length() > 0) {
+							post = postRestController.updatePostForBlog(post.getTumblelog(), post.getId(), post);
+							if (post.getTags().length() > 0) {
 								List<String> individualTags = Arrays.asList(post.getTags().split(","));
 								for (String tag : individualTags) {
 									tag = tag.trim();
-									if(tag.equals("")) {
+									if (tag.equals("")) {
 										logger.error("A hashtag was empty from this list: " + post.getTags());
 									}
-									postRestController.createHashtag(tag);
+									postRestController.createHashtagForBlog(blogName, tag);
 								}
 							}
 						}
@@ -570,7 +573,7 @@ public class BlogXmlReader extends TEVXmlReader {
 				} else if (se.getName().getLocalPart().equals("tag")) {
 					String tag = readCharacters(reader);
 					post.setTags(addTagToString(post.getTags(), tag));
-				} else if(se.getName().getLocalPart().equals("photo-link-url")) {
+				} else if (se.getName().getLocalPart().equals("photo-link-url")) {
 					photoLinkUrl = readCharacters(reader);
 				}
 			} else if (event.isEndElement()) {
@@ -590,7 +593,7 @@ public class BlogXmlReader extends TEVXmlReader {
 						photo.setPhotoLinkUrl(photoLinkUrl);
 
 						photos.add(photo);
-					} 
+					}
 
 					return photos;
 				}

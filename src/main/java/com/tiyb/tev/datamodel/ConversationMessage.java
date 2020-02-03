@@ -36,6 +36,20 @@ public class ConversationMessage implements Serializable {
 	@Column(name = "message", length = 50000)
 	private String message;
 
+	/**
+	 * Helper method for updating all [updateable] fields with new data
+	 * 
+	 * @param newData The data to be copied into this object
+	 */
+	public void updateData(ConversationMessage newData) {
+		// this.id = newData.id;
+		// this.conversationId = newData.conversationId;
+		this.timestamp = newData.timestamp;
+		this.received = newData.received;
+		this.type = newData.type;
+		this.message = newData.message;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

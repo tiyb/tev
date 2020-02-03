@@ -58,16 +58,20 @@ public class ExportWritingUnitTests {
 	private static long SINGLEPHOTO_POST_ID = 180784644740L;
 	private static long MULTIPLEPHOTO_POST_ID = 180254465582L;
 	
+	private static String MAIN_BLOG_NAME = "mainblog";
+	
 	@Before
 	public void setupData() throws FileNotFoundException {
 		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-xml.xml");
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
 		
-		Metadata md = mdController.getMetadata();
+		Metadata md = Metadata.newDefaultMetadata();
 		md.setOverwritePostData(true);
-		md = mdController.updateMetadata(md);
+		md.setIsDefault(true);
+		md.setBlog(MAIN_BLOG_NAME);
+		md = mdController.updateMetadata(md.getId(), md);
 		
-		BlogXmlReader.parseDocument(xmlFile, postController, mdController);
+		BlogXmlReader.parseDocument(xmlFile, postController, mdController, MAIN_BLOG_NAME);
 	}
 	
 	@Test
@@ -108,7 +112,7 @@ public class ExportWritingUnitTests {
 		List<Long> postIDs = new ArrayList<Long>();
 		postIDs.add(postID);
 		
-		String result = BlogXmlWriter.getStagedPostXML(postIDs, postController);
+		String result = BlogXmlWriter.getStagedPostXMLForBlog(postIDs, postController, MAIN_BLOG_NAME);
 		
 		assertThat(result).isEqualToIgnoringWhitespace(expectedAnswer);
 	}

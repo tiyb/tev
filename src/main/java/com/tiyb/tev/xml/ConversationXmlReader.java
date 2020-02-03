@@ -43,7 +43,7 @@ import com.tiyb.tev.exception.XMLParsingException;
  * @author tiyb
  */
 public class ConversationXmlReader extends TEVXmlReader {
-	
+
 	/**
 	 * <p>
 	 * Main method. There are multiple steps to parsing the XML file:
@@ -74,20 +74,27 @@ public class ConversationXmlReader extends TEVXmlReader {
 	 *                        conversation/message is parsed
 	 */
 	public static void parseDocument(MultipartFile xmlFile, TEVMetadataRestController mdController,
-			TEVConvoRestController convoController) {
-		Metadata md = mdController.getMetadata();
+			TEVConvoRestController convoController, String blogName) {
+		Metadata md = mdController.getMetadataForBlogOrDefault(blogName);
 		InputStream xmlStream;
 
 		try {
 			InputStream participantXmlStream = xmlFile.getInputStream();
 			Participant mainParticipant = getMainParticipant(participantXmlStream);
+			// TODO there is probably a more elegant way to handle this
+			if (!blogName.equals(mainParticipant.name)) {
+				logger.error("Mismatch between expected blog name (" + blogName + ") and main participant name ("
+						+ mainParticipant.name + ")");
+				throw new XMLParsingException();
+			}
 			md.setMainTumblrUser(mainParticipant.name);
 			md.setMainTumblrUserAvatarUrl(mainParticipant.avatarURL);
 			String mainParticipantID = mainParticipant.id;
-			md = mdController.updateMetadata(md);
+			md = mdController.updateMetadata(md.getId(), md);
 
 			xmlStream = xmlFile.getInputStream();
-			readConversations(xmlStream, md.getMainTumblrUser(), mainParticipantID, mdController, convoController);
+			readConversations(xmlStream, md.getMainTumblrUser(), mainParticipantID, mdController, convoController,
+					blogName);
 		} catch (IOException e) {
 			logger.error("Error parsing XML file: ", e);
 			throw new XMLParsingException();
@@ -241,13 +248,15 @@ public class ConversationXmlReader extends TEVXmlReader {
 	 * @throws XMLParsingException
 	 */
 	private static void readConversations(InputStream xmlFile, String mainTumblrUserName, String mainTumblrUserId,
-			TEVMetadataRestController mdController, TEVConvoRestController convoController) throws XMLParsingException {
-		boolean isOverwriteConvos = mdController.getMetadata().getOverwriteConvoData();
+			TEVMetadataRestController mdController, TEVConvoRestController convoController, String blogName)
+			throws XMLParsingException {
+		Metadata md = mdController.getMetadataForBlogOrDefault(blogName);
+		boolean isOverwriteConvos = md.getOverwriteConvoData();
 		List<String> allParticipants = new ArrayList<String>();
 
 		if (isOverwriteConvos) {
-			convoController.deleteAllConvoMsgs();
-			convoController.deleteAllConversations();
+			convoController.deleteAllConvoMsgsForBlog(blogName);
+			convoController.deleteAllConversationsForBlog(blogName);
 		}
 		try {
 			XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -265,7 +274,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 
 					if (se.getName().getLocalPart().equals("conversation")) {
 						participant = getParticipantName(reader, mainTumblrUserName);
-						while(allParticipants.contains(participant.name)) {
+						while (allParticipants.contains(participant.name)) {
 							participant.name = participant.name + " 1";
 						}
 						allParticipants.add(participant.name);
@@ -277,28 +286,31 @@ public class ConversationXmlReader extends TEVXmlReader {
 						conversation.setParticipantAvatarUrl(participant.avatarURL);
 						conversation.setParticipantId(messageData.participantId);
 						conversation.setNumMessages(messages.size());
+						conversation.setBlog(blogName);
 
 						boolean isSendConvoToServer = true;
 
 						if (isOverwriteConvos) {
-							conversation = convoController.createConversation(conversation);
+							conversation = convoController.createConversationForBlog(blogName, conversation);
 							isSendConvoToServer = true;
 						} else {
 							try {
-								Conversation convoOnServer = convoController.getConversationByParticipantIdOrName(
-										conversation.getParticipantId(), participant.name);
+								Conversation convoOnServer = convoController
+										.getConversationForBlogByParticipantIdOrName(blogName,
+												conversation.getParticipantId(), participant.name);
 								if ((messages.size() > convoOnServer.getNumMessages())
 										|| !convoOnServer.getParticipant().equals(conversation.getParticipant())) {
 									convoOnServer.setHideConversation(false);
 									convoOnServer.setNumMessages(messages.size());
 									convoOnServer.setParticipant(participant.name);
 									convoOnServer.setParticipantAvatarUrl(participant.avatarURL);
-									convoOnServer = convoController.updateConversation(convoOnServer.getId(),
-											convoOnServer);
-									List<ConversationMessage> msgsForConv = convoController
-											.getConvoMsgByConvoID(convoOnServer.getId());
+									convoOnServer = convoController.updateConversationForBlog(blogName,
+											convoOnServer.getId(), convoOnServer);
+									List<ConversationMessage> msgsForConv = convoController.getConvoMsgForBlogByConvoID(
+											convoOnServer.getBlog(), convoOnServer.getId());
 									for (ConversationMessage msg : msgsForConv) {
-										convoController.deleteConversationMessage(msg.getId());
+										convoController.deleteConversationMessageForBlog(convoOnServer.getBlog(),
+												msg.getId());
 									}
 									isSendConvoToServer = true;
 									conversation.setId(convoOnServer.getId());
@@ -306,13 +318,14 @@ public class ConversationXmlReader extends TEVXmlReader {
 									isSendConvoToServer = false;
 								}
 							} catch (ResourceNotFoundException e) {
-								conversation = convoController.createConversation(conversation);
+								conversation = convoController.createConversationForBlog(blogName, conversation);
 								isSendConvoToServer = true;
 							}
 						}
 
 						if (isSendConvoToServer) {
-							uploadMessagesForConvo(convoController, messages, conversation.getId());
+							uploadMessagesForConvo(convoController, messages, conversation.getId(),
+									conversation.getBlog());
 						}
 					}
 				}
@@ -333,10 +346,10 @@ public class ConversationXmlReader extends TEVXmlReader {
 	 * @param convoID        The ID of the conversation
 	 */
 	private static void uploadMessagesForConvo(TEVConvoRestController restController,
-			List<ConversationMessage> messages, Long convoID) {
+			List<ConversationMessage> messages, Long convoID, String blogName) {
 		for (ConversationMessage msg : messages) {
 			msg.setConversationId(convoID);
-			restController.createConvoMessage(msg);
+			restController.createConvoMessageForBlog(blogName, msg);
 		}
 	}
 
@@ -516,7 +529,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 				EndElement ee = event.asEndElement();
 
 				if (ee.getName().getLocalPart().equals("participants")) {
-					if(participant.name.equals("")) {
+					if (participant.name.equals("")) {
 						participant.name = "NO NAME";
 					}
 					return participant;

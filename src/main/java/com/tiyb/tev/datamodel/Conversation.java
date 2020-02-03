@@ -27,9 +27,26 @@ public class Conversation implements Serializable {
 	private String participantId;
 	private Integer numMessages;
 	private Boolean hideConversation;
+	private String blog;
 	
 	public Conversation() {
 		hideConversation = false;
+	}
+	
+	/**
+	 * Helper function for updating all of the object's properties with values from
+	 * a new object
+	 * 
+	 * @param newData The new object from which to take the values
+	 */
+	public void updateData(Conversation newData) {
+		//this.id = newData.id;
+		this.participant = newData.participant;
+		this.participantAvatarUrl = newData.participantAvatarUrl;
+		this.participantId = newData.participantId;
+		this.numMessages = newData.numMessages;
+		this.hideConversation = newData.hideConversation;
+		this.blog = newData.blog;
 	}
 
 	@Override
@@ -59,6 +76,11 @@ public class Conversation implements Serializable {
 		if (numMessages != null) {
 			builder.append("numMessages=");
 			builder.append(numMessages);
+			builder.append(", ");
+		}
+		if (blog != null) {
+			builder.append("blog=");
+			builder.append(blog);
 			builder.append(", ");
 		}
 		if (hideConversation != null) {
@@ -115,5 +137,13 @@ public class Conversation implements Serializable {
 
 	public void setParticipantId(String participantId) {
 		this.participantId = participantId;
+	}
+
+	public String getBlog() {
+		return blog;
+	}
+
+	public void setBlog(String blog) {
+		this.blog = blog;
 	}
 }

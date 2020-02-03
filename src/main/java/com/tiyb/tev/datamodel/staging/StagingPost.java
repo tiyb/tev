@@ -13,13 +13,14 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name = "statingposts")
+@Table(name = "stagingposts")
 public class StagingPost implements Serializable {
 
 	private static final long serialVersionUID = -1260427401761905114L;
 	
 	@Id
 	private Long id;
+	private String blog;
 
 	public Long getId() {
 		return id;
@@ -27,6 +28,14 @@ public class StagingPost implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getBlog() {
+		return blog;
+	}
+
+	public void setBlog(String blog) {
+		this.blog = blog;
 	}
 
 }

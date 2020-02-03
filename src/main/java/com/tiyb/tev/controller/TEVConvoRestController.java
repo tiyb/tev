@@ -1,11 +1,15 @@
 package com.tiyb.tev.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,19 +22,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.ConversationMessage;
+import com.tiyb.tev.exception.InvalidConvoParentException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.repository.ConversationMessageRepository;
 import com.tiyb.tev.repository.ConversationRepository;
 
 /**
- * REST controller for working with Conversations.
+ * REST controller for working with Conversations and Conversation Messages. All
+ * Conversation APIs are blog-specific; Conversation Message APIs aren't, since
+ * they are tied to specific Conversations already.
  * 
  * @author tiyb
  */
 @RestController
 @RequestMapping("/api")
 public class TEVConvoRestController {
-	
+
+	private Logger logger = LoggerFactory.getLogger(TEVConvoRestController.class);
+
 	/**
 	 * The Repo for working with Conversation data
 	 */
@@ -44,36 +53,40 @@ public class TEVConvoRestController {
 	ConversationMessageRepository msgRepo;
 
 	/**
-	 * GET request for listing all conversations
+	 * GET request for listing all conversations for a given blog
 	 * 
+	 * @param blog Blog for which to return conversations
 	 * @return {@link java.util.List List} of all conversations in the database
 	 */
-	@GetMapping("/conversations")
-	public List<Conversation> getAllConversations() {
-		return convoRepo.findAll();
+	@GetMapping("/conversations/{blog}")
+	public List<Conversation> getAllConversationsForBlog(@PathVariable("blog") String blog) {
+		return convoRepo.findByBlog(blog);
 	}
 
 	/**
-	 * GET to return a single conversation, by ID
+	 * GET to return a single conversation by ID for a given blog
 	 * 
+	 * @param blog           Not used
 	 * @param conversationID the conversation ID
 	 * @return The Conversation details
 	 */
-	@GetMapping("/conversations/{id}")
-	public Conversation getConversationById(@PathVariable(value = "id") Long conversationID) {
+	@GetMapping("/conversations/{blog}/{id}")
+	public Conversation getConversationForBlogById(@PathVariable("blog") String blog,
+			@PathVariable(value = "id") Long conversationID) {
 		return convoRepo.findById(conversationID)
 				.orElseThrow(() -> new ResourceNotFoundException("Conversation", "id", conversationID));
 	}
 
 	/**
-	 * GET to return a single conversation, by participant name
+	 * GET to return a single conversation, by participant name, for a given blog
 	 * 
 	 * @param participantName Name of the participant
 	 * @return Single Conversation
 	 */
-	@GetMapping("/conversations/{participantName}")
-	public Conversation getConversationByParticipant(@RequestParam("participantName") String participantName) {
-		Conversation convo = convoRepo.findByParticipant(participantName);
+	@GetMapping("/conversations/{blog}/{participantName}")
+	public Conversation getConversationForBlogByParticipant(@RequestParam("blog") String blog,
+			@RequestParam("participantName") String participantName) {
+		Conversation convo = convoRepo.findByBlogAndParticipant(blog, participantName);
 
 		if (convo == null) {
 			throw new ResourceNotFoundException("Conversation", "name", participantName);
@@ -90,20 +103,22 @@ public class TEVConvoRestController {
 	 * if the initial search (by Participant ID) returns no results, a secondary
 	 * search (by Participant name) will be attempted
 	 * 
+	 * @param blog            Blog to be searched
 	 * @param participantId   ID of the participant
 	 * @param participantName Name of the participant; not used if ID is
 	 *                        successfully used to retrieve a Conversation
 	 * @return Single Conversation
 	 */
-	@GetMapping("/conversations/id/{participantId}/{participantName}")
-	public Conversation getConversationByParticipantIdOrName(@RequestParam("participantId") String participantId,
-			@RequestParam("participantName") String participantName) {
-		List<Conversation> convos = convoRepo.findByParticipantId(participantId);
+	@GetMapping("/conversations/{blog}/id/{participantId}/{participantName}")
+	public Conversation getConversationForBlogByParticipantIdOrName(@PathVariable("blog") String blog,
+			@PathVariable("participantId") String participantId,
+			@PathVariable("participantName") String participantName) {
+		List<Conversation> convos = convoRepo.findByBlogAndParticipantId(blog, participantId);
 		if (convos.size() == 1) {
 			return convos.get(0);
 		}
 
-		Conversation convoByName = convoRepo.findByParticipant(participantName);
+		Conversation convoByName = convoRepo.findByBlogAndParticipant(blog, participantName);
 
 		if (convoByName != null) {
 			return convoByName;
@@ -113,72 +128,81 @@ public class TEVConvoRestController {
 	}
 
 	/**
-	 * Returns all conversations that are not set to "hidden" status
+	 * Returns all conversations that are not set to "hidden" status for a given
+	 * blog
 	 * 
+	 * @param blog Blog for which conversations should be returned
 	 * @return {@link java.util.List List} of conversations
 	 */
-	@GetMapping("/conversations/unhidden")
-	public List<Conversation> getUnhiddenConversations() {
-		return convoRepo.findByHideConversationFalse();
+	@GetMapping("/conversations/{blog}/unhidden")
+	public List<Conversation> getUnhiddenConversationsForBlog(@PathVariable("blog") String blog) {
+		return convoRepo.findByBlogAndHideConversationFalse(blog);
 	}
 
 	/**
-	 * Returns all conversations that are set to "hidden" status. Not used by TEV,
-	 * but included for the sake of completeness.
+	 * Returns all conversations that are set to "hidden" status for a given blog.
+	 * Not used by TEV, but included for the sake of completeness.
 	 * 
+	 * @param blog Blog for which conversations should be returned
 	 * @return {@link java.util.List List} of conversations
 	 */
-	@GetMapping("/conversations/hidden")
-	public List<Conversation> getHiddenConversations() {
-		return convoRepo.findByHideConversationTrue();
+	@GetMapping("/conversations/{blog}/hidden")
+	public List<Conversation> getHiddenConversationsForBlog(@PathVariable("blog") String blog) {
+		return convoRepo.findByBlogAndHideConversationTrue(blog);
 	}
 
 	/**
-	 * POST request to submit a conversation into the system
+	 * POST request to submit a conversation into the system for a given blog.
+	 * Instead of validating that the blog in the conversation property and the blog
+	 * passed on the URL match, the object is simply updated with the value passed.
 	 * 
+	 * @param blog         The blog for which this conversation should be submitted
 	 * @param conversation The conversation object (in JSON format) to be saved into
 	 *                     the database
 	 * @return The same object that was saved (including the generated ID)
 	 */
-	@PostMapping("/conversations")
-	public Conversation createConversation(@Valid @RequestBody Conversation conversation) {
+	@PostMapping("/conversations/{blog}")
+	public Conversation createConversationForBlog(@PathVariable("blog") String blog,
+			@Valid @RequestBody Conversation conversation) {
+		conversation.setBlog(blog);
 		return convoRepo.save(conversation);
 	}
 
 	/**
-	 * PUT to update a conversation
+	 * PUT to update a conversation for a given blog
 	 * 
+	 * @param blog           Used only for validation purposes
 	 * @param conversationId ID of the convo to be updated
 	 * @param convoDetails   Details to be inserted into the DB
 	 * @return The updated Conversation details
 	 */
-	@PutMapping("/conversations/{id}")
-	public Conversation updateConversation(@PathVariable(value = "id") Long conversationId,
-			@RequestBody Conversation convoDetails) {
+	@PutMapping("/conversations/{blog}/{id}")
+	public Conversation updateConversationForBlog(@PathVariable("blog") String blog,
+			@PathVariable(value = "id") Long conversationId, @RequestBody Conversation convoDetails) {
+		assert blog.equals(convoDetails.getBlog());
+
 		Conversation convo = convoRepo.findById(conversationId)
 				.orElseThrow(() -> new ResourceNotFoundException("Conversation", "id", conversationId));
 
-		convo.setParticipant(convoDetails.getParticipant());
-		convo.setParticipantAvatarUrl(convoDetails.getParticipantAvatarUrl());
-		convo.setNumMessages(convoDetails.getNumMessages());
-		convo.setHideConversation(convoDetails.getHideConversation());
-		convo.setParticipantId(convoDetails.getParticipantId());
+		convo.updateData(convoDetails);
 
-		Conversation updatedConvo = convoRepo.save(convo);
-
-		return updatedConvo;
+		return convoRepo.save(convo);
 	}
 
 	/**
-	 * Sets a conversation to "ignored" status
+	 * Sets a conversation to "ignored" status for a given blog. Note that the blog
+	 * is still needed, not just for the URL but because multiple blogs could have
+	 * had conversations with the same participant.
 	 * 
+	 * @param blog            Blog for which the conversation should be updated.
 	 * @param participantName Name of the participant in the conversation to be
 	 *                        ignored
 	 * @return Updated Conversation
 	 */
-	@PutMapping("/conversations/{participant}/ignoreConvo")
-	public Conversation ignoreConversation(@PathVariable(value = "participant") String participantName) {
-		Conversation convo = convoRepo.findByParticipant(participantName);
+	@PutMapping("/conversations/{blog}/{participant}/ignoreConvo")
+	public Conversation ignoreConversationForBlog(@PathVariable("blog") String blog,
+			@PathVariable(value = "participant") String participantName) {
+		Conversation convo = convoRepo.findByBlogAndParticipant(blog, participantName);
 
 		convo.setHideConversation(true);
 
@@ -188,15 +212,17 @@ public class TEVConvoRestController {
 	}
 
 	/**
-	 * Sets a conversation to "un-ignored" status
+	 * Sets a conversation to "un-ignored" status for a given blog
 	 * 
+	 * @param blog            Blog for which the conversation should be updated
 	 * @param participantName Name of the participant in the conversation to be
 	 *                        ignored
 	 * @return Updated Conversation
 	 */
-	@PutMapping("/conversations/{participant}/unignoreConvo")
-	public Conversation unignoreConversation(@PathVariable(value = "participant") String participantName) {
-		Conversation convo = convoRepo.findByParticipant(participantName);
+	@PutMapping("/conversations/{blog}/{participant}/unignoreConvo")
+	public Conversation unignoreConversationForBlog(@PathVariable("blog") String blog,
+			@PathVariable("participant") String participantName) {
+		Conversation convo = convoRepo.findByBlogAndParticipant(blog, participantName);
 
 		convo.setHideConversation(false);
 
@@ -206,11 +232,13 @@ public class TEVConvoRestController {
 	}
 
 	/**
-	 * Used to reset all conversations back to an un-hidden state
+	 * Used to reset all conversations back to an un-hidden state for a given blog
+	 * 
+	 * @param blog Blog for which conversations should be un-hidden
 	 */
-	@GetMapping("/conversations/unignoreAllConversations")
-	public void unignoreAllConversations() {
-		List<Conversation> hiddenConvos = convoRepo.findByHideConversationTrue();
+	@GetMapping("/conversations/{blog}/unignoreAllConversations")
+	public void unignoreAllConversationsForBlog(@PathVariable("blog") String blog) {
+		List<Conversation> hiddenConvos = convoRepo.findByBlogAndHideConversationTrue(blog);
 
 		if (hiddenConvos.size() < 1) {
 			return;
@@ -225,31 +253,38 @@ public class TEVConvoRestController {
 	}
 
 	/**
-	 * DEL to delete a single conversation, by ID
+	 * DEL to delete a single conversation by ID for a given blog
 	 * 
+	 * @param blog    Used for validation purposes
 	 * @param convoId ID of convo to be deleted
 	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
 	 *         the response details
 	 */
-	@DeleteMapping("/conversations/{id}")
-	public ResponseEntity<?> deleteConversation(@PathVariable(value = "id") Long convoId) {
+	@DeleteMapping("/conversations/{blog}/{id}")
+	public ResponseEntity<?> deleteConversation(@PathVariable("blog") String blog, @PathVariable("id") Long convoId) {
 		Conversation convo = convoRepo.findById(convoId)
 				.orElseThrow(() -> new ResourceNotFoundException("Conversation", "id", convoId));
 
+		if (!blog.equals(convo.getBlog())) {
+			logger.error("Attempt to update conversation but blog doesn't match: " + blog);
+			throw new InvalidConvoParentException();
+		}
 		convoRepo.delete(convo);
 
 		return ResponseEntity.ok().build();
 	}
 
 	/**
-	 * DEL to delete all conversations in the DB
+	 * DEL to delete all conversations in the DB for a given blog
 	 * 
+	 * @param blog Blog for which conversations should be deleted
 	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
 	 *         the response details
 	 */
-	@DeleteMapping("/conversations")
-	public ResponseEntity<?> deleteAllConversations() {
-		convoRepo.deleteAll();
+	@Transactional
+	@DeleteMapping("/conversations/{blog}")
+	public ResponseEntity<?> deleteAllConversationsForBlog(@PathVariable("blog") String blog) {
+		convoRepo.deleteByBlog(blog);
 
 		return ResponseEntity.ok().build();
 	}
@@ -257,8 +292,11 @@ public class TEVConvoRestController {
 	/**
 	 * GET request for listing all messages (regardless of conversation)
 	 * 
+	 * TODO remove this?
+	 * 
 	 * @return list of all messages in the database
 	 */
+	@Deprecated
 	@GetMapping("/conversations/messages")
 	public List<ConversationMessage> getAllConversationMessages() {
 		return msgRepo.findAll();
@@ -270,40 +308,50 @@ public class TEVConvoRestController {
 	 * @param convoMsg The data to be submitted
 	 * @return The object that was just submitted (with ID)
 	 */
-	@PostMapping("/conversations/messages")
-	public ConversationMessage createConvoMessage(@Valid @RequestBody ConversationMessage convoMsg) {
+	@PostMapping("/conversations/{blog}/messages")
+	public ConversationMessage createConvoMessageForBlog(@PathVariable("blog") String blog,
+			@Valid @RequestBody ConversationMessage convoMsg) {
+		Optional<Conversation> optConvo = convoRepo.findById(convoMsg.getConversationId());
+		if (!optConvo.isPresent()) {
+			logger.error("Invalid convo/message combo; convoID=" + convoMsg.getConversationId());
+			throw new InvalidConvoParentException();
+		} else {
+			if (!optConvo.get().getBlog().equals(blog)) {
+				logger.error("invalid message/blog combo; convoID=" + convoMsg.getConversationId() + ", blog=" + blog);
+				throw new InvalidConvoParentException();
+			}
+		}
 		return msgRepo.save(convoMsg);
 	}
 
 	/**
-	 * GET to return all messages for a particular conversation
+	 * GET to return all messages for a particular conversation for a given blog
 	 * 
+	 * @param blog    Not used
 	 * @param convoId The conversation ID
 	 * @return The list of messages
 	 */
-	@GetMapping("/conversations/{id}/messages")
-	public List<ConversationMessage> getConvoMsgByConvoID(@PathVariable(value = "id") Long convoId) {
+	@GetMapping("/conversations/{blog}/{id}/messages")
+	public List<ConversationMessage> getConvoMsgForBlogByConvoID(@PathVariable("blog") String blog,
+			@PathVariable("id") Long convoId) {
 		return msgRepo.findByConversationIdOrderByTimestamp(convoId);
 	}
 
 	/**
-	 * PUT to update a conversation message
+	 * PUT to update a conversation message for a given blog
 	 * 
+	 * @param blog     Not used
 	 * @param msgId    The ID of the message to be updated
 	 * @param convoMsg The updated data
 	 * @return The same data that was just submitted
 	 */
-	@PutMapping("/conversations/messages/{id}")
-	public ConversationMessage updateConvoMsg(@PathVariable(value = "id") Long msgId,
+	@PutMapping("/conversations/{blog}/messages/{id}")
+	public ConversationMessage updateConvoMsgForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long msgId,
 			@RequestBody ConversationMessage convoMsg) {
 		ConversationMessage cm = msgRepo.findById(msgId)
 				.orElseThrow(() -> new ResourceNotFoundException("ConversationMessage", "id", msgId));
 
-		cm.setConversationId(convoMsg.getConversationId());
-		cm.setMessage(convoMsg.getMessage());
-		cm.setReceived(convoMsg.getReceived());
-		cm.setType(convoMsg.getType());
-		cm.setTimestamp(convoMsg.getTimestamp());
+		cm.updateData(convoMsg);
 
 		ConversationMessage updatedCM = msgRepo.save(cm);
 
@@ -311,14 +359,22 @@ public class TEVConvoRestController {
 	}
 
 	/**
-	 * DEL to delete all conversation messages in the DB
+	 * DEL to delete all conversation messages in the DB for a given blog
 	 * 
+	 * @param blog The blog for which convo messsages should be deleted
 	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
 	 *         the response details
 	 */
-	@DeleteMapping("/conversations/messages")
-	public ResponseEntity<?> deleteAllConvoMsgs() {
-		msgRepo.deleteAll();
+	@DeleteMapping("/conversations/{blog}/messages")
+	public ResponseEntity<?> deleteAllConvoMsgsForBlog(@PathVariable("blog") String blog) {
+		List<Conversation> convosForBlog = convoRepo.findByBlog(blog);
+
+		for (Conversation c : convosForBlog) {
+			List<ConversationMessage> msgs = msgRepo.findByConversationIdOrderByTimestamp(c.getId());
+			for (ConversationMessage cm : msgs) {
+				msgRepo.delete(cm);
+			}
+		}
 
 		return ResponseEntity.ok().build();
 	}
@@ -326,12 +382,14 @@ public class TEVConvoRestController {
 	/**
 	 * DEL to delete a single conversation message, by ID
 	 * 
+	 * @param blog  Not used
 	 * @param msgId ID of the message to be deleted
 	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
 	 *         the response details
 	 */
-	@DeleteMapping("/conversations/messages/{id}")
-	public ResponseEntity<?> deleteConversationMessage(@PathVariable(name = "id") Long msgId) {
+	@DeleteMapping("/conversations/{blog}/messages/{id}")
+	public ResponseEntity<?> deleteConversationMessageForBlog(@PathVariable("blog") String blog,
+			@PathVariable("id") Long msgId) {
 		ConversationMessage cm = msgRepo.findById(msgId)
 				.orElseThrow(() -> new ResourceNotFoundException("ConversationMessage", "id", msgId));
 

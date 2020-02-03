@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -74,7 +76,7 @@ public class Metadata implements Serializable {
 	 * Static list of columns that can be sorted on the Conversations page
 	 */
 	public static final List<String> CONVERSATION_SORT_COLUMNS = Arrays.asList("participantName", "numMessages");
-	
+
 	/**
 	 * Static list of theme names
 	 */
@@ -82,12 +84,13 @@ public class Metadata implements Serializable {
 			"dot-luv", "eggplant", "excite-bike", "flick", "hot-sneaks", "humanity", "le-frog", "mint-choc", "overcast",
 			"pepper-grinder", "redmond", "smoothness", "south-street", "start", "sunny", "swanky-purse", "trontastic",
 			"ui-darkness", "ui-lightness", "vader");
-	
+
 	/**
 	 * Default theme to use, when one isn't supplied
 	 */
 	public static final String DEFAULT_THEME = "base";
 
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
 	private Integer id;
 	private String baseMediaPath;
@@ -106,18 +109,18 @@ public class Metadata implements Serializable {
 	private String conversationSortOrder;
 	private String exportImagesFilePath;
 	private String theme;
+	private String blog;
+	private Boolean isDefault;
 
 	/**
 	 * Helper function to generate a new Metadata object, with some defaults filled
 	 * in. baseMediaPath, mainTumblrUser, and mainTumblrUserAvatarUrl not set, since
 	 * no defaults make sense for these values.
 	 * 
-	 * @return Metadata object, with an ID (1), and some reasonable defaults filled
-	 *         in.
+	 * @return Metadata object, with some reasonable defaults filled in.
 	 */
 	public static Metadata newDefaultMetadata() {
 		Metadata md = new Metadata();
-		md.setId(1);
 		md.setSortColumn(SORT_COLUMNS.get(0));
 		md.setSortOrder(SORT_ORDERS.get(1));
 		md.setFilter(FILTER_TYPES.get(2));
@@ -130,6 +133,7 @@ public class Metadata implements Serializable {
 		md.setConversationSortColumn(CONVERSATION_SORT_COLUMNS.get(0));
 		md.setConversationSortOrder(SORT_ORDERS.get(0));
 		md.setTheme(DEFAULT_THEME);
+		md.setIsDefault(false);
 
 		return md;
 	}
@@ -138,7 +142,7 @@ public class Metadata implements Serializable {
 		this.baseMediaPath = newDataObject.baseMediaPath;
 		this.favFilter = newDataObject.favFilter;
 		this.filter = newDataObject.filter;
-		// this.id = newDataObject.id;
+		this.id = newDataObject.id;
 		this.mainTumblrUser = newDataObject.mainTumblrUser;
 		this.mainTumblrUserAvatarUrl = newDataObject.mainTumblrUserAvatarUrl;
 		this.overwriteConvoData = newDataObject.overwriteConvoData;
@@ -152,6 +156,8 @@ public class Metadata implements Serializable {
 		this.conversationSortOrder = newDataObject.conversationSortOrder;
 		this.exportImagesFilePath = newDataObject.exportImagesFilePath;
 		this.theme = newDataObject.theme;
+		this.blog = newDataObject.blog;
+		this.isDefault = newDataObject.isDefault;
 	}
 
 	@Override
@@ -236,6 +242,16 @@ public class Metadata implements Serializable {
 		if (exportImagesFilePath != null) {
 			builder.append("exportImagesFilePath=");
 			builder.append(exportImagesFilePath);
+			builder.append(", ");
+		}
+		if (blog != null) {
+			builder.append("blog=");
+			builder.append(blog);
+			builder.append(", ");
+		}
+		if (isDefault != null) {
+			builder.append("isDefault=");
+			builder.append(isDefault);
 			builder.append(", ");
 		}
 		if (theme != null) {
@@ -380,6 +396,22 @@ public class Metadata implements Serializable {
 
 	public void setTheme(String theme) {
 		this.theme = theme;
+	}
+
+	public String getBlog() {
+		return blog;
+	}
+
+	public void setBlog(String blog) {
+		this.blog = blog;
+	}
+
+	public Boolean getIsDefault() {
+		return isDefault;
+	}
+
+	public void setIsDefault(Boolean isDefault) {
+		this.isDefault = isDefault;
 	}
 
 }

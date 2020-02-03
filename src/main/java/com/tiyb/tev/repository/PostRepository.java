@@ -10,5 +10,7 @@ import com.tiyb.tev.datamodel.Post;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-	public List<Post> findByType(String postType);
+	public List<Post> findByTumblelogAndType(String blog, String postType);
+	public List<Post> findByTumblelog(String tumblelog);
+	Long deleteByTumblelog(String tumblelog);
 }

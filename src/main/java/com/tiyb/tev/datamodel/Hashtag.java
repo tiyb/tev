@@ -26,16 +26,19 @@ public class Hashtag implements Serializable {
 	@NotBlank
 	private String tag;
 	private Integer count = 0;
+	private String blog;
 
-	public Hashtag(String tag, Integer count) {
+	public Hashtag(String tag, Integer count, String blog) {
 		super();
 		this.tag = tag;
 		this.count = count;
+		this.blog = blog;
 	}
 
 	public Hashtag() {
 		this.tag = "";
 		this.count = 0;
+		this.blog = "";
 	}
 
 	@Override
@@ -55,6 +58,11 @@ public class Hashtag implements Serializable {
 		if (count != null) {
 			builder.append("count=");
 			builder.append(count);
+			builder.append(", ");
+		}
+		if (blog != null) {
+			builder.append("blog=");
+			builder.append(blog);
 		}
 		builder.append("]");
 		return builder.toString();
@@ -82,5 +90,13 @@ public class Hashtag implements Serializable {
 
 	public void setCount(Integer count) {
 		this.count = count;
+	}
+
+	public String getBlog() {
+		return blog;
+	}
+
+	public void setBlog(String blog) {
+		this.blog = blog;
 	}
 }

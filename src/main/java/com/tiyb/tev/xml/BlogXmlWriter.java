@@ -58,17 +58,19 @@ public class BlogXmlWriter {
 	 * @param postIDs        List of Post IDs to include in the export, regardless
 	 *                       of type (photo, video, answer, link, regular)
 	 * @param postController The REST controller for working with Posts
+	 * @param blogName       Blog for which posts should be retrieved
 	 * @return String containing the XML document
 	 */
-	public static String getStagedPostXML(List<Long> postIDs, TEVPostRestController postController) {
+	public static String getStagedPostXMLForBlog(List<Long> postIDs, TEVPostRestController postController,
+			String blogName) {
 		List<Post> posts = new ArrayList<Post>();
 
 		for (Long id : postIDs) {
-			Post post = postController.getPostById(id);
+			Post post = postController.getPostForBlogById(blogName, id);
 			posts.add(post);
 		}
 
-		return getDocument(posts, postController);
+		return getDocument(posts, postController, blogName);
 	}
 
 	/**
@@ -89,9 +91,11 @@ public class BlogXmlWriter {
 	 * @param posts          The list of posts to be included in the export.
 	 * @param postController The REST controller, to be used for getting additional
 	 *                       data
+	 * @param blogName       Name of the blog for which the document is being
+	 *                       returned
 	 * @return String containing the XML document
 	 */
-	private static String getDocument(List<Post> posts, TEVPostRestController postController) {
+	private static String getDocument(List<Post> posts, TEVPostRestController postController, String blogName) {
 		String xmlString;
 		try {
 			StringWriter stringWriter = new StringWriter();
@@ -110,7 +114,7 @@ public class BlogXmlWriter {
 			writer.writeStartElement("posts");
 
 			for (Post post : posts) {
-				addPost(post, writer, postController);
+				addPost(post, writer, postController, blogName);
 			}
 
 			writer.writeEndElement();
@@ -135,10 +139,11 @@ public class BlogXmlWriter {
 	 * @param writer         The StAX XML writer to which the data should be written
 	 * @param postController The REST controller for getting additional post
 	 *                       information from the DB
+	 * @param blogName       Blog for which the post is being added
 	 * @throws XMLStreamException if any errors are encountered by the StAX parser.
 	 */
-	private static void addPost(Post post, XMLStreamWriter writer, TEVPostRestController postController)
-			throws XMLStreamException {
+	private static void addPost(Post post, XMLStreamWriter writer, TEVPostRestController postController,
+			String blogName) throws XMLStreamException {
 		writer.writeStartElement("post");
 		addPostAttributes(post, writer);
 		switch (post.getType()) {
@@ -149,7 +154,7 @@ public class BlogXmlWriter {
 			addLinkBody(post, writer, postController);
 			break;
 		case "photo":
-			addPhotoBody(post, writer, postController);
+			addPhotoBody(post, writer, postController, blogName);
 			break;
 		case "regular":
 			addRegularBody(post, writer, postController);
@@ -185,12 +190,13 @@ public class BlogXmlWriter {
 	 * @param post           The post being added, with one or more photos
 	 * @param writer         The StAX XML writer
 	 * @param postController The REST controller for retrieving additional data
+	 * @param blogName       Blog for which the photo si being added
 	 * @throws XMLStreamException if any errors are encountered by the underlying
 	 *                            StAX classes
 	 */
-	private static void addPhotoBody(Post post, XMLStreamWriter writer, TEVPostRestController postController)
-			throws XMLStreamException {
-		List<Photo> photos = postController.getPhotoById(post.getId());
+	private static void addPhotoBody(Post post, XMLStreamWriter writer, TEVPostRestController postController,
+			String blogName) throws XMLStreamException {
+		List<Photo> photos = postController.getPhotoForBlogById(blogName, post.getId());
 
 		writer.writeStartElement("photo-caption");
 		writer.writeCharacters(photos.get(0).getCaption());
@@ -275,7 +281,7 @@ public class BlogXmlWriter {
 	 */
 	private static void addVideoBody(Post post, XMLStreamWriter writer, TEVPostRestController postController)
 			throws XMLStreamException {
-		Video video = postController.getVideoById(post.getId());
+		Video video = postController.getVideoForBlogById(post.getTumblelog(), post.getId());
 
 		writer.writeStartElement("video-source");
 
@@ -324,7 +330,7 @@ public class BlogXmlWriter {
 	 */
 	private static void addAnswerBody(Post post, XMLStreamWriter writer, TEVPostRestController postController)
 			throws XMLStreamException {
-		Answer answer = postController.getAnswerById(post.getId());
+		Answer answer = postController.getAnswerForBlogById(post.getTumblelog(), post.getId());
 
 		writer.writeStartElement("question");
 		writer.writeCharacters(answer.getQuestion());
@@ -347,7 +353,7 @@ public class BlogXmlWriter {
 	 */
 	private static void addLinkBody(Post post, XMLStreamWriter writer, TEVPostRestController postController)
 			throws XMLStreamException {
-		Link link = postController.getLinkById(post.getId());
+		Link link = postController.getLinkForBlogById(post.getTumblelog(), post.getId());
 
 		writer.writeStartElement("link-text");
 		writer.writeCharacters(link.getText());
@@ -375,7 +381,7 @@ public class BlogXmlWriter {
 	 */
 	private static void addRegularBody(Post post, XMLStreamWriter writer, TEVPostRestController postController)
 			throws XMLStreamException {
-		Regular regular = postController.getRegularById(post.getId());
+		Regular regular = postController.getRegularForBlogById(post.getTumblelog(), post.getId());
 
 		if (regular.getTitle() != null && regular.getTitle().length() > 0) {
 			writer.writeStartElement("regular-title");

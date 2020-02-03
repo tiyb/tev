@@ -41,6 +41,8 @@ public class TevAdminToolsUnitTests {
 	private TEVAdminToolsController adminRestController;
 	@Autowired
 	private TEVPostRestController postController;
+	
+	private static final String MAIN_BLOG_NAME = "mainblog";
 
 	/**
 	 * Don't know what the Rule annotation does, but this is a temporary folder
@@ -63,15 +65,16 @@ public class TevAdminToolsUnitTests {
 	 */
 	@Before
 	public void setupData() throws FileNotFoundException {
+		Metadata md = mdRestController.getMetadataForBlogOrDefault(MAIN_BLOG_NAME);
+		md.setOverwritePostData(true);
+		md.setBlog(MAIN_BLOG_NAME);
+		md.setIsDefault(true);
+		md.setBaseMediaPath(tempMDImageFolder.getRoot().getAbsolutePath());
+		md = mdRestController.updateMetadata(md.getId(), md);
+
 		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-xml.xml");
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
-
-		Metadata md = mdRestController.getMetadata();
-		md.setOverwritePostData(true);
-		md.setBaseMediaPath(tempMDImageFolder.getRoot().getAbsolutePath());
-		md = mdRestController.updateMetadata(md);
-
-		BlogXmlReader.parseDocument(xmlFile, postController, mdRestController);
+		BlogXmlReader.parseDocument(xmlFile, postController, mdRestController, MAIN_BLOG_NAME);
 	}
 
 	/**
@@ -83,7 +86,7 @@ public class TevAdminToolsUnitTests {
 	public void testCleaningExtraImages() throws IOException {
 		tempMDImageFolder.newFile("blah.txt");
 
-		adminRestController.cleanImagesOnHD();
+		adminRestController.cleanImagesOnHDForBlog(MAIN_BLOG_NAME);
 
 		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(0);
 	}
@@ -100,7 +103,7 @@ public class TevAdminToolsUnitTests {
 		tempMDImageFolder.newFile("180254465582_0.gif");
 		tempMDImageFolder.newFile("180254465582_1.gif");
 
-		adminRestController.cleanImagesOnHD();
+		adminRestController.cleanImagesOnHDForBlog(MAIN_BLOG_NAME);
 
 		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
 	}
@@ -120,7 +123,7 @@ public class TevAdminToolsUnitTests {
 		tempMDImageFolder.newFile("180254465582_2.gif");
 		tempMDImageFolder.newFile("180254465582_3.gif");
 
-		adminRestController.cleanImagesOnHD();
+		adminRestController.cleanImagesOnHDForBlog(MAIN_BLOG_NAME);
 
 		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
 	}
@@ -134,7 +137,7 @@ public class TevAdminToolsUnitTests {
 	public void testImportingExtraImages() throws IOException {
 		tempInputImageFolder.newFile("blah.txt");
 
-		adminRestController.importImages(tempInputImageFolder.getRoot().getAbsolutePath());
+		adminRestController.importImagesForBlog(MAIN_BLOG_NAME, tempInputImageFolder.getRoot().getAbsolutePath());
 
 		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(0);
 	}
@@ -150,7 +153,7 @@ public class TevAdminToolsUnitTests {
 		tempInputImageFolder.newFile("180254465582_0.gif");
 		tempInputImageFolder.newFile("180254465582_1.gif");
 
-		adminRestController.importImages(tempInputImageFolder.getRoot().getAbsolutePath());
+		adminRestController.importImagesForBlog(MAIN_BLOG_NAME, tempInputImageFolder.getRoot().getAbsolutePath());
 
 		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
 	}
@@ -169,7 +172,7 @@ public class TevAdminToolsUnitTests {
 		tempInputImageFolder.newFile("180254465582_2.gif");
 		tempInputImageFolder.newFile("180254465582_3.gif");
 
-		adminRestController.importImages(tempInputImageFolder.getRoot().getAbsolutePath());
+		adminRestController.importImagesForBlog(MAIN_BLOG_NAME, tempInputImageFolder.getRoot().getAbsolutePath());
 
 		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
 	}
@@ -188,7 +191,7 @@ public class TevAdminToolsUnitTests {
 		tempInputImageFolder.newFile("180254465582_2.gif");
 		tempInputImageFolder.newFile("180254465582_3.gif");
 
-		adminRestController.importImages(tempInputImageFolder.getRoot().getAbsolutePath());
+		adminRestController.importImagesForBlog(MAIN_BLOG_NAME, tempInputImageFolder.getRoot().getAbsolutePath());
 
 		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
 	}
@@ -198,23 +201,23 @@ public class TevAdminToolsUnitTests {
 	 */
 	@Test
 	public void testMarkingAllPostsRead() {
-		List<Post> allPosts = postController.getAllPosts();
+		List<Post> allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
 		assertThat(allPosts).isNotNull();
 		
 		for(Post p : allPosts) {
 			p.setIsRead(false);
-			postController.updatePost(p.getId(), p);
+			postController.updatePostForBlog(p.getTumblelog(), p.getId(), p);
 		}
 		
-		allPosts = postController.getAllPosts();
+		allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
 		assertThat(allPosts).isNotNull();
 		for(Post p : allPosts) {
 			assertThat(p.getIsRead()).isEqualTo(false);
 		}
 		
-		adminRestController.markAllPostsRead();
+		adminRestController.markAllPostsReadForBlog(MAIN_BLOG_NAME);
 		
-		allPosts = postController.getAllPosts();
+		allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
 		assertThat(allPosts).isNotNull();
 		for(Post p : allPosts) {
 			assertThat(p.getIsRead()).isEqualTo(true);
@@ -226,27 +229,27 @@ public class TevAdminToolsUnitTests {
 	 */
 	@Test
 	public void testMarkingAllPostsUnread() {
-		List<Post> allPosts = postController.getAllPosts();
+		List<Post> allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
 		assertThat(allPosts).isNotNull();
 		
 		for(Post p : allPosts) {
 			p.setIsRead(true);
-			postController.updatePost(p.getId(), p);
+			postController.updatePostForBlog(p.getTumblelog(), p.getId(), p);
 		}
 		
-		allPosts = postController.getAllPosts();
+		allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
 		assertThat(allPosts).isNotNull();
 		for(Post p : allPosts) {
 			assertThat(p.getIsRead()).isEqualTo(true);
 		}
 		
-		adminRestController.markAllPostsUnread();
+		adminRestController.markAllPostsUnreadForBlog(MAIN_BLOG_NAME);
 		
-		allPosts = postController.getAllPosts();
+		allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
 		assertThat(allPosts).isNotNull();
 		for(Post p : allPosts) {
 			assertThat(p.getIsRead()).isEqualTo(false);
 		}
 	}
-	
+		
 }

@@ -10,8 +10,10 @@ import com.tiyb.tev.datamodel.Conversation;
 @Repository
 public interface ConversationRepository extends JpaRepository<Conversation, Long> {
 
-	public Conversation findByParticipant(String participantName);
-	public List<Conversation> findByHideConversationTrue();
-	public List<Conversation> findByHideConversationFalse();
-	public List<Conversation> findByParticipantId(String participantId);
+	public List<Conversation> findByBlog(String blog);
+	public Conversation findByBlogAndParticipant(String blog, String participantName);
+	public List<Conversation> findByBlogAndHideConversationTrue(String blog);
+	public List<Conversation> findByBlogAndHideConversationFalse(String blog);
+	public List<Conversation> findByBlogAndParticipantId(String blog, String participantId);
+	Long deleteByBlog(String blog);
 }

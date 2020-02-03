@@ -7,5 +7,7 @@ import com.tiyb.tev.datamodel.Metadata;
 
 @Repository
 public interface MetadataRepository extends JpaRepository<Metadata, Integer> {
+	
+	Metadata findByBlog(String blog);
 
 }

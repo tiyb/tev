@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,11 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tiyb.tev.datamodel.Photo;
 import com.tiyb.tev.datamodel.Post;
+import com.tiyb.tev.exception.InvalidTypeException;
+import com.tiyb.tev.repository.PostRepository;
 
 /**
  * <p>
- * A non-advertised REST controller with some administration tools for working
- * with the database behind the scenes.
+ * A REST controller with some administration tools for working with the
+ * database behind the scenes.
  * </p>
  * 
  * <p>
@@ -66,7 +69,13 @@ public class TEVAdminToolsController {
 	 */
 	@Autowired
 	private TEVMetadataRestController mdController;
-	
+
+	/**
+	 * The underlying repo used for posts
+	 */
+	@Autowired
+	private PostRepository postRepo;
+
 	/**
 	 * Success message returned from the API. Not actually a "constant," it's
 	 * injected at runtime by Spring Boot, but named like one because it's being
@@ -74,24 +83,31 @@ public class TEVAdminToolsController {
 	 */
 	@Value("${controllers.admintools.success}")
 	private String SUCCESS_MESSAGE;
-	
+
 	/**
-	 * Message returned from the API when the images directory in metadata is
-	 * invalid. Not actually a "constant," it's injected at runtime by Spring Boot,
-	 * but named like one because it's being treated like one in the code.
+	 * Localized message returned from the API when the images directory in metadata
+	 * is invalid. Not actually a "constant," it's injected at runtime by Spring
+	 * Boot, but named like one because it's being treated like one in the code.
 	 */
 	@Value("${controllers.admintools.invalidImagesDirectory}")
 	private String INVALID_IMAGES_MESSAGE;
-	
+
+	/**
+	 * Localized message used when the source images directory is not valid
+	 */
 	@Value("${controllers.admintools.invalidSourceImagesDirectory}")
 	private String INVALID_SOURCEIMAGES_MESSAGE;
-	
+
+	/**
+	 * Localized message used when an error is encountered copying media files
+	 */
 	@Value("${controllers.admintools.errorCopyingFiles}")
 	private String ERROR_COPYINGFILES_MESSAGE;
 
 	/**
 	 * Used to compact the database upon shutdown. This causes shutdown to take
-	 * longer, but it's not very noticeable for an application of this size.
+	 * longer, but it's not very noticeable for an application of this size with a
+	 * local DB.
 	 */
 	@PreDestroy
 	public void preDestroy() {
@@ -103,16 +119,37 @@ public class TEVAdminToolsController {
 	}
 
 	/**
-	 * GET request to mark all posts in the database as read
+	 * GET to return a list of posts by a particular type for a given blog
 	 * 
+	 * @param blog Blog for which posts should be returned
+	 * @param type The type of post to return
+	 * @return List of Posts
+	 */
+	@GetMapping("/posts/{blog}/type/{type}")
+	public List<Post> getPostsByBlogByType(@PathVariable("blog") String blog,
+			@PathVariable(value = "type") String type) {
+		List<String> allTypeNames = mdController.getAllTypes();
+
+		if (!TEVMetadataRestController.isValidType(type, allTypeNames)) {
+			logger.error("Invalid type name: " + type);
+			throw new InvalidTypeException();
+		}
+
+		return postRepo.findByTumblelogAndType(blog, type);
+	}
+
+	/**
+	 * GET request to mark all posts in the database as read for a given blog
+	 * 
+	 * @param blog Blog for which the posts should be marked read
 	 * @return Success indicator
 	 */
-	@GetMapping("/posts/markAllRead")
-	public ResponseEntity<String> markAllPostsRead() {
-		List<Post> posts = postController.getAllPosts();
+	@GetMapping("/posts/{blog}/markAllRead")
+	public ResponseEntity<String> markAllPostsReadForBlog(@PathVariable("blog") String blog) {
+		List<Post> posts = postController.getAllPostsForBlog(blog);
 
 		for (Post post : posts) {
-			postController.markPostRead(post.getId());
+			postController.markPostReadForBlog(blog, post.getId());
 		}
 
 		return new ResponseEntity<String>(SUCCESS_MESSAGE, null, HttpStatus.OK);
@@ -121,14 +158,15 @@ public class TEVAdminToolsController {
 	/**
 	 * GET request to mark all posts in the database as unread
 	 * 
+	 * @param blog Name of the blog for which posts should be marked unread
 	 * @return Success indicator
 	 */
-	@GetMapping("/posts/markAllUnread")
-	public ResponseEntity<String> markAllPostsUnread() {
-		List<Post> posts = postController.getAllPosts();
+	@GetMapping("/posts/{blog}/markAllUnread")
+	public ResponseEntity<String> markAllPostsUnreadForBlog(@PathVariable("blog") String blog) {
+		List<Post> posts = postController.getAllPostsForBlog(blog);
 
 		for (Post post : posts) {
-			postController.markPostUnread(post.getId());
+			postController.markPostUnreadForBlog(blog, post.getId());
 		}
 
 		return new ResponseEntity<String>(SUCCESS_MESSAGE, null, HttpStatus.OK);
@@ -136,19 +174,21 @@ public class TEVAdminToolsController {
 
 	/**
 	 * GET request to delete all of the duplicate images that end up on the hard
-	 * drive, coming from the Tumblr export. For photo posts, when the images are
-	 * actually in the export, Tumblr includes duplicates of every image, such that
-	 * there are twice as many images stored on the HD as necessary. This helper API
-	 * retrieves all Photo posts, checks how many images are supposed to be there,
-	 * then looks at the HD to see the number of files there. If there are exactly
-	 * twice as many images as there should be, the duplicates are deleted.
+	 * drive, coming from the Tumblr export, for a given blog. For photo posts, when
+	 * the images are actually in the export, Tumblr includes duplicates of every
+	 * image, such that there are twice as many images stored on the HD as
+	 * necessary. This helper API retrieves all Photo posts, checks how many images
+	 * are supposed to be there, then looks at the HD to see the number of files
+	 * there. If there are exactly twice as many images as there should be, the
+	 * duplicates are deleted.
 	 * 
+	 * @param blog Blog for which images should be cleaned
 	 * @return String indicating the success or failure of the process
 	 */
-	@GetMapping("/posts/cleanImagesOnHD")
-	public ResponseEntity<String> cleanImagesOnHD() {
+	@GetMapping("/posts/{blog}/cleanImagesOnHD")
+	public ResponseEntity<String> cleanImagesOnHDForBlog(@PathVariable("blog") String blog) {
 		ArrayList<String> allCleanFiles = new ArrayList<String>();
-		String imageDirectory = mdController.getMetadata().getBaseMediaPath();
+		String imageDirectory = mdController.getMetadataForBlogOrDefault(blog).getBaseMediaPath();
 		if (imageDirectory == null || imageDirectory.equals("")) {
 			logger.error("Invalid image directory used for cleanImagesOnHD: " + imageDirectory);
 			return new ResponseEntity<String>(INVALID_IMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
@@ -160,9 +200,9 @@ public class TEVAdminToolsController {
 
 		File folder = new File(imageDirectory);
 
-		List<Post> photoPosts = postController.getPostsByType("photo");
+		List<Post> photoPosts = getPostsByBlogByType(blog, "photo");
 		for (Post post : photoPosts) {
-			List<Photo> photosForPost = postController.getPhotoById(post.getId());
+			List<Photo> photosForPost = postController.getPhotoForBlogById(post.getTumblelog(), post.getId());
 			int numPhotos = photosForPost.size();
 
 			File[] imagesForPost = folder.listFiles(new FilenameFilter() {
@@ -197,13 +237,16 @@ public class TEVAdminToolsController {
 	 * {@link #cleanImagesOnHD()} method when it's done, to clean the directory back
 	 * up.
 	 * 
+	 * TODO UI won't be passing blog name yet
+	 * 
 	 * @param imagePath The path of the source directory, from whence images should
 	 *                  be retrieved.
 	 * @return Success/failure message
 	 */
-	@PostMapping("/posts/importImages")
-	public ResponseEntity<String> importImages(@RequestBody String imagePath) {
-		String imageDirectory = mdController.getMetadata().getBaseMediaPath();
+	@PostMapping("/posts/{blog}/importImages")
+	public ResponseEntity<String> importImagesForBlog(@PathVariable("blog") String blog,
+			@RequestBody String imagePath) {
+		String imageDirectory = mdController.getMetadataForBlogOrDefault(blog).getBaseMediaPath();
 		if (imageDirectory == null || imageDirectory.equals("")) {
 			logger.error("Invalid image directory used for importImages: " + imageDirectory);
 			return new ResponseEntity<String>(INVALID_IMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
@@ -231,7 +274,7 @@ public class TEVAdminToolsController {
 			Path inputFilePath = inputFile.toPath();
 			try {
 				Files.copy(inputFilePath, destinationFolderPath.resolve(inputFilePath.getFileName()));
-			} catch(FileAlreadyExistsException e) {
+			} catch (FileAlreadyExistsException e) {
 				logger.debug("File already exists: " + inputFilePath.getFileName());
 				// Skip copying files that don't exist
 			} catch (IOException e) {
@@ -241,7 +284,7 @@ public class TEVAdminToolsController {
 			}
 		}
 
-		return cleanImagesOnHD();
+		return cleanImagesOnHDForBlog(blog);
 	}
 
 }

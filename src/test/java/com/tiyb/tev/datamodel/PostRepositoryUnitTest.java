@@ -124,23 +124,26 @@ public class PostRepositoryUnitTest {
 		post1.setId(1L);
 		post1.setType("answer");
 		post1.setDate("Jan 1, 2019");
+		post1.setTumblelog("blog");
 		entityManager.persist(post1);
 		Post post2 = new Post();
 		post2.setId(2L);
 		post2.setType("answer");
 		post2.setDate("Jan 2, 2019");
+		post2.setTumblelog("blog");
 		entityManager.persist(post2);
 		Post post3 = new Post();
 		post3.setId(3L);
 		post3.setType("link");
 		post3.setDate("Jan 3, 2019");
+		post3.setTumblelog("blog");
 		entityManager.persist(post3);
 		entityManager.flush();
 
 		List<Post> returnedPosts = postRepo.findAll();
 		assertThat(returnedPosts.size()).isEqualTo(3);
 
-		List<Post> answerPosts = postRepo.findByType("answer");
+		List<Post> answerPosts = postRepo.findByTumblelogAndType("blog", "answer");
 		assertThat(answerPosts).isNotNull();
 		assertThat(answerPosts.size()).isEqualTo(2);
 		assertThat(answerPosts.get(0).getId()).isEqualTo(1L);
@@ -148,7 +151,7 @@ public class PostRepositoryUnitTest {
 		assertThat(answerPosts.get(1).getId()).isEqualTo(2L);
 		assertThat(answerPosts.get(1).getDate()).isEqualTo("Jan 2, 2019");
 
-		List<Post> linkPosts = postRepo.findByType("link");
+		List<Post> linkPosts = postRepo.findByTumblelogAndType("blog", "link");
 		assertThat(linkPosts).isNotNull();
 		assertThat(linkPosts.size()).isEqualTo(1);
 		assertThat(linkPosts.get(0).getId()).isEqualTo(3L);
@@ -183,15 +186,15 @@ public class PostRepositoryUnitTest {
 	 */
 	@Test
 	public void deleteAllHashtags() {
-		Hashtag tag1 = new Hashtag("tag1", 1);
+		Hashtag tag1 = new Hashtag("tag1", 1, "blog");
 		entityManager.persist(tag1);
-		Hashtag tag2 = new Hashtag("tag2", 2);
+		Hashtag tag2 = new Hashtag("tag2", 2, "blog");
 		entityManager.persist(tag2);
 		entityManager.flush();
 
-		hashtagRepo.deleteAll();
+		hashtagRepo.deleteByBlog("blog");
 
-		List<Hashtag> hashtags = hashtagRepo.findAll();
+		List<Hashtag> hashtags = hashtagRepo.findByBlog("blog");
 
 		assertThat(hashtags.size()).isEqualTo(0);
 	}
