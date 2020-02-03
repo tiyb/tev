@@ -138,7 +138,7 @@ public class TEVUIController {
 	 * @return The page to which the successful upload should be redirected
 	 */
 	@PostMapping("/postDataUpload/{blog}")
-	public String handlePostFileUploadForBlog(@PathVariable(value = "blog") String blog,
+	public String handlePostFileUploadForBlog(@PathVariable("blog") String blog,
 			@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
 		try {
 			BlogXmlReader.parseDocument(file.getInputStream(), postController, mdController, blog);
@@ -200,7 +200,7 @@ public class TEVUIController {
 	 * @return The name of the template to use for rendering the output
 	 */
 	@RequestMapping(value = { "/postViewer/{blog}" }, method = RequestMethod.GET)
-	public String showViewer(@PathVariable(value = "blog") String blog, @RequestParam("id") Long postID, Model model) {
+	public String showViewer(@PathVariable("blog") String blog, @RequestParam("id") Long postID, Model model) {
 		Post post = postController.getPostForBlogById(blog, postID);
 		model.addAttribute("post", post);
 		model.addAttribute("tags", pullOutTagValues(post.getTags()));
@@ -261,7 +261,7 @@ public class TEVUIController {
 	 * @return The name of the template to use for rendering the output
 	 */
 	@RequestMapping(value = { "/hashtagViewer/{blog}" }, method = RequestMethod.GET)
-	public String showHashtagViewerForBlog(@PathVariable(value = "blog") String blog, Model model) {
+	public String showHashtagViewerForBlog(@PathVariable("blog") String blog, Model model) {
 		List<Hashtag> hashtags = postController.getAllHashtagsForBlog(blog);
 		model.addAttribute("hashtags", hashtags);
 		updateModelWithTheme(model);
@@ -401,7 +401,7 @@ public class TEVUIController {
 	 * @return The XML file, as a String
 	 */
 	@RequestMapping(value = { "/stagedPostsDownload/{blog}" }, method = RequestMethod.GET, produces = { "text/plain" })
-	public @ResponseBody String getStagedPostsFileForBlog(@PathVariable(value = "blog") String blog,
+	public @ResponseBody String getStagedPostsFileForBlog(@PathVariable("blog") String blog,
 			HttpServletResponse response, HttpServletRequest request) {
 		response.setContentType("application/xml");
 		response.setHeader("Pragma", "no-cache");

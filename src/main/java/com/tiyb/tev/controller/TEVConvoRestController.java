@@ -72,7 +72,7 @@ public class TEVConvoRestController {
 	 */
 	@GetMapping("/conversations/{blog}/{id}")
 	public Conversation getConversationForBlogById(@PathVariable("blog") String blog,
-			@PathVariable(value = "id") Long conversationID) {
+			@PathVariable("id") Long conversationID) {
 		return convoRepo.findById(conversationID)
 				.orElseThrow(() -> new ResourceNotFoundException("Conversation", "id", conversationID));
 	}
@@ -178,7 +178,7 @@ public class TEVConvoRestController {
 	 */
 	@PutMapping("/conversations/{blog}/{id}")
 	public Conversation updateConversationForBlog(@PathVariable("blog") String blog,
-			@PathVariable(value = "id") Long conversationId, @RequestBody Conversation convoDetails) {
+			@PathVariable("id") Long conversationId, @RequestBody Conversation convoDetails) {
 		assert blog.equals(convoDetails.getBlog());
 
 		Conversation convo = convoRepo.findById(conversationId)
@@ -201,7 +201,7 @@ public class TEVConvoRestController {
 	 */
 	@PutMapping("/conversations/{blog}/{participant}/ignoreConvo")
 	public Conversation ignoreConversationForBlog(@PathVariable("blog") String blog,
-			@PathVariable(value = "participant") String participantName) {
+			@PathVariable("participant") String participantName) {
 		Conversation convo = convoRepo.findByBlogAndParticipant(blog, participantName);
 
 		convo.setHideConversation(true);

@@ -126,8 +126,7 @@ public class TEVAdminToolsController {
 	 * @return List of Posts
 	 */
 	@GetMapping("/posts/{blog}/type/{type}")
-	public List<Post> getPostsByBlogByType(@PathVariable("blog") String blog,
-			@PathVariable(value = "type") String type) {
+	public List<Post> getPostsByBlogByType(@PathVariable("blog") String blog, @PathVariable("type") String type) {
 		List<String> allTypeNames = mdController.getAllTypes();
 
 		if (!TEVMetadataRestController.isValidType(type, allTypeNames)) {
