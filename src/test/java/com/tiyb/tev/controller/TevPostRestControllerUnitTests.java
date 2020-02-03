@@ -35,6 +35,14 @@ import com.tiyb.tev.datamodel.Video;
  * controller to update the post in the DB; 4) use the REST API to retrieve that
  * same post; 5) verify all of the fields are the same
  * </p>
+ * 
+ * <p>
+ * This class has test cases for single-blog scenarios, and gets deeper in
+ * individual parts of the functionality; the
+ * {@link com.tiyb.tev.controller.TevMultiBlogPostUnitTests
+ * TevPostRestControllerUnitTestsMultiBlogs} class has unit tests for multi-blog
+ * scenarios.
+ * </p>
  *
  */
 @RunWith(SpringRunner.class)
@@ -221,7 +229,7 @@ public class TevPostRestControllerUnitTests {
 		modifiedLink.setText("new link text");
 		modifiedLink.setUrl("new url");
 
-		restController.updateLinkForBlog("blog",1L, modifiedLink);
+		restController.updateLinkForBlog("blog", 1L, modifiedLink);
 
 		Link finalFromServer = restController.getLinkForBlogById("blog", 1L);
 

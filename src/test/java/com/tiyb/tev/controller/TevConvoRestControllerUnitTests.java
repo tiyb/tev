@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +39,17 @@ public class TevConvoRestControllerUnitTests {
 
 	@Autowired
 	private TEVConvoRestController restController;
-	
+
 	private static final String BLOG_NAME = "blog";
+
+	/**
+	 * Clean out conversations before each test
+	 */
+	@Before
+	public void cleanConversations() {
+		restController.deleteAllConvoMsgsForBlog(BLOG_NAME);
+		restController.deleteAllConversationsForBlog(BLOG_NAME);
+	}
 
 	/**
 	 * Verifies that updating a Conversation properly updates all fields
@@ -77,6 +87,7 @@ public class TevConvoRestControllerUnitTests {
 		original.setId(1L);
 		original.setHideConversation(false);
 		original.setParticipant(participantName);
+		original.setBlog(BLOG_NAME);
 
 		original = restController.createConversationForBlog(BLOG_NAME, original);
 		assertThat(original).isNotNull();
@@ -102,6 +113,7 @@ public class TevConvoRestControllerUnitTests {
 		original.setId(1L);
 		original.setHideConversation(true);
 		original.setParticipant(participantName);
+		original.setBlog(BLOG_NAME);
 
 		original = restController.createConversationForBlog(BLOG_NAME, original);
 		assertThat(original).isNotNull();
@@ -174,7 +186,8 @@ public class TevConvoRestControllerUnitTests {
 
 		restController.updateConvoMsgForBlog(BLOG_NAME, modified.getId(), modified);
 
-		List<ConversationMessage> finalFromServer = restController.getConvoMsgForBlogByConvoID(BLOG_NAME, convo.getId());
+		List<ConversationMessage> finalFromServer = restController.getConvoMsgForBlogByConvoID(BLOG_NAME,
+				convo.getId());
 
 		assertThat(finalFromServer).isNotNull();
 		assertThat(finalFromServer.size()).isEqualTo(1);

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tumblr version="1.0">
+	<conversations>
+		<!-- Normal conversation, with back and forth, and different post types -->
+		<conversation status="ACTIVE">
+			<participants>
+				<participant avatar_url="http://secondblog/avatar">secondblog</participant>
+				<participant avatar_url="http://secondblogparticipant1/avatar">secondblogparticipant1</participant>
+			</participants>
+			<messages>
+				<message ts="1544197586" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 1</message>
+				<message ts="1544197605" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 2</message>
+				<message ts="1544197624" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 3</message>
+				<message ts="1544197647" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="IMAGE">
+					<photo-url max-width="0">http://www.photourl.com/photo.png</photo-url>
+				</message>
+				<message ts="1544198315" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 5</message>
+				<message ts="1544221130" participant="t:eMUq2ec6xRwaki33S-DLig" type="TEXT">Message 6</message>
+				<message ts="1544221197" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 7</message>
+				<message ts="1544221203" participant="t:eMUq2ec6xRwaki33S-DLig" type="TEXT">Message 8</message>
+				<message ts="1544221221" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="POSTREF">http://www.tumblr.com/somepost</message>
+			</messages>
+		</conversation>
+		
+		<!-- normal conversation, one received message, from a participant who is also in the first blog's convo -->
+		<conversation status="ACTIVE">
+			<participants>
+				<participant avatar_url="http://participant1/avatar">participant1</participant>
+				<participant avatar_url="http://secondblog/avatar">secondblog</participant>
+			</participants>
+			<messages>
+				<message ts="1544012468" participant="foaiehoihafoei" type="TEXT">Message 1</message>
+				<message ts="1544012470" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 2</message>
+			</messages>
+		</conversation>
+		
+	</conversations>
+</tumblr>

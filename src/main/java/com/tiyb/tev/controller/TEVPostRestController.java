@@ -30,6 +30,7 @@ import com.tiyb.tev.datamodel.Photo;
 import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
 import com.tiyb.tev.datamodel.Video;
+import com.tiyb.tev.exception.BlogPostMismatchException;
 import com.tiyb.tev.exception.NoParentPostException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.repository.AnswerRepository;
@@ -131,7 +132,10 @@ public class TEVPostRestController {
 	 */
 	@PostMapping("/posts/{blog}")
 	public Post createPostForBlog(@PathVariable("blog") String blog, @Valid @RequestBody Post post) {
-		assert blog.equals(post.getTumblelog());
+		if (!blog.equals(post.getTumblelog())) {
+			logger.error("Post blog and API blog don't match; post blog=" + post.getTumblelog() + ", API blog=" + blog);
+			throw new BlogPostMismatchException();
+		}
 		return postRepo.save(post);
 	}
 

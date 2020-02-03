@@ -65,7 +65,7 @@ public class ExportWritingUnitTests {
 		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-xml.xml");
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
 		
-		Metadata md = Metadata.newDefaultMetadata();
+		Metadata md = mdController.getMetadataForBlogOrDefault(MAIN_BLOG_NAME);
 		md.setOverwritePostData(true);
 		md.setIsDefault(true);
 		md.setBlog(MAIN_BLOG_NAME);

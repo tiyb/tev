@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tumblr version="1.0">
+	<posts>
+		<!--  Regular post -->
+		<post id="180894436690" url="https://mainblog.tumblr.com/post/180894436690" url-with-slug="https://mainblog.tumblr.com/post/180894436690/first-post" type="regular" date-gmt="2018-12-07 16:48:43 GMT" date="Fri, 07 Dec 2018 11:48:43" unix-timestamp="1544201323" format="html" reblog-key="O6pLVlp1" slug="first-post" state="published" is_reblog="true" tumblelog="secondblog">
+			<regular-title>First Post</regular-title>
+			<regular-body>This is a post on the second blog</regular-body>
+			<tag>2ndtag1</tag>
+			<tag>tag2</tag>
+		</post>
+	</posts>
+</tumblr>
