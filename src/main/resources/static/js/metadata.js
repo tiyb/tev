@@ -86,8 +86,6 @@ $(document).ready(function () {
 					url: '/api/metadata/' + metadataObject.id,
 					method: 'DELETE',
 					success: function(data, textStatus, hxr) {
-						//var newURL = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "/metadata";
-						//window.parent.opener.location.replace(newURL);
 						window.location = "/metadata";
 					},
 					error: function(xhr, textStatus, errorThrown) {
@@ -101,7 +99,7 @@ $(document).ready(function () {
 	
 	$('#markAllPostsReadButton').click(function() {
 		$.ajax({
-			url: '/admintools/posts/markAllRead',
+			url: '/admintools/posts/' + metadataObject.blog + '/markAllRead',
 			type: 'GET',
 			success: function(data, textStatus, xhr) {
 				createAnInfoMessage($.i18n.prop('md_admintools_markAllReadSuccess'));
@@ -114,7 +112,7 @@ $(document).ready(function () {
 	
 	$('#markAllPostsUnreadButton').click(function() {
 		$.ajax({
-			url: '/admintools/posts/markAllUnread',
+			url: '/admintools/posts/' + metadataObject.blog + '/markAllUnread',
 			type: 'GET',
 			success: function(data, textStatus, xhr) {
 				createAnInfoMessage($.i18n.prop('md_admintools_markAllUnreadSuccess'));
@@ -127,7 +125,7 @@ $(document).ready(function () {
 	
 	$('#cleanImagesButton').click(function() {
 		$.ajax({
-			url: '/admintools/posts/cleanImagesOnHD',
+			url: '/admintools/posts/' + metadataObject.blog + '/cleanImagesOnHD',
 			type: 'GET',
 			success: function(data, textStatus, xhr) {
 				createAnInfoMessage($.i18n.prop('md_admintools_cleanImagesSuccess'));
@@ -145,7 +143,7 @@ $(document).ready(function () {
 		}
 		
 		$.ajax({
-			url: '/admintools/posts/importImages',
+			url: '/admintools/posts/' + metadataObject.blog + '/importImages',
 			type: 'POST',
 			data: $('#importImagesPath').val(),
 			async: false,

@@ -516,12 +516,11 @@ public class TEVUIController {
 	 * {@link #updateModelWithTheme(Model)} method, but broke it out separately in
 	 * case the logic for determining the current blog gets hairy.
 	 * 
-	 * TODO un-hard-code
-	 * 
-	 * @param model
+	 * @param model Model to update with the blog name
 	 */
 	private void updateModelWithBlogName(Model model) {
-		model.addAttribute("blogName", "wm4afs");
+		Metadata m = mdController.getDefaultMetadata();
+		model.addAttribute("blogName", m.getBlog());
 	}
 
 	/**

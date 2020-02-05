@@ -183,24 +183,7 @@ public class TEVMetadataRestController {
 	 */
 	@GetMapping("/metadata/default")
 	public Metadata getDefaultMetadata() {
-		List<Metadata> allMD = metadataRepo.findAll();
-
-		if (allMD == null || allMD.size() < 1) {
-			Metadata newMD = Metadata.newDefaultMetadata();
-			newMD.setIsDefault(true);
-			return metadataRepo.save(newMD);
-		}
-
-		for (Metadata md : allMD) {
-			if (md.getIsDefault()) {
-				return md;
-			}
-		}
-
-		allMD.get(0).setIsDefault(true);
-		metadataRepo.save(allMD.get(0));
-
-		return allMD.get(0);
+		return metadataRepo.findByIsDefaultTrue();
 	}
 
 	/**
