@@ -98,8 +98,6 @@ public class TEVUIController {
 	 * /conversations. Retrieves metadata and conversations, which are added to the
 	 * model, before returning the location of the conversations viewer.
 	 * 
-	 * TODO what to do about getting the right blog
-	 * 
 	 * @param model not used
 	 * @return name of the template to be used to render the page
 	 */
@@ -326,8 +324,6 @@ public class TEVUIController {
 	/**
 	 * Request used to populate conversation viewer
 	 * 
-	 * TODO UI won't be passing blog name
-	 * 
 	 * @param blog            Name of the blog
 	 * @param participantName Name of the conversation
 	 * @param model           Populated with information from this conversation
@@ -376,7 +372,6 @@ public class TEVUIController {
 	@RequestMapping(value = { "/viewerMedia/{imageName}" }, method = RequestMethod.GET, produces = {
 			MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_PNG_VALUE })
 	public @ResponseBody byte[] getMedia(@PathVariable("imageName") String imageName, Model model) {
-		// TODO may need something better than just the default MD
 		String fullName = mdController.getDefaultMetadata().getBaseMediaPath() + "/" + imageName;
 
 		File file = new File(fullName);
@@ -397,7 +392,6 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/viewerVideo/{videoName}" }, method = RequestMethod.GET, produces = { "video/mp4" })
 	public void getVideo(HttpServletResponse response, HttpServletRequest request) {
-		// TODO may need something better than just the default MD
 		String fullName = mdController.getDefaultMetadata().getBaseMediaPath() + "/"
 				+ request.getRequestURI().substring(request.getRequestURI().lastIndexOf('/'));
 

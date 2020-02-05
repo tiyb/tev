@@ -236,8 +236,6 @@ public class TEVAdminToolsController {
 	 * {@link #cleanImagesOnHD()} method when it's done, to clean the directory back
 	 * up.
 	 * 
-	 * TODO UI won't be passing blog name yet
-	 * 
 	 * @param imagePath The path of the source directory, from whence images should
 	 *                  be retrieved.
 	 * @return Success/failure message
