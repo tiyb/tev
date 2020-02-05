@@ -6,10 +6,9 @@ $.i18n.properties({
 
 $(document).ready(function() {
 	$('#newBlogButton').click(function() {
-		var blogName = prompt("Image Output Path:");
+		var blogName = prompt($.i18n.prop('md_createBlog_prompt'));
 		if((blogName == null) || (blogName.length < 1)) {
-			//TODO i18n
-			createAnErrorMessage("please enter the name for the blog, from Tumblr");
+			createAnErrorMessage($.i18n.prop('md_createBlog_errorMessage'));
 			return;
 		}
 		

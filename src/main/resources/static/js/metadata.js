@@ -89,8 +89,7 @@ $(document).ready(function () {
 						window.location = "/metadata";
 					},
 					error: function(xhr, textStatus, errorThrown) {
-						//TODO i18n
-						createAnErrorMessage("error deleting blog from MD");
+						createAnErrorMessage($.i18n.prop('md_deleteBlog_errorMessage'));
 					}
 				});
 			});			

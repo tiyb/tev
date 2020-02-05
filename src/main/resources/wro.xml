@@ -32,6 +32,7 @@
 		
 		<js>/js/md-parent.js</js>
 		<js>/js/helper-functions.js</js>
+		<js>/js/message-areas.js</js>
 		<js>/js/header-footer.js</js>
 	</group>
 	

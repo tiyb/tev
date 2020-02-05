@@ -80,10 +80,9 @@ $(document).ready(function() {
 			
 			var imagesExportPath = metadataObject.exportImagesFilePath;
 			
-			// TODO i18n
-			imagesExportPath = prompt("Image Output Path:", imagesExportPath);
+			imagesExportPath = prompt($.i18n.prop('staging_imageExort_prompt'), imagesExportPath);
 			if((imagesExportPath == null) || (imagesExportPath.length < 1)) {
-				createAnErrorMessage("please enter a destination");
+				createAnErrorMessage($.i18n.prop('staging_imageExort_error'));
 				return;
 			}
 			
