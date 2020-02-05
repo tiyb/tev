@@ -353,7 +353,7 @@ public class ConversationXmlParsingUnitTests {
 			convoRestController.updateConversationForBlog(BLOG_NAME, convo.getId(), convo);
 		}
 
-		Metadata md = mdRestController.getMetadataForBlogOrDefault(BLOG_NAME);
+		Metadata md = mdRestController.getMetadataForBlog(BLOG_NAME);
 		md.setOverwriteConvoData(false);
 		md = mdRestController.updateMetadata(md.getId(), md);
 

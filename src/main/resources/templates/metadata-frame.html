@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<title th:text="#{metadata.title}"></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<link rel="stylesheet" type="text/css" th:href="@{/owr/jquery.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/jquery-ui.min.css'}"/>
+<link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/tev.css'}"/>    
+<link rel="stylesheet" type="text/css" th:href="@{/owr/mdframe.css}"/>
+</head>
+<body>
+
+	<div id="header"></div>
+	
+	<div class="container">
+
+		<div class="starter-template">
+			<div id="messageAreas"></div>
+			<table><tr valign="top">
+				<td width="10%">
+					<fieldset class="ui-widget-content">
+						<legend th:text="${blogName}" class="ui-widget-header"></legend>
+					<table>
+						<tr>
+							<td class="settingsLabel"><label for="blogNameInput" th:text="#{metadata.blogNameLabel}" class="ui-checkboxradio-label"></label></td>
+							<td class="settingsInput"><input type="text" id="blogNameInput" class="autoUpdateSetting"></input></td>
+						</tr>
+						<tr>
+							<td colspan="2" class="settingsInput"><input type="button" th:value="#{metadata.deleteBlogButton}" class="ui-button ui-widget ui-corner-all" id="deleteBlogButton" /></td>
+						</tr>
+						<tr>
+							<td colspan="2" class="settingsInput">
+								<p id="blogIsDefaultMessage" th:text="#{metadata.defaultBlog.message}"></p>
+								<input type="button" th:value="#{metadata.defaultBlog.button}" class="ui-button ui-widget ui-corner-all" id="setDefaultBlogButton" />
+							</td>
+						</tr>
+					</table>
+					</fieldset>
+				</td>
+				<td width="40%">
+					<fieldset class="ui-widget-content">
+						<legend th:text="#{metadata.viewSettings}" class="ui-widget-header"></legend>
+						<p th:text="#{metadata.explanatoryText}"></p>
+						<table>
+							<tr>
+								<td class="settingsLabel"><label for="baseMediaPath" th:text="#{metadata.baseMediaPath}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><input type="text" id="baseMediaPath" class="autoUpdateSetting"></input></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="filterDropdown" th:text="#{metadata.filter}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="filterDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="sortByDropdown" th:text="#{metadata.sortColumn}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="sortByDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="sortOrderDropdown" th:text="#{metadata.sortOrder}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="sortOrderDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="favsDropdown" th:text="#{metadata.showFavs}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="favsDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="pageLengthDropdown" th:text="#{metadata.defaultPageLength}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="pageLengthDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="showReadingPaneDropdown" th:text="#{metadata.showReadingPane}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="showReadingPaneDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="overwritePostsDropdown" th:text="#{metadata.overwritePosts}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="overwritePostsDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="imageExportPath" th:text="#{metadata.imageExportPath}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><input type="text" id="imageExportPath" class="autoUpdateSetting"></input></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="themesDropdown" th:text="#{metadata.themes}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="themesDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+						</table>
+					</fieldset>
+				</td>
+				<td width="40%">
+					<fieldset class="ui-widget-content">
+						<legend th:text="#{metadata.conversationTitle}" class="ui-widget-header"></legend>
+						<p th:utext="#{metadata.conversationExplanatoryText}"></p>
+						<table>
+							<tr>
+								<td class="settingsLabel"><label for="mainUser" th:text="#{metadata.mainTumblrUser}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><input type="text" id="mainUser" readonly="readonly"></input></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="mainUserAvatarUrl" th:text="#{metadata.mainTumblrUserAvatar}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><input type="text" id="mainUserAvatarUrl" readonly="readonly"></input></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="conversationDisplayDropdown" th:text="#{metadata.conversationDisplayStyle}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="conversationDisplayDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="conversationSortColumnDropdown" th:text="#{metadata.conversationSortColumn}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="conversationSortColumnDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="conversationSortOrderDropdown" th:text="#{metadata.conversationSordOrder}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="conversationSortOrderDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+							<tr>
+								<td class="settingsLabel"><label for="overwriteConvosDropdown" th:text="#{metadata.overwriteConvos}" class="ui-checkboxradio-label"></label></td>
+								<td class="settingsInput"><select id="overwriteConvosDropdown" class="ui-selectmenu-text"></select></td>
+							</tr>
+						</table>
+					</fieldset>
+				</td>
+			</tr></table>
+			<table><tr>
+				<td width="50%">
+					<fieldset class="ui-widget-content">
+						<legend th:text="#{metadata.uploadTitle}" class="ui-widget-header"></legend>
+						<p th:text="#{metadata.uploadExplanatoryText}"></p>
+						<form th:action="'/postDataUpload?blog=' + ${blogName}" method="POST" enctype="multipart/form-data">
+							<p><label for="postUploadFileInput" th:text="#{metadata.uploadFile}" class="ui-checkboxradio-label"></label>
+							<input id="postUploadFileInput" type="file" name="file" class="ui-button ui-widget ui-corner-all" /></p>
+							<p><input type="submit" th:value="#{metadata.uploadSubmitButton}" class="ui-button ui-widget ui-corner-all" /></p>
+						</form>
+					</fieldset>
+				</td>
+				<td width="50%">
+					<fieldset class="ui-widget-content">
+					<legend th:text="#{metadata.uploadConversationTitle}" class="ui-widget-header"></legend>
+					<p th:text="#{metadata.uploadConvoExplanatoryText}"></p>
+					<form th:action="'/conversationDataUpload/' + ${blogName}" method="POST" enctype="multipart/form-data">
+						<p><label for="convoUploadFileInput" th:text="#{metadata.uploadConversationFile}" class="ui-checkboxradio-label"></label>
+						<input id="convoUploadFileInput" type="file" name="conversationFile" class="ui-button ui-widget ui-corner-all"/></p>
+						<input type="submit" th:value="#{metadata.uploadConversationSubmitButton}" class="ui-button ui-widget ui-corner-all"/>
+					</form>
+					</fieldset>
+				</td>
+			</tr></table>
+			
+			<fieldset class="ui-widget-content">
+				<legend th:text="#{metadata.adminButtonsTitle}" class="ui-widget-header"></legend>
+				<p th:utext="#{metadata.adminButtonsExplanatoryText}"></p>
+				<p><input type="submit" th:value="#{metadata.adminButtonsMarkAllPostReadButton}" id="markAllPostsReadButton" class="ui-button ui-widget ui-corner-all"/>
+				<input type="submit" th:value="#{metadata.adminButtonsMarkAllPostUnreadButton}" id="markAllPostsUnreadButton" class="ui-button ui-widget ui-corner-all"/>
+				<input type="submit" th:value="#{metadata.adminButtonsCleanImagesButton}" id="cleanImagesButton" class="ui-button ui-widget ui-corner-all"/></p>
+				<p><input type="text" id="importImagesPath" />
+				<input type="submit" th:value="#{metadata.adminButtonsImportImagesButton}" id="importImagesButton" class="ui-button ui-widget ui-corner-all"/></p>
+			</fieldset>
+		</div>
+
+	</div>
+	
+	<div id="footer"></div>
+
+	<script type="text/javascript" th:utext="${blogNameJScript}"></script>
+	
+	<script type="text/javascript" th:src="@{/owr/jquery.js}"></script>
+
+	<script type="text/javascript" th:src="@{/owr/mdframe.js}"></script>
+
+</body>
+</html>

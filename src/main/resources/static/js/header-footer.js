@@ -46,6 +46,22 @@ $(document).ready(function() {
 		} else {
 			addLinkToHeader('navbar-link-index', $.i18n.prop('header_indexTitle'), '/', false);
 		}
+		
+		$.ajax({
+			url: '/api/metadata',
+			method: 'GET'
+		}).then(function(data) {
+			for(i = 0; i < data.length; i++) {
+				addOptionToSelect(data[i].blog, "headerBlogSelect", data[i].blog);
+			}
+			
+			if(data.length > 1) {
+				$('#headerBlogSelect').selectmenu({change: function(event,ui) {alert('header select changed');}});
+			} else {
+				$('#headerBlogSelect').selectmenu("disable");
+			}
+			
+		});
 	});
 	$('#footer').load("/footer");
 	

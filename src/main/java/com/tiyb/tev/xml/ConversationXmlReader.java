@@ -23,6 +23,7 @@ import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.ConversationMessage;
 import com.tiyb.tev.datamodel.Metadata;
+import com.tiyb.tev.exception.BlogMismatchParsingException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.exception.XMLParsingException;
 
@@ -65,7 +66,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 	 * 
 	 * <p>
 	 * Data is inserted directly into the database, via the REST APIs (accessed via
-	 * the <code>convoRestController</code> parameter).
+	 * the <code>convoRestController</code> parameter). 
 	 * </p>
 	 * 
 	 * @param xmlFile         File containing XML to be parsed
@@ -75,17 +76,16 @@ public class ConversationXmlReader extends TEVXmlReader {
 	 */
 	public static void parseDocument(MultipartFile xmlFile, TEVMetadataRestController mdController,
 			TEVConvoRestController convoController, String blogName) {
-		Metadata md = mdController.getMetadataForBlogOrDefault(blogName);
+		Metadata md = mdController.getMetadataForBlog(blogName);
 		InputStream xmlStream;
 
 		try {
 			InputStream participantXmlStream = xmlFile.getInputStream();
 			Participant mainParticipant = getMainParticipant(participantXmlStream);
-			// TODO there is probably a more elegant way to handle this
 			if (!blogName.equals(mainParticipant.name)) {
 				logger.error("Mismatch between expected blog name (" + blogName + ") and main participant name ("
 						+ mainParticipant.name + ")");
-				throw new XMLParsingException();
+				throw new BlogMismatchParsingException(blogName, mainParticipant.name);
 			}
 			md.setMainTumblrUser(mainParticipant.name);
 			md.setMainTumblrUserAvatarUrl(mainParticipant.avatarURL);
@@ -250,7 +250,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 	private static void readConversations(InputStream xmlFile, String mainTumblrUserName, String mainTumblrUserId,
 			TEVMetadataRestController mdController, TEVConvoRestController convoController, String blogName)
 			throws XMLParsingException {
-		Metadata md = mdController.getMetadataForBlogOrDefault(blogName);
+		Metadata md = mdController.getMetadataForBlog(blogName);
 		boolean isOverwriteConvos = md.getOverwriteConvoData();
 		List<String> allParticipants = new ArrayList<String>();
 

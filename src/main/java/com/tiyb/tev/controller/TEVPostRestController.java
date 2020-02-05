@@ -307,7 +307,7 @@ public class TEVPostRestController {
 	 */
 	@GetMapping("/posts/{blog}/{id}/fixPhotos")
 	public Boolean fixPhotosForBlogForPost(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
-		String imageDirectory = mdController.getMetadataForBlogOrDefault(blog).getBaseMediaPath();
+		String imageDirectory = mdController.getMetadataForBlog(blog).getBaseMediaPath();
 		if (imageDirectory == null || imageDirectory.equals("")) {
 			return false;
 		}

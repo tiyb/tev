@@ -37,6 +37,7 @@ import com.tiyb.tev.datamodel.Photo;
 import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
 import com.tiyb.tev.datamodel.Video;
+import com.tiyb.tev.exception.BlogMismatchParsingException;
 import com.tiyb.tev.exception.InvalidTypeException;
 import com.tiyb.tev.exception.NoStagedPostsException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
@@ -87,6 +88,7 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
 	public String index(Model model) {
+		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
 		return "index";
 	}
@@ -108,6 +110,7 @@ public class TEVUIController {
 		List<Conversation> conversations = convoController.getAllConversationsForBlog(md.getBlog());
 		model.addAttribute("conversations", conversations);
 
+		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
 
 		return "conversations";
@@ -121,8 +124,28 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/metadata" }, method = RequestMethod.GET)
 	public String metadata(Model model) {
+		model.addAttribute("blogName", mdController.getDefaultMetadata().getBlog());
 		updateModelWithTheme(model);
+
+		List<Metadata> mdCollection = mdController.getAllMetadata();
+		model.addAttribute("mdCollection", mdCollection);
 		return "metadata";
+	}
+
+	/**
+	 * Returns the page for maintaining metadata for a particular blog
+	 * 
+	 * @param blogName Name of the blog being edited
+	 * @param model    Used for setting the theme
+	 * @return Name of the template to be used to render the page
+	 */
+	@RequestMapping(value = { "/metadata/{blogName}" }, method = RequestMethod.GET)
+	public String individualMetatada(@PathVariable("blogName") String blogName, Model model) {
+		model.addAttribute("blogName", blogName);
+		model.addAttribute("blogNameJScript", "var blogName = \"" + blogName + "\";");
+		updateModelWithTheme(model);
+
+		return "metadata-frame";
 	}
 
 	/**
@@ -158,8 +181,6 @@ public class TEVUIController {
 	 * class and then (upon success) redirects to the index. Failure redirects to
 	 * the "bad XML" error page.
 	 * 
-	 * TODO UI won't be passing this param
-	 * 
 	 * @param blog               Blog for which conversation should be read
 	 * @param file               the XML file to be parsed
 	 * @param redirectAttributes not used
@@ -167,10 +188,15 @@ public class TEVUIController {
 	 */
 	@PostMapping("/conversationDataUpload/{blog}")
 	public String handleConversationFileUpload(@PathVariable("blog") String blog,
-			@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
-
+			@RequestParam("conversationFile") MultipartFile file, RedirectAttributes redirectAttributes) {
 		try {
 			ConversationXmlReader.parseDocument(file, mdController, convoController, blog);
+		} catch (BlogMismatchParsingException e) {
+			logger.error("Mismatch in XML between specified blog name ({}) and name in XML ({}).", e.getBlogName(),
+					e.getMainParticipantName());
+			String redirectString = String.format("redirect:/errorblogmismatch?blogName=%s&participantName=%s",
+					e.getBlogName(), e.getMainParticipantName());
+			return redirectString;
 		} catch (XMLParsingException e) {
 			logger.error("UI Controller failing in handleConversationFileUpload due to XML parsing error: ", e);
 			return "redirect:/errorbadxml";
@@ -264,6 +290,7 @@ public class TEVUIController {
 	public String showHashtagViewerForBlog(@PathVariable("blog") String blog, Model model) {
 		List<Hashtag> hashtags = postController.getAllHashtagsForBlog(blog);
 		model.addAttribute("hashtags", hashtags);
+		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
 		return "viewers/hashtags";
 	}
@@ -277,6 +304,7 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/exportViewer" }, method = RequestMethod.GET)
 	public String showExportViewer(Model model) {
+		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
 		return "viewers/exportedxml";
 	}
@@ -290,6 +318,7 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/staged" }, method = RequestMethod.GET)
 	public String showStagedPosts(Model model) {
+		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
 		return "staged";
 	}
@@ -307,7 +336,7 @@ public class TEVUIController {
 	@RequestMapping(value = { "/conversationViewer" }, method = RequestMethod.GET)
 	public String showConversationViewer(@RequestParam("blog") String blog,
 			@RequestParam("participant") String participantName, Model model) {
-		Metadata md = mdController.getMetadataForBlogOrDefault(blog);
+		Metadata md = mdController.getMetadataForBlog(blog);
 		model.addAttribute("metadata", md);
 		Conversation convo = convoController.getConversationForBlogByParticipant(md.getBlog(), participantName);
 		model.addAttribute("conversation", convo);
@@ -315,6 +344,7 @@ public class TEVUIController {
 				convo.getId());
 		model.addAttribute("messages", messages);
 
+		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
 
 		return "viewers/conversation";
@@ -330,6 +360,7 @@ public class TEVUIController {
 	@RequestMapping(value = { "/viewers/imageViewer/{imageName}" }, method = RequestMethod.GET)
 	public String showSingleImageViewer(@PathVariable("imageName") String imageName, Model model) {
 		model.addAttribute("imageName", imageName);
+		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
 		return "viewers/singleimageviewer";
 	}
@@ -480,17 +511,30 @@ public class TEVUIController {
 	}
 
 	/**
-	 * Used to set the theme, so that Thymeleaf pages can set the correct CSS
+	 * Used to update the model object with the name of the current in-use blog.
+	 * Could have simply added this logic to the
+	 * {@link #updateModelWithTheme(Model)} method, but broke it out separately in
+	 * case the logic for determining the current blog gets hairy.
 	 * 
-	 * TODO definitely need to get the proper blog, not just pass the default
+	 * TODO un-hard-code
+	 * 
+	 * @param model
+	 */
+	private void updateModelWithBlogName(Model model) {
+		model.addAttribute("blogName", "wm4afs");
+	}
+
+	/**
+	 * Used to set the theme, so that Thymeleaf pages can set the correct CSS
 	 * 
 	 * @param model The model to be updated
 	 */
 	private void updateModelWithTheme(Model model) {
-		Metadata md = mdController.getDefaultMetadata();
+		String blogName = (String) model.getAttribute("blogName");
+		Metadata md = mdController.getMetadataForBlog(blogName);
 		String theme = md.getTheme();
 		if (theme == null || theme.equals("")) {
-			theme = "base";
+			theme = Metadata.DEFAULT_THEME;
 			md.setTheme(theme);
 			mdController.updateMetadata(md.getId(), md);
 		}

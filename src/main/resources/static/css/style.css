@@ -17,6 +17,14 @@ fieldset {
 	margin: 10px;
 }
 
+#headerBlogSelect-button {
+	float: right;
+}
+
+#headerBlogSelect {
+	float: right;
+}
+
 #footer {
 	margin-top: 20px;
 }
@@ -123,6 +131,11 @@ fieldset {
 .settingsInput {
 	text-align: left;
 	padding-left: 2px;
+}
+
+.mdIframeContainer iframe {
+	width: 100%;
+	height: 700px;
 }
 
 /* conversations page */

@@ -181,7 +181,7 @@ public class TEVStagingController {
 			return new ResponseEntity<String>("Error getting images for post", null, HttpStatus.FAILED_DEPENDENCY);
 		}
 
-		String imageDirectory = mdController.getMetadataForBlogOrDefault(blog).getBaseMediaPath();
+		String imageDirectory = mdController.getMetadataForBlog(blog).getBaseMediaPath();
 		if (imageDirectory.charAt(imageDirectory.length() - 1) != '/') {
 			imageDirectory = imageDirectory + "/";
 		}

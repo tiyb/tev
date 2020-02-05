@@ -30,7 +30,6 @@ $(document).ready(function() {
 		    }		
 	    },
 	    "autoWidth": false,
-	    //"lengthMenu": [[10, 25, 50, 100, -1], [$.i18n.prop('md_pagelengths_10'), $.i18n.prop('md_pagelengths_25'), $.i18n.prop('md_pagelengths_50'), $.i18n.prop('md_pagelengths_100'), $.i18n.prop('md_pagelengths_all')]],
 		"orderCellsTop": true,
 	});
 	
@@ -81,6 +80,7 @@ $(document).ready(function() {
 			
 			var imagesExportPath = metadataObject.exportImagesFilePath;
 			
+			// TODO i18n
 			imagesExportPath = prompt("Image Output Path:", imagesExportPath);
 			if((imagesExportPath == null) || (imagesExportPath.length < 1)) {
 				createAnErrorMessage("please enter a destination");

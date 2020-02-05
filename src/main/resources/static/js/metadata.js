@@ -2,7 +2,7 @@ var metadataObject;
 
 $.i18n.properties({
 	name: 'messages',
-	path: 'js/i18n/',
+	path: '/js/i18n/',
 	mode: 'both'
 });
 
@@ -21,11 +21,12 @@ $(document).ready(function () {
 		fillDropdownsWithValues(data);
 		
 		$.ajax({
-			url: "/api/metadata",
+			url: "/api/metadata/byBlog/" + blogName,
 			data: ""
 		}).then(function(data) {
 			metadataObject = data;
 			$('#baseMediaPath').val(metadataObject.baseMediaPath);
+			$('#blogNameInput').val(metadataObject.blog);
 			$('#sortOrderDropdown').val(metadataObject.sortOrder).selectmenu('refresh');
 			$('#conversationSortOrderDropdown').val(metadataObject.conversationSortOrder).selectmenu('refresh');
 			$('#sortByDropdown').val(metadataObject.sortColumn).selectmenu('refresh');
@@ -54,8 +55,48 @@ $(document).ready(function () {
 				$('#overwriteConvosDropdown').val('false').selectmenu('refresh');
 			}
 			
+			if(metadataObject.isDefault) {
+				$('#setDefaultBlogButton').hide();
+			} else {
+				$('#blogIsDefaultMessage').hide();
+				$('#setDefaultBlogButton').click(function() {
+					$.ajax({
+						url: '/api/metadata/' + metadataObject.id + '/markAsDefault',
+						method: 'PUT'
+					}).then(function(data) {
+						location.reload();
+					});
+				});
+			}
+				
 		});
 				
+	});
+	
+	$.ajax({
+		url: '/api/metadata',
+		method: 'GET',
+		data: ''
+	}).then(function(data) {
+		if(data.length == 1) {
+			$('#deleteBlogButton').hide();
+		} else {
+			$('#deleteBlogButton').click(function() {
+				$.ajax({
+					url: '/api/metadata/' + metadataObject.id,
+					method: 'DELETE',
+					success: function(data, textStatus, hxr) {
+						//var newURL = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "/metadata";
+						//window.parent.opener.location.replace(newURL);
+						window.location = "/metadata";
+					},
+					error: function(xhr, textStatus, errorThrown) {
+						//TODO i18n
+						createAnErrorMessage("error deleting blog from MD");
+					}
+				});
+			});			
+		}
 	});
 	
 	$('#markAllPostsReadButton').click(function() {
@@ -314,7 +355,7 @@ function setUIWidgets() {
 	$('#conversationSortOrderDropdown').selectmenu({change: function(event,ui) {updateServer();}});
 	$('#themesDropdown').selectmenu({change: function(event,ui) {
 		updateServer();
-		setTimeout(function() {location.reload();}, 1500);
+		setTimeout(function() {parent.location.reload();}, 1500);
 	}});
 }
 
@@ -366,6 +407,7 @@ function fillDropdownsWithValues(data) {
  */
 function updateServer() {
 	metadataObject.baseMediaPath = $('#baseMediaPath').val();
+	metadataObject.blog = $('#blogNameInput').val();
 	metadataObject.mainTumblrUser = $('#mainUser').val();
 	metadataObject.mainTumblrUserAvatarUrl = $('#mainUserAvatarUrl').val();
 	metadataObject.sortOrder = $('#sortOrderDropdown').val();
@@ -383,7 +425,7 @@ function updateServer() {
 	metadataObject.theme = $('#themesDropdown').val();
 	
 	$.ajax({
-		url: '/api/metadata',
+		url: '/api/metadata/' + metadataObject.id,
 		type: 'PUT',
 		data: JSON.stringify(metadataObject),
 		contentType: 'application/json',

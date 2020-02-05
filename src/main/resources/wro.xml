@@ -5,6 +5,7 @@
 		
 		<js>/js/posts.js</js>
 		<js>/js/message-areas.js</js>
+		<js>/js/helper-functions.js</js>
 		<js>/js/header-footer.js</js>
 	</group>
 	
@@ -13,6 +14,7 @@
 		
 		<js>/js/conversations.js</js>
 		<js>/js/message-areas.js</js>
+		<js>/js/helper-functions.js</js>
 		<js>/js/header-footer.js</js>
 	</group>
 	
@@ -21,10 +23,19 @@
 		
 		<js>/js/staged.js</js>
 		<js>/js/message-areas.js</js>
+		<js>/js/helper-functions.js</js>
 		<js>/js/header-footer.js</js>
 	</group>
 	
 	<group name="md">
+		<css>/css/style.css</css>
+		
+		<js>/js/md-parent.js</js>
+		<js>/js/helper-functions.js</js>
+		<js>/js/header-footer.js</js>
+	</group>
+	
+	<group name="mdframe">
 		<css>/css/style.css</css>
 		
 		<js>/js/helper-functions.js</js>
@@ -47,6 +58,7 @@
 		
 		<js>/js/hashtagviewer.js</js>
 		<js>/js/taghandler.js</js>
+		<js>/js/helper-functions.js</js>
 		<js>/js/header-footer.js</js>
 	</group>
 	
@@ -59,11 +71,15 @@
 	<group name="exportedxml">
 		<css>/css/style.css</css>
 		<js>/js/exportedxml.js</js>
+		<js>/js/helper-functions.js</js>
 		<js>/js/header-footer.js</js>
 	</group>
 	
 	<group name="errorpage">
 		<css>/css/style.css</css>
+		
+		<js>/js/errorpage.js</js>
+		<js>/js/helper-functions.js</js>
 		<js>/js/header-footer.js</js>
 	</group>
 	

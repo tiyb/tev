@@ -5,8 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.helpers.StaticListData;
+import com.tiyb.tev.exception.ResourceNotFoundException;
+import com.tiyb.tev.exception.UnableToDeleteMetadataException;
 import com.tiyb.tev.repository.MetadataRepository;
 
 /**
@@ -31,11 +37,25 @@ import com.tiyb.tev.repository.MetadataRepository;
 @RequestMapping("/api")
 public class TEVMetadataRestController {
 
+	Logger logger = LoggerFactory.getLogger(TEVMetadataRestController.class);
+
 	/**
 	 * The repo for working with Metadata
 	 */
 	@Autowired
 	private MetadataRepository metadataRepo;
+
+	/**
+	 * For working with Posts
+	 */
+	@Autowired
+	private TEVPostRestController postController;
+
+	/**
+	 * For working with Conversations
+	 */
+	@Autowired
+	private TEVConvoRestController convoController;
 
 	/**
 	 * List of all post types available from Tumblr/TEV
@@ -184,13 +204,26 @@ public class TEVMetadataRestController {
 	}
 
 	/**
-	 * GET to return the Metadata for a given blog, by name, or the default MD if
-	 * none found
+	 * GET to return the Metadata for a given blog, by name
 	 * 
 	 * @param blog Name of the blog in question
-	 * @return Metadata for the blog, or default if none
+	 * @return Metadata for the blog
 	 */
 	@GetMapping("/metadata/byBlog/{blog}")
+	public Metadata getMetadataForBlog(@PathVariable("blog") String blog) {
+		return metadataRepo.findByBlog(blog);
+	}
+
+	/**
+	 * Specialized method to return the Metadata for a given blog, <i>or</i> the
+	 * default Metadata object (which is also inserted into the DB, with the given
+	 * blog name), if it doesn't yet exist.
+	 * 
+	 * @param blog Name of the blog to be returned
+	 * @return Metadata for the blog, or the default MD object if it didn't
+	 *         originally exist
+	 */
+	@GetMapping("/metadata/byBlog/{blog}/orDefault")
 	public Metadata getMetadataForBlogOrDefault(@PathVariable("blog") String blog) {
 		List<Metadata> all = metadataRepo.findAll();
 
@@ -258,6 +291,67 @@ public class TEVMetadataRestController {
 				"Theme must be one of the pre-defined values");
 
 		return metadataRepo.save(metadataDetails);
+	}
+
+	/**
+	 * Removes a Metadata object (and therefore the blog, and all of its settings)
+	 * from the DB.
+	 * 
+	 * <ol>
+	 * <li>Validates that the MD being deleted exists, and isn't the only MD in the
+	 * system</li>
+	 * <li>Removes all conversation messages / conversations</li>
+	 * <li>Removes all posts</li>
+	 * <li>Removes the Metadata itself</li>
+	 * <li>Ensures there is at least one MD object left in the system marked as
+	 * 'default' or marks the first one as default otherwise</li>
+	 * </ol>
+	 * 
+	 * @param id Metadata to be removed
+	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
+	 *         the response details
+	 */
+	@DeleteMapping("/metadata/{id}")
+	public ResponseEntity<?> deleteMetadata(@PathVariable("id") Integer id) {
+		Optional<Metadata> omd = metadataRepo.findById(id);
+		if (!omd.isPresent()) {
+			logger.error("Unable to find MD with this ID", id);
+			throw new ResourceNotFoundException("Metadata", "ID", id);
+		}
+
+		List<Metadata> allMDs = getAllMetadata();
+		if (allMDs.size() < 2) {
+			logger.error("Attempting to delete the only MD left in the system");
+			throw new UnableToDeleteMetadataException();
+		}
+
+		Metadata md = omd.get();
+
+		convoController.deleteAllConvoMsgsForBlog(md.getBlog());
+		convoController.deleteAllConversationsForBlog(md.getBlog());
+
+		postController.deleteAllRegularsForBlog(md.getBlog());
+		postController.deleteAllAnswersForBlog(md.getBlog());
+		postController.deleteAllLinksForBlog(md.getBlog());
+		postController.deleteAllPhotosForBlog(md.getBlog());
+		postController.deleteAllVideosForBlog(md.getBlog());
+		postController.deleteAllPostsForBlog(md.getBlog());
+		postController.deleteAllHashtagsForBlog(md.getBlog());
+
+		metadataRepo.deleteById(id);
+		
+		allMDs = getAllMetadata();
+		boolean aDefaultExists = false;
+		for(Metadata m : allMDs) {
+			if(m.getIsDefault()) {
+				aDefaultExists = true;
+			}
+		}
+		if(!aDefaultExists) {
+			markBlogAsDefault(allMDs.get(0).getId());
+		}
+
+		return ResponseEntity.ok().build();
 	}
 
 }

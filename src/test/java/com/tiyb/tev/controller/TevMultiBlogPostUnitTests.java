@@ -176,11 +176,11 @@ public class TevMultiBlogPostUnitTests {
 		md2.setBaseMediaPath("media path for blog 2");
 		md2 = mdRestController.updateMetadata(md2.getId(), md2);
 
-		Metadata response = mdRestController.getMetadataForBlogOrDefault(FIRST_BLOG);
+		Metadata response = mdRestController.getMetadataForBlog(FIRST_BLOG);
 		assertThat(response).isNotNull();
 		assertThat(response.getBaseMediaPath()).isEqualTo("media path for blog 1");
 
-		response = mdRestController.getMetadataForBlogOrDefault(SECOND_BLOG);
+		response = mdRestController.getMetadataForBlog(SECOND_BLOG);
 		assertThat(response).isNotNull();
 		assertThat(response.getBaseMediaPath()).isEqualTo("media path for blog 2");
 	}

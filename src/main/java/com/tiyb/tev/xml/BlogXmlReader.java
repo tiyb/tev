@@ -92,7 +92,7 @@ public class BlogXmlReader extends TEVXmlReader {
 	 */
 	public static void parseDocument(InputStream xmlFile, TEVPostRestController postController,
 			TEVMetadataRestController mdController, String blogName) throws XMLParsingException {
-		boolean isOverwritePosts = mdController.getMetadataForBlogOrDefault(blogName).getOverwritePostData();
+		boolean isOverwritePosts = mdController.getMetadataForBlog(blogName).getOverwritePostData();
 
 		if (isOverwritePosts) {
 			postController.deleteAllRegularsForBlog(blogName);

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="#{error.blogmismatcherror.title}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/owr/jquery.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/jquery-ui.min.css'}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/themes/' + ${theme} + '/tev.css'}"/>    
+    <link rel="stylesheet" type="text/css" th:href="@{/owr/errorpage.css}"/>
+</head>
+<body>
+
+<div id="header"></div>
+
+<div class="container-fluid">
+	<h1 th:text="#{error.blogmismatcherror.heading}"></h1>
+	<p th:text="#{error.blogmismatcherror.explanatorytext}"></p>
+	<ul>
+		<li th:text="#{error.blogmismatcherror.blogText(${blogName})}"></li>
+		<li th:text="#{error.blogmismatcherror.participantText(${participantName})}"></li>
+	</ul>
+	<p><a href="/" th:text="#{error.blogmismatcherror.linktohome}"></a></p>
+	<p><a href="/metadata" th:text="#{error.blogmismatcherror.linktosettings}"></a></p>
+</div>
+
+<div id="footer"></div>
+
+<script type="text/javascript" th:src="@{/owr/jquery.js}"></script>
+<script type="text/javascript" th:src="@{/owr/errorpage.js}"></script>
+</body>
+</html>

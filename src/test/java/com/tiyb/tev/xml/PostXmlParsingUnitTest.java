@@ -423,7 +423,7 @@ public class PostXmlParsingUnitTest {
 			postController.markPostReadForBlog(MAIN_BLOG_NAME, post.getId());
 		}
 
-		Metadata md = mdController.getMetadataForBlogOrDefault(MAIN_BLOG_NAME);
+		Metadata md = mdController.getMetadataForBlog(MAIN_BLOG_NAME);
 		md.setOverwritePostData(false);
 		md = mdController.updateMetadata(md.getId(), md);
 

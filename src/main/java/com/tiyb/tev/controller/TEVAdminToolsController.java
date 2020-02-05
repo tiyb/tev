@@ -187,7 +187,7 @@ public class TEVAdminToolsController {
 	@GetMapping("/posts/{blog}/cleanImagesOnHD")
 	public ResponseEntity<String> cleanImagesOnHDForBlog(@PathVariable("blog") String blog) {
 		ArrayList<String> allCleanFiles = new ArrayList<String>();
-		String imageDirectory = mdController.getMetadataForBlogOrDefault(blog).getBaseMediaPath();
+		String imageDirectory = mdController.getMetadataForBlog(blog).getBaseMediaPath();
 		if (imageDirectory == null || imageDirectory.equals("")) {
 			logger.error("Invalid image directory used for cleanImagesOnHD: " + imageDirectory);
 			return new ResponseEntity<String>(INVALID_IMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
@@ -245,7 +245,7 @@ public class TEVAdminToolsController {
 	@PostMapping("/posts/{blog}/importImages")
 	public ResponseEntity<String> importImagesForBlog(@PathVariable("blog") String blog,
 			@RequestBody String imagePath) {
-		String imageDirectory = mdController.getMetadataForBlogOrDefault(blog).getBaseMediaPath();
+		String imageDirectory = mdController.getMetadataForBlog(blog).getBaseMediaPath();
 		if (imageDirectory == null || imageDirectory.equals("")) {
 			logger.error("Invalid image directory used for importImages: " + imageDirectory);
 			return new ResponseEntity<String>(INVALID_IMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
