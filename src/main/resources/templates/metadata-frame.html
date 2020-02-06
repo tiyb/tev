@@ -125,7 +125,7 @@
 					<fieldset class="ui-widget-content">
 						<legend th:text="#{metadata.uploadTitle}" class="ui-widget-header"></legend>
 						<p th:text="#{metadata.uploadExplanatoryText}"></p>
-						<form th:action="'/postDataUpload?blog=' + ${blogName}" method="POST" enctype="multipart/form-data">
+						<form th:action="'/postDataUpload/' + ${blogName}" method="POST" enctype="multipart/form-data">
 							<p><label for="postUploadFileInput" th:text="#{metadata.uploadFile}" class="ui-checkboxradio-label"></label>
 							<input id="postUploadFileInput" type="file" name="file" class="ui-button ui-widget ui-corner-all" /></p>
 							<p><input type="submit" th:value="#{metadata.uploadSubmitButton}" class="ui-button ui-widget ui-corner-all" /></p>

@@ -1,6 +1,6 @@
 $.i18n.properties({
 	name : 'messages',
-	path : 'js/i18n/',
+	path : '/js/i18n/',
 	mode : 'both'
 });
 

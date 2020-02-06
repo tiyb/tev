@@ -47,17 +47,39 @@ $(document).ready(function() {
 			addLinkToHeader('navbar-link-index', $.i18n.prop('header_indexTitle'), '/', false);
 		}
 		
+		$('#headerBlogSelect').selectmenu({change: function(event,ui) {
+			var newBlogName = $('#headerBlogSelect').val();
+			
+			$.ajax({
+				url: '/api/metadata/byBlog/' + newBlogName,
+				method: 'GET'
+			}).then(function(currentMD) {
+				$.ajax({
+					url: '/api/metadata/' + currentMD.id + '/markAsDefault',
+					method: 'PUT'
+				}).then(function(innerData) {
+					location.reload();
+				});
+			});
+		}});
+		
 		$.ajax({
 			url: '/api/metadata',
 			method: 'GET'
-		}).then(function(data) {
-			for(i = 0; i < data.length; i++) {
-				addOptionToSelect(data[i].blog, "headerBlogSelect", data[i].blog);
+		}).then(function(allMDs) {
+			var currentlySelectedBlog = "";
+			
+			for(i = 0; i < allMDs.length; i++) {
+				addOptionToSelect(allMDs[i].blog, "headerBlogSelect", allMDs[i].blog);
+				
+				if(allMDs[i].isDefault) {
+					currentlySelectedBlog = allMDs[i].blog;
+				}
 			}
 			
-			if(data.length > 1) {
-				$('#headerBlogSelect').selectmenu({change: function(event,ui) {alert('header select changed');}});
-			} else {
+			$('#headerBlogSelect').val(currentlySelectedBlog).selectmenu("refresh");
+			
+			if(allMDs.length < 2) {
 				$('#headerBlogSelect').selectmenu("disable");
 			}
 			

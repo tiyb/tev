@@ -12,27 +12,17 @@ var NUMMESSAGES_COLUMN_NO = 1;
 
 $.i18n.properties({
 	name: 'messages',
-	path: 'js/i18n/',
+	path: '/js/i18n/',
 	mode: 'both'
 });
 
 $(document).ready(function() {
 	setUIWidgets();
 	
-	$('#unhideAllConversationsBtn').click(function() {
-		$.ajax({
-			url: "/api/conversations/unignoreAllConversations",
-			dataSrc: ""
-		}).then(function(data) {
-			createAnInfoMessage($.i18n.prop('convos_markAllUnhidden'));
-			location.reload();
-		});
-	});
-
 	// load the metadata from the server, populate the radio buttons, and show
 	// the table or reading pane accordingly
 	$.ajax({
-		url: "/api/metadata",
+		url: "/api/metadata/default",
 		dataSrc: ""
 	}).then(function(data) {
 		metadata = data;
@@ -52,8 +42,98 @@ $(document).ready(function() {
 			$('#conversationTableContainer').show();
 		}
 		
+		// load the conversations from the server
+		$.ajax({
+			url: "/api/conversations/" + metadata.blog + "/unhidden",
+			dataSrc: ""
+		}).then(function(data) {
+			var words = [];
+			
+			data.forEach(element => words.push({
+				text: element.participant, 
+				weight: element.numMessages, 
+				handlers: {
+					click: function(item) {
+						if(metadata.showReadingPane) {
+							$('#contentDisplayReadingPane').show();
+							$('#displayPaneIFrame').prop('src', "/conversationViewer?participant=" + item.target.textContent, "viewer");
+						} else {
+							window.open("/conversationViewer?participant=" + item.target.textContent, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
+						}
+					}
+				}
+			}));
+			
+			$('#conversationWordCloudContainer').jQCloud(words, {width:900,height:500,fontSize:{from:0.01,to:0.002},autoResize:false,removeOverflowing:true});
+			
+			var convoTable = $('#conversationTable').DataTable( {
+				"language": {
+					"emptyTable": 	  $.i18n.prop('index_posttable_emptytable'),
+				    "info":           $.i18n.prop('index_posttable_info'),
+				    "infoEmpty":      $.i18n.prop('index_posttable_infoempty'),
+				    "infoFiltered":   $.i18n.prop('index_posttable_infofiltered'),
+				    "lengthMenu":     $.i18n.prop('index_posttable_lengthmenu'),
+				    "loadingRecords": $.i18n.prop('index_posttable_loadingrecords'),
+				    "processing":     $.i18n.prop('index_posttable_processing'),
+				    "search":         $.i18n.prop('index_posttable_search'),
+				    "zeroRecords":    $.i18n.prop('index_posttable_zerorecords'),
+				    "paginate": {
+				        "first":      $.i18n.prop('index_posttable_paginate_first'),
+				        "last":       $.i18n.prop('index_posttable_paginate_last'),
+				        "next":       $.i18n.prop('index_posttable_paginate_next'),
+				        "previous":   $.i18n.prop('index_posttable_paginate_previous')
+				    },
+				    "aria": {
+				        "sortAscending":  $.i18n.prop('index_posttable_aria_sortasc'),
+				        "sortDescending": $.i18n.prop('index_posttable_aria_sortdesc')
+				    }		
+			    },
+			    "autoWidth": false,
+			    "lengthMenu": [[10, 25, 50, 100, -1], [$.i18n.prop('md_pagelengths_10'), $.i18n.prop('md_pagelengths_25'), $.i18n.prop('md_pagelengths_50'), $.i18n.prop('md_pagelengths_100'), $.i18n.prop('md_pagelengths_all')]],
+				"orderCellsTop": true,
+				"data": data,
+				"columns": [
+					{
+						"data": "participant",
+						"render": function(data,type,row,meta) {
+							return "<div class='clickableTableValue'>" + data + "</div>";
+						}
+					},
+					{
+						"data": "numMessages"
+					}
+				],
+				"initComplete": function() {
+					$('#conversationTable tbody').on('click', 'div[class=clickableTableValue]', function () {
+						var participant = $(this).parent().parent().children('td:first-child').text();
+						if(metadata.showReadingPane) {
+							$('#contentDisplayReadingPane').show();
+							$('#displayPaneIFrame').prop('src', "/conversationViewer?participant=" + participant + "&blog=" + metadata.blog, "viewer");
+						} else {
+							window.open("/conversationViewer?participant=" + participant + "&blog=" + metadata.blog, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
+						}
+					});
+					$('#conversationTable').on('order.dt', function() {
+						var dataTable = $('#conversationTable').DataTable();
+						var order = dataTable.order();
+						updateSortOrderInMD(order[0][0], order[0][1]);
+					});
+					sortTable();
+				}
+			});
+		
 	});
 		
+	$('#unhideAllConversationsBtn').click(function() {
+		$.ajax({
+			url: "/api/conversations/" + metadata.blog + "/unignoreAllConversations",
+			dataSrc: ""
+		}).then(function(data) {
+			createAnInfoMessage($.i18n.prop('convos_markAllUnhidden'));
+			location.reload();
+		});
+	});
+
 	$('input[type=radio][name=showReadingPaneRadio]').change(function() {
 		if(this.id == "showReadingPaneSelected") {
 			metadata.showReadingPane = true;
@@ -79,86 +159,6 @@ $(document).ready(function() {
 		updateMDAPI();
 	});
 	
-	// load the conversations from the server
-	$.ajax({
-		url: "/api/conversations/unhidden",
-		dataSrc: ""
-	}).then(function(data) {
-		var words = [];
-		
-		data.forEach(element => words.push({
-			text: element.participant, 
-			weight: element.numMessages, 
-			handlers: {
-				click: function(item) {
-					if(metadata.showReadingPane) {
-						$('#contentDisplayReadingPane').show();
-						$('#displayPaneIFrame').prop('src', "/conversationViewer?participant=" + item.target.textContent, "viewer");
-					} else {
-						window.open("/conversationViewer?participant=" + item.target.textContent, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
-					}
-				}
-			}
-		}));
-		
-		$('#conversationWordCloudContainer').jQCloud(words, {width:900,height:500,fontSize:{from:0.01,to:0.002},autoResize:false,removeOverflowing:true});
-		
-		var convoTable = $('#conversationTable').DataTable( {
-			"language": {
-				"emptyTable": 	  $.i18n.prop('index_posttable_emptytable'),
-			    "info":           $.i18n.prop('index_posttable_info'),
-			    "infoEmpty":      $.i18n.prop('index_posttable_infoempty'),
-			    "infoFiltered":   $.i18n.prop('index_posttable_infofiltered'),
-			    "lengthMenu":     $.i18n.prop('index_posttable_lengthmenu'),
-			    "loadingRecords": $.i18n.prop('index_posttable_loadingrecords'),
-			    "processing":     $.i18n.prop('index_posttable_processing'),
-			    "search":         $.i18n.prop('index_posttable_search'),
-			    "zeroRecords":    $.i18n.prop('index_posttable_zerorecords'),
-			    "paginate": {
-			        "first":      $.i18n.prop('index_posttable_paginate_first'),
-			        "last":       $.i18n.prop('index_posttable_paginate_last'),
-			        "next":       $.i18n.prop('index_posttable_paginate_next'),
-			        "previous":   $.i18n.prop('index_posttable_paginate_previous')
-			    },
-			    "aria": {
-			        "sortAscending":  $.i18n.prop('index_posttable_aria_sortasc'),
-			        "sortDescending": $.i18n.prop('index_posttable_aria_sortdesc')
-			    }		
-		    },
-		    "autoWidth": false,
-		    "lengthMenu": [[10, 25, 50, 100, -1], [$.i18n.prop('md_pagelengths_10'), $.i18n.prop('md_pagelengths_25'), $.i18n.prop('md_pagelengths_50'), $.i18n.prop('md_pagelengths_100'), $.i18n.prop('md_pagelengths_all')]],
-			"orderCellsTop": true,
-			"data": data,
-			"columns": [
-				{
-					"data": "participant",
-					"render": function(data,type,row,meta) {
-						return "<div class='clickableTableValue'>" + data + "</div>";
-					}
-				},
-				{
-					"data": "numMessages"
-				}
-			],
-			"initComplete": function() {
-				$('#conversationTable tbody').on('click', 'div[class=clickableTableValue]', function () {
-					var participant = $(this).parent().parent().children('td:first-child').text();
-					if(metadata.showReadingPane) {
-						$('#contentDisplayReadingPane').show();
-						$('#displayPaneIFrame').prop('src', "/conversationViewer?participant=" + participant, "viewer");
-					} else {
-						window.open("/conversationViewer?participant=" + participant, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
-					}
-				});
-				$('#conversationTable').on('order.dt', function() {
-					var dataTable = $('#conversationTable').DataTable();
-					var order = dataTable.order();
-					updateSortOrderInMD(order[0][0], order[0][1]);
-				});
-				sortTable();
-			}
-		});
-
 	});
 	
 	var iframeOffset = $('#displayPaneIFrame').offset();
@@ -237,7 +237,7 @@ function updateSortOrderInMD(column, order) {
  */
 function updateMDAPI() {
 	$.ajax({
-		url: '/api/metadata',
+		url: '/api/metadata/' + metadata.id,
 		type: 'PUT',
 		data: JSON.stringify(metadata),
 		contentType: 'application/json',

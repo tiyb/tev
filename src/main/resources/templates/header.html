@@ -5,6 +5,9 @@
 	    <span id="navbar-link-staged" class="navbar-brand"></span>
 	    <span id="navbar-link-hashtags" class="navbar-brand"></span>
 	    <span id="navbar-link-md" class="navbar-brand"></span>
-	    <select id="headerBlogSelect" class="ui-selectmenu-text"></select>
+		<fieldset class="ui-widget-content" id="headerBlogSelectContainer">	
+			<label for="headerBlogSelect" th:text="#{header.currentblog.label}" class="ui-checkboxradio-label"></label>
+	    	<select id="headerBlogSelect" class="ui-selectmenu-text"></select>
+		</fieldset>
     </div>
 </nav>

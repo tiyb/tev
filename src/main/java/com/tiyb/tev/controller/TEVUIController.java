@@ -140,10 +140,14 @@ public class TEVUIController {
 	@RequestMapping(value = { "/metadata/{blogName}" }, method = RequestMethod.GET)
 	public String individualMetatada(@PathVariable("blogName") String blogName, Model model) {
 		model.addAttribute("blogName", blogName);
-		model.addAttribute("blogNameJScript", "var blogName = \"" + blogName + "\";");
+		addBlogNameJSToModel(model, blogName);
 		updateModelWithTheme(model);
 
 		return "metadata-frame";
+	}
+	
+	private void addBlogNameJSToModel(Model model, String blogName) {
+		model.addAttribute("blogNameJScript", "var blogName = \"" + blogName + "\"");
 	}
 
 	/**
@@ -227,6 +231,7 @@ public class TEVUIController {
 	public String showViewer(@PathVariable("blog") String blog, @RequestParam("id") Long postID, Model model) {
 		Post post = postController.getPostForBlogById(blog, postID);
 		model.addAttribute("post", post);
+		addBlogNameJSToModel(model, blog);
 		model.addAttribute("tags", pullOutTagValues(post.getTags()));
 		List<String> availableTypes = mdController.getAllTypes();
 		String postType = "";
@@ -284,12 +289,14 @@ public class TEVUIController {
 	 *              in the HTML template
 	 * @return The name of the template to use for rendering the output
 	 */
-	@RequestMapping(value = { "/hashtagViewer/{blog}" }, method = RequestMethod.GET)
-	public String showHashtagViewerForBlog(@PathVariable("blog") String blog, Model model) {
+	@RequestMapping(value = { "/hashtagViewer" }, method = RequestMethod.GET)
+	public String showHashtagViewerForBlog(Model model) {
+		String blog = mdController.getDefaultMetadata().getBlog();
 		List<Hashtag> hashtags = postController.getAllHashtagsForBlog(blog);
 		model.addAttribute("hashtags", hashtags);
 		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
+		addBlogNameJSToModel(model, blog);
 		return "viewers/hashtags";
 	}
 
@@ -304,6 +311,7 @@ public class TEVUIController {
 	public String showExportViewer(Model model) {
 		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
+		addBlogNameJSToModel(model, (String) model.getAttribute("blogName"));
 		return "viewers/exportedxml";
 	}
 
@@ -334,6 +342,7 @@ public class TEVUIController {
 			@RequestParam("participant") String participantName, Model model) {
 		Metadata md = mdController.getMetadataForBlog(blog);
 		model.addAttribute("metadata", md);
+		addBlogNameJSToModel(model, blog);
 		Conversation convo = convoController.getConversationForBlogByParticipant(md.getBlog(), participantName);
 		model.addAttribute("conversation", convo);
 		List<ConversationMessage> messages = convoController.getConvoMsgForBlogByConvoID(convo.getBlog(),
@@ -358,6 +367,7 @@ public class TEVUIController {
 		model.addAttribute("imageName", imageName);
 		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
+		addBlogNameJSToModel(model, (String) model.getAttribute("blogName"));
 		return "viewers/singleimageviewer";
 	}
 

@@ -1,6 +1,6 @@
 $.i18n.properties({
 	name: 'messages',
-	path: 'js/i18n/',
+	path: '/js/i18n/',
 	mode: 'both'
 });
 
@@ -8,7 +8,7 @@ $(document).ready(function() {
 	$('#buttonsDiv').load("/viewerbuttons");
 	
 	$.ajax({
-		url: "/api/posts/" + postId,
+		url: "/api/posts/" + blogName + "/" + postId,
 		dataSrc: "",
 		type: "GET"
 	}).then(function(postData) {
@@ -27,9 +27,9 @@ $(document).ready(function() {
 		$('#markReadButton').click(function() {
 			var url;
 			if(postData.isRead) {
-				url = "/api/posts/" + postId + "/markUnread";
+				url = "/api/posts/" + blogName + "/" + postId + "/markUnread";
 			} else {
-				url = "/api/posts/" + postId + "/markread";
+				url = "/api/posts/" + blogName + "/" + postId + "/markread";
 			}
 			$.ajax({
 				url: url,
@@ -44,9 +44,9 @@ $(document).ready(function() {
 		$('#favouriteButton').click(function() {
 			var url;
 			if(postData.isFavourite) {
-				url = "/api/posts/" + postId + "/markNonFavourite";
+				url = "/api/posts/" + blogName + "/" + postId + "/markNonFavourite";
 			} else {
-				url = "/api/posts/" + postId + "/markFavourite";
+				url = "/api/posts/" + blogName + "/" + postId + "/markFavourite";
 			}
 			
 			$.ajax({
@@ -71,7 +71,7 @@ $(document).ready(function() {
 			$('#stageForDownloadButton').hide();
 		} else {
 			$.ajax({
-				url: "/staging-api/posts",
+				url: "/staging-api/posts/" + blogName,
 				dataSrc: ""
 			}).then(function(data) {
 				var stagedPost = false;
@@ -89,7 +89,7 @@ $(document).ready(function() {
 				
 				$('#stageForDownloadButton').click(function() {
 					$.ajax({
-						url: "/staging-api/posts/" + postId,
+						url: "/staging-api/posts/" + blogName + "/" + postId,
 						dataSrc: "",
 						type: (stagedPost ? "DELETE" : "POST")
 					}).then(function(data) {

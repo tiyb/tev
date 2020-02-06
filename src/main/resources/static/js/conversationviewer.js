@@ -1,13 +1,13 @@
 $.i18n.properties({
 	name: 'messages',
-	path: 'js/i18n/',
+	path: '/js/i18n/',
 	mode: 'both'
 });
 
 $(document).ready(function() {
 	$('#hideConvoBtn').click(function() {
 		$.ajax({
-			url: "/api/conversations/" + participant + "/ignoreConvo",
+			url: "/api/conversations/" + blogName + "/" + participant + "/ignoreConvo",
 			dataSrc: "",
 			type: "PUT"
 		}).then(function(data) {
@@ -17,7 +17,7 @@ $(document).ready(function() {
 	
 	$('#hideConvoAndRefreshBtn').click(function() {
 		$.ajax({
-			url: "/api/conversations/" + participant + "/ignoreConvo",
+			url: "/api/conversations/" + blogName + "/" + participant + "/ignoreConvo",
 			dataSrc: "",
 			type: "PUT"
 		}).then(function(data) {

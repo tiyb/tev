@@ -5,7 +5,7 @@
 $(document).ready(function() {
 	$('#fixImagesButton').click(function() {
 		$.ajax({
-			url: "/api/posts/" + postId + "/fixPhotos",
+			url: "/api/posts/" + blogName + "/" + postId + "/fixPhotos",
 			dataSrc: ""
 		}).then(function(data) {
 			if(data) {

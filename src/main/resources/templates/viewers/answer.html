@@ -17,11 +17,8 @@
 <div id="tagContainer" th:utext="${tags}"></div>
 
 <script type="text/javascript" th:text="'var postId = ' + ${post.Id} + ';'"></script>
-<script type="text/javascript"
-        src="webjars/jquery/3.3.1/jquery.min.js"></script>
-<script type="text/javascript" 
-        src="webjars/jquery-i18n-properties/1.10.2/jquery.i18n.properties.min.js"></script>
-
+<script type="text/javascript" th:utext="${blogNameJScript}"></script>	
+<script type="text/javascript" th:src="@{/owr/jquery.js}"></script>
 
 <script type="text/javascript" th:src="@{/owr/postviewers.js}"></script>
 

@@ -1,6 +1,6 @@
 $.i18n.properties({
 	name: 'messages',
-	path: 'js/i18n/',
+	path: '/js/i18n/',
 	mode: 'both'
 });
 
@@ -28,7 +28,7 @@ $(document).ready(function() {
 		    }		
 	    },
 		"ajax": {
-			"url": "api/hashtags",
+			"url": "api/hashtags/" + blogName,
 			"dataSrc": ""
 		},
 		"scrollCollapse": true,

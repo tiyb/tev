@@ -70,7 +70,8 @@ $(document).ready(function () {
 			}
 				
 		});
-				
+		
+		$('#headerBlogSelect').selectmenu("disable");				
 	});
 	
 	$.ajax({
@@ -423,7 +424,7 @@ function updateServer() {
 	
 	$.ajax({
 		url: '/api/metadata/' + metadataObject.id,
-		type: 'PUT',
+		method: 'PUT',
 		data: JSON.stringify(metadataObject),
 		contentType: 'application/json',
 		success: function(data, textStatus, xhr) {

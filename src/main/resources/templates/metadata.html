@@ -24,7 +24,7 @@
 			<legend th:text="#{metadata.existingBlogs.title}" class="ui-widget-header"></legend>
 			<p th:text="#{metadata.existingBlogs.explanatoryText}"></p>
 			<ul th:each="md : ${mdCollection}" class="mdIframeContainer">
-				<li><a th:href="'/metadata/' + ${md.blog}" th:text="${md.blog}"></a></li>
+				<li><span class="ui-icon ui-icon-check" th:if="${md.isDefault}"></span><a th:href="'/metadata/' + ${md.blog}" th:text="${md.blog}"></a></li>
 			</ul>
 		</fieldset>
 	</div>

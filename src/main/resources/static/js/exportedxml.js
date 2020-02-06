@@ -1,6 +1,6 @@
 $.i18n.properties({
 	name: 'messages',
-	path: 'js/i18n/',
+	path: '/js/i18n/',
 	mode: 'both'
 });
 
@@ -19,7 +19,7 @@ $(document).ready(function() {
 	});
 	
 	$.ajax({
-		url: "/stagedPostsDownload",
+		url: "/stagedPostsDownload/" + blogName,
 		dataSrc: ""
 	}).then(function(data) {
 		$('#exportedXMLText').val(data).trigger("input.autoExpand");

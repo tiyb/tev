@@ -19,7 +19,7 @@ var additionalOptionsShowing = false;
 
 $.i18n.properties({
 	name: 'messages',
-	path: 'js/i18n/',
+	path: '/js/i18n/',
 	mode: 'both'
 });
 
@@ -33,7 +33,7 @@ $(document).ready(function() {
 	setUIWidgets();
 	
 	$.ajax({
-		url: "/api/metadata",
+		url: "/api/metadata/default",
 		dataSrc: ""
 	}).then(function(data) {
 		metadata = data;
@@ -86,7 +86,7 @@ $(document).ready(function() {
 		    "lengthMenu": [[10, 25, 50, 100, -1], [$.i18n.prop('md_pagelengths_10'), $.i18n.prop('md_pagelengths_25'), $.i18n.prop('md_pagelengths_50'), $.i18n.prop('md_pagelengths_100'), $.i18n.prop('md_pagelengths_all')]],
 			"orderCellsTop": true,
 			"ajax": {
-				"url": "api/posts",
+				"url": "api/posts/" + metadata.blog,
 				"dataSrc": ""
 			},
 			"columns": [
@@ -153,14 +153,14 @@ $(document).ready(function() {
 					$(this).parent().parent().children('td:last-child').html($.i18n.prop('index_posttable_isReadIndicator'));
 					postTable.draw();
 					$.ajax({
-						url: "/api/posts/" + postID + "/markRead",
+						url: "/api/posts/" + metadata.blog + "/" + postID + "/markRead",
 						type: "PUT"
 					});
 					if(metadata.showReadingPane) {
 						$('#contentDisplayReadingPane').show();
-						$('#displayPaneIFrame').prop('src', "/postViewer?id=" + postID, "viewer");
+						$('#displayPaneIFrame').prop('src', "/postViewer/" + metadata.blog + "?id=" + postID, "viewer");
 					} else {
-						window.open("/postViewer?id=" + postID, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
+						window.open("/postViewer/" + metadata.blog + "?id=" + postID, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
 					}
 				});
 				$('#postTable').on('order.dt', function() {
@@ -182,7 +182,7 @@ $(document).ready(function() {
 			var data = postTable.row( $(this).parents('tr') ).data();
 			var postID = data.id;
 			$.ajax({
-				url: "/api/posts/" + postID + "/markUnread",
+				url: "/api/posts/" + metadata.blog + "/" + postID + "/markUnread",
 				type: "PUT"
 			});
 			$(this).parent().parent('tr').children('td:last-child').html($.i18n.prop('index_posttable_isNotreadIndicator'));
@@ -195,7 +195,7 @@ $(document).ready(function() {
 			var data = postTable.row($(this).parents('tr')).data();
 			var postID = data.id;
 			$.ajax({
-				url: "/api/posts/" + postID + "/markFavourite",
+				url: "/api/posts/" + metadata.blog + "/" + postID + "/markFavourite",
 				type: "PUT"
 			});
 			$(this).parents('tr').children('td:nth-child(' + (FAV_COLUMN_NO + 1) + ')').html($.i18n.prop('index_posttable_isFavourite'));
@@ -208,7 +208,7 @@ $(document).ready(function() {
 			var data = postTable.row($(this).parents('tr')).data();
 			var postID = data.id;
 			$.ajax({
-				url: "/api/posts/" + postID + "/markNonFavourite",
+				url: "/api/posts/" + metadata.blog + "/" + postID + "/markNonFavourite",
 				type: "PUT"
 			});
 			$(this).parents('tr').children('td:nth-child(' + (FAV_COLUMN_NO + 1) + ')').html($.i18n.prop('index_posttable_isNotFavourite'));
@@ -465,7 +465,7 @@ function updateSortOrderInMD(column, order) {
  */
 function updateMDAPI() {
 	$.ajax({
-		url: '/api/metadata',
+		url: '/api/metadata/' + metadata.id,
 		type: 'PUT',
 		data: JSON.stringify(metadata),
 		contentType: 'application/json',

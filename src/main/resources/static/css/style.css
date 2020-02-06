@@ -17,11 +17,7 @@ fieldset {
 	margin: 10px;
 }
 
-#headerBlogSelect-button {
-	float: right;
-}
-
-#headerBlogSelect {
+#headerBlogSelectContainer {
 	float: right;
 }
 
