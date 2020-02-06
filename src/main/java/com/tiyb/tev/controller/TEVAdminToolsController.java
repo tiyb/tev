@@ -233,8 +233,8 @@ public class TEVAdminToolsController {
 	/**
 	 * Copies all files from a source directory (posted as the body of the request)
 	 * to the images directory stored in the metadata. Calls the
-	 * {@link #cleanImagesOnHD()} method when it's done, to clean the directory back
-	 * up.
+	 * {@link #cleanImagesOnHDForBlog(String) cleanImagesOnHDForBlog()} method when
+	 * it's done, to clean the directory back up.
 	 * 
 	 * @param imagePath The path of the source directory, from whence images should
 	 *                  be retrieved.

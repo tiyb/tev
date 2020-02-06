@@ -58,7 +58,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 	 * <li>Update the application's metadata with that information</li>
 	 * <li>Get a <i>new</i> stream (to start over at the beginning of the file)</li>
 	 * <li>Use that stream to call the
-	 * {@link #readConversations(InputStream, String, String, TEVMetadataRestController, TEVConvoRestController)
+	 * {@link #readConversations(InputStream, String, String, TEVMetadataRestController, TEVConvoRestController, String)
 	 * readConversations()} method to parse the document again, this time reading in
 	 * all of the data (making use of the main Tumblr user information captured
 	 * earlier)</li>
@@ -66,7 +66,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 	 * 
 	 * <p>
 	 * Data is inserted directly into the database, via the REST APIs (accessed via
-	 * the <code>convoRestController</code> parameter). 
+	 * the <code>convoRestController</code> parameter).
 	 * </p>
 	 * 
 	 * @param xmlFile         File containing XML to be parsed

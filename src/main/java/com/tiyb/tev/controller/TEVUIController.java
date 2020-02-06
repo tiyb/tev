@@ -145,7 +145,7 @@ public class TEVUIController {
 
 		return "metadata-frame";
 	}
-	
+
 	private void addBlogNameJSToModel(Model model, String blogName) {
 		model.addAttribute("blogNameJScript", "var blogName = \"" + blogName + "\"");
 	}
@@ -153,10 +153,10 @@ public class TEVUIController {
 	/**
 	 * Handles file uploads, for reading in the Tumblr Post XML Export for a given
 	 * blog. Actual logic is handled by the
-	 * {@link com.tiyb.tev.xml.BlogXmlReader#parseDocument(java.io.InputStream, TEVPostRestController, TEVMetadataRestController)
-	 * BlogXmlReader#parseDocument()} method; this method simply calls that class
-	 * and then (upon success) redirects to the index. Failure redirects to the "bad
-	 * XML" error page.
+	 * {@link com.tiyb.tev.xml.BlogXmlReader#parseDocument(java.io.InputStream, TEVPostRestController, TEVMetadataRestController, String)
+	 * parseDocument()} method; this method simply calls that class and then (upon
+	 * success) redirects to the index. Failure redirects to the "bad XML" error
+	 * page.
 	 * 
 	 * @param file               The Tumblr XML file to be read
 	 * @param redirectAttributes not used
@@ -178,10 +178,10 @@ public class TEVUIController {
 	/**
 	 * Handles file uploads for reading in Tumblr messaging XML extract. Actual
 	 * logic is handled by the
-	 * {@link com.tiyb.tev.xml.ConversationXmlReader#parseDocument(MultipartFile, TEVMetadataRestController, TEVConvoRestController)
-	 * ConversationXmlReader#parseDocument()} method; this method simply calls that
-	 * class and then (upon success) redirects to the index. Failure redirects to
-	 * the "bad XML" error page.
+	 * {@link com.tiyb.tev.xml.ConversationXmlReader#parseDocument(MultipartFile, TEVMetadataRestController, TEVConvoRestController, String)
+	 * parseDocument()} method; this method simply calls that class and then (upon
+	 * success) redirects to the index. Failure redirects to the "bad XML" error
+	 * page.
 	 * 
 	 * @param blog               Blog for which conversation should be read
 	 * @param file               the XML file to be parsed
@@ -284,7 +284,6 @@ public class TEVUIController {
 	/**
 	 * This request is used to populate the hashtag viewer.
 	 * 
-	 * @param blog  The blog for which hashtags are being retrieved
 	 * @param model The model to be populated with post data, for use by Thymeleaf
 	 *              in the HTML template
 	 * @return The name of the template to use for rendering the output

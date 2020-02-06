@@ -51,8 +51,8 @@ public class BlogXmlWriter {
 	 * <p>
 	 * This method doesn't do much, other than retrieve the Post data from the REST
 	 * controller for each post. The
-	 * {@link #getDocument(List, TEVPostRestController) getDocument()} method (and
-	 * subsequent, type-specific methods) do most of the work.
+	 * {@link #getDocument(List, TEVPostRestController, String) getDocument()}
+	 * method (and subsequent, type-specific methods) do most of the work.
 	 * </p>
 	 * 
 	 * @param postIDs        List of Post IDs to include in the export, regardless
@@ -76,8 +76,8 @@ public class BlogXmlWriter {
 	/**
 	 * <p>
 	 * This method starts the work of creating the outer shell of the document. The
-	 * {@link #addPost(Post, XMLStreamWriter, TEVPostRestController) addPost()}
-	 * method starts adding in the detailed data, post-by-post. The
+	 * {@link #addPost(Post, XMLStreamWriter, TEVPostRestController, String)
+	 * addPost()} method starts adding in the detailed data, post-by-post. The
 	 * {@link com.tiyb.tev.xml.helper.PrettyPrintHandler PrettyPrintHandler} helper
 	 * class is used to create a more readable version of the XML output.
 	 * </p>

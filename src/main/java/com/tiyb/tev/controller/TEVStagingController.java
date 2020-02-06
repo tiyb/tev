@@ -154,7 +154,7 @@ public class TEVStagingController {
 	 * 
 	 * <p>
 	 * First calls the
-	 * {@link com.tiyb.tev.controller.TEVPostRestController#fixPhotosForPost(Long)
+	 * {@link com.tiyb.tev.controller.TEVPostRestController#fixPhotosForBlogForPost(String, Long)
 	 * fixPhotosForPost()} to ensure that the photos for the given post are already
 	 * on disk, then copies them to the target directory. Because of this call to
 	 * <code>fixPhotosForPost()</code>, there is no sanity check to ensure that the

@@ -58,12 +58,13 @@ import com.tiyb.tev.exception.XMLParsingException;
  * 
  * <p>
  * The general approach taken is that the
- * {@link #parseDocument(InputStream, TEVPostRestController, TEVMetadataRestController)
+ * {@link #parseDocument(InputStream, TEVPostRestController, TEVMetadataRestController, String)
  * parseDocument()} method sets up some initial variables, the
- * {@link #readPosts(InputStream, TEVPostRestController, boolean) readPosts()}
- * method then goes through the document post-by-post, and as it determines what
- * type each post is, additional methods are called to read the additional,
- * type-specific XML within the post's XML element (answer, link, photo, etc.).
+ * {@link #readPosts(InputStream, TEVPostRestController, boolean, String)
+ * readPosts()} method then goes through the document post-by-post, and as it
+ * determines what type each post is, additional methods are called to read the
+ * additional, type-specific XML within the post's XML element (answer, link,
+ * photo, etc.).
  * </p>
  * 
  * @author tiyb
@@ -74,8 +75,8 @@ public class BlogXmlReader extends TEVXmlReader {
 	 * <p>
 	 * This is the main method of the class, which kicks off the processing of the
 	 * document. It doesn't do much work itself, it simply calls the
-	 * {@link #readPosts(InputStream, TEVPostRestController, boolean) readPosts()}
-	 * method to get into the actual XML document.
+	 * {@link #readPosts(InputStream, TEVPostRestController, boolean, String)
+	 * readPosts()} method to get into the actual XML document.
 	 * </p>
 	 * 
 	 * <p>
@@ -260,8 +261,8 @@ public class BlogXmlReader extends TEVXmlReader {
 	 * Helper function specifically for reading the attributes from a
 	 * <code>&lt;post&gt;</code> element. The logic could easily have been
 	 * incorporated into
-	 * {@link #readPosts(InputStream, TEVPostRestController, boolean) readPosts()},
-	 * but the method would have gotten much longer.
+	 * {@link #readPosts(InputStream, TEVPostRestController, boolean, String)
+	 * readPosts()}, but the method would have gotten much longer.
 	 * 
 	 * @param startElement The {@link javax.xml.stream.events.StartElement
 	 *                     StartElement} object being processed

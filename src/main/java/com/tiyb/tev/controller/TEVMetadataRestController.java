@@ -128,7 +128,7 @@ public class TEVMetadataRestController {
 	/**
 	 * GET to return the metadata for a particular blog based on the Metadata ID.
 	 * 
-	 * @param blog The name of the blog for which to return metadata
+	 * @param id The ID of the MD to return
 	 * @return {@link com.tiyb.tev.datamodel.Metadata Metadata} object containing
 	 *         the settings for the blog in question
 	 */
@@ -322,15 +322,15 @@ public class TEVMetadataRestController {
 		postController.deleteAllHashtagsForBlog(md.getBlog());
 
 		metadataRepo.deleteById(id);
-		
+
 		allMDs = getAllMetadata();
 		boolean aDefaultExists = false;
-		for(Metadata m : allMDs) {
-			if(m.getIsDefault()) {
+		for (Metadata m : allMDs) {
+			if (m.getIsDefault()) {
 				aDefaultExists = true;
 			}
 		}
-		if(!aDefaultExists) {
+		if (!aDefaultExists) {
 			markBlogAsDefault(allMDs.get(0).getId());
 		}
 
