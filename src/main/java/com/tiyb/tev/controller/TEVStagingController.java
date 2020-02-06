@@ -124,7 +124,7 @@ public class TEVStagingController {
 				.orElseThrow(() -> new ResourceNotFoundException("StagedPost", "id", id));
 
 		if (!blog.equals(post.getBlog())) {
-			logger.error("Invalid staged post/blog combination; post=" + id + ", blog=" + blog);
+			logger.error("Invalid staged post/blog combination; post={}, blog={}", id, blog);
 			throw new InvalidConvoParentException();
 		}
 		stagingRepo.delete(post);
@@ -190,7 +190,7 @@ public class TEVStagingController {
 
 		File targetFolder = new File(pathForDestination);
 		if (!targetFolder.isDirectory()) {
-			logger.error("Invalid target directory passed to export images: " + pathForDestination);
+			logger.error("Invalid target directory passed to export images: {}", pathForDestination);
 			return new ResponseEntity<String>(INVALID_TARGET_DIRECTORY, null, HttpStatus.BAD_REQUEST);
 		}
 		Path destinationPath = targetFolder.toPath();
@@ -208,9 +208,9 @@ public class TEVStagingController {
 			try {
 				Files.copy(sourcePath, destinationPath.resolve(sourcePath.getFileName()));
 			} catch (FileAlreadyExistsException e) {
-				logger.warn("File already exists: " + sourceFile.getName());
+				logger.warn("File already exists: {}", sourceFile.getName());
 			} catch (IOException e) {
-				logger.error("Error copying file to destination: " + sourceFile.getName());
+				logger.error("Error copying file to destination: {}", sourceFile.getName());
 				logger.debug("Exception for file error: ", e);
 				return new ResponseEntity<String>(ERROR_COPYING_FILE, null, HttpStatus.INTERNAL_SERVER_ERROR);
 			}

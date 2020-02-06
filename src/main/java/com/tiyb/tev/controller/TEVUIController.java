@@ -387,7 +387,7 @@ public class TEVUIController {
 		try {
 			return Files.readAllBytes(file.toPath());
 		} catch (IOException e) {
-			logger.warn("File " + imageName + " not found.");
+			logger.warn("File {} not found.", imageName);
 			throw new ResourceNotFoundException(fullName, fullName, e);
 		}
 	}

@@ -83,8 +83,8 @@ public class ConversationXmlReader extends TEVXmlReader {
 			InputStream participantXmlStream = xmlFile.getInputStream();
 			Participant mainParticipant = getMainParticipant(participantXmlStream);
 			if (!blogName.equals(mainParticipant.name)) {
-				logger.error("Mismatch between expected blog name (" + blogName + ") and main participant name ("
-						+ mainParticipant.name + ")");
+				logger.error("Mismatch between expected blog name ({}) and main participant name ({}).", blogName,
+						mainParticipant.name);
 				throw new BlogMismatchParsingException(blogName, mainParticipant.name);
 			}
 			md.setMainTumblrUser(mainParticipant.name);

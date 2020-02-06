@@ -240,7 +240,7 @@ public class BlogXmlReader extends TEVXmlReader {
 								for (String tag : individualTags) {
 									tag = tag.trim();
 									if (tag.equals("")) {
-										logger.error("A hashtag was empty from this list: " + post.getTags());
+										logger.error("A hashtag was empty from this list: {}", post.getTags());
 									}
 									postRestController.createHashtagForBlog(blogName, tag);
 								}

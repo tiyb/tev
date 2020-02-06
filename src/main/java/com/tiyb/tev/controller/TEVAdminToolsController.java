@@ -130,7 +130,7 @@ public class TEVAdminToolsController {
 		List<String> allTypeNames = mdController.getAllTypes();
 
 		if (!TEVMetadataRestController.isValidType(type, allTypeNames)) {
-			logger.error("Invalid type name: " + type);
+			logger.error("Invalid type name: {}", type);
 			throw new InvalidTypeException();
 		}
 
@@ -189,7 +189,7 @@ public class TEVAdminToolsController {
 		ArrayList<String> allCleanFiles = new ArrayList<String>();
 		String imageDirectory = mdController.getMetadataForBlog(blog).getBaseMediaPath();
 		if (imageDirectory == null || imageDirectory.equals("")) {
-			logger.error("Invalid image directory used for cleanImagesOnHD: " + imageDirectory);
+			logger.error("Invalid image directory used for cleanImagesOnHD: {}", imageDirectory);
 			return new ResponseEntity<String>(INVALID_IMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
 		}
 
@@ -245,7 +245,7 @@ public class TEVAdminToolsController {
 			@RequestBody String imagePath) {
 		String imageDirectory = mdController.getMetadataForBlog(blog).getBaseMediaPath();
 		if (imageDirectory == null || imageDirectory.equals("")) {
-			logger.error("Invalid image directory used for importImages: " + imageDirectory);
+			logger.error("Invalid image directory used for importImages: {}", imageDirectory);
 			return new ResponseEntity<String>(INVALID_IMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
 		}
 
@@ -255,14 +255,14 @@ public class TEVAdminToolsController {
 
 		File destinationFolder = new File(imageDirectory);
 		if (!destinationFolder.isDirectory()) {
-			logger.error("Images directory in metadata is not a valid directory: " + imageDirectory);
+			logger.error("Images directory in metadata is not a valid directory: {}", imageDirectory);
 			return new ResponseEntity<String>(INVALID_IMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
 		}
 		Path destinationFolderPath = destinationFolder.toPath();
 
 		File sourceFolder = new File(imagePath);
 		if (!sourceFolder.isDirectory()) {
-			logger.error("Invalid source directory passed to import images: " + imagePath);
+			logger.error("Invalid source directory passed to import images: {}", imagePath);
 			return new ResponseEntity<String>(INVALID_SOURCEIMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
 		}
 
@@ -272,10 +272,10 @@ public class TEVAdminToolsController {
 			try {
 				Files.copy(inputFilePath, destinationFolderPath.resolve(inputFilePath.getFileName()));
 			} catch (FileAlreadyExistsException e) {
-				logger.debug("File already exists: " + inputFilePath.getFileName());
+				logger.debug("File already exists: {}", inputFilePath.getFileName());
 				// Skip copying files that don't exist
 			} catch (IOException e) {
-				logger.error("Error copying file from source to destination: " + inputFilePath.getFileName());
+				logger.error("Error copying file from source to destination: {}", inputFilePath.getFileName());
 				logger.debug("File Copy Error:", e);
 				return new ResponseEntity<String>(ERROR_COPYINGFILES_MESSAGE, null, HttpStatus.INTERNAL_SERVER_ERROR);
 			}

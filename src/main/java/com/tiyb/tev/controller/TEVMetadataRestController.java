@@ -298,7 +298,7 @@ public class TEVMetadataRestController {
 	public ResponseEntity<?> deleteMetadata(@PathVariable("id") Integer id) {
 		Optional<Metadata> omd = metadataRepo.findById(id);
 		if (!omd.isPresent()) {
-			logger.error("Unable to find MD with this ID", id);
+			logger.error("Unable to find MD with this ID: {}", id);
 			throw new ResourceNotFoundException("Metadata", "ID", id);
 		}
 

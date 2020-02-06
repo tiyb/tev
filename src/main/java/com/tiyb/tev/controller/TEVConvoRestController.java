@@ -266,7 +266,7 @@ public class TEVConvoRestController {
 				.orElseThrow(() -> new ResourceNotFoundException("Conversation", "id", convoId));
 
 		if (!blog.equals(convo.getBlog())) {
-			logger.error("Attempt to update conversation but blog doesn't match: " + blog);
+			logger.error("Attempt to update conversation {} but blog {} doesn't match", convoId, blog);
 			throw new InvalidConvoParentException();
 		}
 		convoRepo.delete(convo);
@@ -313,11 +313,11 @@ public class TEVConvoRestController {
 			@Valid @RequestBody ConversationMessage convoMsg) {
 		Optional<Conversation> optConvo = convoRepo.findById(convoMsg.getConversationId());
 		if (!optConvo.isPresent()) {
-			logger.error("Invalid convo/message combo; convoID=" + convoMsg.getConversationId());
+			logger.error("Invalid convo/message combo; convoID={}", convoMsg.getConversationId());
 			throw new InvalidConvoParentException();
 		} else {
 			if (!optConvo.get().getBlog().equals(blog)) {
-				logger.error("invalid message/blog combo; convoID=" + convoMsg.getConversationId() + ", blog=" + blog);
+				logger.error("invalid message/blog combo; convoID={}, blog={}", convoMsg.getConversationId(), blog);
 				throw new InvalidConvoParentException();
 			}
 		}

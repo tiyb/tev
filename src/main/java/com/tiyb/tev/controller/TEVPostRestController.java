@@ -133,7 +133,7 @@ public class TEVPostRestController {
 	@PostMapping("/posts/{blog}")
 	public Post createPostForBlog(@PathVariable("blog") String blog, @Valid @RequestBody Post post) {
 		if (!blog.equals(post.getTumblelog())) {
-			logger.error("Post blog and API blog don't match; post blog=" + post.getTumblelog() + ", API blog=" + blog);
+			logger.error("Post blog and API blog don't match; post blog={}, API blog={}", post.getTumblelog(), blog);
 			throw new BlogPostMismatchException();
 		}
 		return postRepo.save(post);
@@ -427,7 +427,7 @@ public class TEVPostRestController {
 			@Valid @RequestBody Answer answer) {
 		Optional<Post> post = postRepo.findById(postId);
 		if (!post.isPresent()) {
-			logger.error("Tried to submit answer for a post that doesn't exist: " + postId);
+			logger.error("Tried to submit answer for a post that doesn't exist: {}", postId);
 			throw new NoParentPostException();
 		} else {
 			assert blog.equals(post.get().getTumblelog());
@@ -541,7 +541,7 @@ public class TEVPostRestController {
 			@Valid @RequestBody Link link) {
 		Optional<Post> post = postRepo.findById(postId);
 		if (!post.isPresent()) {
-			logger.error("Tried to submit link for a post that doesn't exist: " + postId);
+			logger.error("Tried to submit link for a post that doesn't exist: {}", postId);
 			throw new NoParentPostException();
 		} else {
 			assert blog.equals(post.get().getTumblelog());
@@ -651,7 +651,7 @@ public class TEVPostRestController {
 	public Photo createPhotoForBlog(@PathVariable("blog") String blog, @Valid @RequestBody Photo photo) {
 		Optional<Post> post = postRepo.findById(photo.getPostId());
 		if (!post.isPresent()) {
-			logger.error("Tried to submit link for a post that doesn't exist: " + photo.getPostId());
+			logger.error("Tried to submit link for a post that doesn't exist: {}", photo.getPostId());
 			throw new NoParentPostException();
 		} else {
 			assert blog.equals(post.get().getTumblelog());
@@ -770,7 +770,7 @@ public class TEVPostRestController {
 			@Valid @RequestBody Regular regular) {
 		Optional<Post> post = postRepo.findById(postId);
 		if (!post.isPresent()) {
-			logger.error("Tried to submit regular for a post that doesn't exist: " + postId);
+			logger.error("Tried to submit regular for a post that doesn't exist: {}", postId);
 			throw new NoParentPostException();
 		} else {
 			assert blog.equals(post.get().getTumblelog());
@@ -828,7 +828,7 @@ public class TEVPostRestController {
 		for (Post post : posts) {
 			Optional<Regular> response = regularRepo.findById(post.getId());
 			if (!response.isPresent()) {
-				logger.error("Attempting to delete a regular that doesn't exist: " + post.getId());
+				logger.error("Attempting to delete a regular that doesn't exist: {}", post.getId());
 				return ResponseEntity.badRequest().build();
 			}
 
@@ -891,7 +891,7 @@ public class TEVPostRestController {
 			@Valid @RequestBody Video video) {
 		Optional<Post> post = postRepo.findById(postId);
 		if (!post.isPresent()) {
-			logger.error("Tried to submit a video for a post that doesn't exist: " + postId);
+			logger.error("Tried to submit a video for a post that doesn't exist: {}", postId);
 			throw new NoParentPostException();
 		} else {
 			assert blog.equals(post.get().getTumblelog());
@@ -949,7 +949,7 @@ public class TEVPostRestController {
 		for (Post post : posts) {
 			Optional<Video> response = videoRepo.findById(post.getId());
 			if (!response.isPresent()) {
-				logger.error("Attempting to delete a video that doesn't exist: " + post.getId());
+				logger.error("Attempting to delete a video that doesn't exist: {}", post.getId());
 				return ResponseEntity.badRequest().build();
 			}
 
