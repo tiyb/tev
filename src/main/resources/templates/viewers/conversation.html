@@ -15,34 +15,16 @@
 	<button id="hideConvoBtn" th:text="#{conversation.hideConvoBtn}"></button>
 	<button id="hideConvoAndRefreshBtn" th:text="#{conversation.hideConvoAndRefreshBtn}"></button>
 </p>
-<table id="messagesTable">
-<tr th:each="message: ${messages}">
-	<td>
-		<div th:if="${message.received}" class="message-received">
-			<table th:if="${message.received}" style="width:100%;"><tr>
-				<td width="5%"><img th:src="${conversation.participantAvatarUrl}" height="30px" width="30px" /></td>
-				<td width="auto">
-					<div th:text="${#dates.format(message.timestamp * 1000, 'MMM dd, yyyy, HH:mm')}"></div>
-					<div th:switch="${message.type}">
-						<p th:case="'POSTREF'"><a th:href="${message.message}" th:text="${message.message}" target="_blank"></a></p>
-						<p th:case="'IMAGE'"><img th:src="${message.message}"></p>
-						<p th:case="*" th:text="${message.message}"></p>
-					</div>
-				</td>
-			</tr></table>
-		</div>
-		<div th:unless="${message.received}" class="message-sent">
-			<table th:unless="${message.received}" style="width: 100%;"><tr>
-				<td width="auto">
-					<div th:text="${#dates.format(message.timestamp * 1000, 'MMM dd, yyyy, HH:mm')}"></div>
-					<div th:text="${message.message}"></div>
-				</td>
-				<td width="5%"><img th:src="${metadata.mainTumblrUserAvatarUrl}" height="30px" width="30px"  /></td>
-			</tr></table>
-		</div> 
-	</td>
-</tr>
-</table>
+
+<div th:each="message: ${messages}" th:class="${message.received} ? 'messageDiv message-received' : 'messageDiv message-sent'">
+	<span th:if="${message.received}" class="avatarSpan participantAvatarSpan"><img th:src="${conversation.participantAvatarUrl}" /></span>
+	<span th:if="${message.received} == false" class="avatarSpan tumblrUserAvatarSpan"><img th:src="${metadata.mainTumblrUserAvatarUrl}" /></span>
+	<span th:text="${#dates.format(message.timestamp * 1000, 'MMM dd, yyyy, HH:mm')}" class="messageTimestampSpan"></span><br/>
+	<span th:if="${message.type == 'POSTREF'}" class="messageBodySpan"><a th:href="${message.message}" th:text="${message.message}"></a></span>
+	<span th:if="${message.type == 'IMAGE'}" class="messageBodySpan"><img th:src="${message.message}" ></span>
+	<span th:if="${message.type != 'IMAGE' && message.type != 'IMAGE'}" class="messageBodySpan" th:text="${message.message}"></span>
+</div>
+
 </div>
 <script type="text/javascript">var participant = '[[${conversation.participant}]]';</script>
 <script type="text/javascript" th:utext="${blogNameJScript}"></script>	

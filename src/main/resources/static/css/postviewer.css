@@ -89,37 +89,56 @@ h2 {
 	font-weight: 400;
 }
 
-#messagesTable {
+.messageDiv {
 	margin-left: 5%;
 	margin-right: 5%;
 	width: 90%;
+	padding: 5px;
+	font-family: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	font-weight: 400;
+	width: 85%;
+	margin: 10px;
 }
 
-#messagesTable tr td {
-}
-
-#messagesTable tr td .message-received {
+.message-received {
 	border-radius: 15px 50px;
 	background: rgba(0, 25, 53, 0.05); 
 	color: rgb(0, 25, 53);
-	padding: 5px;
-	display: inline-block;
-	font-family: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
-	font-size: 14px;
-	font-weight: 400;
-	width: 85%;
 	text-align: left;
 }
-#messagesTable tr td .message-sent {
+.message-sent {
 	border-radius: 50px 15px;
 	background: rgba(0, 25, 53, 0.1); 
-	padding: 5px;
-	display: inline-block;
-	font-family: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
-	font-size: 14px;
-	font-weight: 400;
-	width: 85%;
 	text-align: right;
+}
+
+
+.avatarSpan {
+	margin-top: 0px;
+	margin-left: 5px;
+	margin-right: 5px;
+	margin-bottom: 5px;
+}
+
+.avatarSpan img {
+	height: 30px;
+	width: 30px;
+	margin: 0px;
+}
+
+.participantAvatarSpan {
+	float: left;
+}
+
+.tumblrUserAvatarSpan {
+	float: right;
+}
+
+.messageTimestampSpan {
+}
+
+.messageBodySpan {
 }
 
 .hashtagspan {
