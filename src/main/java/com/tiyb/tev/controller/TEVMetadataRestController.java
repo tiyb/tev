@@ -187,6 +187,18 @@ public class TEVMetadataRestController {
 	}
 
 	/**
+	 * Helper API for just getting the default blog name -- i.e. getting the default
+	 * MD, and returning that MD's blog property.
+	 * 
+	 * @return String of the blog's name
+	 */
+	@GetMapping("/metadata/default/blogName")
+	public String getDefaultBlogName() {
+		Metadata defaultMD = getDefaultMetadata();
+		return defaultMD.getBlog();
+	}
+
+	/**
 	 * GET to return the Metadata for a given blog, by name
 	 * 
 	 * @param blog Name of the blog in question
