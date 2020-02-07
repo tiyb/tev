@@ -424,7 +424,7 @@ public class ConversationXmlParsingUnitTests {
 	 */
 	@Test(expected = XMLParsingException.class)
 	public void testBadXml() throws IOException {
-		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-messages-badxml.xml");
+		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-messages-badxml.txt");
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
 		MockMultipartFile mockFile = new MockMultipartFile("testmessages", xmlFile);
 

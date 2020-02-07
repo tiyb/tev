@@ -519,7 +519,7 @@ public class PostXmlParsingUnitTest {
 	 */
 	@Test(expected = XMLParsingException.class)
 	public void testBadXmlUpload() throws FileNotFoundException {
-		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-badxml.xml");
+		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-badxml.txt");
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
 
 		BlogXmlReader.parseDocument(xmlFile, postController, mdController, MAIN_BLOG_NAME);
