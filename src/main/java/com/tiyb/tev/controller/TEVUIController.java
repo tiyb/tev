@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -87,8 +88,12 @@ public class TEVUIController {
 	 * @return name of the template to be used to render the page
 	 */
 	@RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
-	public String index(Model model) {
-		updateModelWithBlogName(model);
+	public String index(Model model, @RequestParam("tempBlogName") Optional<String> blogParam) {
+		if(blogParam.isPresent()) {
+			model.addAttribute("blogName", blogParam.get());
+		} else {
+			model.addAttribute("blogName", mdController.getDefaultBlogName());
+		}
 		updateModelWithTheme(model);
 		return "index";
 	}
@@ -102,13 +107,18 @@ public class TEVUIController {
 	 * @return name of the template to be used to render the page
 	 */
 	@RequestMapping(value = { "/conversations" }, method = RequestMethod.GET)
-	public String conversations(Model model) {
-		Metadata md = mdController.getDefaultMetadata();
+	public String conversations(Model model, @RequestParam("tempBlogName") Optional<String> blogParam) {
+		Metadata md = null;
+		if(blogParam.isPresent()) {
+			md = mdController.getMetadataForBlog(blogParam.get());
+		} else {
+			md = mdController.getDefaultMetadata();
+		}
 		model.addAttribute("metadata", md);
 		List<Conversation> conversations = convoController.getAllConversationsForBlog(md.getBlog());
 		model.addAttribute("conversations", conversations);
 
-		updateModelWithBlogName(model);
+		model.addAttribute("blogName", md.getBlog());
 		updateModelWithTheme(model);
 
 		return "conversations";
@@ -122,7 +132,7 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/metadata" }, method = RequestMethod.GET)
 	public String metadata(Model model) {
-		model.addAttribute("blogName", mdController.getDefaultMetadata().getBlog());
+		model.addAttribute("blogName", mdController.getDefaultBlogName());
 		updateModelWithTheme(model);
 
 		List<Metadata> mdCollection = mdController.getAllMetadata();
@@ -146,6 +156,16 @@ public class TEVUIController {
 		return "metadata-frame";
 	}
 
+	/**
+	 * Helper function to add an attribute to the Model for a client-side bit of JS
+	 * code for setting a variable with the blog's name. This <i>should</i> have
+	 * been as simple as setting an attribute with the blog's name and then setting
+	 * the JS code in the Thymeleaf page, but for some reason the initial developer
+	 * couldn't figure out a way to get single quotes into the generated string...
+	 * 
+	 * @param model    The Model to which the JS code should be added
+	 * @param blogName The name of the current blog
+	 */
 	private void addBlogNameJSToModel(Model model, String blogName) {
 		model.addAttribute("blogNameJScript", "var blogName = \"" + blogName + "\"");
 	}
@@ -284,16 +304,18 @@ public class TEVUIController {
 	/**
 	 * This request is used to populate the hashtag viewer.
 	 * 
-	 * @param model The model to be populated with post data, for use by Thymeleaf
-	 *              in the HTML template
+	 * @param model     The model to be populated with post data, for use by
+	 *                  Thymeleaf in the HTML template
+	 * @param blogParam Optional: the name of the blog for which this page should be
+	 *                  rendered, regardless of the default
 	 * @return The name of the template to use for rendering the output
 	 */
 	@RequestMapping(value = { "/hashtagViewer" }, method = RequestMethod.GET)
-	public String showHashtagViewerForBlog(Model model) {
-		String blog = mdController.getDefaultMetadata().getBlog();
+	public String showHashtagViewerForBlog(Model model, @RequestParam("tempBlogName") Optional<String> blogParam) {
+		String blog = blogParam.isPresent() ? blogParam.get() : mdController.getDefaultBlogName();
 		List<Hashtag> hashtags = postController.getAllHashtagsForBlog(blog);
 		model.addAttribute("hashtags", hashtags);
-		updateModelWithBlogName(model);
+		model.addAttribute("blogName", blog);
 		updateModelWithTheme(model);
 		addBlogNameJSToModel(model, blog);
 		return "viewers/hashtags";
@@ -307,8 +329,12 @@ public class TEVUIController {
 	 * @return The name of the template to use for rendering the output
 	 */
 	@RequestMapping(value = { "/exportViewer" }, method = RequestMethod.GET)
-	public String showExportViewer(Model model) {
-		updateModelWithBlogName(model);
+	public String showExportViewer(Model model, @RequestParam("tempBlogName") Optional<String> blogParam) {
+		if(blogParam.isPresent()) {
+			model.addAttribute("blogName", blogParam.get());
+		} else {
+			model.addAttribute("blogName", mdController.getDefaultBlogName());
+		}
 		updateModelWithTheme(model);
 		addBlogNameJSToModel(model, (String) model.getAttribute("blogName"));
 		return "viewers/exportedxml";
@@ -322,8 +348,12 @@ public class TEVUIController {
 	 * @return The name of the template to use for rendering the output
 	 */
 	@RequestMapping(value = { "/staged" }, method = RequestMethod.GET)
-	public String showStagedPosts(Model model) {
-		updateModelWithBlogName(model);
+	public String showStagedPosts(Model model, @RequestParam("tempBlogName") Optional<String> blogParam) {
+		if(blogParam.isPresent()) {
+			model.addAttribute("blogName", blogParam.get());
+		} else {
+			model.addAttribute("blogName", mdController.getDefaultBlogName());
+		}
 		updateModelWithTheme(model);
 		return "staged";
 	}
@@ -348,7 +378,7 @@ public class TEVUIController {
 				convo.getId());
 		model.addAttribute("messages", messages);
 
-		updateModelWithBlogName(model);
+		model.addAttribute("blogName", blog);
 		updateModelWithTheme(model);
 
 		return "viewers/conversation";
@@ -364,9 +394,6 @@ public class TEVUIController {
 	@RequestMapping(value = { "/viewers/imageViewer/{imageName}" }, method = RequestMethod.GET)
 	public String showSingleImageViewer(@PathVariable("imageName") String imageName, Model model) {
 		model.addAttribute("imageName", imageName);
-		updateModelWithBlogName(model);
-		updateModelWithTheme(model);
-		addBlogNameJSToModel(model, (String) model.getAttribute("blogName"));
 		return "viewers/singleimageviewer";
 	}
 
@@ -511,19 +538,6 @@ public class TEVUIController {
 		}
 
 		return builder.toString();
-	}
-
-	/**
-	 * Used to update the model object with the name of the current in-use blog.
-	 * Could have simply added this logic to the
-	 * {@link #updateModelWithTheme(Model)} method, but broke it out separately in
-	 * case the logic for determining the current blog gets hairy.
-	 * 
-	 * @param model Model to update with the blog name
-	 */
-	private void updateModelWithBlogName(Model model) {
-		Metadata m = mdController.getDefaultMetadata();
-		model.addAttribute("blogName", m.getBlog());
 	}
 
 	/**

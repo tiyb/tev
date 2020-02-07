@@ -33,7 +33,7 @@ $(document).ready(function() {
 	setUIWidgets();
 	
 	$.ajax({
-		url: "/api/metadata/default",
+		url: "/api/metadata/byBlog/" + getCurrentBlogName(),
 		dataSrc: ""
 	}).then(function(data) {
 		metadata = data;

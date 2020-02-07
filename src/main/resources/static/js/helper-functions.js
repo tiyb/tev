@@ -14,3 +14,22 @@ function addOptionToSelect(optionValue, selectName, optionText) {
 			+ "</option>";
 	$(optionData).appendTo("#" + selectName);
 }
+
+/**
+ * Function to get the current blog's name, either via the tempBlogName request
+ * param (if present), or via back-end API call
+ * 
+ * @returns The name of the currently viewed blog
+ */
+function getCurrentBlogName() {
+	var urlParams = new URLSearchParams(window.location.search);
+	if (urlParams.has("tempBlogName")) {
+		return urlParams.get("tempBlogName");
+	} else {
+		return $.ajax({
+			url : '/api/metadata/default/blogName',
+			type : 'GET',
+			async : false
+		}).responseText;
+	}
+}

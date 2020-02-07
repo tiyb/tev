@@ -34,7 +34,7 @@ $(document).ready(function() {
 	});
 	
 	$.ajax({
-		url: "/api/metadata/default",
+		url: "/api/metadata/byBlog/" + getCurrentBlogName(),
 		dataSrc: ""
 	}).then(function(data) {
 		metadataObject = data;
@@ -122,7 +122,12 @@ $(document).ready(function() {
 	});
 	
 	$('#downloadButton').click(function() {
-		window.open("/exportViewer");
+		var urlString = "/exportViewer";
+		var urlParams = new URLSearchParams(window.location.search);
+		if (urlParams.has("tempBlogName")) {
+			urlString += "?tempBlogName=" + urlParams.get("tempBlogName");
+		}
+		window.open(urlString);
 	});
 	
 	$('#removeAllButton').click(function() {

@@ -22,7 +22,7 @@ $(document).ready(function() {
 	// load the metadata from the server, populate the radio buttons, and show
 	// the table or reading pane accordingly
 	$.ajax({
-		url: "/api/metadata/default",
+		url: "/api/metadata/byBlog/" + getCurrentBlogName(),
 		dataSrc: ""
 	}).then(function(data) {
 		metadata = data;
