@@ -49,6 +49,7 @@
 		<css>/css/postviewer.css</css>
 		
 		<js>/js/taghandler.js</js>
+		<js>/js/close-on-esc.js</js>
 		<js>/js/viewerbuttonshandler.js</js>
 		<js>/js/imageViewer.js</js>
 		<js>/js/conversationviewer.js</js>
@@ -66,7 +67,7 @@
 	<group name="singleimageviewer">
 		<css>/css/singleimageviewer.css</css>
 		
-		<js>/js/taghandler.js</js>
+		<js>/js/close-on-esc.js</js>
 	</group>
 	
 	<group name="exportedxml">
@@ -74,6 +75,7 @@
 		<js>/js/exportedxml.js</js>
 		<js>/js/helper-functions.js</js>
 		<js>/js/header-footer.js</js>
+		<js>/js/close-on-esc.js</js>
 	</group>
 	
 	<group name="errorpage">
