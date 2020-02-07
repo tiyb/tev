@@ -345,7 +345,7 @@ public class TevPostRestControllerUnitTests {
 	 */
 	@Test
 	public void updateMetadata() {
-		Metadata md = mdRestController.getDefaultMetadata();
+		Metadata md = mdRestController.getMetadataForBlogOrDefault("blogName");
 		assertThat(md).isNotNull();
 
 		md.setBaseMediaPath("new base media path");
