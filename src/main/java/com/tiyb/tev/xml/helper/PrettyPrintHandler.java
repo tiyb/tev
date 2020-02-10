@@ -21,6 +21,14 @@ import org.slf4j.LoggerFactory;
  */
 public class PrettyPrintHandler implements InvocationHandler {
 
+	private static final String WRITE_EMPTY_ELEMENT = "writeEmptyElement"; //$NON-NLS-1$
+
+	private static final String WRITE_END_ELEMENT = "writeEndElement"; //$NON-NLS-1$
+
+	private static final String WRITE_START_ELEMENT = "writeStartElement"; //$NON-NLS-1$
+
+	private static final String BEGIN_XMLEVENT_LOG = "XML event: {}"; //$NON-NLS-1$
+
 	private static Logger logger = LoggerFactory.getLogger(PrettyPrintHandler.class);
 
 	/**
@@ -43,7 +51,7 @@ public class PrettyPrintHandler implements InvocationHandler {
 	 * The sequence of characters used to insert indentation into the output.
 	 * Currently using two spaces.
 	 */
-	private static final String INDENT_SEQUENCE = "  ";
+	private static final String INDENT_SEQUENCE = "  "; //$NON-NLS-1$
 
 	/**
 	 * The string to be used for line separators. Using
@@ -78,9 +86,9 @@ public class PrettyPrintHandler implements InvocationHandler {
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		String methodName = method.getName();
-		logger.debug("XML event: " + methodName);
+		logger.debug(BEGIN_XMLEVENT_LOG, methodName);
 
-		if (methodName.equals("writeStartElement")) {
+		if (methodName.equals(WRITE_START_ELEMENT)) {
 			if (depth > 0) {
 				hasChildElement.put(depth - 1, true);
 			}
@@ -90,13 +98,13 @@ public class PrettyPrintHandler implements InvocationHandler {
 			target.writeCharacters(LINEFEED_STRING);
 			target.writeCharacters(repeat(depth, INDENT_SEQUENCE));
 			++depth;
-		} else if (methodName.equals("writeEndElement")) {
+		} else if (methodName.equals(WRITE_END_ELEMENT)) {
 			--depth;
 			if (hasChildElement.get(depth) == true) {
 				target.writeCharacters(LINEFEED_STRING);
 				target.writeCharacters(repeat(depth, INDENT_SEQUENCE));
 			}
-		} else if (methodName.equals("writeEmptyElement")) {
+		} else if (methodName.equals(WRITE_EMPTY_ELEMENT)) {
 			if (depth > 0) {
 				hasChildElement.put(depth - 1, true);
 			}

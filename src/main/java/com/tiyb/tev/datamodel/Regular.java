@@ -33,6 +33,7 @@ public class Regular implements Serializable {
 		this.title = newDataObject.title;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

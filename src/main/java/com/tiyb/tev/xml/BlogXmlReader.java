@@ -15,6 +15,8 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.controller.TEVPostRestController;
 import com.tiyb.tev.datamodel.Answer;
@@ -71,6 +73,65 @@ import com.tiyb.tev.exception.XMLParsingException;
  */
 public class BlogXmlReader extends TEVXmlReader {
 
+	public static final String TAG_COMMA_SEPARATOR = ", "; //$NON-NLS-1$
+	
+	public static final String VIDEO_TAG_CAPTION = "video-caption"; //$NON-NLS-1$
+	public static final String VIDEO_TAG_REVISION = "revision"; //$NON-NLS-1$
+	public static final String VIDEO_TAG_DURATION = "duration"; //$NON-NLS-1$
+	public static final String VIDEO_TAG_HEIGHT = "height"; //$NON-NLS-1$
+	public static final String VIDEO_TAG_WIDTH = "width"; //$NON-NLS-1$
+	public static final String VIDEO_TAG_EXTENSION = "extension"; //$NON-NLS-1$
+	public static final String VIDEO_TAG_CONTENTTYPE = "content-type"; //$NON-NLS-1$
+	
+	public static final String PHOTO_ATTRIBUTE_OFFSET = "offset"; //$NON-NLS-1$
+	public static final String PHOTO_TAG_PHOTO = "photo"; //$NON-NLS-1$
+	public static final String PHOTO_TAG_LINKURL = "photo-link-url"; //$NON-NLS-1$
+	public static final String PHOTO_TAG_PHOTOSET = "photoset"; //$NON-NLS-1$
+	public static final String PHOTO_SIZE_75 = "75"; //$NON-NLS-1$
+	public static final String PHOTO_SIZE_100 = "100"; //$NON-NLS-1$
+	public static final String PHOTO_SIZE_250 = "250"; //$NON-NLS-1$
+	public static final String PHOTO_SIZE_400 = "400"; //$NON-NLS-1$
+	public static final String PHOTO_SIZE_500 = "500"; //$NON-NLS-1$
+	public static final String PHOTO_SIZE_1280 = "1280"; //$NON-NLS-1$
+	public static final String PHOTO_ATTRIBUTE_MAXWIDTH = "max-width"; //$NON-NLS-1$
+	public static final String PHOTO_ATTRIBUTE_WIDTH = "width"; //$NON-NLS-1$
+	public static final String PHOTO_ATTRIBUTE_HEIGHT = "height"; //$NON-NLS-1$
+	public static final String PHOTO_ATTRIBUTE_CAPTION = "caption"; //$NON-NLS-1$
+	public static final String PHOTO_TAG_URL = "photo-url"; //$NON-NLS-1$
+	public static final String PHOTO_TAG_CAPTION = "photo-caption"; //$NON-NLS-1$
+	
+	public static final String LINK_TAG_URL = "link-url"; //$NON-NLS-1$
+	public static final String LINK_TAG_TEXT = "link-text"; //$NON-NLS-1$
+	public static final String LINK_TAG_DESCRIPTION = "link-description"; //$NON-NLS-1$
+	
+	public static final String ANSWER_ANSWER_TAG = "answer"; //$NON-NLS-1$
+	public static final String ANSWER_QUESTION_TAG = "question"; //$NON-NLS-1$
+	
+	public static final String POST_TAG_HASHTAG = "tag"; //$NON-NLS-1$
+	
+	public static final String REGULAR_TAG_BODY = "regular-body"; //$NON-NLS-1$
+	public static final String REGULAR_TAG_TITLE = "regular-title"; //$NON-NLS-1$
+	
+	public static final String POST_ATTRIBUTE_HEIGHT = "height"; //$NON-NLS-1$
+	public static final String POST_ATTRIBUTE_WIDTH = "width"; //$NON-NLS-1$
+	public static final String POST_ATTRIBUTE_TUMBLELOG = "tumblelog"; //$NON-NLS-1$
+	public static final String POST_ATTRIBUTE_ISREBLOG = "is_reblog"; //$NON-NLS-1$
+	public static final String POST_ATTRIBUTE_STATE = "state"; //$NON-NLS-1$
+	public static final String POST_ATTRIBUTE_SLUG = "slug"; //$NON-NLS-1$
+	public static final String POST_ATTRIBUTE_REBLOGKEY = "reblog-key"; //$NON-NLS-1$
+	public static final String POST_ATTRIBUTE_FORMAT = "format"; //$NON-NLS-1$
+	public static final String POST_ATTRIBUTE_UNIXTIMESTAMP = "unix-timestamp"; //$NON-NLS-1$
+	public static final String POST_ATTRIBUTE_DATE = "date"; //$NON-NLS-1$
+	public static final String POST_ATTRIBUTE_DATEGMT = "date-gmt"; //$NON-NLS-1$
+	public static final String POST_ATTRIBUTE_TYPE = "type"; //$NON-NLS-1$
+	public static final String POST_ATTRIBUTE_URLWITHSLUG = "url-with-slug"; //$NON-NLS-1$
+	public static final String POST_ATTRIBUTE_URL = "url"; //$NON-NLS-1$
+	public static final String POST_ATTRIBUTE_ID = "id"; //$NON-NLS-1$
+	public static final String POST_TAG_NAME = "post"; //$NON-NLS-1$
+	
+	private static final String XML_PARSER_THREW_ERROR = "XML parser threw error: "; //$NON-NLS-1$
+	
+	private static final String POST_CONTENT_DELETED_LOG = "Previous content deleted as part of post XML import"; //$NON-NLS-1$
 	/**
 	 * <p>
 	 * This is the main method of the class, which kicks off the processing of the
@@ -103,7 +164,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			postController.deleteAllVideosForBlog(blogName);
 			postController.deleteAllPostsForBlog(blogName);
 			postController.deleteAllHashtagsForBlog(blogName);
-			logger.debug("previous content deleted as part of post XML import");
+			logger.debug(POST_CONTENT_DELETED_LOG);
 		}
 
 		readPosts(xmlFile, postController, isOverwritePosts, blogName);
@@ -173,7 +234,7 @@ public class BlogXmlReader extends TEVXmlReader {
 				if (event.isStartElement()) {
 					StartElement se = event.asStartElement();
 
-					if (se.getName().getLocalPart().equals("post")) {
+					if (se.getName().getLocalPart().equals(POST_TAG_NAME)) {
 						post = new Post();
 						boolean isSubmitablePost = true;
 						readPostAttributes(se, post);
@@ -200,25 +261,25 @@ public class BlogXmlReader extends TEVXmlReader {
 							}
 						}
 						switch (post.getType()) {
-						case "regular":
+						case Post.POST_TYPE_REGULAR:
 							Regular regular = readRegular(reader, post, postRestController);
 							if (isSubmitablePost) {
 								postRestController.createRegularForBlog(post.getTumblelog(), post.getId(), regular);
 							}
 							break;
-						case "answer":
+						case Post.POST_TYPE_ANSWER:
 							Answer answer = readAnswer(reader, post, postRestController);
 							if (isSubmitablePost) {
 								postRestController.createAnswerForBlog(post.getTumblelog(), post.getId(), answer);
 							}
 							break;
-						case "link":
+						case Post.POST_TYPE_LINK:
 							Link link = readLink(reader, post, postRestController);
 							if (isSubmitablePost) {
 								postRestController.createLinkForBlog(post.getTumblelog(), post.getId(), link);
 							}
 							break;
-						case "photo":
+						case Post.POST_TYPE_PHOTO:
 							List<Photo> photos = readPhotos(reader, post, postRestController);
 							if (isSubmitablePost) {
 								for (Photo p : photos) {
@@ -226,7 +287,7 @@ public class BlogXmlReader extends TEVXmlReader {
 								}
 							}
 							break;
-						case "video":
+						case Post.POST_TYPE_VIDEO:
 							Video video = readVideos(reader, post, postRestController);
 							if (isSubmitablePost) {
 								postRestController.createVideoForBlog(post.getTumblelog(), post.getId(), video);
@@ -236,11 +297,11 @@ public class BlogXmlReader extends TEVXmlReader {
 						if (isSubmitablePost) {
 							post = postRestController.updatePostForBlog(post.getTumblelog(), post.getId(), post);
 							if (post.getTags().length() > 0) {
-								List<String> individualTags = Arrays.asList(post.getTags().split(","));
+								List<String> individualTags = Arrays.asList(post.getTags().split(",")); //$NON-NLS-1$
 								for (String tag : individualTags) {
 									tag = tag.trim();
-									if (tag.equals("")) {
-										logger.error("A hashtag was empty from this list: {}", post.getTags());
+									if (tag.equals(StringUtils.EMPTY)) {
+										logger.error("A hashtag was empty from this list: {}", post.getTags()); //$NON-NLS-1$
 									}
 									postRestController.createHashtagForBlog(blogName, tag);
 								}
@@ -250,7 +311,7 @@ public class BlogXmlReader extends TEVXmlReader {
 				}
 			}
 		} catch (XMLStreamException e) {
-			logger.error("XML parser threw error: ", e);
+			logger.error(XML_PARSER_THREW_ERROR, e);
 			throw new XMLParsingException();
 		} finally {
 
@@ -276,49 +337,49 @@ public class BlogXmlReader extends TEVXmlReader {
 			Attribute att = atts.next();
 			String attName = att.getName().getLocalPart();
 			switch (attName) {
-			case "id":
+			case POST_ATTRIBUTE_ID:
 				post.setId(Long.parseLong(att.getValue()));
 				break;
-			case "url":
+			case POST_ATTRIBUTE_URL:
 				post.setUrl(att.getValue());
 				break;
-			case "url-with-slug":
+			case POST_ATTRIBUTE_URLWITHSLUG:
 				post.setUrlWithSlug(att.getValue());
 				break;
-			case "type":
+			case POST_ATTRIBUTE_TYPE:
 				post.setType(att.getValue());
 				break;
-			case "date-gmt":
+			case POST_ATTRIBUTE_DATEGMT:
 				post.setDateGmt(att.getValue());
 				break;
-			case "date":
+			case POST_ATTRIBUTE_DATE:
 				post.setDate(att.getValue());
 				break;
-			case "unix-timestamp":
+			case POST_ATTRIBUTE_UNIXTIMESTAMP:
 				post.setUnixtimestamp(Long.parseLong(att.getValue()));
 				break;
-			case "format":
+			case POST_ATTRIBUTE_FORMAT:
 				// attribute not used
 				break;
-			case "reblog-key":
+			case POST_ATTRIBUTE_REBLOGKEY:
 				post.setReblogKey(att.getValue());
 				break;
-			case "slug":
+			case POST_ATTRIBUTE_SLUG:
 				post.setSlug(att.getValue());
 				break;
-			case "state":
+			case POST_ATTRIBUTE_STATE:
 				post.setState(att.getValue());
 				break;
-			case "is_reblog":
+			case POST_ATTRIBUTE_ISREBLOG:
 				post.setIsReblog(Boolean.parseBoolean(att.getValue()));
 				break;
-			case "tumblelog":
+			case POST_ATTRIBUTE_TUMBLELOG:
 				post.setTumblelog(att.getValue());
 				break;
-			case "width":
+			case POST_ATTRIBUTE_WIDTH:
 				post.setWidth(Integer.parseInt(att.getValue()));
 				break;
-			case "height":
+			case POST_ATTRIBUTE_HEIGHT:
 				post.setHeight(Integer.parseInt(att.getValue()));
 				break;
 			}
@@ -353,24 +414,24 @@ public class BlogXmlReader extends TEVXmlReader {
 			if (event.isStartElement()) {
 				StartElement se = event.asStartElement();
 
-				if (se.getName().getLocalPart().equals("regular-title")) {
+				if (se.getName().getLocalPart().equals(REGULAR_TAG_TITLE)) {
 					regular.setTitle(readCharacters(reader));
-				} else if (se.getName().getLocalPart().equals("regular-body")) {
+				} else if (se.getName().getLocalPart().equals(REGULAR_TAG_BODY)) {
 					regular.setBody(readCharacters(reader));
-				} else if (se.getName().getLocalPart().equals("tag")) {
+				} else if (se.getName().getLocalPart().equals(POST_TAG_HASHTAG)) {
 					String hashtag = readCharacters(reader);
 					post.setTags(addTagToString(post.getTags(), hashtag));
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
 
-				if (ee.getName().getLocalPart().equals("post")) {
+				if (ee.getName().getLocalPart().equals(POST_TAG_NAME)) {
 					return regular;
 				}
 			}
 		}
 
-		logger.error("Unexpected end of file reached in readRegular");
+		logger.error(UNEXPECTED_EOF_LOG, "readRegular"); //$NON-NLS-1$
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -398,24 +459,24 @@ public class BlogXmlReader extends TEVXmlReader {
 			if (event.isStartElement()) {
 				StartElement se = event.asStartElement();
 
-				if (se.getName().getLocalPart().equals("question")) {
+				if (se.getName().getLocalPart().equals(ANSWER_QUESTION_TAG)) {
 					answer.setQuestion(readCharacters(reader));
-				} else if (se.getName().getLocalPart().equals("answer")) {
+				} else if (se.getName().getLocalPart().equals(ANSWER_ANSWER_TAG)) {
 					answer.setAnswer(readCharacters(reader));
-				} else if (se.getName().getLocalPart().equals("tag")) {
+				} else if (se.getName().getLocalPart().equals(POST_TAG_HASHTAG)) {
 					String tag = readCharacters(reader);
 					post.setTags(addTagToString(post.getTags(), tag));
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
 
-				if (ee.getName().getLocalPart().equals("post")) {
+				if (ee.getName().getLocalPart().equals(POST_TAG_NAME)) {
 					return answer;
 				}
 			}
 		}
 
-		logger.error("Unexpected end of file reached in readAnswer");
+		logger.error(UNEXPECTED_EOF_LOG, "readAnswer"); //$NON-NLS-1$
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -442,26 +503,26 @@ public class BlogXmlReader extends TEVXmlReader {
 			if (event.isStartElement()) {
 				StartElement se = event.asStartElement();
 
-				if (se.getName().getLocalPart().equals("link-description")) {
+				if (se.getName().getLocalPart().equals(LINK_TAG_DESCRIPTION)) {
 					link.setDescription(readCharacters(reader));
-				} else if (se.getName().getLocalPart().equals("link-text")) {
+				} else if (se.getName().getLocalPart().equals(LINK_TAG_TEXT)) {
 					link.setText(readCharacters(reader));
-				} else if (se.getName().getLocalPart().equals("link-url")) {
+				} else if (se.getName().getLocalPart().equals(LINK_TAG_URL)) {
 					link.setUrl(readCharacters(reader));
-				} else if (se.getName().getLocalPart().equals("tag")) {
+				} else if (se.getName().getLocalPart().equals(POST_TAG_HASHTAG)) {
 					String tag = readCharacters(reader);
 					post.setTags(addTagToString(post.getTags(), tag));
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
 
-				if (ee.getName().getLocalPart().equals("post")) {
+				if (ee.getName().getLocalPart().equals(POST_TAG_NAME)) {
 					return link;
 				}
 			}
 		}
 
-		logger.error("Unexpected end of file reached in readLink");
+		logger.error(UNEXPECTED_EOF_LOG, "readLink"); //$NON-NLS-1$
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -530,13 +591,13 @@ public class BlogXmlReader extends TEVXmlReader {
 	private static List<Photo> readPhotos(XMLEventReader reader, Post post, TEVPostRestController postRestController)
 			throws XMLStreamException {
 		List<Photo> photos = new ArrayList<Photo>();
-		String caption = "";
-		String url1280 = "";
-		String url500 = "";
-		String url400 = "";
-		String url250 = "";
-		String url100 = "";
-		String url75 = "";
+		String caption = StringUtils.EMPTY;
+		String url1280 = StringUtils.EMPTY;
+		String url500 = StringUtils.EMPTY;
+		String url400 = StringUtils.EMPTY;
+		String url250 = StringUtils.EMPTY;
+		String url100 = StringUtils.EMPTY;
+		String url75 = StringUtils.EMPTY;
 		String photoLinkUrl = null;
 
 		while (reader.hasNext()) {
@@ -545,42 +606,42 @@ public class BlogXmlReader extends TEVXmlReader {
 			if (event.isStartElement()) {
 				StartElement se = event.asStartElement();
 
-				if (se.getName().getLocalPart().equals("photo-caption")) {
+				if (se.getName().getLocalPart().equals(PHOTO_TAG_CAPTION)) {
 					caption = readCharacters(reader);
-				} else if (se.getName().getLocalPart().equalsIgnoreCase("photo-url")) {
-					String width = se.getAttributeByName(new QName("max-width")).getValue();
+				} else if (se.getName().getLocalPart().equalsIgnoreCase(PHOTO_TAG_URL)) {
+					String width = se.getAttributeByName(new QName(PHOTO_ATTRIBUTE_MAXWIDTH)).getValue();
 					switch (width) {
-					case "1280":
+					case PHOTO_SIZE_1280:
 						url1280 = readCharacters(reader);
 						break;
-					case "500":
+					case PHOTO_SIZE_500:
 						url500 = readCharacters(reader);
 						break;
-					case "400":
+					case PHOTO_SIZE_400:
 						url400 = readCharacters(reader);
 						break;
-					case "250":
+					case PHOTO_SIZE_250:
 						url250 = readCharacters(reader);
 						break;
-					case "100":
+					case PHOTO_SIZE_100:
 						url100 = readCharacters(reader);
 						break;
-					case "75":
+					case PHOTO_SIZE_75:
 						url75 = readCharacters(reader);
 						break;
 					}
-				} else if (se.getName().getLocalPart().equals("photoset")) {
+				} else if (se.getName().getLocalPart().equals(PHOTO_TAG_PHOTOSET)) {
 					readPhotoStream(reader, post.getId(), caption, photos);
-				} else if (se.getName().getLocalPart().equals("tag")) {
+				} else if (se.getName().getLocalPart().equals(POST_TAG_HASHTAG)) {
 					String tag = readCharacters(reader);
 					post.setTags(addTagToString(post.getTags(), tag));
-				} else if (se.getName().getLocalPart().equals("photo-link-url")) {
+				} else if (se.getName().getLocalPart().equals(PHOTO_TAG_LINKURL)) {
 					photoLinkUrl = readCharacters(reader);
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
 
-				if (ee.getName().getLocalPart().equals("post")) {
+				if (ee.getName().getLocalPart().equals(POST_TAG_NAME)) {
 					if (photos.size() < 1) {
 						Photo photo = new Photo();
 						photo.setPostId(post.getId());
@@ -601,7 +662,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			}
 		}
 
-		logger.error("Unexpected end of file reached in readPhotos");
+		logger.error(UNEXPECTED_EOF_LOG, "readPhotos"); //$NON-NLS-1$
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -630,35 +691,35 @@ public class BlogXmlReader extends TEVXmlReader {
 			if (event.isStartElement()) {
 				StartElement se = event.asStartElement();
 
-				if (se.getName().getLocalPart().equals("photo")) {
+				if (se.getName().getLocalPart().equals(PHOTO_TAG_PHOTO)) {
 					currentPhoto = new Photo();
 					currentPhoto.setPostId(postID);
 					currentPhoto.setCaption(photoCaption);
-					String offset = se.getAttributeByName(new QName("offset")).getValue();
-					String width = se.getAttributeByName(new QName("width")).getValue();
-					String height = se.getAttributeByName(new QName("height")).getValue();
+					String offset = se.getAttributeByName(new QName(PHOTO_ATTRIBUTE_OFFSET)).getValue();
+					String width = se.getAttributeByName(new QName(PHOTO_ATTRIBUTE_WIDTH)).getValue();
+					String height = se.getAttributeByName(new QName(PHOTO_ATTRIBUTE_HEIGHT)).getValue();
 					currentPhoto.setOffset(offset);
 					currentPhoto.setWidth(Integer.valueOf(width));
 					currentPhoto.setHeight(Integer.valueOf(height));
-				} else if (se.getName().getLocalPart().equals("photo-url")) {
-					String maxWidth = se.getAttributeByName(new QName("max-width")).getValue();
+				} else if (se.getName().getLocalPart().equals(PHOTO_TAG_URL)) {
+					String maxWidth = se.getAttributeByName(new QName(PHOTO_ATTRIBUTE_MAXWIDTH)).getValue();
 					switch (maxWidth) {
-					case "1280":
+					case PHOTO_SIZE_1280:
 						currentPhoto.setUrl1280(readCharacters(reader));
 						break;
-					case "500":
+					case PHOTO_SIZE_500:
 						currentPhoto.setUrl500(readCharacters(reader));
 						break;
-					case "400":
+					case PHOTO_SIZE_400:
 						currentPhoto.setUrl400(readCharacters(reader));
 						break;
-					case "250":
+					case PHOTO_SIZE_250:
 						currentPhoto.setUrl250(readCharacters(reader));
 						break;
-					case "100":
+					case PHOTO_SIZE_100:
 						currentPhoto.setUrl100(readCharacters(reader));
 						break;
-					case "75":
+					case PHOTO_SIZE_75:
 						currentPhoto.setUrl75(readCharacters(reader));
 						break;
 					}
@@ -666,15 +727,15 @@ public class BlogXmlReader extends TEVXmlReader {
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
 
-				if (ee.getName().getLocalPart().equals("photo")) {
+				if (ee.getName().getLocalPart().equals(PHOTO_TAG_PHOTO)) {
 					photos.add(currentPhoto);
-				} else if (ee.getName().getLocalPart().equals("photoset")) {
+				} else if (ee.getName().getLocalPart().equals(PHOTO_TAG_PHOTOSET)) {
 					return photos;
 				}
 			}
 		}
 
-		logger.error("Unexpected end of file reached in readPhotoStream");
+		logger.error(UNEXPECTED_EOF_LOG, "readPhotoStream"); //$NON-NLS-1$
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -714,34 +775,34 @@ public class BlogXmlReader extends TEVXmlReader {
 			if (event.isStartElement()) {
 				StartElement se = event.asStartElement();
 
-				if (se.getName().getLocalPart().equals("content-type")) {
+				if (se.getName().getLocalPart().equals(VIDEO_TAG_CONTENTTYPE)) {
 					video.setContentType(readCharacters(reader));
-				} else if (se.getName().getLocalPart().equals("extension")) {
+				} else if (se.getName().getLocalPart().equals(VIDEO_TAG_EXTENSION)) {
 					video.setExtension(readCharacters(reader));
-				} else if (se.getName().getLocalPart().equals("width")) {
+				} else if (se.getName().getLocalPart().equals(VIDEO_TAG_WIDTH)) {
 					video.setWidth(Integer.parseInt(readCharacters(reader)));
-				} else if (se.getName().getLocalPart().equals("height")) {
+				} else if (se.getName().getLocalPart().equals(VIDEO_TAG_HEIGHT)) {
 					video.setHeight(Integer.parseInt(readCharacters(reader)));
-				} else if (se.getName().getLocalPart().equals("duration")) {
+				} else if (se.getName().getLocalPart().equals(VIDEO_TAG_DURATION)) {
 					video.setDuration(Integer.parseInt(readCharacters(reader)));
-				} else if (se.getName().getLocalPart().equals("revision")) {
+				} else if (se.getName().getLocalPart().equals(VIDEO_TAG_REVISION)) {
 					video.setRevision(readCharacters(reader));
-				} else if (se.getName().getLocalPart().equals("video-caption")) {
+				} else if (se.getName().getLocalPart().equals(VIDEO_TAG_CAPTION)) {
 					video.setVideoCaption(readCharacters(reader));
-				} else if (se.getName().getLocalPart().equals("tag")) {
+				} else if (se.getName().getLocalPart().equals(POST_TAG_HASHTAG)) {
 					String tag = readCharacters(reader);
 					post.setTags(addTagToString(post.getTags(), tag));
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
 
-				if (ee.getName().getLocalPart().equals("post")) {
+				if (ee.getName().getLocalPart().equals(POST_TAG_NAME)) {
 					return video;
 				}
 			}
 		}
 
-		logger.error("Unexpected end of file reached in readVideos");
+		logger.error(UNEXPECTED_EOF_LOG, "readVideos"); //$NON-NLS-1$
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -762,7 +823,7 @@ public class BlogXmlReader extends TEVXmlReader {
 
 		StringBuilder builder = new StringBuilder();
 		builder.append(original);
-		builder.append(", ");
+		builder.append(TAG_COMMA_SEPARATOR);
 		builder.append(tag);
 		return builder.toString();
 	}

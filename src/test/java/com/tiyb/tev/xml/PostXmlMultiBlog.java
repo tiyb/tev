@@ -33,6 +33,7 @@ import com.tiyb.tev.datamodel.Regular;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@SuppressWarnings("nls")
 public class PostXmlMultiBlog {
 	
 	@Autowired

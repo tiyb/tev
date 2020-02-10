@@ -13,6 +13,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,68 @@ import com.tiyb.tev.xml.ConversationXmlReader;
 @Controller
 public class TEVUIController {
 
+	private static final String HASHTAG_ENDSPAN = "</span>&nbsp;&nbsp;&nbsp;&nbsp;"; //$NON-NLS-1$
+	private static final String HASHTAG_STARTSPAN = "<span class='hashtagspan'>"; //$NON-NLS-1$
+	private static final String HASHTAG_SPLITSTRING = "\\s*,\\s*"; //$NON-NLS-1$
+	
+	
+	private static final String XML_CONTENTTYPE = "application/xml"; //$NON-NLS-1$
+	private static final String CACHECONTROL_VALUE = "no-cache"; //$NON-NLS-1$
+	private static final String CACHECONTROL_HEADER = "Cache-Control"; //$NON-NLS-1$
+	private static final String PRAGMA_VALUE = "no-cache"; //$NON-NLS-1$
+	private static final String PRAGMA_HEADER = "Pragma"; //$NON-NLS-1$
+	private static final String VIDEO_CONTENTTYPE = "video/mp4"; //$NON-NLS-1$
+	
+	private static final String FULL_IMAGE_PATH = "%s/%s"; //$NON-NLS-1$
+	private static final String IMAGE_NAME_FORMAT = "%d_%d%s"; //$NON-NLS-1$
+	private static final String JS_BLOGNAME = "var blogName = \"%s\""; //$NON-NLS-1$
+	
+	private static final String MODEL_ATTRIBUTE_IMAGENAME = "imageName"; //$NON-NLS-1$
+	private static final String MODEL_ATTRIBUTE_MESSAGES = "messages"; //$NON-NLS-1$
+	private static final String MODEL_ATTRIBUTE_CONVERSATION = "conversation"; //$NON-NLS-1$
+	private static final String MODEL_ATTRIBUTE_HASHTAGS = "hashtags"; //$NON-NLS-1$
+	private static final String MODEL_ATTRIBUTE_VIDEO = "video"; //$NON-NLS-1$
+	private static final String MODEL_ATTRIBUTE_CAPTION = "caption"; //$NON-NLS-1$
+	private static final String MODEL_ATTRIBUTE_PHOTOS = "photos"; //$NON-NLS-1$
+	private static final String MODEL_ATTRIBUTE_ANSWER = "answer"; //$NON-NLS-1$
+	private static final String MODEL_ATTRIBUTE_LINK = "link"; //$NON-NLS-1$
+	private static final String MODEL_ATTRIBUTE_REGULAR = "regular"; //$NON-NLS-1$
+	private static final String MODEL_ATTRIBUTE_TAGS = "tags"; //$NON-NLS-1$
+	private static final String MODEL_ATTRIBUTE_POST = "post"; //$NON-NLS-1$
+	private static final String MODEL_ATTRIBUTE_BLOGNAMEJS = "blogNameJScript"; //$NON-NLS-1$
+	private static final String MODEL_ATTRIBUTE_MDCOLLECTION = "mdCollection"; //$NON-NLS-1$
+	private static final String MODEL_ATTRIBUTE_NOBLOGSCREATED = "noBlogsCreated"; //$NON-NLS-1$
+	public static final String MODEL_ATTRIBUTE_THEME = "theme"; //$NON-NLS-1$
+	public static final String MODEL_ATTRIBUTE_BLOGNAME = "blogName"; //$NON-NLS-1$
+	
+	private static final String REQUEST_MAPPING_VIDEOVIEWER = "viewers/video"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_PHOTOVIEWER = "viewers/photo"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_ANSWERVIEWER = "viewers/answer"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_LINKVIEWER = "viewers/link"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_REGULARVIEWER = "viewers/regular"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_REDIRECT_BLOGNAMEMISMATCH = "redirect:/errorblogmismatch?blogName=%s&participantName=%s"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_VIEWERBUTTONS = "viewers/viewerbuttons"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_HEADER = "header"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_FOOTER = "footer"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_SINGLEIMAGEVIEWER = "viewers/singleimageviewer"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_CONVERSATIONVIEWER = "viewers/conversation"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_STAGED = "staged"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_XMLEXPORTVIEWER = "viewers/exportedxml"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_HASHTAGVIEWER = "viewers/hashtags"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_VIEWERS = "viewers/"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_REDIRECT_CONVERSATIONS = "redirect:/conversations"; //$NON-NLS-1$
+	private static final String TEMPBLOGNAME_URLSUFFIX = "?tempBlogName=%s"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_REDIRECT_INDEX = "redirect:/index"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_REDIRECT_ERRORBADXML = "redirect:/errorbadxml"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_METADATAFRAME = "metadata-frame"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_METADATA = "metadata"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_CONVERSATIONS = "conversations"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_INDEX = "index"; //$NON-NLS-1$
+
+	private static final String NOSTAGEDPOSTS_WARNING = "No posts staged for download"; //$NON-NLS-1$
+	private static final String VIDEO_IOEXCEPTION = "IO exception reading video file"; //$NON-NLS-1$
+	private static final String FILE_NOT_FOUND_WARNING = "File {} not found."; //$NON-NLS-1$
+
 	Logger logger = LoggerFactory.getLogger(TEVUIController.class);
 
 	/**
@@ -98,12 +161,12 @@ public class TEVUIController {
 			return metadata(model);
 		}
 		if (blogParam.isPresent()) {
-			model.addAttribute("blogName", blogParam.get());
+			model.addAttribute(MODEL_ATTRIBUTE_BLOGNAME, blogParam.get());
 		} else {
-			model.addAttribute("blogName", mdController.getDefaultBlogName());
+			model.addAttribute(MODEL_ATTRIBUTE_BLOGNAME, mdController.getDefaultBlogName());
 		}
 		updateModelWithTheme(model);
-		return "index";
+		return REQUEST_MAPPING_INDEX;
 	}
 
 	/**
@@ -122,14 +185,14 @@ public class TEVUIController {
 		} else {
 			md = mdController.getDefaultMetadata();
 		}
-		model.addAttribute("metadata", md);
+		model.addAttribute(REQUEST_MAPPING_METADATA, md);
 		List<Conversation> conversations = convoController.getAllConversationsForBlog(md.getBlog());
-		model.addAttribute("conversations", conversations);
+		model.addAttribute(REQUEST_MAPPING_CONVERSATIONS, conversations);
 
-		model.addAttribute("blogName", md.getBlog());
+		model.addAttribute(MODEL_ATTRIBUTE_BLOGNAME, md.getBlog());
 		updateModelWithTheme(model);
 
-		return "conversations";
+		return REQUEST_MAPPING_CONVERSATIONS;
 	}
 
 	/**
@@ -143,16 +206,16 @@ public class TEVUIController {
 	@RequestMapping(value = { "/metadata" }, method = RequestMethod.GET)
 	public String metadata(Model model) {
 		try {
-			model.addAttribute("blogName", mdController.getDefaultBlogName());
+			model.addAttribute(MODEL_ATTRIBUTE_BLOGNAME, mdController.getDefaultBlogName());
 			updateModelWithTheme(model);
 		} catch (NoMetadataFoundException e) {
-			model.addAttribute("noBlogsCreated", Boolean.TRUE);
-			model.addAttribute("theme", Metadata.DEFAULT_THEME);
+			model.addAttribute(MODEL_ATTRIBUTE_NOBLOGSCREATED, Boolean.TRUE);
+			model.addAttribute(MODEL_ATTRIBUTE_THEME, Metadata.DEFAULT_THEME);
 		}
 
 		List<Metadata> mdCollection = mdController.getAllMetadata();
-		model.addAttribute("mdCollection", mdCollection);
-		return "metadata";
+		model.addAttribute(MODEL_ATTRIBUTE_MDCOLLECTION, mdCollection);
+		return REQUEST_MAPPING_METADATA;
 	}
 
 	/**
@@ -163,12 +226,12 @@ public class TEVUIController {
 	 * @return Name of the template to be used to render the page
 	 */
 	@RequestMapping(value = { "/metadata/{blogName}" }, method = RequestMethod.GET)
-	public String individualMetatada(@PathVariable("blogName") String blogName, Model model) {
-		model.addAttribute("blogName", blogName);
+	public String individualMetatada(@PathVariable(MODEL_ATTRIBUTE_BLOGNAME) String blogName, Model model) {
+		model.addAttribute(MODEL_ATTRIBUTE_BLOGNAME, blogName);
 		addBlogNameJSToModel(model, blogName);
 		updateModelWithTheme(model);
 
-		return "metadata-frame";
+		return REQUEST_MAPPING_METADATAFRAME;
 	}
 
 	/**
@@ -182,7 +245,7 @@ public class TEVUIController {
 	 * @param blogName The name of the current blog
 	 */
 	private void addBlogNameJSToModel(Model model, String blogName) {
-		model.addAttribute("blogNameJScript", "var blogName = \"" + blogName + "\"");
+		model.addAttribute(MODEL_ATTRIBUTE_BLOGNAMEJS, String.format(JS_BLOGNAME, blogName));
 	}
 
 	/**
@@ -203,15 +266,15 @@ public class TEVUIController {
 		try {
 			BlogXmlReader.parseDocument(file.getInputStream(), postController, mdController, blog);
 		} catch (XMLParsingException | IOException e) {
-			logger.error("UI Controller failing in handlePostFileUpload due to XML parsing error: ", e);
-			return "redirect:/errorbadxml";
+			logger.error("UI Controller failing in handlePostFileUpload due to XML parsing error: ", e); //$NON-NLS-1$
+			return REQUEST_MAPPING_REDIRECT_ERRORBADXML;
 		}
 
 		String defaultBlogName = mdController.getDefaultBlogName();
-		if(blog.equals(defaultBlogName)) {
-			return "redirect:/index";
+		if (blog.equals(defaultBlogName)) {
+			return REQUEST_MAPPING_REDIRECT_INDEX;
 		} else {
-			return String.format("redirect:/index?tempBlogName=%s", blog);
+			return String.format(REQUEST_MAPPING_REDIRECT_INDEX.concat(TEMPBLOGNAME_URLSUFFIX), blog);
 		}
 	}
 
@@ -234,21 +297,21 @@ public class TEVUIController {
 		try {
 			ConversationXmlReader.parseDocument(file, mdController, convoController, blog);
 		} catch (BlogMismatchParsingException e) {
-			logger.error("Mismatch in XML between specified blog name ({}) and name in XML ({}).", e.getBlogName(),
+			logger.error("Mismatch in XML between specified blog name ({}) and name in XML ({}).", e.getBlogName(), //$NON-NLS-1$
 					e.getMainParticipantName());
-			String redirectString = String.format("redirect:/errorblogmismatch?blogName=%s&participantName=%s",
-					e.getBlogName(), e.getMainParticipantName());
+			String redirectString = String.format(REQUEST_MAPPING_REDIRECT_BLOGNAMEMISMATCH, e.getBlogName(),
+					e.getMainParticipantName());
 			return redirectString;
 		} catch (XMLParsingException e) {
-			logger.error("UI Controller failing in handleConversationFileUpload due to XML parsing error: ", e);
-			return "redirect:/errorbadxml";
+			logger.error("UI Controller failing in handleConversationFileUpload due to XML parsing error: ", e); //$NON-NLS-1$
+			return REQUEST_MAPPING_REDIRECT_ERRORBADXML;
 		}
-		
+
 		String defaultBlogName = mdController.getDefaultBlogName();
-		if(blog.equals(defaultBlogName)) {
-			return "redirect:/conversations";
+		if (blog.equals(defaultBlogName)) {
+			return REQUEST_MAPPING_REDIRECT_CONVERSATIONS;
 		} else {
-			return String.format("redirect:/conversations?tempBlogName=%s", blog);
+			return String.format(REQUEST_MAPPING_REDIRECT_CONVERSATIONS.concat(TEMPBLOGNAME_URLSUFFIX), blog);
 		}
 	}
 
@@ -275,11 +338,11 @@ public class TEVUIController {
 	@RequestMapping(value = { "/postViewer/{blog}" }, method = RequestMethod.GET)
 	public String showViewer(@PathVariable("blog") String blog, @RequestParam("id") Long postID, Model model) {
 		Post post = postController.getPostForBlogById(blog, postID);
-		model.addAttribute("post", post);
+		model.addAttribute(MODEL_ATTRIBUTE_POST, post);
 		addBlogNameJSToModel(model, blog);
-		model.addAttribute("tags", pullOutTagValues(post.getTags()));
+		model.addAttribute(MODEL_ATTRIBUTE_TAGS, pullOutTagValues(post.getTags()));
 		List<String> availableTypes = mdController.getAllTypes();
-		String postType = "";
+		String postType = StringUtils.EMPTY;
 
 		for (String type : availableTypes) {
 			if (type.equals(post.getType())) {
@@ -288,42 +351,42 @@ public class TEVUIController {
 			}
 		}
 
-		if (postType == "") {
-			logger.error("Post found in DB with an invalid type");
+		if (postType == StringUtils.EMPTY) {
+			logger.error("Post found in DB with an invalid type"); //$NON-NLS-1$
 			throw new InvalidTypeException();
 		}
 
 		switch (postType) {
-		case "regular":
+		case Post.POST_TYPE_REGULAR:
 			Regular reg = postController.getRegularForBlogById(post.getTumblelog(), postID);
-			model.addAttribute("regular", reg);
-			return "viewers/regular";
-		case "link":
+			model.addAttribute(MODEL_ATTRIBUTE_REGULAR, reg);
+			return REQUEST_MAPPING_REGULARVIEWER;
+		case Post.POST_TYPE_LINK:
 			Link ln = postController.getLinkForBlogById(blog, postID);
-			model.addAttribute("link", ln);
-			return "viewers/link";
-		case "answer":
+			model.addAttribute(MODEL_ATTRIBUTE_LINK, ln);
+			return REQUEST_MAPPING_LINKVIEWER;
+		case Post.POST_TYPE_ANSWER:
 			Answer ans = postController.getAnswerForBlogById(blog, postID);
-			model.addAttribute("answer", ans);
-			return "viewers/answer";
-		case "photo":
+			model.addAttribute(MODEL_ATTRIBUTE_ANSWER, ans);
+			return REQUEST_MAPPING_ANSWERVIEWER;
+		case Post.POST_TYPE_PHOTO:
 			List<String> images = new ArrayList<String>();
 			List<Photo> photos = postController.getPhotoForBlogById(post.getTumblelog(), postID);
 			for (int i = 0; i < photos.size(); i++) {
 				Photo photo = photos.get(i);
 				String ext = photo.getUrl1280().substring(photo.getUrl1280().lastIndexOf('.'));
-				images.add(postID + "_" + i + ext);
+				images.add(String.format(IMAGE_NAME_FORMAT, postID, i, ext));
 			}
-			model.addAttribute("photos", images);
-			model.addAttribute("caption", photos.get(0).getCaption());
-			return "viewers/photo";
-		case "video":
+			model.addAttribute(MODEL_ATTRIBUTE_PHOTOS, images);
+			model.addAttribute(MODEL_ATTRIBUTE_CAPTION, photos.get(0).getCaption());
+			return REQUEST_MAPPING_PHOTOVIEWER;
+		case Post.POST_TYPE_VIDEO:
 			Video vid = postController.getVideoForBlogById(post.getTumblelog(), postID);
-			model.addAttribute("video", vid);
-			return "viewers/video";
+			model.addAttribute(MODEL_ATTRIBUTE_VIDEO, vid);
+			return REQUEST_MAPPING_VIDEOVIEWER;
 		}
 
-		return "viewers/" + postType;
+		return REQUEST_MAPPING_VIEWERS.concat(postType);
 	}
 
 	/**
@@ -339,11 +402,11 @@ public class TEVUIController {
 	public String showHashtagViewerForBlog(Model model, @RequestParam("tempBlogName") Optional<String> blogParam) {
 		String blog = blogParam.isPresent() ? blogParam.get() : mdController.getDefaultBlogName();
 		List<Hashtag> hashtags = postController.getAllHashtagsForBlog(blog);
-		model.addAttribute("hashtags", hashtags);
-		model.addAttribute("blogName", blog);
+		model.addAttribute(MODEL_ATTRIBUTE_HASHTAGS, hashtags);
+		model.addAttribute(MODEL_ATTRIBUTE_BLOGNAME, blog);
 		updateModelWithTheme(model);
 		addBlogNameJSToModel(model, blog);
-		return "viewers/hashtags";
+		return REQUEST_MAPPING_HASHTAGVIEWER;
 	}
 
 	/**
@@ -356,13 +419,13 @@ public class TEVUIController {
 	@RequestMapping(value = { "/exportViewer" }, method = RequestMethod.GET)
 	public String showExportViewer(Model model, @RequestParam("tempBlogName") Optional<String> blogParam) {
 		if (blogParam.isPresent()) {
-			model.addAttribute("blogName", blogParam.get());
+			model.addAttribute(MODEL_ATTRIBUTE_BLOGNAME, blogParam.get());
 		} else {
-			model.addAttribute("blogName", mdController.getDefaultBlogName());
+			model.addAttribute(MODEL_ATTRIBUTE_BLOGNAME, mdController.getDefaultBlogName());
 		}
 		updateModelWithTheme(model);
-		addBlogNameJSToModel(model, (String) model.getAttribute("blogName"));
-		return "viewers/exportedxml";
+		addBlogNameJSToModel(model, (String) model.getAttribute(MODEL_ATTRIBUTE_BLOGNAME));
+		return REQUEST_MAPPING_XMLEXPORTVIEWER;
 	}
 
 	/**
@@ -375,12 +438,12 @@ public class TEVUIController {
 	@RequestMapping(value = { "/staged" }, method = RequestMethod.GET)
 	public String showStagedPosts(Model model, @RequestParam("tempBlogName") Optional<String> blogParam) {
 		if (blogParam.isPresent()) {
-			model.addAttribute("blogName", blogParam.get());
+			model.addAttribute(MODEL_ATTRIBUTE_BLOGNAME, blogParam.get());
 		} else {
-			model.addAttribute("blogName", mdController.getDefaultBlogName());
+			model.addAttribute(MODEL_ATTRIBUTE_BLOGNAME, mdController.getDefaultBlogName());
 		}
 		updateModelWithTheme(model);
-		return "staged";
+		return REQUEST_MAPPING_STAGED;
 	}
 
 	/**
@@ -395,18 +458,18 @@ public class TEVUIController {
 	public String showConversationViewer(@RequestParam("blog") String blog,
 			@RequestParam("participant") String participantName, Model model) {
 		Metadata md = mdController.getMetadataForBlog(blog);
-		model.addAttribute("metadata", md);
+		model.addAttribute(REQUEST_MAPPING_METADATA, md);
 		addBlogNameJSToModel(model, blog);
 		Conversation convo = convoController.getConversationForBlogByParticipant(md.getBlog(), participantName);
-		model.addAttribute("conversation", convo);
+		model.addAttribute(MODEL_ATTRIBUTE_CONVERSATION, convo);
 		List<ConversationMessage> messages = convoController.getConvoMsgForBlogByConvoID(convo.getBlog(),
 				convo.getId());
-		model.addAttribute("messages", messages);
+		model.addAttribute(MODEL_ATTRIBUTE_MESSAGES, messages);
 
-		model.addAttribute("blogName", blog);
+		model.addAttribute(MODEL_ATTRIBUTE_BLOGNAME, blog);
 		updateModelWithTheme(model);
 
-		return "viewers/conversation";
+		return REQUEST_MAPPING_CONVERSATIONVIEWER;
 	}
 
 	/**
@@ -417,9 +480,9 @@ public class TEVUIController {
 	 * @return Name of the viewer to load
 	 */
 	@RequestMapping(value = { "/viewers/imageViewer/{imageName}" }, method = RequestMethod.GET)
-	public String showSingleImageViewer(@PathVariable("imageName") String imageName, Model model) {
-		model.addAttribute("imageName", imageName);
-		return "viewers/singleimageviewer";
+	public String showSingleImageViewer(@PathVariable(MODEL_ATTRIBUTE_IMAGENAME) String imageName, Model model) {
+		model.addAttribute(MODEL_ATTRIBUTE_IMAGENAME, imageName);
+		return REQUEST_MAPPING_SINGLEIMAGEVIEWER;
 	}
 
 	/**
@@ -432,14 +495,15 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/viewerMedia/{imageName}" }, method = RequestMethod.GET, produces = {
 			MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_PNG_VALUE })
-	public @ResponseBody byte[] getMedia(@PathVariable("imageName") String imageName, Model model) {
-		String fullName = mdController.getDefaultMetadata().getBaseMediaPath() + "/" + imageName;
+	public @ResponseBody byte[] getMedia(@PathVariable(MODEL_ATTRIBUTE_IMAGENAME) String imageName, Model model) {
+		String fullName = String.format(FULL_IMAGE_PATH, mdController.getDefaultMetadata().getBaseMediaPath(),
+				imageName);
 
 		File file = new File(fullName);
 		try {
 			return Files.readAllBytes(file.toPath());
 		} catch (IOException e) {
-			logger.warn("File {} not found.", imageName);
+			logger.warn(FILE_NOT_FOUND_WARNING, imageName);
 			throw new ResourceNotFoundException(fullName, fullName, e);
 		}
 	}
@@ -451,14 +515,14 @@ public class TEVUIController {
 	 * @param response HTTP Response object
 	 * @param request  HTTP Request object
 	 */
-	@RequestMapping(value = { "/viewerVideo/{videoName}" }, method = RequestMethod.GET, produces = { "video/mp4" })
+	@RequestMapping(value = { "/viewerVideo/{videoName}" }, method = RequestMethod.GET, produces = { VIDEO_CONTENTTYPE })
 	public void getVideo(HttpServletResponse response, HttpServletRequest request) {
-		String fullName = mdController.getDefaultMetadata().getBaseMediaPath() + "/"
-				+ request.getRequestURI().substring(request.getRequestURI().lastIndexOf('/'));
+		String fullName = String.format(FULL_IMAGE_PATH, mdController.getDefaultMetadata().getBaseMediaPath(),
+				request.getRequestURI().substring(request.getRequestURI().lastIndexOf('/')));
 
-		response.setContentType("video/mp4");
-		response.setHeader("Pragma", "no-cache");
-		response.setHeader("Cache-Control", "no-cache");
+		response.setContentType(VIDEO_CONTENTTYPE);
+		response.setHeader(PRAGMA_HEADER, PRAGMA_VALUE);
+		response.setHeader(CACHECONTROL_HEADER, CACHECONTROL_VALUE);
 
 		File file = new File(fullName);
 		try {
@@ -471,7 +535,7 @@ public class TEVUIController {
 			in.close();
 			out.close();
 		} catch (IOException e) {
-			logger.error("IO exception reading video file", e);
+			logger.error(VIDEO_IOEXCEPTION, e);
 			throw new ResourceNotFoundException(fullName, fullName, e);
 		}
 	}
@@ -489,13 +553,13 @@ public class TEVUIController {
 	@RequestMapping(value = { "/stagedPostsDownload/{blog}" }, method = RequestMethod.GET, produces = { "text/plain" })
 	public @ResponseBody String getStagedPostsFileForBlog(@PathVariable("blog") String blog,
 			HttpServletResponse response, HttpServletRequest request) {
-		response.setContentType("application/xml");
-		response.setHeader("Pragma", "no-cache");
-		response.setHeader("Cache-Control", "no-cache");
+		response.setContentType(XML_CONTENTTYPE);
+		response.setHeader(PRAGMA_HEADER, PRAGMA_VALUE);
+		response.setHeader(CACHECONTROL_HEADER, CACHECONTROL_VALUE);
 		List<Long> postIDs = stagingController.getAllPostsForBlog(blog);
 
 		if (postIDs.size() < 1) {
-			logger.warn("No posts staged for download");
+			logger.warn(NOSTAGEDPOSTS_WARNING);
 			throw new NoStagedPostsException();
 		}
 
@@ -517,7 +581,7 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/footer" }, method = RequestMethod.GET)
 	public String footer(Model model) {
-		return "footer";
+		return REQUEST_MAPPING_FOOTER;
 	}
 
 	/**
@@ -528,7 +592,7 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/header" }, method = RequestMethod.GET)
 	public String header(Model model) {
-		return "header";
+		return REQUEST_MAPPING_HEADER;
 	}
 
 	/**
@@ -538,7 +602,7 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/viewerbuttons" }, method = RequestMethod.GET)
 	public String viewerButtons() {
-		return "viewers/viewerbuttons";
+		return REQUEST_MAPPING_VIEWERBUTTONS;
 	}
 
 	/**
@@ -549,17 +613,17 @@ public class TEVUIController {
 	 * @return String, containing HTML span tags containing the hashtags
 	 */
 	private String pullOutTagValues(String csvTags) {
-		if (csvTags == null || csvTags.equals("")) {
+		if (csvTags == null || csvTags.equals(StringUtils.EMPTY)) {
 			return csvTags;
 		}
 
-		List<String> items = Arrays.asList(csvTags.split("\\s*,\\s*"));
+		List<String> items = Arrays.asList(csvTags.split(HASHTAG_SPLITSTRING));
 		StringBuilder builder = new StringBuilder();
 
 		for (String s : items) {
-			builder.append("<span class='hashtagspan'>");
+			builder.append(HASHTAG_STARTSPAN);
 			builder.append(s);
-			builder.append("</span>&nbsp;&nbsp;&nbsp;&nbsp;");
+			builder.append(HASHTAG_ENDSPAN);
 		}
 
 		return builder.toString();
@@ -571,16 +635,16 @@ public class TEVUIController {
 	 * @param model The model to be updated
 	 */
 	private void updateModelWithTheme(Model model) {
-		String blogName = (String) model.getAttribute("blogName");
+		String blogName = (String) model.getAttribute(MODEL_ATTRIBUTE_BLOGNAME);
 		Metadata md = mdController.getMetadataForBlog(blogName);
 		String theme = md.getTheme();
-		if (theme == null || theme.equals("")) {
+		if (theme == null || theme.equals(StringUtils.EMPTY)) {
 			theme = Metadata.DEFAULT_THEME;
 			md.setTheme(theme);
 			mdController.updateMetadata(md.getId(), md);
 		}
 
-		model.addAttribute("theme", theme);
+		model.addAttribute(MODEL_ATTRIBUTE_THEME, theme);
 	}
 
 }

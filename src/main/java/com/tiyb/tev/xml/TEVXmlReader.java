@@ -22,7 +22,14 @@ public class TEVXmlReader {
 	 * Value used for the exception encountered when XML parsing fails because of
 	 * unexpected conditions (i.e. a closing tag was expected but never arrived).
 	 */
-	protected static final String END_OF_FILE_ERROR = "Premature end of file";
+	protected static final String END_OF_FILE_ERROR = "Premature end of file"; //$NON-NLS-1$
+
+	/**
+	 * Raised when unexpectedly getting to the end of an XML file
+	 */
+	protected static final String UNEXPECTED_EOF_LOG = "Unexpected end of file reached in method {}"; //$NON-NLS-1$
+	
+	protected static final String XML_PARSER_ERROR = "Error parsing XML file: "; //$NON-NLS-1$
 
 	/**
 	 * <p>
@@ -59,7 +66,7 @@ public class TEVXmlReader {
 			}
 		}
 
-		logger.error("Unexpected end of file reached in readCharacters");
+		logger.error(UNEXPECTED_EOF_LOG, "readCharacters"); //$NON-NLS-1$
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 }

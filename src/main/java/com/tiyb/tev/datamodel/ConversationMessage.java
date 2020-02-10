@@ -50,6 +50,7 @@ public class ConversationMessage implements Serializable {
 		this.message = newData.message;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

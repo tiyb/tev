@@ -20,6 +20,7 @@ import com.tiyb.tev.repository.ConversationRepository;
  */
 @RunWith(SpringRunner.class)
 @DataJpaTest
+@SuppressWarnings("nls")
 public class ConversationRepositoryUnitTest {
 
 	@Autowired

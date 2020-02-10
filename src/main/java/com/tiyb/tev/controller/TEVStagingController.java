@@ -118,6 +118,7 @@ public class TEVStagingController {
 	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
 	 *         the details
 	 */
+	@SuppressWarnings("nls")
 	@DeleteMapping("/posts/{blog}/{id}")
 	public ResponseEntity<?> deleteStagedPostForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long id) {
 		StagingPost post = stagingRepo.findById(id)
@@ -174,6 +175,7 @@ public class TEVStagingController {
 	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
 	 *         the details
 	 */
+	@SuppressWarnings("nls")
 	@PostMapping("/posts/{blog}/{id}/exportImages")
 	public ResponseEntity<?> exportImagesForBlogForPost(@PathVariable("blog") String blog,
 			@PathVariable("id") Long postID, @RequestBody String pathForDestination) {
@@ -183,7 +185,7 @@ public class TEVStagingController {
 
 		String imageDirectory = mdController.getMetadataForBlog(blog).getBaseMediaPath();
 		if (imageDirectory.charAt(imageDirectory.length() - 1) != '/') {
-			imageDirectory = imageDirectory + "/";
+			imageDirectory = imageDirectory.concat("/");
 		}
 
 		File sourceDirectory = new File(imageDirectory);

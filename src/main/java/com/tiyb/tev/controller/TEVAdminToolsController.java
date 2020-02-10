@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,8 @@ import com.tiyb.tev.repository.PostRepository;
 @RestController
 @RequestMapping("/admintools")
 public class TEVAdminToolsController {
+
+	private static final String INVALID_IMAGE_DIRECTORY = "Invalid image directory: {}"; //$NON-NLS-1$
 
 	Logger logger = LoggerFactory.getLogger(TEVAdminToolsController.class);
 
@@ -112,9 +115,9 @@ public class TEVAdminToolsController {
 	@PreDestroy
 	public void preDestroy() {
 		try {
-			jdbcTemplate.execute("SHUTDOWN COMPACT");
+			jdbcTemplate.execute("SHUTDOWN COMPACT"); //$NON-NLS-1$
 		} catch (DataAccessException e) {
-			logger.error("Error encountered in preDestroy method: ", e);
+			logger.error("Error encountered in preDestroy method: ", e); //$NON-NLS-1$
 		}
 	}
 
@@ -130,7 +133,7 @@ public class TEVAdminToolsController {
 		List<String> allTypeNames = mdController.getAllTypes();
 
 		if (!TEVMetadataRestController.isValidType(type, allTypeNames)) {
-			logger.error("Invalid type name: {}", type);
+			logger.error("Invalid type name: {}", type); //$NON-NLS-1$
 			throw new InvalidTypeException();
 		}
 
@@ -188,18 +191,18 @@ public class TEVAdminToolsController {
 	public ResponseEntity<String> cleanImagesOnHDForBlog(@PathVariable("blog") String blog) {
 		ArrayList<String> allCleanFiles = new ArrayList<String>();
 		String imageDirectory = mdController.getMetadataForBlog(blog).getBaseMediaPath();
-		if (imageDirectory == null || imageDirectory.equals("")) {
-			logger.error("Invalid image directory used for cleanImagesOnHD: {}", imageDirectory);
+		if (imageDirectory == null || imageDirectory.equals(StringUtils.EMPTY)) {
+			logger.error(INVALID_IMAGE_DIRECTORY, imageDirectory);
 			return new ResponseEntity<String>(INVALID_IMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
 		}
 
 		if (imageDirectory.charAt(imageDirectory.length() - 1) != '/') {
-			imageDirectory = imageDirectory + "/";
+			imageDirectory = imageDirectory.concat("/"); //$NON-NLS-1$
 		}
 
 		File folder = new File(imageDirectory);
 
-		List<Post> photoPosts = getPostsByBlogByType(blog, "photo");
+		List<Post> photoPosts = getPostsByBlogByType(blog, Post.POST_TYPE_PHOTO);
 		for (Post post : photoPosts) {
 			List<Photo> photosForPost = postController.getPhotoForBlogById(post.getTumblelog(), post.getId());
 			int numPhotos = photosForPost.size();
@@ -244,25 +247,25 @@ public class TEVAdminToolsController {
 	public ResponseEntity<String> importImagesForBlog(@PathVariable("blog") String blog,
 			@RequestBody String imagePath) {
 		String imageDirectory = mdController.getMetadataForBlog(blog).getBaseMediaPath();
-		if (imageDirectory == null || imageDirectory.equals("")) {
-			logger.error("Invalid image directory used for importImages: {}", imageDirectory);
+		if (imageDirectory == null || imageDirectory.equals(StringUtils.EMPTY)) {
+			logger.error(INVALID_IMAGE_DIRECTORY, imageDirectory);
 			return new ResponseEntity<String>(INVALID_IMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
 		}
 
 		if (imageDirectory.charAt(imageDirectory.length() - 1) != '/') {
-			imageDirectory = imageDirectory + "/";
+			imageDirectory = imageDirectory.concat("/"); //$NON-NLS-1$
 		}
 
 		File destinationFolder = new File(imageDirectory);
 		if (!destinationFolder.isDirectory()) {
-			logger.error("Images directory in metadata is not a valid directory: {}", imageDirectory);
+			logger.error(INVALID_IMAGE_DIRECTORY, imageDirectory);
 			return new ResponseEntity<String>(INVALID_IMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
 		}
 		Path destinationFolderPath = destinationFolder.toPath();
 
 		File sourceFolder = new File(imagePath);
 		if (!sourceFolder.isDirectory()) {
-			logger.error("Invalid source directory passed to import images: {}", imagePath);
+			logger.error(INVALID_IMAGE_DIRECTORY, imagePath);
 			return new ResponseEntity<String>(INVALID_SOURCEIMAGES_MESSAGE, null, HttpStatus.BAD_REQUEST);
 		}
 
@@ -272,11 +275,11 @@ public class TEVAdminToolsController {
 			try {
 				Files.copy(inputFilePath, destinationFolderPath.resolve(inputFilePath.getFileName()));
 			} catch (FileAlreadyExistsException e) {
-				logger.debug("File already exists: {}", inputFilePath.getFileName());
+				logger.debug("File already exists: {}", inputFilePath.getFileName()); //$NON-NLS-1$
 				// Skip copying files that don't exist
 			} catch (IOException e) {
-				logger.error("Error copying file from source to destination: {}", inputFilePath.getFileName());
-				logger.debug("File Copy Error:", e);
+				logger.error("Error copying file from source to destination: {}", inputFilePath.getFileName()); //$NON-NLS-1$
+				logger.debug("File Copy Error:", e); //$NON-NLS-1$
 				return new ResponseEntity<String>(ERROR_COPYINGFILES_MESSAGE, null, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}

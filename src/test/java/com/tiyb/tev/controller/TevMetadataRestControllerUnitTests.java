@@ -23,6 +23,7 @@ import com.tiyb.tev.exception.NoMetadataFoundException;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@SuppressWarnings("nls")
 public class TevMetadataRestControllerUnitTests {
 
 	@Autowired

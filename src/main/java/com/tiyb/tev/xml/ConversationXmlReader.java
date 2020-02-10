@@ -16,6 +16,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.tiyb.tev.controller.TEVConvoRestController;
@@ -44,6 +45,20 @@ import com.tiyb.tev.exception.XMLParsingException;
  * @author tiyb
  */
 public class ConversationXmlReader extends TEVXmlReader {
+
+	private static final String DEACTIVATED_POSTFIX = "-deact"; //$NON-NLS-1$
+	private static final String DEFAULT_PARTICIPANT_NAME = "NO NAME"; //$NON-NLS-1$
+	private static final String PARTICIPANTS_TAG = "participants"; //$NON-NLS-1$
+	private static final String TYPE_ATTRIBUTE = "type"; //$NON-NLS-1$
+	private static final String TIMESTAMP_ATTRIBUTE = "ts"; //$NON-NLS-1$
+	private static final String IMAGE_PHOTOURL = "photo-url"; //$NON-NLS-1$
+	private static final String MESSAGE_TYPE_IMAGE = "IMAGE"; //$NON-NLS-1$
+	private static final String PARTICIPANT_DIFFERENTIATOR_STRING = " 1"; //$NON-NLS-1$
+	private static final String CONVERSATION_TAG = "conversation"; //$NON-NLS-1$
+	private static final String MESSAGES_TAG = "messages"; //$NON-NLS-1$
+	private static final String MESSAGE_TAG = "message"; //$NON-NLS-1$
+	private static final String PARTICIPANT_ATTRIBUTE_AVATARURL = "avatar_url"; //$NON-NLS-1$
+	private static final String PARTICIPANT_TAG = "participant"; //$NON-NLS-1$
 
 	/**
 	 * <p>
@@ -83,7 +98,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 			InputStream participantXmlStream = xmlFile.getInputStream();
 			Participant mainParticipant = getMainParticipant(participantXmlStream);
 			if (!blogName.equals(mainParticipant.name)) {
-				logger.error("Mismatch between expected blog name ({}) and main participant name ({}).", blogName,
+				logger.error("Mismatch between expected blog name ({}) and main participant name ({}).", blogName, //$NON-NLS-1$
 						mainParticipant.name);
 				throw new BlogMismatchParsingException(blogName, mainParticipant.name);
 			}
@@ -96,7 +111,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 			readConversations(xmlStream, md.getMainTumblrUser(), mainParticipantID, mdController, convoController,
 					blogName);
 		} catch (IOException e) {
-			logger.error("Error parsing XML file: ", e);
+			logger.error(XML_PARSER_ERROR, e);
 			throw new XMLParsingException();
 		}
 	}
@@ -139,15 +154,15 @@ public class ConversationXmlReader extends TEVXmlReader {
 				if (event.isStartElement()) {
 					StartElement se = event.asStartElement();
 
-					if (se.getName().getLocalPart().equals("participant")) {
+					if (se.getName().getLocalPart().equals(PARTICIPANT_TAG)) {
 						@SuppressWarnings("unchecked")
 						Iterator<Attribute> atts = se.getAttributes();
-						String participantName = "";
-						String participantURL = "";
+						String participantName = StringUtils.EMPTY;
+						String participantURL = StringUtils.EMPTY;
 
 						while (atts.hasNext()) {
 							Attribute att = atts.next();
-							if (att.getName().getLocalPart().equals("avatar_url")) {
+							if (att.getName().getLocalPart().equals(PARTICIPANT_ATTRIBUTE_AVATARURL)) {
 								participantURL = att.getValue();
 							}
 						}
@@ -161,13 +176,13 @@ public class ConversationXmlReader extends TEVXmlReader {
 							returnParticipant.name = participantName;
 							returnParticipant.avatarURL = participantURL;
 						}
-					} else if (se.getName().getLocalPart().equals("message")) {
+					} else if (se.getName().getLocalPart().equals(MESSAGE_TAG)) {
 						@SuppressWarnings("unchecked")
 						Iterator<Attribute> atts = se.getAttributes();
 
 						while (atts.hasNext()) {
 							Attribute att = atts.next();
-							if (att.getName().getLocalPart().equals("participant")) {
+							if (att.getName().getLocalPart().equals(PARTICIPANT_TAG)) {
 								if (newConversation) {
 									if (nameIds.contains(att.getValue())) {
 										returnParticipant.id = att.getValue();
@@ -184,17 +199,17 @@ public class ConversationXmlReader extends TEVXmlReader {
 				} else if (event.isEndElement()) {
 					EndElement ee = event.asEndElement();
 
-					if (ee.getName().getLocalPart().equals("messages")) {
+					if (ee.getName().getLocalPart().equals(MESSAGES_TAG)) {
 						newConversation = true;
 					}
 				}
 			}
 		} catch (Exception e) {
-			logger.error("Exception thrown by XML parser: ", e);
+			logger.error(XML_PARSER_ERROR, e);
 			throw new XMLParsingException();
 		}
 
-		logger.error("Unexpected end of file found in getMainParticipant()");
+		logger.error(UNEXPECTED_EOF_LOG, "getMainParticipant"); //$NON-NLS-1$
 		throw new XMLParsingException();
 	}
 
@@ -272,10 +287,10 @@ public class ConversationXmlReader extends TEVXmlReader {
 				if (event.isStartElement()) {
 					StartElement se = event.asStartElement();
 
-					if (se.getName().getLocalPart().equals("conversation")) {
+					if (se.getName().getLocalPart().equals(CONVERSATION_TAG)) {
 						participant = getParticipantName(reader, mainTumblrUserName);
 						while (allParticipants.contains(participant.name)) {
-							participant.name = participant.name + " 1";
+							participant.name = participant.name.concat(PARTICIPANT_DIFFERENTIATOR_STRING);
 						}
 						allParticipants.add(participant.name);
 						MessageSuperStructure messageData = getMessages(reader, mainTumblrUserId);
@@ -331,7 +346,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 				}
 			}
 		} catch (XMLStreamException e) {
-			logger.error("Error thrown by XML parser: ", e);
+			logger.error(XML_PARSER_ERROR, e);
 			throw new XMLParsingException();
 		} finally {
 
@@ -377,13 +392,13 @@ public class ConversationXmlReader extends TEVXmlReader {
 			if (event.isStartElement()) {
 				StartElement se = event.asStartElement();
 
-				if (se.getName().getLocalPart().equals("message")) {
+				if (se.getName().getLocalPart().equals(MESSAGE_TAG)) {
 					ConversationMessage currentMessage = new ConversationMessage();
 					String pId = readMessageAttributes(se, currentMessage, tumblrUserID);
-					if ((returnObject.participantId.equals("")) && (!pId.equals(""))) {
+					if ((returnObject.participantId.equals(StringUtils.EMPTY)) && (!pId.equals(StringUtils.EMPTY))) {
 						returnObject.participantId = pId;
 					}
-					if (currentMessage.getType().equals("IMAGE")) {
+					if (currentMessage.getType().equals(MESSAGE_TYPE_IMAGE)) {
 						currentMessage.setMessage(readImageMessage(reader));
 					} else {
 						currentMessage.setMessage(readCharacters(reader));
@@ -393,14 +408,14 @@ public class ConversationXmlReader extends TEVXmlReader {
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
 
-				if (ee.getName().getLocalPart().equals("conversation")) {
+				if (ee.getName().getLocalPart().equals(CONVERSATION_TAG)) {
 					returnObject.messages = messages;
 					return returnObject;
 				}
 			}
 		}
 
-		logger.error("Unexpected end of file reached in getMessages");
+		logger.error(UNEXPECTED_EOF_LOG, "getMessages"); //$NON-NLS-1$
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -416,7 +431,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 	 * @throws XMLStreamException
 	 */
 	private static String readImageMessage(XMLEventReader reader) throws XMLStreamException {
-		String imageMessage = "";
+		String imageMessage = StringUtils.EMPTY;
 
 		while (reader.hasNext()) {
 			XMLEvent event = reader.nextEvent();
@@ -424,19 +439,19 @@ public class ConversationXmlReader extends TEVXmlReader {
 			if (event.isStartElement()) {
 				StartElement se = event.asStartElement();
 
-				if (se.getName().getLocalPart().equals("photo-url")) {
+				if (se.getName().getLocalPart().equals(IMAGE_PHOTOURL)) {
 					imageMessage = readCharacters(reader);
 				}
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
 
-				if (ee.getName().getLocalPart().equals("message")) {
+				if (ee.getName().getLocalPart().equals(MESSAGE_TAG)) {
 					return imageMessage;
 				}
 			}
 		}
 
-		logger.error("Unexpected end of file reached in readImageMessage");
+		logger.error(UNEXPECTED_EOF_LOG, "readImageMessage"); //$NON-NLS-1$
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -453,17 +468,17 @@ public class ConversationXmlReader extends TEVXmlReader {
 			String tumblrUserID) {
 		@SuppressWarnings("unchecked")
 		Iterator<Attribute> atts = startElement.getAttributes();
-		String participantId = "";
+		String participantId = StringUtils.EMPTY;
 
 		while (atts.hasNext()) {
 			Attribute att = atts.next();
 			String attName = att.getName().getLocalPart();
 
 			switch (attName) {
-			case "ts":
+			case TIMESTAMP_ATTRIBUTE:
 				currentMessage.setTimestamp(Long.parseLong(att.getValue()));
 				break;
-			case "participant":
+			case PARTICIPANT_TAG:
 				String participant = att.getValue();
 				if (participant.equals(tumblrUserID)) {
 					currentMessage.setReceived(false);
@@ -472,7 +487,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 					participantId = participant;
 				}
 				break;
-			case "type":
+			case TYPE_ATTRIBUTE:
 				currentMessage.setType(att.getValue());
 				break;
 			}
@@ -498,8 +513,8 @@ public class ConversationXmlReader extends TEVXmlReader {
 	 */
 	private static ConversationXmlReader.Participant getParticipantName(XMLEventReader reader, String tumblrUserName)
 			throws XMLStreamException {
-		String participantName = "";
-		String participantAvatar = "";
+		String participantName = StringUtils.EMPTY;
+		String participantAvatar = StringUtils.EMPTY;
 		ConversationXmlReader.Participant participant = new ConversationXmlReader.Participant();
 
 		while (reader.hasNext()) {
@@ -508,13 +523,13 @@ public class ConversationXmlReader extends TEVXmlReader {
 			if (event.isStartElement()) {
 				StartElement se = event.asStartElement();
 
-				if (se.getName().getLocalPart().equals("participant")) {
+				if (se.getName().getLocalPart().equals(PARTICIPANT_TAG)) {
 					@SuppressWarnings("unchecked")
 					Iterator<Attribute> atts = se.getAttributes();
 					while (atts.hasNext()) {
 						Attribute att = atts.next();
 						String attName = att.getName().getLocalPart();
-						if (attName == "avatar_url") {
+						if (attName == PARTICIPANT_ATTRIBUTE_AVATARURL) {
 							participantAvatar = att.getValue();
 							break;
 						}
@@ -528,16 +543,16 @@ public class ConversationXmlReader extends TEVXmlReader {
 			} else if (event.isEndElement()) {
 				EndElement ee = event.asEndElement();
 
-				if (ee.getName().getLocalPart().equals("participants")) {
-					if (participant.name.equals("")) {
-						participant.name = "NO NAME";
+				if (ee.getName().getLocalPart().equals(PARTICIPANTS_TAG)) {
+					if (participant.name.equals(StringUtils.EMPTY)) {
+						participant.name = DEFAULT_PARTICIPANT_NAME;
 					}
 					return participant;
 				}
 			}
 		}
 
-		logger.error("Unexpected end of file reached in getParticipantName");
+		logger.error(UNEXPECTED_EOF_LOG, "getParticipantName"); //$NON-NLS-1$
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -553,7 +568,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 	 * @return Username without the postfix (if any)
 	 */
 	private static String fixName(String participantName) {
-		int postfix = participantName.indexOf("-deact");
+		int postfix = participantName.indexOf(DEACTIVATED_POSTFIX);
 		if (postfix == -1) {
 			return participantName;
 		}
@@ -601,7 +616,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 		/**
 		 * The ID of the participant in the conversation
 		 */
-		public String participantId = "";
+		public String participantId = StringUtils.EMPTY;
 	}
 
 }

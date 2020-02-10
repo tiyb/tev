@@ -9,6 +9,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,15 @@ import com.tiyb.tev.xml.helper.PrettyPrintHandler;
  */
 public class BlogXmlWriter {
 
+	private static final String POST_FORMAT_HTML = "html"; //$NON-NLS-1$
+	private static final String VIDEO_TAG_SOURCE = "video-source"; //$NON-NLS-1$
+	private static final String HASHTAG_SEPARATOR = ","; //$NON-NLS-1$
+	private static final String POSTS_TAG = "posts"; //$NON-NLS-1$
+	private static final String TUMBLR_VERSION_ATTRIBUTE_VALUE = "1.0"; //$NON-NLS-1$
+	private static final String TUMBLR_VERSION_ATTRIBUTE_NAME = "version"; //$NON-NLS-1$
+	private static final String TUMBLR_TAG = "tumblr"; //$NON-NLS-1$
+	private static final String XML_VERSION_NO = "1.0"; //$NON-NLS-1$
+	private static final String DOCUMENT_ENCODING = "UTF-8"; //$NON-NLS-1$
 	private static Logger logger = LoggerFactory.getLogger(BlogXmlWriter.class);
 
 	/**
@@ -107,11 +117,11 @@ public class BlogXmlWriter {
 					XMLStreamWriter.class.getClassLoader(), new Class[] { XMLStreamWriter.class }, handler);
 			writer = prettyPrintWriter;
 
-			writer.writeStartDocument("UTF-8", "1.0");
-			writer.writeStartElement("tumblr");
-			writer.writeAttribute("version", "1.0");
+			writer.writeStartDocument(DOCUMENT_ENCODING, XML_VERSION_NO);
+			writer.writeStartElement(TUMBLR_TAG);
+			writer.writeAttribute(TUMBLR_VERSION_ATTRIBUTE_NAME, TUMBLR_VERSION_ATTRIBUTE_VALUE);
 
-			writer.writeStartElement("posts");
+			writer.writeStartElement(POSTS_TAG);
 
 			for (Post post : posts) {
 				addPost(post, writer, postController, blogName);
@@ -123,7 +133,7 @@ public class BlogXmlWriter {
 
 			xmlString = stringWriter.toString();
 		} catch (XMLStreamException e) {
-			logger.error("Error creating XML document", e);
+			logger.error("Error creating XML document", e); //$NON-NLS-1$
 			return null;
 		}
 
@@ -144,36 +154,36 @@ public class BlogXmlWriter {
 	 */
 	private static void addPost(Post post, XMLStreamWriter writer, TEVPostRestController postController,
 			String blogName) throws XMLStreamException {
-		writer.writeStartElement("post");
+		writer.writeStartElement(BlogXmlReader.POST_TAG_NAME);
 		addPostAttributes(post, writer);
 		switch (post.getType()) {
-		case "answer":
+		case Post.POST_TYPE_ANSWER:
 			addAnswerBody(post, writer, postController);
 			break;
-		case "link":
+		case Post.POST_TYPE_LINK:
 			addLinkBody(post, writer, postController);
 			break;
-		case "photo":
+		case Post.POST_TYPE_PHOTO:
 			addPhotoBody(post, writer, postController, blogName);
 			break;
-		case "regular":
+		case Post.POST_TYPE_REGULAR:
 			addRegularBody(post, writer, postController);
 			break;
-		case "video":
+		case Post.POST_TYPE_VIDEO:
 			addVideoBody(post, writer, postController);
 			break;
 		default:
-			logger.error("Invalid post type");
+			logger.error("Invalid post type"); //$NON-NLS-1$
 			throw new XMLStreamException();
 		}
 
 		String postTags = post.getTags();
-		String enumeratedTags[] = postTags.split(",");
+		String enumeratedTags[] = postTags.split(HASHTAG_SEPARATOR);
 
 		for (String tag : enumeratedTags) {
 			tag = tag.trim();
 			if (tag.length() > 0) {
-				writer.writeStartElement("tag");
+				writer.writeStartElement(BlogXmlReader.POST_TAG_HASHTAG);
 				writer.writeCharacters(tag);
 				writer.writeEndElement();
 			}
@@ -198,12 +208,12 @@ public class BlogXmlWriter {
 			String blogName) throws XMLStreamException {
 		List<Photo> photos = postController.getPhotoForBlogById(blogName, post.getId());
 
-		writer.writeStartElement("photo-caption");
+		writer.writeStartElement(BlogXmlReader.PHOTO_TAG_CAPTION);
 		writer.writeCharacters(photos.get(0).getCaption());
 		writer.writeEndElement();
 
 		if (photos.get(0).getPhotoLinkUrl() != null) {
-			writer.writeStartElement("photo-link-url");
+			writer.writeStartElement(BlogXmlReader.PHOTO_TAG_LINKURL);
 			writer.writeCharacters(photos.get(0).getPhotoLinkUrl());
 			writer.writeEndElement();
 		}
@@ -211,13 +221,13 @@ public class BlogXmlWriter {
 		addPhotoWithSizes(photos.get(0), writer);
 
 		if (photos.size() > 1) {
-			writer.writeStartElement("photoset");
+			writer.writeStartElement(BlogXmlReader.PHOTO_TAG_PHOTOSET);
 			for (int i = 0; i < photos.size(); i++) {
-				writer.writeStartElement("photo");
-				writer.writeAttribute("offset", photos.get(i).getOffset());
-				writer.writeAttribute("caption", "");
-				writer.writeAttribute("width", String.valueOf(photos.get(i).getWidth()));
-				writer.writeAttribute("height", String.valueOf(photos.get(i).getHeight()));
+				writer.writeStartElement(BlogXmlReader.PHOTO_TAG_PHOTO);
+				writer.writeAttribute(BlogXmlReader.PHOTO_ATTRIBUTE_OFFSET, photos.get(i).getOffset());
+				writer.writeAttribute(BlogXmlReader.PHOTO_ATTRIBUTE_CAPTION, StringUtils.EMPTY);
+				writer.writeAttribute(BlogXmlReader.PHOTO_ATTRIBUTE_WIDTH, String.valueOf(photos.get(i).getWidth()));
+				writer.writeAttribute(BlogXmlReader.PHOTO_ATTRIBUTE_HEIGHT, String.valueOf(photos.get(i).getHeight()));
 				addPhotoWithSizes(photos.get(i), writer);
 				writer.writeEndElement();
 			}
@@ -235,33 +245,33 @@ public class BlogXmlWriter {
 	 *                            StAX objects
 	 */
 	private static void addPhotoWithSizes(Photo photo, XMLStreamWriter writer) throws XMLStreamException {
-		writer.writeStartElement("photo-url");
-		writer.writeAttribute("max-width", "1280");
+		writer.writeStartElement(BlogXmlReader.PHOTO_TAG_URL);
+		writer.writeAttribute(BlogXmlReader.PHOTO_ATTRIBUTE_MAXWIDTH, BlogXmlReader.PHOTO_SIZE_1280);
 		writer.writeCharacters(photo.getUrl1280());
 		writer.writeEndElement();
 
-		writer.writeStartElement("photo-url");
-		writer.writeAttribute("max-width", "500");
+		writer.writeStartElement(BlogXmlReader.PHOTO_TAG_URL);
+		writer.writeAttribute(BlogXmlReader.PHOTO_ATTRIBUTE_MAXWIDTH, BlogXmlReader.PHOTO_SIZE_500);
 		writer.writeCharacters(photo.getUrl500());
 		writer.writeEndElement();
 
-		writer.writeStartElement("photo-url");
-		writer.writeAttribute("max-width", "400");
+		writer.writeStartElement(BlogXmlReader.PHOTO_TAG_URL);
+		writer.writeAttribute(BlogXmlReader.PHOTO_ATTRIBUTE_MAXWIDTH, BlogXmlReader.PHOTO_SIZE_400);
 		writer.writeCharacters(photo.getUrl400());
 		writer.writeEndElement();
 
-		writer.writeStartElement("photo-url");
-		writer.writeAttribute("max-width", "250");
+		writer.writeStartElement(BlogXmlReader.PHOTO_TAG_URL);
+		writer.writeAttribute(BlogXmlReader.PHOTO_ATTRIBUTE_MAXWIDTH, BlogXmlReader.PHOTO_SIZE_250);
 		writer.writeCharacters(photo.getUrl250());
 		writer.writeEndElement();
 
-		writer.writeStartElement("photo-url");
-		writer.writeAttribute("max-width", "100");
+		writer.writeStartElement(BlogXmlReader.PHOTO_TAG_URL);
+		writer.writeAttribute(BlogXmlReader.PHOTO_ATTRIBUTE_MAXWIDTH, BlogXmlReader.PHOTO_SIZE_100);
 		writer.writeCharacters(photo.getUrl100());
 		writer.writeEndElement();
 
-		writer.writeStartElement("photo-url");
-		writer.writeAttribute("max-width", "75");
+		writer.writeStartElement(BlogXmlReader.PHOTO_TAG_URL);
+		writer.writeAttribute(BlogXmlReader.PHOTO_ATTRIBUTE_MAXWIDTH, BlogXmlReader.PHOTO_SIZE_75);
 		writer.writeCharacters(photo.getUrl75());
 		writer.writeEndElement();
 
@@ -283,35 +293,35 @@ public class BlogXmlWriter {
 			throws XMLStreamException {
 		Video video = postController.getVideoForBlogById(post.getTumblelog(), post.getId());
 
-		writer.writeStartElement("video-source");
+		writer.writeStartElement(VIDEO_TAG_SOURCE);
 
-		writer.writeStartElement("content-type");
+		writer.writeStartElement(BlogXmlReader.VIDEO_TAG_CONTENTTYPE);
 		writer.writeCharacters(video.getContentType());
 		writer.writeEndElement();
 
-		writer.writeStartElement("extension");
+		writer.writeStartElement(BlogXmlReader.VIDEO_TAG_EXTENSION);
 		writer.writeCharacters(video.getExtension());
 		writer.writeEndElement();
 
-		writer.writeStartElement("width");
+		writer.writeStartElement(BlogXmlReader.VIDEO_TAG_WIDTH);
 		writer.writeCharacters(String.valueOf(video.getWidth()));
 		writer.writeEndElement();
 
-		writer.writeStartElement("height");
+		writer.writeStartElement(BlogXmlReader.VIDEO_TAG_HEIGHT);
 		writer.writeCharacters(String.valueOf(video.getHeight()));
 		writer.writeEndElement();
 
-		writer.writeStartElement("duration");
+		writer.writeStartElement(BlogXmlReader.VIDEO_TAG_DURATION);
 		writer.writeCharacters(String.valueOf(video.getDuration()));
 		writer.writeEndElement();
 
-		writer.writeStartElement("revision");
+		writer.writeStartElement(BlogXmlReader.VIDEO_TAG_REVISION);
 		writer.writeCharacters(video.getRevision());
 		writer.writeEndElement();
 
 		writer.writeEndElement();
 
-		writer.writeStartElement("video-caption");
+		writer.writeStartElement(BlogXmlReader.VIDEO_TAG_CAPTION);
 		writer.writeCharacters(video.getVideoCaption());
 		writer.writeEndElement();
 
@@ -332,11 +342,11 @@ public class BlogXmlWriter {
 			throws XMLStreamException {
 		Answer answer = postController.getAnswerForBlogById(post.getTumblelog(), post.getId());
 
-		writer.writeStartElement("question");
+		writer.writeStartElement(BlogXmlReader.ANSWER_QUESTION_TAG);
 		writer.writeCharacters(answer.getQuestion());
 		writer.writeEndElement();
 
-		writer.writeStartElement("answer");
+		writer.writeStartElement(BlogXmlReader.ANSWER_ANSWER_TAG);
 		writer.writeCharacters(answer.getAnswer());
 		writer.writeEndElement();
 
@@ -355,15 +365,15 @@ public class BlogXmlWriter {
 			throws XMLStreamException {
 		Link link = postController.getLinkForBlogById(post.getTumblelog(), post.getId());
 
-		writer.writeStartElement("link-text");
+		writer.writeStartElement(BlogXmlReader.LINK_TAG_TEXT);
 		writer.writeCharacters(link.getText());
 		writer.writeEndElement();
 
-		writer.writeStartElement("link-url");
+		writer.writeStartElement(BlogXmlReader.LINK_TAG_URL);
 		writer.writeCharacters(link.getUrl());
 		writer.writeEndElement();
 
-		writer.writeStartElement("link-description");
+		writer.writeStartElement(BlogXmlReader.LINK_TAG_DESCRIPTION);
 		writer.writeCharacters(link.getDescription());
 		writer.writeEndElement();
 
@@ -384,12 +394,12 @@ public class BlogXmlWriter {
 		Regular regular = postController.getRegularForBlogById(post.getTumblelog(), post.getId());
 
 		if (regular.getTitle() != null && regular.getTitle().length() > 0) {
-			writer.writeStartElement("regular-title");
+			writer.writeStartElement(BlogXmlReader.REGULAR_TAG_TITLE);
 			writer.writeCharacters(regular.getTitle());
 			writer.writeEndElement();
 		}
 
-		writer.writeStartElement("regular-body");
+		writer.writeStartElement(BlogXmlReader.REGULAR_TAG_BODY);
 		writer.writeCharacters(regular.getBody());
 		writer.writeEndElement();
 
@@ -405,23 +415,23 @@ public class BlogXmlWriter {
 	 *                            StAX objects
 	 */
 	private static void addPostAttributes(Post post, XMLStreamWriter writer) throws XMLStreamException {
-		writer.writeAttribute("id", String.valueOf(post.getId()));
-		writer.writeAttribute("url", post.getUrl());
-		writer.writeAttribute("url-with-slug", post.getUrlWithSlug());
-		writer.writeAttribute("type", post.getType());
-		writer.writeAttribute("date-gmt", post.getDateGmt());
-		writer.writeAttribute("date", post.getDate());
-		writer.writeAttribute("unix-timestamp", String.valueOf(post.getUnixtimestamp()));
-		writer.writeAttribute("format", "html"); // hard-coded
-		writer.writeAttribute("reblog-key", post.getReblogKey());
-		writer.writeAttribute("slug", post.getSlug());
-		writer.writeAttribute("state", post.getState());
-		writer.writeAttribute("is_reblog", String.valueOf(post.getIsReblog()));
-		writer.writeAttribute("tumblelog", String.valueOf(post.getTumblelog()));
+		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_ID, String.valueOf(post.getId()));
+		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_URL, post.getUrl());
+		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_URLWITHSLUG, post.getUrlWithSlug());
+		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_TYPE, post.getType());
+		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_DATEGMT, post.getDateGmt());
+		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_DATE, post.getDate());
+		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_UNIXTIMESTAMP, String.valueOf(post.getUnixtimestamp()));
+		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_FORMAT, POST_FORMAT_HTML); // hard-coded
+		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_REBLOGKEY, post.getReblogKey());
+		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_SLUG, post.getSlug());
+		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_STATE, post.getState());
+		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_ISREBLOG, String.valueOf(post.getIsReblog()));
+		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_TUMBLELOG, String.valueOf(post.getTumblelog()));
 
-		if (post.getType().equals("photo")) {
-			writer.writeAttribute("width", String.valueOf(post.getWidth()));
-			writer.writeAttribute("height", String.valueOf(post.getHeight()));
+		if (post.getType().equals(Post.POST_TYPE_PHOTO)) {
+			writer.writeAttribute(BlogXmlReader.PHOTO_ATTRIBUTE_WIDTH, String.valueOf(post.getWidth()));
+			writer.writeAttribute(BlogXmlReader.PHOTO_ATTRIBUTE_HEIGHT, String.valueOf(post.getHeight()));
 		}
 	}
 }

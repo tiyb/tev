@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Encapsulates the data for any Tumblr post. This entity has the main post
  * details, and other entities (Answer, Link, Photo, Regular, and Video) have
@@ -20,6 +22,11 @@ import javax.persistence.Table;
 public class Post implements Serializable {
 
 	private static final long serialVersionUID = -7988281852593439595L;
+	public static final String POST_TYPE_REGULAR = "regular"; //$NON-NLS-1$
+	public static final String POST_TYPE_LINK = "link"; //$NON-NLS-1$
+	public static final String POST_TYPE_ANSWER = "answer"; //$NON-NLS-1$
+	public static final String POST_TYPE_PHOTO = "photo"; //$NON-NLS-1$
+	public static final String POST_TYPE_VIDEO = "video"; //$NON-NLS-1$
 
 	@Id
 	private Long id;
@@ -39,7 +46,7 @@ public class Post implements Serializable {
 	private Boolean isRead = false;
 	@Lob
 	@Column(name="tags", length=50000)
-	private String tags = "";
+	private String tags = StringUtils.EMPTY;
 	private Boolean isFavourite = false;
 	private String state;
 	private Integer height;
@@ -65,6 +72,7 @@ public class Post implements Serializable {
 		this.width = newDataObject.width;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

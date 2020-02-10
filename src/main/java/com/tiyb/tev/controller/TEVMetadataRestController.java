@@ -61,6 +61,7 @@ public class TEVMetadataRestController {
 	/**
 	 * List of all post types available from Tumblr/TEV
 	 */
+	@SuppressWarnings("nls")
 	public final static List<String> POST_TYPES = new ArrayList<String>(
 			Arrays.asList("answer", "link", "photo", "regular", "video"));
 
@@ -287,6 +288,7 @@ public class TEVMetadataRestController {
 	 * @param metadataDetails The data to be updated in the DB
 	 * @return The updated {@link com.tiyb.tev.datamodel.Metadata Metadata} object
 	 */
+	@SuppressWarnings("nls")
 	@PutMapping("/metadata/{id}")
 	public Metadata updateMetadata(@PathVariable("id") Integer id, @RequestBody Metadata metadataDetails) {
 		Assert.hasText(metadataDetails.getTheme(), "Theme must not be null");
@@ -314,6 +316,7 @@ public class TEVMetadataRestController {
 	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
 	 *         the response details
 	 */
+	@SuppressWarnings("nls")
 	@DeleteMapping("/metadata/{id}")
 	public ResponseEntity<?> deleteMetadata(@PathVariable("id") Integer id) {
 		Optional<Metadata> omd = metadataRepo.findById(id);

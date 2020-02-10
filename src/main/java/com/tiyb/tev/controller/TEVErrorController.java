@@ -1,5 +1,6 @@
 package com.tiyb.tev.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
@@ -19,6 +20,11 @@ import com.tiyb.tev.datamodel.Metadata;
 @Controller
 public class TEVErrorController implements ErrorController {
 
+	private static final String MODEL_ATTRIBUTE_PARTICIPANTNAME = "participantName"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_ERRORPATH = "/error"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_ERRORBLOGNAMEMISMATCH = "errorblognamemismatch"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_ERRORBADXML = "errorbadxml"; //$NON-NLS-1$
+	private static final String REQUEST_MAPPING_ERROR = "error"; //$NON-NLS-1$
 	/**
 	 * REST controller for working with metadata
 	 */
@@ -32,11 +38,11 @@ public class TEVErrorController implements ErrorController {
 	 * 
 	 * @return Mapping to the generic error page
 	 */
-	@RequestMapping("/error")
+	@RequestMapping(REQUEST_MAPPING_ERRORPATH)
 	public String handleError(Model model) {
 		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
-		return "error";
+		return REQUEST_MAPPING_ERROR;
 	}
 
 	/**
@@ -49,7 +55,7 @@ public class TEVErrorController implements ErrorController {
 	public String handleXMLError(Model model) {
 		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
-		return "errorbadxml";
+		return REQUEST_MAPPING_ERRORBADXML;
 	}
 
 	/**
@@ -63,12 +69,12 @@ public class TEVErrorController implements ErrorController {
 	 */
 	@RequestMapping("/errorblogmismatch")
 	public String handleBlogMismatchError(@RequestParam("blogName") String blogName,
-			@RequestParam("participantName") String participantName, Model model) {
-		model.addAttribute("blogName", blogName);
-		model.addAttribute("participantName", participantName);
+			@RequestParam(MODEL_ATTRIBUTE_PARTICIPANTNAME) String participantName, Model model) {
+		model.addAttribute(TEVUIController.MODEL_ATTRIBUTE_BLOGNAME, blogName);
+		model.addAttribute(MODEL_ATTRIBUTE_PARTICIPANTNAME, participantName);
 		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
-		return "errorblognamemismatch";
+		return REQUEST_MAPPING_ERRORBLOGNAMEMISMATCH;
 	}
 
 	/**
@@ -79,7 +85,7 @@ public class TEVErrorController implements ErrorController {
 	 */
 	@Override
 	public String getErrorPath() {
-		return "/error";
+		return REQUEST_MAPPING_ERRORPATH;
 	}
 
 	/**
@@ -92,7 +98,7 @@ public class TEVErrorController implements ErrorController {
 	 */
 	private void updateModelWithBlogName(Model model) {
 		Metadata m = mdController.getDefaultMetadata();
-		model.addAttribute("blogName", m.getBlog());
+		model.addAttribute(TEVUIController.MODEL_ATTRIBUTE_BLOGNAME, m.getBlog());
 	}
 
 	/**
@@ -101,16 +107,16 @@ public class TEVErrorController implements ErrorController {
 	 * @param model The model to be updated
 	 */
 	private void updateModelWithTheme(Model model) {
-		String blogName = (String) model.getAttribute("blogName");
+		String blogName = (String) model.getAttribute(TEVUIController.MODEL_ATTRIBUTE_BLOGNAME);
 		Metadata md = mdController.getMetadataForBlog(blogName);
 		String theme = md.getTheme();
-		if (theme == null || theme.equals("")) {
+		if (theme == null || theme.equals(StringUtils.EMPTY)) {
 			theme = Metadata.DEFAULT_THEME;
 			md.setTheme(theme);
 			mdController.updateMetadata(md.getId(), md);
 		}
 
-		model.addAttribute("theme", theme);
+		model.addAttribute(TEVUIController.MODEL_ATTRIBUTE_THEME, theme);
 	}
 
 }

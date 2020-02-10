@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,8 @@ import com.tiyb.tev.repository.VideoRepository;
 @RestController
 @RequestMapping("/api")
 public class TEVPostRestController {
+
+	private static final String PHOTONAME_STRINGFORMAT = "%s%s_%s"; //$NON-NLS-1$
 
 	Logger logger = LoggerFactory.getLogger(TEVPostRestController.class);
 
@@ -133,7 +136,7 @@ public class TEVPostRestController {
 	@PostMapping("/posts/{blog}")
 	public Post createPostForBlog(@PathVariable("blog") String blog, @Valid @RequestBody Post post) {
 		if (!blog.equals(post.getTumblelog())) {
-			logger.error("Post blog and API blog don't match; post blog={}, API blog={}", post.getTumblelog(), blog);
+			logger.error("Post blog and API blog don't match; post blog={}, API blog={}", post.getTumblelog(), blog); //$NON-NLS-1$
 			throw new BlogPostMismatchException();
 		}
 		return postRepo.save(post);
@@ -146,6 +149,7 @@ public class TEVPostRestController {
 	 * @param postId The Post ID
 	 * @return The {@link com.tiyb.tev.datamodel.Post Post} details
 	 */
+	@SuppressWarnings("nls")
 	@GetMapping("/posts/{blog}/{id}")
 	public Post getPostForBlogById(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		return postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
@@ -161,6 +165,7 @@ public class TEVPostRestController {
 	 * @return The same {@link com.tiyb.tev.datamodel.Post Post} object that was
 	 *         submitted
 	 */
+	@SuppressWarnings("nls")
 	@PutMapping("/posts/{blog}/{id}")
 	public Post updatePostForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId,
 			@RequestBody Post postDetails) {
@@ -183,6 +188,7 @@ public class TEVPostRestController {
 	 * @param postId The ID of the post to be marked read
 	 * @return The modified Post
 	 */
+	@SuppressWarnings("nls")
 	@PutMapping("/posts/{blog}/{id}/markRead")
 	public Post markPostReadForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
@@ -203,6 +209,7 @@ public class TEVPostRestController {
 	 * @param postId The ID of the post to be marked as a favourite
 	 * @return The modified Post
 	 */
+	@SuppressWarnings("nls")
 	@PutMapping("/posts/{blog}/{id}/markFavourite")
 	public Post markPostFavouriteForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
@@ -223,6 +230,7 @@ public class TEVPostRestController {
 	 * @param postId The ID of the post to be marked unread
 	 * @return The modified Post
 	 */
+	@SuppressWarnings("nls")
 	@PutMapping("/posts/{blog}/{id}/markUnread")
 	public Post markPostUnreadForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
@@ -243,6 +251,7 @@ public class TEVPostRestController {
 	 * @param postId The ID of the post to be marked as not a favourite
 	 * @return The modified Post
 	 */
+	@SuppressWarnings("nls")
 	@PutMapping("/posts/{blog}/{id}/markNonFavourite")
 	public Post markPostNonFavouriteForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
@@ -264,6 +273,7 @@ public class TEVPostRestController {
 	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
 	 *         the response details
 	 */
+	@SuppressWarnings("nls")
 	@DeleteMapping("/posts/{blog}/{id}")
 	public ResponseEntity<?> deletePostForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
@@ -308,12 +318,12 @@ public class TEVPostRestController {
 	@GetMapping("/posts/{blog}/{id}/fixPhotos")
 	public Boolean fixPhotosForBlogForPost(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		String imageDirectory = mdController.getMetadataForBlog(blog).getBaseMediaPath();
-		if (imageDirectory == null || imageDirectory.equals("")) {
+		if (imageDirectory == null || imageDirectory.equals(StringUtils.EMPTY)) {
 			return false;
 		}
 
 		if (imageDirectory.charAt(imageDirectory.length() - 1) != '/') {
-			imageDirectory = imageDirectory + "/";
+			imageDirectory = imageDirectory.concat("/"); //$NON-NLS-1$
 		}
 
 		List<Photo> photos = photoRepo.findByPostIdOrderByOffset(postId);
@@ -325,7 +335,8 @@ public class TEVPostRestController {
 			String ext = url.substring(url.lastIndexOf('.'));
 			try {
 				BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
-				FileOutputStream out = new FileOutputStream(imageDirectory + photo.getPostId() + "_" + i + ext);
+				FileOutputStream out = new FileOutputStream(
+						String.format(PHOTONAME_STRINGFORMAT, imageDirectory, photo.getPostId(), ext));
 				byte dataBuffer[] = new byte[1024];
 				int bytesRead;
 				while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
@@ -400,7 +411,7 @@ public class TEVPostRestController {
 	 */
 	@GetMapping("/posts/{blog}/answers")
 	public List<Answer> getAllAnswersForBlog(@PathVariable("blog") String blog) {
-		List<Post> posts = postRepo.findByTumblelogAndType(blog, "answer");
+		List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_ANSWER);
 		List<Answer> answers = new ArrayList<Answer>();
 
 		for (Post post : posts) {
@@ -427,7 +438,7 @@ public class TEVPostRestController {
 			@Valid @RequestBody Answer answer) {
 		Optional<Post> post = postRepo.findById(postId);
 		if (!post.isPresent()) {
-			logger.error("Tried to submit answer for a post that doesn't exist: {}", postId);
+			logger.error("Tried to submit answer for a post that doesn't exist: {}", postId); //$NON-NLS-1$
 			throw new NoParentPostException();
 		} else {
 			assert blog.equals(post.get().getTumblelog());
@@ -443,6 +454,7 @@ public class TEVPostRestController {
 	 * @param postId The Post ID
 	 * @return The {@link com.tiyb.tev.datamodel.Answer Answer} details
 	 */
+	@SuppressWarnings("nls")
 	@GetMapping("/posts/{blog}/{id}/answer")
 	public Answer getAnswerForBlogById(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		return answerRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Answer", "id", postId));
@@ -457,6 +469,7 @@ public class TEVPostRestController {
 	 * @return The same {@link com.tiyb.tev.datamodel.Answer Answer} object that was
 	 *         submitted
 	 */
+	@SuppressWarnings("nls")
 	@PutMapping("/posts/{blog}/{id}/answer")
 	public Answer updateAnswerForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId,
 			@RequestBody Answer answerDetails) {
@@ -479,7 +492,7 @@ public class TEVPostRestController {
 	 */
 	@DeleteMapping("/posts/{blog}/answers")
 	public ResponseEntity<?> deleteAllAnswersForBlog(@PathVariable("blog") String blog) {
-		List<Post> posts = postRepo.findByTumblelogAndType(blog, "answer");
+		List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_ANSWER);
 
 		for (Post post : posts) {
 			answerRepo.deleteById(post.getId());
@@ -496,6 +509,7 @@ public class TEVPostRestController {
 	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
 	 *         the response details
 	 */
+	@SuppressWarnings("nls")
 	@DeleteMapping("/posts/{blog}/{id}/answer")
 	public ResponseEntity<?> deleteAnswerForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		Answer ans = answerRepo.findById(postId)
@@ -514,7 +528,7 @@ public class TEVPostRestController {
 	 */
 	@GetMapping("/posts/{blog}/links")
 	public List<Link> getAllLinksForBlog(@PathVariable("blog") String blog) {
-		List<Post> posts = postRepo.findByTumblelogAndType(blog, "link");
+		List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_LINK);
 		List<Link> links = new ArrayList<Link>();
 
 		for (Post post : posts) {
@@ -541,7 +555,7 @@ public class TEVPostRestController {
 			@Valid @RequestBody Link link) {
 		Optional<Post> post = postRepo.findById(postId);
 		if (!post.isPresent()) {
-			logger.error("Tried to submit link for a post that doesn't exist: {}", postId);
+			logger.error("Tried to submit link for a post that doesn't exist: {}", postId); //$NON-NLS-1$
 			throw new NoParentPostException();
 		} else {
 			assert blog.equals(post.get().getTumblelog());
@@ -557,6 +571,7 @@ public class TEVPostRestController {
 	 * @param postId The Post ID
 	 * @return The {@link com.tiyb.tev.datamodel.Link Link} details
 	 */
+	@SuppressWarnings("nls")
 	@GetMapping("/posts/{blog}/{id}/link")
 	public Link getLinkForBlogById(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		return linkRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Link", "id", postId));
@@ -571,6 +586,7 @@ public class TEVPostRestController {
 	 * @return The same {@link com.tiyb.tev.datamodel.Link Link} object that was
 	 *         submitted
 	 */
+	@SuppressWarnings("nls")
 	@PutMapping("/posts/{blog}/{id}/link")
 	public Link updateLinkForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId,
 			@RequestBody Link linkDetails) {
@@ -592,7 +608,7 @@ public class TEVPostRestController {
 	 */
 	@DeleteMapping("/posts/{blog}/links")
 	public ResponseEntity<?> deleteAllLinksForBlog(@PathVariable("blog") String blog) {
-		List<Post> posts = postRepo.findByTumblelogAndType(blog, "link");
+		List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_LINK);
 
 		for (Post post : posts) {
 			linkRepo.deleteById(post.getId());
@@ -609,6 +625,7 @@ public class TEVPostRestController {
 	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
 	 *         the response details
 	 */
+	@SuppressWarnings("nls")
 	@DeleteMapping("/posts/{blog}/{id}/link")
 	public ResponseEntity<?> deleteLinkForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		Link link = linkRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Link", "id", postId));
@@ -626,7 +643,7 @@ public class TEVPostRestController {
 	 */
 	@GetMapping("/posts/{blog}/photos")
 	public List<Photo> getAllPhotosForBlog(@PathVariable("blog") String blog) {
-		List<Post> posts = postRepo.findByTumblelogAndType(blog, "photo");
+		List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_PHOTO);
 		List<Photo> photos = new ArrayList<Photo>();
 
 		for (Post post : posts) {
@@ -651,7 +668,7 @@ public class TEVPostRestController {
 	public Photo createPhotoForBlog(@PathVariable("blog") String blog, @Valid @RequestBody Photo photo) {
 		Optional<Post> post = postRepo.findById(photo.getPostId());
 		if (!post.isPresent()) {
-			logger.error("Tried to submit link for a post that doesn't exist: {}", photo.getPostId());
+			logger.error("Tried to submit link for a post that doesn't exist: {}", photo.getPostId()); //$NON-NLS-1$
 			throw new NoParentPostException();
 		} else {
 			assert blog.equals(post.get().getTumblelog());
@@ -680,6 +697,7 @@ public class TEVPostRestController {
 	 * @return The same {@link com.tiyb.tev.datamodel.Photo Photo} object that was
 	 *         submitted
 	 */
+	@SuppressWarnings("nls")
 	@PutMapping("/posts/{blog}/{id}/photo")
 	public Photo updatePhotoForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId,
 			@RequestBody Photo photoDetails) {
@@ -704,7 +722,7 @@ public class TEVPostRestController {
 	 */
 	@DeleteMapping("/posts/{blog}/photos")
 	public ResponseEntity<?> deleteAllPhotosForBlog(@PathVariable("blog") String blog) {
-		List<Post> posts = postRepo.findByTumblelogAndType(blog, "photo");
+		List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_PHOTO);
 
 		for (Post post : posts) {
 			List<Photo> photos = photoRepo.findByPostId(post.getId());
@@ -724,6 +742,7 @@ public class TEVPostRestController {
 	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
 	 *         the response details
 	 */
+	@SuppressWarnings("nls")
 	@DeleteMapping("/posts/{blog}/{id}/photo")
 	public ResponseEntity<?> deletePhotoForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		Photo photo = photoRepo.findById(postId)
@@ -742,7 +761,7 @@ public class TEVPostRestController {
 	 */
 	@GetMapping("/posts/{blog}/regulars")
 	public List<Regular> getAllRegularsForBlog(@PathVariable("blog") String blog) {
-		List<Post> posts = postRepo.findByTumblelogAndType(blog, "regular");
+		List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_REGULAR);
 		List<Regular> regulars = new ArrayList<Regular>();
 
 		for (Post post : posts) {
@@ -770,7 +789,7 @@ public class TEVPostRestController {
 			@Valid @RequestBody Regular regular) {
 		Optional<Post> post = postRepo.findById(postId);
 		if (!post.isPresent()) {
-			logger.error("Tried to submit regular for a post that doesn't exist: {}", postId);
+			logger.error("Tried to submit regular for a post that doesn't exist: {}", postId); //$NON-NLS-1$
 			throw new NoParentPostException();
 		} else {
 			assert blog.equals(post.get().getTumblelog());
@@ -787,6 +806,7 @@ public class TEVPostRestController {
 	 * @param postId The Post ID
 	 * @return The {@link com.tiyb.tev.datamodel.Regular Regular} details
 	 */
+	@SuppressWarnings("nls")
 	@GetMapping("/posts/{blog}/{id}/regular")
 	public Regular getRegularForBlogById(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		return regularRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Regular", "id", postId));
@@ -801,6 +821,7 @@ public class TEVPostRestController {
 	 * @return The same {@link com.tiyb.tev.datamodel.Regular Regular} object that
 	 *         was submitted
 	 */
+	@SuppressWarnings("nls")
 	@PutMapping("/posts/{blog}/{id}/regular")
 	public Regular updateRegularForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId,
 			@RequestBody Regular regularDetails) {
@@ -823,12 +844,12 @@ public class TEVPostRestController {
 	 */
 	@DeleteMapping("/posts/{blog}/regulars")
 	public ResponseEntity<?> deleteAllRegularsForBlog(@PathVariable("blog") String blog) {
-		List<Post> posts = postRepo.findByTumblelogAndType(blog, "regular");
+		List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_REGULAR);
 
 		for (Post post : posts) {
 			Optional<Regular> response = regularRepo.findById(post.getId());
 			if (!response.isPresent()) {
-				logger.error("Attempting to delete a regular that doesn't exist: {}", post.getId());
+				logger.error("Attempting to delete a regular that doesn't exist: {}", post.getId()); //$NON-NLS-1$
 				return ResponseEntity.badRequest().build();
 			}
 
@@ -846,6 +867,7 @@ public class TEVPostRestController {
 	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
 	 *         the response details
 	 */
+	@SuppressWarnings("nls")
 	@DeleteMapping("/posts/{id}/regular")
 	public ResponseEntity<?> deleteRegularForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		Regular reg = regularRepo.findById(postId)
@@ -864,7 +886,7 @@ public class TEVPostRestController {
 	 */
 	@GetMapping("/posts/{blog}/videos")
 	public List<Video> getAllVideosForBlog(@PathVariable("blog") String blog) {
-		List<Post> posts = postRepo.findByTumblelogAndType(blog, "video");
+		List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_VIDEO);
 		List<Video> videos = new ArrayList<Video>();
 
 		for (Post post : posts) {
@@ -891,7 +913,7 @@ public class TEVPostRestController {
 			@Valid @RequestBody Video video) {
 		Optional<Post> post = postRepo.findById(postId);
 		if (!post.isPresent()) {
-			logger.error("Tried to submit a video for a post that doesn't exist: {}", postId);
+			logger.error("Tried to submit a video for a post that doesn't exist: {}", postId); //$NON-NLS-1$
 			throw new NoParentPostException();
 		} else {
 			assert blog.equals(post.get().getTumblelog());
@@ -908,6 +930,7 @@ public class TEVPostRestController {
 	 * @param postId The Post ID
 	 * @return The {@link com.tiyb.tev.datamodel.Video Video} details
 	 */
+	@SuppressWarnings("nls")
 	@GetMapping("/posts/{blog}/{id}/video")
 	public Video getVideoForBlogById(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		return videoRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Video", "id", postId));
@@ -922,6 +945,7 @@ public class TEVPostRestController {
 	 * @return The same {@link com.tiyb.tev.datamodel.Video Video} object that was
 	 *         submitted
 	 */
+	@SuppressWarnings("nls")
 	@PutMapping("/posts/{blog}/{id}/video")
 	public Video updateVideoForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId,
 			@RequestBody Video videoDetails) {
@@ -944,12 +968,12 @@ public class TEVPostRestController {
 	 */
 	@DeleteMapping("/posts/{blog}/videos")
 	public ResponseEntity<?> deleteAllVideosForBlog(@PathVariable("blog") String blog) {
-		List<Post> posts = postRepo.findByTumblelogAndType(blog, "video");
+		List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_VIDEO);
 
 		for (Post post : posts) {
 			Optional<Video> response = videoRepo.findById(post.getId());
 			if (!response.isPresent()) {
-				logger.error("Attempting to delete a video that doesn't exist: {}", post.getId());
+				logger.error("Attempting to delete a video that doesn't exist: {}", post.getId()); //$NON-NLS-1$
 				return ResponseEntity.badRequest().build();
 			}
 
@@ -967,6 +991,7 @@ public class TEVPostRestController {
 	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
 	 *         the response details
 	 */
+	@SuppressWarnings("nls")
 	@DeleteMapping("/posts/{blog}/{id}/video")
 	public ResponseEntity<?> deleteVideoForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long postId) {
 		Video video = videoRepo.findById(postId)

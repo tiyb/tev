@@ -9,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Entity for storing hashtags in the DB
  * 
@@ -36,11 +38,12 @@ public class Hashtag implements Serializable {
 	}
 
 	public Hashtag() {
-		this.tag = "";
+		this.tag = StringUtils.EMPTY;
 		this.count = 0;
-		this.blog = "";
+		this.blog = StringUtils.EMPTY;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

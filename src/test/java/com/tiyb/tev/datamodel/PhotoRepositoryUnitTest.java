@@ -19,6 +19,7 @@ import com.tiyb.tev.repository.PhotoRepository;
  */
 @RunWith(SpringRunner.class)
 @DataJpaTest
+@SuppressWarnings("nls")
 public class PhotoRepositoryUnitTest {
 
 	@Autowired

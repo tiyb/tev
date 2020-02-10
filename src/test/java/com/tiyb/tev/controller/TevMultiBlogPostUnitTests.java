@@ -27,6 +27,7 @@ import com.tiyb.tev.exception.BlogPostMismatchException;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@SuppressWarnings("nls")
 public class TevMultiBlogPostUnitTests {
 
 	@Autowired

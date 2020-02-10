@@ -24,6 +24,7 @@ import com.tiyb.tev.repository.PostRepository;
  */
 @RunWith(SpringRunner.class)
 @DataJpaTest
+@SuppressWarnings("nls")
 public class PostRepositoryUnitTest {
 
 	@Autowired

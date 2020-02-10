@@ -35,6 +35,7 @@ import com.tiyb.tev.datamodel.ConversationMessage;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@SuppressWarnings("nls")
 public class TevConvoRestControllerUnitTests {
 
 	@Autowired

@@ -1,5 +1,6 @@
 package com.tiyb.tev.exception;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -26,8 +27,8 @@ public class BlogMismatchParsingException extends XMLParsingException {
 	}
 	
 	public BlogMismatchParsingException() {
-		this.blogName = "";
-		this.mainParticipantName = "";
+		this.blogName = StringUtils.EMPTY;
+		this.mainParticipantName = StringUtils.EMPTY;
 	}
 	
 	public String getBlogName() {
