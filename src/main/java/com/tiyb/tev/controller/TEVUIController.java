@@ -207,7 +207,12 @@ public class TEVUIController {
 			return "redirect:/errorbadxml";
 		}
 
-		return "redirect:/index";
+		String defaultBlogName = mdController.getDefaultBlogName();
+		if(blog.equals(defaultBlogName)) {
+			return "redirect:/index";
+		} else {
+			return String.format("redirect:/index?tempBlogName=%s", blog);
+		}
 	}
 
 	/**
@@ -238,8 +243,13 @@ public class TEVUIController {
 			logger.error("UI Controller failing in handleConversationFileUpload due to XML parsing error: ", e);
 			return "redirect:/errorbadxml";
 		}
-
-		return "redirect:/conversations";
+		
+		String defaultBlogName = mdController.getDefaultBlogName();
+		if(blog.equals(defaultBlogName)) {
+			return "redirect:/conversations";
+		} else {
+			return String.format("redirect:/conversations?tempBlogName=%s", blog);
+		}
 	}
 
 	/**
