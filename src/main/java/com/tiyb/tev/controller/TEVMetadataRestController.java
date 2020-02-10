@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.helpers.StaticListData;
+import com.tiyb.tev.exception.NoMetadataFoundException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.exception.UnableToDeleteMetadataException;
 import com.tiyb.tev.repository.MetadataRepository;
@@ -194,8 +195,12 @@ public class TEVMetadataRestController {
 	 */
 	@GetMapping("/metadata/default/blogName")
 	public String getDefaultBlogName() {
-		Metadata defaultMD = getDefaultMetadata();
-		return defaultMD.getBlog();
+		try {
+			Metadata defaultMD = getDefaultMetadata();
+			return defaultMD.getBlog();
+		} catch (NullPointerException e) {
+			throw new NoMetadataFoundException();
+		}
 	}
 
 	/**
@@ -230,6 +235,9 @@ public class TEVMetadataRestController {
 
 		Metadata defaultMD = Metadata.newDefaultMetadata();
 		defaultMD.setBlog(blog);
+		if (all.size() < 1) {
+			defaultMD.setIsDefault(true);
+		}
 		return metadataRepo.save(defaultMD);
 	}
 
@@ -347,6 +355,14 @@ public class TEVMetadataRestController {
 		}
 
 		return ResponseEntity.ok().build();
+	}
+
+	/**
+	 * Package-private method to delete all MD objects in the DB. Never used by TEV;
+	 * only used by JUnit test cases.
+	 */
+	void deleteAllMD() {
+		metadataRepo.deleteAll();
 	}
 
 }

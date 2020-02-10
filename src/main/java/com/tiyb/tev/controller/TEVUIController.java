@@ -40,6 +40,7 @@ import com.tiyb.tev.datamodel.Regular;
 import com.tiyb.tev.datamodel.Video;
 import com.tiyb.tev.exception.BlogMismatchParsingException;
 import com.tiyb.tev.exception.InvalidTypeException;
+import com.tiyb.tev.exception.NoMetadataFoundException;
 import com.tiyb.tev.exception.NoStagedPostsException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.exception.XMLParsingException;
@@ -82,14 +83,21 @@ public class TEVUIController {
 	private TEVStagingController stagingController;
 
 	/**
-	 * Returns the main (or index) page, at either / or /index
+	 * Returns the main (or index) page, at either / or /index. Checks first to see
+	 * whether any metadata has been created; if not, redirects to the settings
+	 * page.
 	 * 
 	 * @param model not used
 	 * @return name of the template to be used to render the page
 	 */
 	@RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
 	public String index(Model model, @RequestParam("tempBlogName") Optional<String> blogParam) {
-		if(blogParam.isPresent()) {
+		try {
+			mdController.getDefaultBlogName();
+		} catch (NoMetadataFoundException e) {
+			return metadata(model);
+		}
+		if (blogParam.isPresent()) {
 			model.addAttribute("blogName", blogParam.get());
 		} else {
 			model.addAttribute("blogName", mdController.getDefaultBlogName());
@@ -109,7 +117,7 @@ public class TEVUIController {
 	@RequestMapping(value = { "/conversations" }, method = RequestMethod.GET)
 	public String conversations(Model model, @RequestParam("tempBlogName") Optional<String> blogParam) {
 		Metadata md = null;
-		if(blogParam.isPresent()) {
+		if (blogParam.isPresent()) {
 			md = mdController.getMetadataForBlog(blogParam.get());
 		} else {
 			md = mdController.getDefaultMetadata();
@@ -125,15 +133,22 @@ public class TEVUIController {
 	}
 
 	/**
-	 * Returns the a page for maintaining the application's metadata, at /metadata
+	 * Returns the a page for maintaining the application's metadata, at /metadata.
+	 * If no blogs have been created (i.e. if there are no Metadata objects in the
+	 * DB), the model is updated with this info, so the client can create one.
 	 * 
 	 * @param model not used
 	 * @return name of the template to be used to render the page
 	 */
 	@RequestMapping(value = { "/metadata" }, method = RequestMethod.GET)
 	public String metadata(Model model) {
-		model.addAttribute("blogName", mdController.getDefaultBlogName());
-		updateModelWithTheme(model);
+		try {
+			model.addAttribute("blogName", mdController.getDefaultBlogName());
+			updateModelWithTheme(model);
+		} catch (NoMetadataFoundException e) {
+			model.addAttribute("noBlogsCreated", Boolean.TRUE);
+			model.addAttribute("theme", Metadata.DEFAULT_THEME);
+		}
 
 		List<Metadata> mdCollection = mdController.getAllMetadata();
 		model.addAttribute("mdCollection", mdCollection);
@@ -330,7 +345,7 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/exportViewer" }, method = RequestMethod.GET)
 	public String showExportViewer(Model model, @RequestParam("tempBlogName") Optional<String> blogParam) {
-		if(blogParam.isPresent()) {
+		if (blogParam.isPresent()) {
 			model.addAttribute("blogName", blogParam.get());
 		} else {
 			model.addAttribute("blogName", mdController.getDefaultBlogName());
@@ -349,7 +364,7 @@ public class TEVUIController {
 	 */
 	@RequestMapping(value = { "/staged" }, method = RequestMethod.GET)
 	public String showStagedPosts(Model model, @RequestParam("tempBlogName") Optional<String> blogParam) {
-		if(blogParam.isPresent()) {
+		if (blogParam.isPresent()) {
 			model.addAttribute("blogName", blogParam.get());
 		} else {
 			model.addAttribute("blogName", mdController.getDefaultBlogName());
