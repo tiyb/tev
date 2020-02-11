@@ -62,7 +62,7 @@ import com.tiyb.tev.repository.VideoRepository;
 @RequestMapping("/api")
 public class TEVPostRestController {
 
-	private static final String PHOTONAME_STRINGFORMAT = "%s%s_%s"; //$NON-NLS-1$
+	private static final String PHOTONAME_STRINGFORMAT = "%s%s_%d%s"; //$NON-NLS-1$
 
 	Logger logger = LoggerFactory.getLogger(TEVPostRestController.class);
 
@@ -336,7 +336,7 @@ public class TEVPostRestController {
 			try {
 				BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
 				FileOutputStream out = new FileOutputStream(
-						String.format(PHOTONAME_STRINGFORMAT, imageDirectory, photo.getPostId(), ext));
+						String.format(PHOTONAME_STRINGFORMAT, imageDirectory, photo.getPostId(), i, ext));
 				byte dataBuffer[] = new byte[1024];
 				int bytesRead;
 				while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
