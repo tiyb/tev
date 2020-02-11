@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.exception.NoMetadataFoundException;
+import com.tiyb.tev.exception.UnableToDeleteMetadataException;
 
 /**
  * Tests for the Metadata REST controller. Not all functionality is tested.
@@ -98,6 +99,24 @@ public class TevMetadataRestControllerUnitTests {
 		mdList = mdController.getAllMetadata();
 		assertThat(mdList).isNotNull();
 		assertThat(mdList.size()).isEqualTo(2);
+	}
+
+	/**
+	 * Tests the controller's logic whereby it will refuse to delete the last MD in
+	 * the DB
+	 */
+	@Test(expected = UnableToDeleteMetadataException.class)
+	public void deleteLastMDReturnsRightException() {
+		cleanAllMDObjects();
+
+		mdController.getMetadataForBlogOrDefault("blog1");
+		mdController.getMetadataForBlogOrDefault("blog2");
+
+		List<Metadata> md = mdController.getAllMetadata();
+
+		for (Metadata m : md) {
+			mdController.deleteMetadata(m.getId());
+		}
 	}
 
 	/**
