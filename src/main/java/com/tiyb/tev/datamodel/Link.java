@@ -38,7 +38,6 @@ public class Link implements Serializable {
 		this.url = newDataObject.url;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

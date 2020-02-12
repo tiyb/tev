@@ -48,7 +48,6 @@ import com.tiyb.tev.datamodel.Video;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@SuppressWarnings("nls")
 public class TevPostRestControllerUnitTests {
 
 	@Autowired

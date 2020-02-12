@@ -42,7 +42,6 @@ import com.tiyb.tev.exception.XMLParsingException;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@SuppressWarnings("nls")
 public class ConversationXmlParsingUnitTests {
 
 	@Autowired

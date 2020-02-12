@@ -40,13 +40,11 @@ public class Metadata implements Serializable {
 	 * Static constant list of ways data can be filtered (show only read posts, show
 	 * only unread posts, show all posts)
 	 */
-	@SuppressWarnings("nls")
 	public static final List<String> FILTER_TYPES = Arrays.asList("Filter Read Posts", "Filter Unread Posts",
 			"Do not Filter");
 	/**
 	 * Static constant list of the different columns by which data can be sorted
 	 */
-	@SuppressWarnings("nls")
 	public static final List<String> SORT_COLUMNS = Arrays.asList("ID", "Type", "State", "Slug", "Date", "Is Read",
 			"Is Favourite", "Hashtags");
 
@@ -55,14 +53,12 @@ public class Metadata implements Serializable {
 	 * descending). Used for both Post column sort orders and Conversation column
 	 * sort orders.
 	 */
-	@SuppressWarnings("nls")
 	public static final List<String> SORT_ORDERS = Arrays.asList("Ascending", "Descending");
 
 	/**
 	 * Static constant list of the different filters that can be applied to
 	 * favourited posts
 	 */
-	@SuppressWarnings("nls")
 	public static final List<String> FAV_FILTERS = Arrays.asList("Show Favourites", "Show Non Favourites",
 			"Show Everything");
 
@@ -74,19 +70,16 @@ public class Metadata implements Serializable {
 	/**
 	 * Static list of different display style options for the Conversations page
 	 */
-	@SuppressWarnings("nls")
 	public static final List<String> CONVERSATION_DISPLAY_STYLES = Arrays.asList("cloud", "table");
 
 	/**
 	 * Static list of columns that can be sorted on the Conversations page
 	 */
-	@SuppressWarnings("nls")
 	public static final List<String> CONVERSATION_SORT_COLUMNS = Arrays.asList("participantName", "numMessages");
 
 	/**
 	 * Static list of theme names
 	 */
-	@SuppressWarnings("nls")
 	public static final List<String> THEMES = Arrays.asList("base", "black-tie", "blitzer", "cupertino", "dark-hive",
 			"dot-luv", "eggplant", "excite-bike", "flick", "hot-sneaks", "humanity", "le-frog", "mint-choc", "overcast",
 			"pepper-grinder", "redmond", "smoothness", "south-street", "start", "sunny", "swanky-purse", "trontastic",
@@ -95,7 +88,6 @@ public class Metadata implements Serializable {
 	/**
 	 * Default theme to use, when one isn't supplied
 	 */
-	@SuppressWarnings("nls")
 	public static final String DEFAULT_THEME = "base";
 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -168,7 +160,6 @@ public class Metadata implements Serializable {
 		this.isDefault = newDataObject.isDefault;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

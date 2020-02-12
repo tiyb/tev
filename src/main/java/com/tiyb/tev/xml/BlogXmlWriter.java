@@ -40,15 +40,11 @@ import com.tiyb.tev.xml.helper.PrettyPrintHandler;
  */
 public class BlogXmlWriter {
 
-	private static final String POST_FORMAT_HTML = "html"; //$NON-NLS-1$
-	private static final String VIDEO_TAG_SOURCE = "video-source"; //$NON-NLS-1$
-	private static final String HASHTAG_SEPARATOR = ","; //$NON-NLS-1$
-	private static final String POSTS_TAG = "posts"; //$NON-NLS-1$
-	private static final String TUMBLR_VERSION_ATTRIBUTE_VALUE = "1.0"; //$NON-NLS-1$
-	private static final String TUMBLR_VERSION_ATTRIBUTE_NAME = "version"; //$NON-NLS-1$
-	private static final String TUMBLR_TAG = "tumblr"; //$NON-NLS-1$
-	private static final String XML_VERSION_NO = "1.0"; //$NON-NLS-1$
-	private static final String DOCUMENT_ENCODING = "UTF-8"; //$NON-NLS-1$
+	private static final String VIDEO_TAG_SOURCE = "video-source"; 
+	private static final String HASHTAG_SEPARATOR = ","; 
+	private static final String POSTS_TAG = "posts"; 
+	private static final String TUMBLR_VERSION_ATTRIBUTE_NAME = "version"; 
+	private static final String TUMBLR_TAG = "tumblr"; 
 	private static Logger logger = LoggerFactory.getLogger(BlogXmlWriter.class);
 
 	/**
@@ -117,9 +113,9 @@ public class BlogXmlWriter {
 					XMLStreamWriter.class.getClassLoader(), new Class[] { XMLStreamWriter.class }, handler);
 			writer = prettyPrintWriter;
 
-			writer.writeStartDocument(DOCUMENT_ENCODING, XML_VERSION_NO);
+			writer.writeStartDocument("UTF-8", "1.0");
 			writer.writeStartElement(TUMBLR_TAG);
-			writer.writeAttribute(TUMBLR_VERSION_ATTRIBUTE_NAME, TUMBLR_VERSION_ATTRIBUTE_VALUE);
+			writer.writeAttribute(TUMBLR_VERSION_ATTRIBUTE_NAME, "1.0");
 
 			writer.writeStartElement(POSTS_TAG);
 
@@ -133,7 +129,7 @@ public class BlogXmlWriter {
 
 			xmlString = stringWriter.toString();
 		} catch (XMLStreamException e) {
-			logger.error("Error creating XML document", e); //$NON-NLS-1$
+			logger.error("Error creating XML document", e); 
 			return null;
 		}
 
@@ -173,7 +169,7 @@ public class BlogXmlWriter {
 			addVideoBody(post, writer, postController);
 			break;
 		default:
-			logger.error("Invalid post type"); //$NON-NLS-1$
+			logger.error("Invalid post type"); 
 			throw new XMLStreamException();
 		}
 
@@ -422,7 +418,7 @@ public class BlogXmlWriter {
 		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_DATEGMT, post.getDateGmt());
 		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_DATE, post.getDate());
 		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_UNIXTIMESTAMP, String.valueOf(post.getUnixtimestamp()));
-		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_FORMAT, POST_FORMAT_HTML); // hard-coded
+		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_FORMAT, "html"); // hard-coded
 		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_REBLOGKEY, post.getReblogKey());
 		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_SLUG, post.getSlug());
 		writer.writeAttribute(BlogXmlReader.POST_ATTRIBUTE_STATE, post.getState());

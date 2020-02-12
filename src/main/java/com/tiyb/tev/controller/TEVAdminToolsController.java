@@ -51,7 +51,10 @@ import com.tiyb.tev.repository.PostRepository;
 @RequestMapping("/admintools")
 public class TEVAdminToolsController {
 
-	private static final String INVALID_IMAGE_DIRECTORY = "Invalid image directory: {}"; //$NON-NLS-1$
+	/**
+	 * Used for logging errors related to bad image directories
+	 */
+	private static final String INVALID_IMAGE_DIRECTORY = "Invalid image directory: {}"; 
 
 	Logger logger = LoggerFactory.getLogger(TEVAdminToolsController.class);
 
@@ -115,9 +118,9 @@ public class TEVAdminToolsController {
 	@PreDestroy
 	public void preDestroy() {
 		try {
-			jdbcTemplate.execute("SHUTDOWN COMPACT"); //$NON-NLS-1$
+			jdbcTemplate.execute("SHUTDOWN COMPACT");
 		} catch (DataAccessException e) {
-			logger.error("Error encountered in preDestroy method: ", e); //$NON-NLS-1$
+			logger.error("Error encountered in preDestroy method: ", e);
 		}
 	}
 
@@ -133,7 +136,7 @@ public class TEVAdminToolsController {
 		List<String> allTypeNames = mdController.getAllTypes();
 
 		if (!TEVMetadataRestController.isValidType(type, allTypeNames)) {
-			logger.error("Invalid type name: {}", type); //$NON-NLS-1$
+			logger.error("Invalid type name: {}", type); 
 			throw new InvalidTypeException();
 		}
 
@@ -197,7 +200,7 @@ public class TEVAdminToolsController {
 		}
 
 		if (imageDirectory.charAt(imageDirectory.length() - 1) != '/') {
-			imageDirectory = imageDirectory.concat("/"); //$NON-NLS-1$
+			imageDirectory = imageDirectory.concat("/");
 		}
 
 		File folder = new File(imageDirectory);
@@ -253,7 +256,7 @@ public class TEVAdminToolsController {
 		}
 
 		if (imageDirectory.charAt(imageDirectory.length() - 1) != '/') {
-			imageDirectory = imageDirectory.concat("/"); //$NON-NLS-1$
+			imageDirectory = imageDirectory.concat("/");
 		}
 
 		File destinationFolder = new File(imageDirectory);
@@ -275,11 +278,11 @@ public class TEVAdminToolsController {
 			try {
 				Files.copy(inputFilePath, destinationFolderPath.resolve(inputFilePath.getFileName()));
 			} catch (FileAlreadyExistsException e) {
-				logger.debug("File already exists: {}", inputFilePath.getFileName()); //$NON-NLS-1$
+				logger.debug("File already exists: {}", inputFilePath.getFileName());
 				// Skip copying files that don't exist
 			} catch (IOException e) {
-				logger.error("Error copying file from source to destination: {}", inputFilePath.getFileName()); //$NON-NLS-1$
-				logger.debug("File Copy Error:", e); //$NON-NLS-1$
+				logger.error("Error copying file from source to destination: {}", inputFilePath.getFileName());
+				logger.debug("File Copy Error:", e); 
 				return new ResponseEntity<String>(ERROR_COPYINGFILES_MESSAGE, null, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}

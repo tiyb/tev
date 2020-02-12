@@ -57,7 +57,6 @@ public class Photo implements Serializable {
 		this.width = newDataObject.width;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

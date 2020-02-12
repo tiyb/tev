@@ -22,11 +22,11 @@ import org.apache.commons.lang3.StringUtils;
 public class Post implements Serializable {
 
 	private static final long serialVersionUID = -7988281852593439595L;
-	public static final String POST_TYPE_REGULAR = "regular"; //$NON-NLS-1$
-	public static final String POST_TYPE_LINK = "link"; //$NON-NLS-1$
-	public static final String POST_TYPE_ANSWER = "answer"; //$NON-NLS-1$
-	public static final String POST_TYPE_PHOTO = "photo"; //$NON-NLS-1$
-	public static final String POST_TYPE_VIDEO = "video"; //$NON-NLS-1$
+	public static final String POST_TYPE_REGULAR = "regular"; 
+	public static final String POST_TYPE_LINK = "link"; 
+	public static final String POST_TYPE_ANSWER = "answer"; 
+	public static final String POST_TYPE_PHOTO = "photo"; 
+	public static final String POST_TYPE_VIDEO = "video"; 
 
 	@Id
 	private Long id;
@@ -72,7 +72,6 @@ public class Post implements Serializable {
 		this.width = newDataObject.width;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

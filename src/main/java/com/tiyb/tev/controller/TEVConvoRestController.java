@@ -70,7 +70,6 @@ public class TEVConvoRestController {
 	 * @param conversationID the conversation ID
 	 * @return The Conversation details
 	 */
-	@SuppressWarnings("nls")
 	@GetMapping("/conversations/{blog}/{id}")
 	public Conversation getConversationForBlogById(@PathVariable("blog") String blog,
 			@PathVariable("id") Long conversationID) {
@@ -84,7 +83,6 @@ public class TEVConvoRestController {
 	 * @param participantName Name of the participant
 	 * @return Single Conversation
 	 */
-	@SuppressWarnings("nls")
 	@GetMapping("/conversations/{blog}/{participantName}")
 	public Conversation getConversationForBlogByParticipant(@RequestParam("blog") String blog,
 			@RequestParam("participantName") String participantName) {
@@ -111,7 +109,6 @@ public class TEVConvoRestController {
 	 *                        successfully used to retrieve a Conversation
 	 * @return Single Conversation
 	 */
-	@SuppressWarnings("nls")
 	@GetMapping("/conversations/{blog}/id/{participantId}/{participantName}")
 	public Conversation getConversationForBlogByParticipantIdOrName(@PathVariable("blog") String blog,
 			@PathVariable("participantId") String participantId,
@@ -184,7 +181,6 @@ public class TEVConvoRestController {
 			@PathVariable("id") Long conversationId, @RequestBody Conversation convoDetails) {
 		assert blog.equals(convoDetails.getBlog());
 
-		@SuppressWarnings("nls")
 		Conversation convo = convoRepo.findById(conversationId)
 				.orElseThrow(() -> new ResourceNotFoundException("Conversation", "id", conversationId));
 
@@ -264,7 +260,6 @@ public class TEVConvoRestController {
 	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
 	 *         the response details
 	 */
-	@SuppressWarnings("nls")
 	@DeleteMapping("/conversations/{blog}/{id}")
 	public ResponseEntity<?> deleteConversation(@PathVariable("blog") String blog, @PathVariable("id") Long convoId) {
 		Conversation convo = convoRepo.findById(convoId)
@@ -313,7 +308,6 @@ public class TEVConvoRestController {
 	 * @param convoMsg The data to be submitted
 	 * @return The object that was just submitted (with ID)
 	 */
-	@SuppressWarnings("nls")
 	@PostMapping("/conversations/{blog}/messages")
 	public ConversationMessage createConvoMessageForBlog(@PathVariable("blog") String blog,
 			@Valid @RequestBody ConversationMessage convoMsg) {
@@ -351,7 +345,6 @@ public class TEVConvoRestController {
 	 * @param convoMsg The updated data
 	 * @return The same data that was just submitted
 	 */
-	@SuppressWarnings("nls")
 	@PutMapping("/conversations/{blog}/messages/{id}")
 	public ConversationMessage updateConvoMsgForBlog(@PathVariable("blog") String blog, @PathVariable("id") Long msgId,
 			@RequestBody ConversationMessage convoMsg) {
@@ -394,7 +387,6 @@ public class TEVConvoRestController {
 	 * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
 	 *         the response details
 	 */
-	@SuppressWarnings("nls")
 	@DeleteMapping("/conversations/{blog}/messages/{id}")
 	public ResponseEntity<?> deleteConversationMessageForBlog(@PathVariable("blog") String blog,
 			@PathVariable("id") Long msgId) {

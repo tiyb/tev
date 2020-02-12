@@ -23,7 +23,6 @@ import com.tiyb.tev.datamodel.Conversation;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@SuppressWarnings("nls")
 public class TevMultiBlogConvoTests {
 	@Autowired
 	private TEVConvoRestController restController;

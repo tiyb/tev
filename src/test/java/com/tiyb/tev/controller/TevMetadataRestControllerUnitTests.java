@@ -24,7 +24,6 @@ import com.tiyb.tev.exception.UnableToDeleteMetadataException;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@SuppressWarnings("nls")
 public class TevMetadataRestControllerUnitTests {
 
 	@Autowired

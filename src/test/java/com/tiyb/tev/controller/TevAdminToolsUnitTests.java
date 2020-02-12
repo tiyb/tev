@@ -33,7 +33,6 @@ import com.tiyb.tev.xml.BlogXmlReader;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@SuppressWarnings("nls")
 public class TevAdminToolsUnitTests {
 
 	@Autowired

@@ -20,11 +20,8 @@ import com.tiyb.tev.datamodel.Metadata;
 @Controller
 public class TEVErrorController implements ErrorController {
 
-	private static final String MODEL_ATTRIBUTE_PARTICIPANTNAME = "participantName"; //$NON-NLS-1$
-	private static final String REQUEST_MAPPING_ERRORPATH = "/error"; //$NON-NLS-1$
-	private static final String REQUEST_MAPPING_ERRORBLOGNAMEMISMATCH = "errorblognamemismatch"; //$NON-NLS-1$
-	private static final String REQUEST_MAPPING_ERRORBADXML = "errorbadxml"; //$NON-NLS-1$
-	private static final String REQUEST_MAPPING_ERROR = "error"; //$NON-NLS-1$
+	private static final String MODEL_ATTRIBUTE_PARTICIPANTNAME = "participantName";
+	
 	/**
 	 * REST controller for working with metadata
 	 */
@@ -38,11 +35,11 @@ public class TEVErrorController implements ErrorController {
 	 * 
 	 * @return Mapping to the generic error page
 	 */
-	@RequestMapping(REQUEST_MAPPING_ERRORPATH)
+	@RequestMapping("/error")
 	public String handleError(Model model) {
 		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
-		return REQUEST_MAPPING_ERROR;
+		return "error";
 	}
 
 	/**
@@ -55,7 +52,7 @@ public class TEVErrorController implements ErrorController {
 	public String handleXMLError(Model model) {
 		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
-		return REQUEST_MAPPING_ERRORBADXML;
+		return "errorbadxml";
 	}
 
 	/**
@@ -74,7 +71,7 @@ public class TEVErrorController implements ErrorController {
 		model.addAttribute(MODEL_ATTRIBUTE_PARTICIPANTNAME, participantName);
 		updateModelWithBlogName(model);
 		updateModelWithTheme(model);
-		return REQUEST_MAPPING_ERRORBLOGNAMEMISMATCH;
+		return "errorblognamemismatch";
 	}
 
 	/**
@@ -85,7 +82,7 @@ public class TEVErrorController implements ErrorController {
 	 */
 	@Override
 	public String getErrorPath() {
-		return REQUEST_MAPPING_ERRORPATH;
+		return "/error";
 	}
 
 	/**

@@ -43,7 +43,6 @@ public class Hashtag implements Serializable {
 		this.blog = StringUtils.EMPTY;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

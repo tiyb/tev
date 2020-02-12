@@ -73,65 +73,62 @@ import com.tiyb.tev.exception.XMLParsingException;
  */
 public class BlogXmlReader extends TEVXmlReader {
 
-	public static final String TAG_COMMA_SEPARATOR = ", "; //$NON-NLS-1$
+	public static final String TAG_COMMA_SEPARATOR = ", "; 
 	
-	public static final String VIDEO_TAG_CAPTION = "video-caption"; //$NON-NLS-1$
-	public static final String VIDEO_TAG_REVISION = "revision"; //$NON-NLS-1$
-	public static final String VIDEO_TAG_DURATION = "duration"; //$NON-NLS-1$
-	public static final String VIDEO_TAG_HEIGHT = "height"; //$NON-NLS-1$
-	public static final String VIDEO_TAG_WIDTH = "width"; //$NON-NLS-1$
-	public static final String VIDEO_TAG_EXTENSION = "extension"; //$NON-NLS-1$
-	public static final String VIDEO_TAG_CONTENTTYPE = "content-type"; //$NON-NLS-1$
+	public static final String VIDEO_TAG_CAPTION = "video-caption"; 
+	public static final String VIDEO_TAG_REVISION = "revision"; 
+	public static final String VIDEO_TAG_DURATION = "duration"; 
+	public static final String VIDEO_TAG_HEIGHT = "height"; 
+	public static final String VIDEO_TAG_WIDTH = "width"; 
+	public static final String VIDEO_TAG_EXTENSION = "extension"; 
+	public static final String VIDEO_TAG_CONTENTTYPE = "content-type"; 
 	
-	public static final String PHOTO_ATTRIBUTE_OFFSET = "offset"; //$NON-NLS-1$
-	public static final String PHOTO_TAG_PHOTO = "photo"; //$NON-NLS-1$
-	public static final String PHOTO_TAG_LINKURL = "photo-link-url"; //$NON-NLS-1$
-	public static final String PHOTO_TAG_PHOTOSET = "photoset"; //$NON-NLS-1$
-	public static final String PHOTO_SIZE_75 = "75"; //$NON-NLS-1$
-	public static final String PHOTO_SIZE_100 = "100"; //$NON-NLS-1$
-	public static final String PHOTO_SIZE_250 = "250"; //$NON-NLS-1$
-	public static final String PHOTO_SIZE_400 = "400"; //$NON-NLS-1$
-	public static final String PHOTO_SIZE_500 = "500"; //$NON-NLS-1$
-	public static final String PHOTO_SIZE_1280 = "1280"; //$NON-NLS-1$
-	public static final String PHOTO_ATTRIBUTE_MAXWIDTH = "max-width"; //$NON-NLS-1$
-	public static final String PHOTO_ATTRIBUTE_WIDTH = "width"; //$NON-NLS-1$
-	public static final String PHOTO_ATTRIBUTE_HEIGHT = "height"; //$NON-NLS-1$
-	public static final String PHOTO_ATTRIBUTE_CAPTION = "caption"; //$NON-NLS-1$
-	public static final String PHOTO_TAG_URL = "photo-url"; //$NON-NLS-1$
-	public static final String PHOTO_TAG_CAPTION = "photo-caption"; //$NON-NLS-1$
+	public static final String PHOTO_ATTRIBUTE_OFFSET = "offset"; 
+	public static final String PHOTO_TAG_PHOTO = "photo"; 
+	public static final String PHOTO_TAG_LINKURL = "photo-link-url"; 
+	public static final String PHOTO_TAG_PHOTOSET = "photoset"; 
+	public static final String PHOTO_SIZE_75 = "75"; 
+	public static final String PHOTO_SIZE_100 = "100"; 
+	public static final String PHOTO_SIZE_250 = "250"; 
+	public static final String PHOTO_SIZE_400 = "400"; 
+	public static final String PHOTO_SIZE_500 = "500"; 
+	public static final String PHOTO_SIZE_1280 = "1280"; 
+	public static final String PHOTO_ATTRIBUTE_MAXWIDTH = "max-width"; 
+	public static final String PHOTO_ATTRIBUTE_WIDTH = "width"; 
+	public static final String PHOTO_ATTRIBUTE_HEIGHT = "height"; 
+	public static final String PHOTO_ATTRIBUTE_CAPTION = "caption"; 
+	public static final String PHOTO_TAG_URL = "photo-url"; 
+	public static final String PHOTO_TAG_CAPTION = "photo-caption"; 
 	
-	public static final String LINK_TAG_URL = "link-url"; //$NON-NLS-1$
-	public static final String LINK_TAG_TEXT = "link-text"; //$NON-NLS-1$
-	public static final String LINK_TAG_DESCRIPTION = "link-description"; //$NON-NLS-1$
+	public static final String LINK_TAG_URL = "link-url"; 
+	public static final String LINK_TAG_TEXT = "link-text"; 
+	public static final String LINK_TAG_DESCRIPTION = "link-description"; 
 	
-	public static final String ANSWER_ANSWER_TAG = "answer"; //$NON-NLS-1$
-	public static final String ANSWER_QUESTION_TAG = "question"; //$NON-NLS-1$
+	public static final String ANSWER_ANSWER_TAG = "answer"; 
+	public static final String ANSWER_QUESTION_TAG = "question"; 
 	
-	public static final String POST_TAG_HASHTAG = "tag"; //$NON-NLS-1$
+	public static final String POST_TAG_HASHTAG = "tag"; 
 	
-	public static final String REGULAR_TAG_BODY = "regular-body"; //$NON-NLS-1$
-	public static final String REGULAR_TAG_TITLE = "regular-title"; //$NON-NLS-1$
+	public static final String REGULAR_TAG_BODY = "regular-body"; 
+	public static final String REGULAR_TAG_TITLE = "regular-title"; 
 	
-	public static final String POST_ATTRIBUTE_HEIGHT = "height"; //$NON-NLS-1$
-	public static final String POST_ATTRIBUTE_WIDTH = "width"; //$NON-NLS-1$
-	public static final String POST_ATTRIBUTE_TUMBLELOG = "tumblelog"; //$NON-NLS-1$
-	public static final String POST_ATTRIBUTE_ISREBLOG = "is_reblog"; //$NON-NLS-1$
-	public static final String POST_ATTRIBUTE_STATE = "state"; //$NON-NLS-1$
-	public static final String POST_ATTRIBUTE_SLUG = "slug"; //$NON-NLS-1$
-	public static final String POST_ATTRIBUTE_REBLOGKEY = "reblog-key"; //$NON-NLS-1$
-	public static final String POST_ATTRIBUTE_FORMAT = "format"; //$NON-NLS-1$
-	public static final String POST_ATTRIBUTE_UNIXTIMESTAMP = "unix-timestamp"; //$NON-NLS-1$
-	public static final String POST_ATTRIBUTE_DATE = "date"; //$NON-NLS-1$
-	public static final String POST_ATTRIBUTE_DATEGMT = "date-gmt"; //$NON-NLS-1$
-	public static final String POST_ATTRIBUTE_TYPE = "type"; //$NON-NLS-1$
-	public static final String POST_ATTRIBUTE_URLWITHSLUG = "url-with-slug"; //$NON-NLS-1$
-	public static final String POST_ATTRIBUTE_URL = "url"; //$NON-NLS-1$
-	public static final String POST_ATTRIBUTE_ID = "id"; //$NON-NLS-1$
-	public static final String POST_TAG_NAME = "post"; //$NON-NLS-1$
+	public static final String POST_ATTRIBUTE_HEIGHT = "height"; 
+	public static final String POST_ATTRIBUTE_WIDTH = "width"; 
+	public static final String POST_ATTRIBUTE_TUMBLELOG = "tumblelog"; 
+	public static final String POST_ATTRIBUTE_ISREBLOG = "is_reblog"; 
+	public static final String POST_ATTRIBUTE_STATE = "state"; 
+	public static final String POST_ATTRIBUTE_SLUG = "slug"; 
+	public static final String POST_ATTRIBUTE_REBLOGKEY = "reblog-key"; 
+	public static final String POST_ATTRIBUTE_FORMAT = "format"; 
+	public static final String POST_ATTRIBUTE_UNIXTIMESTAMP = "unix-timestamp"; 
+	public static final String POST_ATTRIBUTE_DATE = "date"; 
+	public static final String POST_ATTRIBUTE_DATEGMT = "date-gmt"; 
+	public static final String POST_ATTRIBUTE_TYPE = "type"; 
+	public static final String POST_ATTRIBUTE_URLWITHSLUG = "url-with-slug"; 
+	public static final String POST_ATTRIBUTE_URL = "url"; 
+	public static final String POST_ATTRIBUTE_ID = "id"; 
+	public static final String POST_TAG_NAME = "post"; 
 	
-	private static final String XML_PARSER_THREW_ERROR = "XML parser threw error: "; //$NON-NLS-1$
-	
-	private static final String POST_CONTENT_DELETED_LOG = "Previous content deleted as part of post XML import"; //$NON-NLS-1$
 	/**
 	 * <p>
 	 * This is the main method of the class, which kicks off the processing of the
@@ -164,7 +161,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			postController.deleteAllVideosForBlog(blogName);
 			postController.deleteAllPostsForBlog(blogName);
 			postController.deleteAllHashtagsForBlog(blogName);
-			logger.debug(POST_CONTENT_DELETED_LOG);
+			logger.debug("Previous content deleted as part of post XML import");
 		}
 
 		readPosts(xmlFile, postController, isOverwritePosts, blogName);
@@ -297,11 +294,11 @@ public class BlogXmlReader extends TEVXmlReader {
 						if (isSubmitablePost) {
 							post = postRestController.updatePostForBlog(post.getTumblelog(), post.getId(), post);
 							if (post.getTags().length() > 0) {
-								List<String> individualTags = Arrays.asList(post.getTags().split(",")); //$NON-NLS-1$
+								List<String> individualTags = Arrays.asList(post.getTags().split(",")); 
 								for (String tag : individualTags) {
 									tag = tag.trim();
 									if (tag.equals(StringUtils.EMPTY)) {
-										logger.error("A hashtag was empty from this list: {}", post.getTags()); //$NON-NLS-1$
+										logger.error("A hashtag was empty from this list: {}", post.getTags()); 
 									}
 									postRestController.createHashtagForBlog(blogName, tag);
 								}
@@ -311,7 +308,7 @@ public class BlogXmlReader extends TEVXmlReader {
 				}
 			}
 		} catch (XMLStreamException e) {
-			logger.error(XML_PARSER_THREW_ERROR, e);
+			logger.error("XML parser threw error: ", e);
 			throw new XMLParsingException();
 		} finally {
 
@@ -431,7 +428,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			}
 		}
 
-		logger.error(UNEXPECTED_EOF_LOG, "readRegular"); //$NON-NLS-1$
+		logger.error(UNEXPECTED_EOF_LOG, "readRegular"); 
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -476,7 +473,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			}
 		}
 
-		logger.error(UNEXPECTED_EOF_LOG, "readAnswer"); //$NON-NLS-1$
+		logger.error(UNEXPECTED_EOF_LOG, "readAnswer"); 
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -522,7 +519,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			}
 		}
 
-		logger.error(UNEXPECTED_EOF_LOG, "readLink"); //$NON-NLS-1$
+		logger.error(UNEXPECTED_EOF_LOG, "readLink"); 
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -662,7 +659,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			}
 		}
 
-		logger.error(UNEXPECTED_EOF_LOG, "readPhotos"); //$NON-NLS-1$
+		logger.error(UNEXPECTED_EOF_LOG, "readPhotos"); 
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -735,7 +732,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			}
 		}
 
-		logger.error(UNEXPECTED_EOF_LOG, "readPhotoStream"); //$NON-NLS-1$
+		logger.error(UNEXPECTED_EOF_LOG, "readPhotoStream"); 
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -802,7 +799,7 @@ public class BlogXmlReader extends TEVXmlReader {
 			}
 		}
 
-		logger.error(UNEXPECTED_EOF_LOG, "readVideos"); //$NON-NLS-1$
+		logger.error(UNEXPECTED_EOF_LOG, "readVideos"); 
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 

@@ -39,7 +39,7 @@ public class LocaleConfiguration implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
-		lci.setParamName("lang"); //$NON-NLS-1$
+		lci.setParamName("lang"); 
 		registry.addInterceptor(lci);
 	}
 }

@@ -49,7 +49,6 @@ public class Conversation implements Serializable {
 		this.blog = newData.blog;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

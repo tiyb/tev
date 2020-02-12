@@ -27,7 +27,6 @@ public class Answer implements Serializable {
 	@Column(name="answer", length=50000)
 	private String answer;
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

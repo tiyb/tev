@@ -34,7 +34,6 @@ import com.tiyb.tev.datamodel.Metadata;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@SuppressWarnings("nls")
 public class ConversationXmlMultiBlog {
 
 	@Autowired

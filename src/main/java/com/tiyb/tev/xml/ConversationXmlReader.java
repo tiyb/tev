@@ -46,19 +46,17 @@ import com.tiyb.tev.exception.XMLParsingException;
  */
 public class ConversationXmlReader extends TEVXmlReader {
 
-	private static final String DEACTIVATED_POSTFIX = "-deact"; //$NON-NLS-1$
-	private static final String DEFAULT_PARTICIPANT_NAME = "NO NAME"; //$NON-NLS-1$
-	private static final String PARTICIPANTS_TAG = "participants"; //$NON-NLS-1$
-	private static final String TYPE_ATTRIBUTE = "type"; //$NON-NLS-1$
-	private static final String TIMESTAMP_ATTRIBUTE = "ts"; //$NON-NLS-1$
-	private static final String IMAGE_PHOTOURL = "photo-url"; //$NON-NLS-1$
-	private static final String MESSAGE_TYPE_IMAGE = "IMAGE"; //$NON-NLS-1$
-	private static final String PARTICIPANT_DIFFERENTIATOR_STRING = " 1"; //$NON-NLS-1$
-	private static final String CONVERSATION_TAG = "conversation"; //$NON-NLS-1$
-	private static final String MESSAGES_TAG = "messages"; //$NON-NLS-1$
-	private static final String MESSAGE_TAG = "message"; //$NON-NLS-1$
-	private static final String PARTICIPANT_ATTRIBUTE_AVATARURL = "avatar_url"; //$NON-NLS-1$
-	private static final String PARTICIPANT_TAG = "participant"; //$NON-NLS-1$
+	private static final String DEFAULT_PARTICIPANT_NAME = "NO NAME"; 
+	private static final String PARTICIPANTS_TAG = "participants"; 
+	private static final String TYPE_ATTRIBUTE = "type"; 
+	private static final String TIMESTAMP_ATTRIBUTE = "ts"; 
+	private static final String IMAGE_PHOTOURL = "photo-url"; 
+	private static final String MESSAGE_TYPE_IMAGE = "IMAGE"; 
+	private static final String CONVERSATION_TAG = "conversation"; 
+	private static final String MESSAGES_TAG = "messages"; 
+	private static final String MESSAGE_TAG = "message"; 
+	private static final String PARTICIPANT_ATTRIBUTE_AVATARURL = "avatar_url"; 
+	private static final String PARTICIPANT_TAG = "participant"; 
 
 	/**
 	 * <p>
@@ -98,7 +96,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 			InputStream participantXmlStream = xmlFile.getInputStream();
 			Participant mainParticipant = getMainParticipant(participantXmlStream);
 			if (!blogName.equals(mainParticipant.name)) {
-				logger.error("Mismatch between expected blog name ({}) and main participant name ({}).", blogName, //$NON-NLS-1$
+				logger.error("Mismatch between expected blog name ({}) and main participant name ({}).", blogName, 
 						mainParticipant.name);
 				throw new BlogMismatchParsingException(blogName, mainParticipant.name);
 			}
@@ -209,7 +207,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 			throw new XMLParsingException();
 		}
 
-		logger.error(UNEXPECTED_EOF_LOG, "getMainParticipant"); //$NON-NLS-1$
+		logger.error(UNEXPECTED_EOF_LOG, "getMainParticipant"); 
 		throw new XMLParsingException();
 	}
 
@@ -290,7 +288,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 					if (se.getName().getLocalPart().equals(CONVERSATION_TAG)) {
 						participant = getParticipantName(reader, mainTumblrUserName);
 						while (allParticipants.contains(participant.name)) {
-							participant.name = participant.name.concat(PARTICIPANT_DIFFERENTIATOR_STRING);
+							participant.name = participant.name.concat(" 1");
 						}
 						allParticipants.add(participant.name);
 						MessageSuperStructure messageData = getMessages(reader, mainTumblrUserId);
@@ -415,7 +413,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 			}
 		}
 
-		logger.error(UNEXPECTED_EOF_LOG, "getMessages"); //$NON-NLS-1$
+		logger.error(UNEXPECTED_EOF_LOG, "getMessages"); 
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -451,7 +449,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 			}
 		}
 
-		logger.error(UNEXPECTED_EOF_LOG, "readImageMessage"); //$NON-NLS-1$
+		logger.error(UNEXPECTED_EOF_LOG, "readImageMessage"); 
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -552,7 +550,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 			}
 		}
 
-		logger.error(UNEXPECTED_EOF_LOG, "getParticipantName"); //$NON-NLS-1$
+		logger.error(UNEXPECTED_EOF_LOG, "getParticipantName"); 
 		throw new XMLStreamException(END_OF_FILE_ERROR);
 	}
 
@@ -568,7 +566,7 @@ public class ConversationXmlReader extends TEVXmlReader {
 	 * @return Username without the postfix (if any)
 	 */
 	private static String fixName(String participantName) {
-		int postfix = participantName.indexOf(DEACTIVATED_POSTFIX);
+		int postfix = participantName.indexOf("-deact");
 		if (postfix == -1) {
 			return participantName;
 		}
