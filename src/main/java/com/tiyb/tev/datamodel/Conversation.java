@@ -10,140 +10,170 @@ import javax.persistence.Table;
 
 /**
  * Entity representing a conversation, from Tumblr's messaging system
- * 
+ *
  * @author tiyb
  */
 @Entity
 @Table(name = "conversation")
 public class Conversation implements Serializable {
 
-	private static final long serialVersionUID = 8779758912300542993L;
+    private static final long serialVersionUID = 8779758912300542993L;
 
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Id
-	private Long id;
-	private String participant;
-	private String participantAvatarUrl;
-	private String participantId;
-	private Integer numMessages;
-	private Boolean hideConversation;
-	private String blog;
-	
-	public Conversation() {
-		hideConversation = false;
-	}
-	
-	/**
-	 * Helper function for updating all of the object's properties with values from
-	 * a new object
-	 * 
-	 * @param newData The new object from which to take the values
-	 */
-	public void updateData(Conversation newData) {
-		//this.id = newData.id;
-		this.participant = newData.participant;
-		this.participantAvatarUrl = newData.participantAvatarUrl;
-		this.participantId = newData.participantId;
-		this.numMessages = newData.numMessages;
-		this.hideConversation = newData.hideConversation;
-		this.blog = newData.blog;
-	}
+    /**
+     * Unique ID for the conversation
+     */
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    private Long id;
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Conversation [");
-		if (id != null) {
-			builder.append("id=");
-			builder.append(id);
-			builder.append(", ");
-		}
-		if (participant != null) {
-			builder.append("participant=");
-			builder.append(participant);
-			builder.append(", ");
-		}
-		if (participantAvatarUrl != null) {
-			builder.append("participantAvatarUrl=");
-			builder.append(participantAvatarUrl);
-			builder.append(", ");
-		}
-		if (participantId != null) {
-			builder.append("participantId=");
-			builder.append(participantId);
-			builder.append(", ");
-		}
-		if (numMessages != null) {
-			builder.append("numMessages=");
-			builder.append(numMessages);
-			builder.append(", ");
-		}
-		if (blog != null) {
-			builder.append("blog=");
-			builder.append(blog);
-			builder.append(", ");
-		}
-		if (hideConversation != null) {
-			builder.append("hideConversation=");
-			builder.append(hideConversation);
-		}
-		builder.append("]");
-		return builder.toString();
-	}
+    /**
+     * Participant with which the conversation is being held
+     */
+    private String participant;
 
-	public Long getId() {
-		return id;
-	}
+    /**
+     * URL to the participant's avatar image
+     */
+    private String participantAvatarUrl;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    /**
+     * Unique ID of the participant
+     */
+    private String participantId;
 
-	public String getParticipant() {
-		return participant;
-	}
+    /**
+     * Number of messages in the conversation
+     */
+    private Integer numMessages;
 
-	public void setParticipant(String participant) {
-		this.participant = participant;
-	}
+    /**
+     * Whether the conversation is marked "hidden" in the DB
+     */
+    private Boolean hideConversation;
 
-	public String getParticipantAvatarUrl() {
-		return participantAvatarUrl;
-	}
+    /**
+     * Blog for which the conversation was held
+     */
+    private String blog;
 
-	public void setParticipantAvatarUrl(String participantAvatarUrl) {
-		this.participantAvatarUrl = participantAvatarUrl;
-	}
+    /**
+     * Default constructor, ensures that new conversations are initially hidden
+     */
+    public Conversation() {
+        hideConversation = false;
+    }
 
-	public Integer getNumMessages() {
-		return numMessages;
-	}
+    /**
+     * Helper function for updating all of the object's properties with values from a new object. ID
+     * is ignored.
+     *
+     * @param newData The new object from which to take the values
+     */
+    public void updateData(final Conversation newData) {
+        // this.id = newData.id;
+        this.participant = newData.participant;
+        this.participantAvatarUrl = newData.participantAvatarUrl;
+        this.participantId = newData.participantId;
+        this.numMessages = newData.numMessages;
+        this.hideConversation = newData.hideConversation;
+        this.blog = newData.blog;
+    }
 
-	public void setNumMessages(Integer numMessages) {
-		this.numMessages = numMessages;
-	}
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Conversation [");
+        if (id != null) {
+            builder.append("id=");
+            builder.append(id);
+            builder.append(", ");
+        }
+        if (participant != null) {
+            builder.append("participant=");
+            builder.append(participant);
+            builder.append(", ");
+        }
+        if (participantAvatarUrl != null) {
+            builder.append("participantAvatarUrl=");
+            builder.append(participantAvatarUrl);
+            builder.append(", ");
+        }
+        if (participantId != null) {
+            builder.append("participantId=");
+            builder.append(participantId);
+            builder.append(", ");
+        }
+        if (numMessages != null) {
+            builder.append("numMessages=");
+            builder.append(numMessages);
+            builder.append(", ");
+        }
+        if (blog != null) {
+            builder.append("blog=");
+            builder.append(blog);
+            builder.append(", ");
+        }
+        if (hideConversation != null) {
+            builder.append("hideConversation=");
+            builder.append(hideConversation);
+        }
+        builder.append("]");
+        return builder.toString();
+    }
 
-	public Boolean getHideConversation() {
-		return hideConversation;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setHideConversation(Boolean hideConversation) {
-		this.hideConversation = hideConversation;
-	}
+    public void setId(final Long id) {
+        this.id = id;
+    }
 
-	public String getParticipantId() {
-		return participantId;
-	}
+    public String getParticipant() {
+        return participant;
+    }
 
-	public void setParticipantId(String participantId) {
-		this.participantId = participantId;
-	}
+    public void setParticipant(final String participant) {
+        this.participant = participant;
+    }
 
-	public String getBlog() {
-		return blog;
-	}
+    public String getParticipantAvatarUrl() {
+        return participantAvatarUrl;
+    }
 
-	public void setBlog(String blog) {
-		this.blog = blog;
-	}
+    public void setParticipantAvatarUrl(final String participantAvatarUrl) {
+        this.participantAvatarUrl = participantAvatarUrl;
+    }
+
+    public Integer getNumMessages() {
+        return numMessages;
+    }
+
+    public void setNumMessages(final Integer numMessages) {
+        this.numMessages = numMessages;
+    }
+
+    public Boolean getHideConversation() {
+        return hideConversation;
+    }
+
+    public void setHideConversation(final Boolean hideConversation) {
+        this.hideConversation = hideConversation;
+    }
+
+    public String getParticipantId() {
+        return participantId;
+    }
+
+    public void setParticipantId(final String participantId) {
+        this.participantId = participantId;
+    }
+
+    public String getBlog() {
+        return blog;
+    }
+
+    public void setBlog(final String blog) {
+        this.blog = blog;
+    }
 }

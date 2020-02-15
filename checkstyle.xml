@@ -1,0 +1,234 @@
+<!DOCTYPE module PUBLIC
+  "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+  "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!-- Checkstyle configuration file, per the details given at https://checkstyle.sourceforge.io/checks.html 
+	Modules that aren't required are not included. Purposely not including checks 
+	for multiple string literals; this application is so string-based that it 
+	was decided it would be better to keep the multiple strings rather than obfuscate 
+	it by replacing them with constants. -->
+
+<module name="Checker">
+
+	<module name="SuppressWarningsFilter"/>
+
+	<!-- Javadoc Comments -->
+	<module name="JavadocPackage"></module>
+
+	<!-- Misc -->
+	<module name="Translation" />
+	<module name="NewlineAtEndOfFile">
+		<property name="severity" value="warning" />
+	</module>
+	<module name="UniqueProperties" />
+
+	<!-- Size Violations -->
+	<module name="FileLength" />
+	<module name="LineLength">
+		<property name="severity" value="warning" />
+		<property name="max" value="120" />
+	</module>
+
+	<!-- Whitespace -->
+	<module name="FileTabCharacter" />
+	
+	
+
+	<module name="TreeWalker">
+		<module name="SuppressWarningsHolder"/>
+	
+		<module name="ConstantName"></module>
+		<module name="EmptyBlock"></module>
+
+		<!-- Annotations -->
+		<module name="AnnotationLocation" />
+		<module name="MissingDeprecated" />
+		<module name="MissingOverride" />
+		<module name="PackageAnnotation" />
+
+		<!-- Block Checks -->
+		<module name="AvoidNestedBlocks" />
+		<module name="EmptyCatchBlock" />
+		<module name="LeftCurly" />
+		<module name="RightCurly" />
+		<module name="NeedBraces" />
+
+		<!-- Class Design -->
+		<module name="FinalClass" />
+		<module name="HideUtilityClassConstructor" />
+		<module name="InnerTypeLast" />
+		<module name="InterfaceIsType" />
+		<module name="MutableException" />
+		<module name="OneTopLevelClass" />
+		<module name="ThrowsCount" />
+		<module name="VisibilityModifier" />
+
+		<!-- Coding -->
+		<module name="AvoidNoArgumentSuperConstructorCall" />
+		<module name="CovariantEquals" />
+		<module name="DeclarationOrder" />
+		<module name="DefaultComesLast" />
+		<module name="EmptyStatement" />
+		<module name="EqualsAvoidNull" />
+		<module name="EqualsHashCode" />
+		<module name="ExplicitInitialization" />
+		<module name="FallThrough" />
+		<module name="FinalLocalVariable" />
+		<module name="HiddenField">
+			<property name="ignoreConstructorParameter" value="true"/>
+			<property name="ignoreSetter" value="true"/>
+		</module>
+		<module name="IllegalCatch" />
+		<module name="IllegalInstantiation" />
+		<module name="IllegalThrows" />
+		<module name="IllegalToken" />
+		<module name="IllegalTokenText" />
+		<module name="IllegalType" />
+		<module name="InnerAssignment" />
+		<module name="MagicNumber" />
+		<module name="MissingSwitchDefault" />
+		<module name="MultipleVariableDeclarations" />
+		<module name="NestedForDepth" />
+		<!-- TODO revisit -->
+		<module name="NestedIfDepth">
+			<property name="severity" value="ignore"/>
+		</module>
+		<module name="NestedTryDepth" />
+		<module name="NoClone" />
+		<module name="NoFinalizer" />
+		<module name="OneStatementPerLine" />
+		<module name="OverloadMethodsDeclarationOrder" />
+		<module name="PackageDeclaration" />
+		<module name="ParameterAssignment" />
+		<module name="RequireThis" />
+		<module name="SimplifyBooleanExpression" />
+		<module name="SimplifyBooleanReturn" />
+		<module name="StringLiteralEquality" />
+		<module name="SuperClone" />
+		<module name="SuperFinalize" />
+		<module name="UnnecessaryParentheses" />
+		<module name="UnnecessarySemicolonAfterTypeMemberDeclaration" />
+		<module name="UnnecessarySemicolonInEnumeration" />
+		<module name="UnnecessarySemicolonInTryWithResources" />
+		<module name="VariableDeclarationUsageDistance" />
+
+		<!-- Headers -->
+		<!-- NONE -->
+
+		<!-- Imports -->
+		<module name="AvoidStarImport" />
+		<module name="AvoidStaticImport">
+			<property name="excludes"
+				value="org.assertj.core.api.Assertions.assertThat" />
+		</module>
+		<module name="IllegalImport" />
+		<module name="RedundantImport" />
+		<module name="UnusedImports" />
+
+		<!-- JavaDoc Comments -->
+		<module name="InvalidJavadocPosition" />
+		<module name="JavadocBlockTagLocation" />
+		<module name="JavadocContentLocationCheck" />
+		<module name="JavadocParagraph">
+			<property name="severity" value="warning" />
+		</module>
+		<module name="JavadocStyle">
+			<property name="checkFirstSentence" value="false" />
+			<property name="checkEmptyJavadoc" value="true" />
+		</module>
+		<module name="JavadocTagContinuationIndentation" />
+		<module name="JavadocType" />
+		<module name="JavadocVariable">
+			<property name="ignoreNamePattern" value="logger" />
+		</module>
+		<module name="MissingJavadocMethod">
+			<property name="allowMissingPropertyJavadoc" value="true" />
+		</module>
+		<module name="MissingJavadocPackage" />
+		<module name="MissingJavadocType" />
+		<module name="NonEmptyAtclauseDescription" />
+
+		<!-- Metrics -->
+		<module name="BooleanExpressionComplexity" />
+		<!-- TODO revisit -->
+		<module name="ClassDataAbstractionCoupling">
+			<property name="severity" value="ignore"/>
+		</module>
+		<!-- TODO revisit -->
+		<module name="ClassFanOutComplexity">
+			<property name="severity" value="ignore"/>
+		</module>
+		<!-- TODO revisit -->
+		<module name="CyclomaticComplexity">
+			<property name="severity" value="ignore" />
+		</module>
+		<!-- TODO revisit -->
+		<module name="JavaNCSS">
+			<property name="severity" value="ignore"/>
+		</module>
+		<!-- TODO revisit -->
+		<module name="NPathComplexity">
+			<property name="severity" value="ignore"/>
+		</module>
+
+		<!-- Misc -->
+		<module name="ArrayTypeStyle" />
+		<module name="AvoidEscapedUnicodeCharacters" />
+		<module name="CommentsIndentation" />
+		<module name="FinalParameters" />
+		<module name="OuterTypeFilename" />
+		<module name="TodoComment" />
+		<module name="TrailingComment" />
+		<module name="UncommentedMain">
+			<property name="excludedClasses" value="TevApplication" />
+		</module>
+		<module name="UpperEll" />
+
+		<!-- Modifiers -->
+		<module name="ClassMemberImpliedModifier" />
+		<module name="ModifierOrder" />
+
+		<!-- Naming Conventions -->
+		<module name="AbstractClassName" />
+		<module name="CatchParameterName" />
+		<module name="ClassTypeParameterName" />
+		<module name="ConstantName" />
+		<module name="InterfaceTypeParameterName" />
+		<module name="LambdaParameterName" />
+		<module name="LocalFinalVariableName" />
+		<module name="LocalVariableName" />
+		<module name="MemberName" />
+		<module name="MethodName" />
+		<module name="MethodTypeParameterName" />
+		<module name="PackageName" />
+		<module name="ParameterName" />
+		<module name="StaticVariableName" />
+		<module name="TypeName" />
+
+		<!-- Size Violations -->
+		<module name="AnonInnerLength" />
+		<!-- TODO revisit -->
+		<module name="ExecutableStatementCount">
+			<property name="severity" value="ignore"/>
+		</module>
+		<module name="MethodCount" />
+		<module name="MethodLength" />
+		<module name="OuterTypeNumber" />
+		<module name="ParameterNumber" />
+
+		<!-- Whitespace -->
+		<module name="EmptyForInitializerPad" />
+		<module name="EmptyForIteratorPad" />
+		<module name="EmptyLineSeparator" />
+		<module name="GenericWhitespace" />
+		<module name="MethodParamPad" />
+		<module name="NoLineWrap" />
+		<module name="NoWhitespaceBefore" />
+		<module name="OperatorWrap" />
+		<module name="ParenPad" />
+		<module name="SingleSpaceSeparator" />
+		<module name="TypecastParenPad" />
+		<module name="WhitespaceAfter" />
+		<module name="WhitespaceAround" />
+	</module>
+</module>

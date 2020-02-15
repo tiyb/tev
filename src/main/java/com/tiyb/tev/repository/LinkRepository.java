@@ -5,6 +5,12 @@ import org.springframework.stereotype.Repository;
 
 import com.tiyb.tev.datamodel.Link;
 
+/**
+ * Repo for Links
+ *
+ * @author tiyb
+ *
+ */
 @Repository
 public interface LinkRepository extends JpaRepository<Link, Long> {
 

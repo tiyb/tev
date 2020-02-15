@@ -12,9 +12,8 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 /**
- * Configuration class, used for internationalization (i18n) of the TEV
- * application.
- * 
+ * Configuration class, used for internationalization (i18n) of the TEV application.
+ *
  * @author tiyb
  *
  */
@@ -22,24 +21,26 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 @PropertySource("classpath:messages.properties")
 public class LocaleConfiguration implements WebMvcConfigurer {
 
-	/**
-	 * @return Default locale set by the user
-	 */
-	@Bean(name = "localeResolver")
-	public LocaleResolver localeResolver() {
-		SessionLocaleResolver slr = new SessionLocaleResolver();
-		slr.setDefaultLocale(Locale.US);
-		return slr;
-	}
+    /**
+     * Retrieves the locale resolver
+     *
+     * @return Default locale set by the user
+     */
+    @Bean(name = "localeResolver")
+    public LocaleResolver localeResolver() {
+        final SessionLocaleResolver slr = new SessionLocaleResolver();
+        slr.setDefaultLocale(Locale.US);
+        return slr;
+    }
 
-	/**
-	 * an interceptor bean that will switch to a new locale based on the value of
-	 * the lang parameter appended to a request:
-	 */
-	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
-		LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
-		lci.setParamName("lang"); 
-		registry.addInterceptor(lci);
-	}
+    /**
+     * An interceptor bean that will switch to a new locale, based on the value of the lang
+     * parameter appended to a request.
+     */
+    @Override
+    public void addInterceptors(final InterceptorRegistry registry) {
+        final LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
+        lci.setParamName("lang");
+        registry.addInterceptor(lci);
+    }
 }

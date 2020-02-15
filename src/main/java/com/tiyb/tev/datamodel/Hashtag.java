@@ -13,92 +13,116 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * Entity for storing hashtags in the DB
- * 
+ *
  * @author tiyb
  */
 @Entity
 @Table(name = "hashtag")
 public class Hashtag implements Serializable {
 
-	private static final long serialVersionUID = 5295937621643057029L;
+    private static final long serialVersionUID = 5295937621643057029L;
 
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Id
-	private Long id;
-	@NotBlank
-	private String tag;
-	private Integer count = 0;
-	private String blog;
+    /**
+     * Unique ID of the hashtag
+     */
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    private Long id;
 
-	public Hashtag(String tag, Integer count, String blog) {
-		super();
-		this.tag = tag;
-		this.count = count;
-		this.blog = blog;
-	}
+    /**
+     * The hashtag's text
+     */
+    @NotBlank
+    private String tag;
 
-	public Hashtag() {
-		this.tag = StringUtils.EMPTY;
-		this.count = 0;
-		this.blog = StringUtils.EMPTY;
-	}
+    /**
+     * Number of times the hashtag occurs in the DB (for a given blog)
+     */
+    private Integer count = 0;
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Hashtag [");
-		if (id != null) {
-			builder.append("id=");
-			builder.append(id);
-			builder.append(", ");
-		}
-		if (tag != null) {
-			builder.append("tag=");
-			builder.append(tag);
-			builder.append(", ");
-		}
-		if (count != null) {
-			builder.append("count=");
-			builder.append(count);
-			builder.append(", ");
-		}
-		if (blog != null) {
-			builder.append("blog=");
-			builder.append(blog);
-		}
-		builder.append("]");
-		return builder.toString();
-	}
+    /**
+     * Blog for which this hashtag exists
+     */
+    private String blog;
 
-	public Long getId() {
-		return id;
-	}
+    /**
+     * Constructor to initialize a hashtag
+     *
+     * @param tag   The tag's text
+     * @param count Number of times the tag exists for the given blog
+     * @param blog  blog for which the hashtag is being created
+     */
+    public Hashtag(final String tag, final Integer count, final String blog) {
+        this.tag = tag;
+        this.count = count;
+        this.blog = blog;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    /**
+     * Default constructor to initialize an empty hashtag
+     */
+    public Hashtag() {
+        this.tag = StringUtils.EMPTY;
+        this.count = 0;
+        this.blog = StringUtils.EMPTY;
+    }
 
-	public String getTag() {
-		return tag;
-	}
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Hashtag [");
+        if (id != null) {
+            builder.append("id=");
+            builder.append(id);
+            builder.append(", ");
+        }
+        if (tag != null) {
+            builder.append("tag=");
+            builder.append(tag);
+            builder.append(", ");
+        }
+        if (count != null) {
+            builder.append("count=");
+            builder.append(count);
+            builder.append(", ");
+        }
+        if (blog != null) {
+            builder.append("blog=");
+            builder.append(blog);
+        }
+        builder.append("]");
+        return builder.toString();
+    }
 
-	public void setTag(String tag) {
-		this.tag = tag;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public Integer getCount() {
-		return count;
-	}
+    public void setId(final Long id) {
+        this.id = id;
+    }
 
-	public void setCount(Integer count) {
-		this.count = count;
-	}
+    public String getTag() {
+        return tag;
+    }
 
-	public String getBlog() {
-		return blog;
-	}
+    public void setTag(final String tag) {
+        this.tag = tag;
+    }
 
-	public void setBlog(String blog) {
-		this.blog = blog;
-	}
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(final Integer count) {
+        this.count = count;
+    }
+
+    public String getBlog() {
+        return blog;
+    }
+
+    public void setBlog(final String blog) {
+        this.blog = blog;
+    }
 }

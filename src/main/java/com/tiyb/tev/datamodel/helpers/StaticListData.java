@@ -5,86 +5,116 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Helper class used for populating drop-down lists, for users setting their
- * metadata preferences
- * 
+ * Helper class used for populating drop-down lists, for users setting their metadata preferences
+ *
  * @author tiyb
  *
  */
 public class StaticListData implements Serializable {
 
-	private static final long serialVersionUID = 8979062815138982615L;
+    private static final long serialVersionUID = 8979062815138982615L;
 
-	private List<String> filterTypes = new ArrayList<String>();
-	private List<String> sortColumns = new ArrayList<String>();
-	private List<String> sortOrders = new ArrayList<String>();
-	private List<String> favFilters = new ArrayList<String>();
-	private List<Integer> pageLengths = new ArrayList<Integer>();
-	private List<String> conversationStyles = new ArrayList<String>();
-	private List<String> conversationSortColumns = new ArrayList<String>();
-	private List<String> themes = new ArrayList<String>();
+    /**
+     * List of filter types
+     */
+    private List<String> filterTypes = new ArrayList<String>();
 
-	public List<String> getFilterTypes() {
-		return filterTypes;
-	}
+    /**
+     * All columns that can be sorted on
+     */
+    private List<String> sortColumns = new ArrayList<String>();
 
-	public void setFilterTypes(List<String> filterTypes) {
-		this.filterTypes = filterTypes;
-	}
+    /**
+     * Orders by which data can be sorted (i.e. asc/desc)
+     */
+    private List<String> sortOrders = new ArrayList<String>();
 
-	public List<String> getSortColumns() {
-		return sortColumns;
-	}
+    /**
+     * Filters for favourite/non-favourite posts
+     */
+    private List<String> favFilters = new ArrayList<String>();
 
-	public void setSortColumns(List<String> sortColumns) {
-		this.sortColumns = sortColumns;
-	}
+    /**
+     * List of valid page sizes
+     */
+    private List<Integer> pageLengths = new ArrayList<Integer>();
 
-	public List<String> getSortOrders() {
-		return sortOrders;
-	}
+    /**
+     * List of styles by which conversations can be displayed
+     */
+    private List<String> conversationStyles = new ArrayList<String>();
 
-	public void setSortOrders(List<String> sortOrders) {
-		this.sortOrders = sortOrders;
-	}
+    /**
+     * Columns by which conversation data can be sorted
+     */
+    private List<String> conversationSortColumns = new ArrayList<String>();
 
-	public List<String> getFavFilters() {
-		return favFilters;
-	}
+    /**
+     * All themes available for TEV
+     */
+    private List<String> themes = new ArrayList<String>();
 
-	public void setFavFilters(List<String> favFilters) {
-		this.favFilters = favFilters;
-	}
+    public List<String> getFilterTypes() {
+        return filterTypes;
+    }
 
-	public List<Integer> getPageLengths() {
-		return pageLengths;
-	}
+    public void setFilterTypes(final List<String> filterTypes) {
+        this.filterTypes = filterTypes;
+    }
 
-	public void setPageLengths(List<Integer> pageLengths) {
-		this.pageLengths = pageLengths;
-	}
+    public List<String> getSortColumns() {
+        return sortColumns;
+    }
 
-	public List<String> getConversationStyles() {
-		return conversationStyles;
-	}
+    public void setSortColumns(final List<String> sortColumns) {
+        this.sortColumns = sortColumns;
+    }
 
-	public void setConversationStyles(List<String> conversationStyles) {
-		this.conversationStyles = conversationStyles;
-	}
+    public List<String> getSortOrders() {
+        return sortOrders;
+    }
 
-	public List<String> getConversationSortColumns() {
-		return conversationSortColumns;
-	}
+    public void setSortOrders(final List<String> sortOrders) {
+        this.sortOrders = sortOrders;
+    }
 
-	public void setConversationSortColumns(List<String> conversationSortColumns) {
-		this.conversationSortColumns = conversationSortColumns;
-	}
+    public List<String> getFavFilters() {
+        return favFilters;
+    }
 
-	public List<String> getThemes() {
-		return themes;
-	}
+    public void setFavFilters(final List<String> favFilters) {
+        this.favFilters = favFilters;
+    }
 
-	public void setThemes(List<String> themes) {
-		this.themes = themes;
-	}
+    public List<Integer> getPageLengths() {
+        return pageLengths;
+    }
+
+    public void setPageLengths(final List<Integer> pageLengths) {
+        this.pageLengths = pageLengths;
+    }
+
+    public List<String> getConversationStyles() {
+        return conversationStyles;
+    }
+
+    public void setConversationStyles(final List<String> conversationStyles) {
+        this.conversationStyles = conversationStyles;
+    }
+
+    public List<String> getConversationSortColumns() {
+        return conversationSortColumns;
+    }
+
+    public void setConversationSortColumns(final List<String> conversationSortColumns) {
+        this.conversationSortColumns = conversationSortColumns;
+    }
+
+    public List<String> getThemes() {
+        return themes;
+    }
+
+    public void setThemes(final List<String> themes) {
+        this.themes = themes;
+    }
 }

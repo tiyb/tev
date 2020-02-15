@@ -10,72 +10,90 @@ import javax.persistence.Table;
 
 /**
  * Encapsulates the data needed for a Tumblr "Answer" style of post
- * 
+ *
  * @author tiyb
  */
 @Entity
 @Table(name = "answer")
 public class Answer implements Serializable {
 
-	private static final long serialVersionUID = -4839741081483158077L;
-	@Id
-	private Long postId;
-	@Lob
-	@Column(name="question", length=50000)
-	private String question;
-	@Lob
-	@Column(name="answer", length=50000)
-	private String answer;
+    private static final long serialVersionUID = -4839741081483158077L;
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Answer [");
-		if (postId != null) {
-			builder.append("postId=");
-			builder.append(postId);
-			builder.append(", ");
-		}
-		if (question != null) {
-			builder.append("question=");
-			builder.append(question);
-			builder.append(", ");
-		}
-		if (answer != null) {
-			builder.append("answer=");
-			builder.append(answer);
-		}
-		builder.append("]");
-		return builder.toString();
-	}
-	
-	public void updateData(Answer newDataObject) {
-		this.answer = newDataObject.answer;
-		//this.postId = newDataObject.postId;
-		this.question = newDataObject.question;
-	}
-	
-	public Long getPostId() {
-		return postId;
-	}
+    /**
+     * ID of the post to which this answer is associated
+     */
+    @Id
+    private Long postId;
 
-	public void setPostId(Long postId) {
-		this.postId = postId;
-	}
+    /**
+     * The Question field
+     */
+    @Lob
+    @Column(name = "question", length = Post.LONG_FIELD_SIZE)
+    private String question;
 
-	public String getQuestion() {
-		return question;
-	}
+    /**
+     * The actual answer field (unfortunately ambiguously named with the class)
+     */
+    @Lob
+    @Column(name = "answer", length = Post.LONG_FIELD_SIZE)
+    private String answer;
 
-	public void setQuestion(String question) {
-		this.question = question;
-	}
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Answer [");
+        if (postId != null) {
+            builder.append("postId=");
+            builder.append(postId);
+            builder.append(", ");
+        }
+        if (question != null) {
+            builder.append("question=");
+            builder.append(question);
+            builder.append(", ");
+        }
+        if (answer != null) {
+            builder.append("answer=");
+            builder.append(answer);
+        }
+        builder.append("]");
+        return builder.toString();
+    }
 
-	public String getAnswer() {
-		return answer;
-	}
+    /**
+     * Helper method used for updating the fields in an Answer with fields from another Answer
+     * object. Ignores ID field.
+     *
+     * @param newDataObject Object from which to copy the fields
+     */
+    public void updateData(final Answer newDataObject) {
+        this.answer = newDataObject.answer;
+        // this.postId = newDataObject.postId;
+        this.question = newDataObject.question;
+    }
 
-	public void setAnswer(String answer) {
-		this.answer = answer;
-	}
+    public Long getPostId() {
+        return postId;
+    }
+
+    public void setPostId(final Long postId) {
+        this.postId = postId;
+    }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(final String question) {
+        this.question = question;
+    }
+
+    public String getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(final String answer) {
+        this.answer = answer;
+    }
 }

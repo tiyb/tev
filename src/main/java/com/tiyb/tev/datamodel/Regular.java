@@ -9,74 +9,90 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 /**
- * Encapsulates the data needed for a Tumblr "Regular" style of post (just a
- * normal text post)
- * 
+ * Encapsulates the data needed for a Tumblr "Regular" style of post (just a normal text post)
+ *
  * @author tiyb
  */
 @Entity
 @Table(name = "regular")
 public class Regular implements Serializable {
 
-	private static final long serialVersionUID = 1029059617501526454L;
+    private static final long serialVersionUID = 1029059617501526454L;
 
-	@Id
-	private Long postId;
-	private String title;
-	@Lob
-	@Column(name="body", length=50000)
-	private String body;
-	
-	public void updateData(Regular newDataObject) {
-		this.body = newDataObject.body;
-		//this.postId = newDataObject.postId;
-		this.title = newDataObject.title;
-	}
+    /**
+     * ID of the post to which this 'regular' applies
+     */
+    @Id
+    private Long postId;
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Regular [");
-		if (postId != null) {
-			builder.append("postId=");
-			builder.append(postId);
-			builder.append(", ");
-		}
-		if (title != null) {
-			builder.append("title=");
-			builder.append(title);
-			builder.append(", ");
-		}
-		if (body != null) {
-			builder.append("body=");
-			builder.append(body);
-		}
-		builder.append("]");
-		return builder.toString();
-	}
+    /**
+     * Title of the post
+     */
+    private String title;
 
-	public Long getPostId() {
-		return postId;
-	}
+    /**
+     * Body of the post
+     */
+    @Lob
+    @Column(name = "body", length = Post.LONG_FIELD_SIZE)
+    private String body;
 
-	public void setPostId(Long postId) {
-		this.postId = postId;
-	}
+    /**
+     * Helper method to update the data in this object with properties from another copy of the
+     * object. ID ignored.
+     *
+     * @param newDataObject Object from which to copy the properties.
+     */
+    public void updateData(final Regular newDataObject) {
+        this.body = newDataObject.body;
+        // this.postId = newDataObject.postId;
+        this.title = newDataObject.title;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Regular [");
+        if (postId != null) {
+            builder.append("postId=");
+            builder.append(postId);
+            builder.append(", ");
+        }
+        if (title != null) {
+            builder.append("title=");
+            builder.append(title);
+            builder.append(", ");
+        }
+        if (body != null) {
+            builder.append("body=");
+            builder.append(body);
+        }
+        builder.append("]");
+        return builder.toString();
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public Long getPostId() {
+        return postId;
+    }
 
-	public String getBody() {
-		return body;
-	}
+    public void setPostId(final Long postId) {
+        this.postId = postId;
+    }
 
-	public void setBody(String body) {
-		this.body = body;
-	}
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(final String title) {
+        this.title = title;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(final String body) {
+        this.body = body;
+    }
 
 }

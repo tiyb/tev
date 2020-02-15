@@ -11,407 +11,506 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * Encapsulates metadata stored in the database for use by the application.
- * There are a number of different fields stored here:
- * 
+ * <p>
+ * Encapsulates metadata stored in the database for use by the application. There are a number of
+ * different fields stored here:
+ * </p>
+ *
  * <ul>
- * <li>baseMediaPath: The directory on the user's computer where media (images
- * and videos) are stored</li>
- * <li>sortColumn: The column that should be used for sorting the data in the
- * table</li>
- * <li>sortOrder: The order (ascending or descending) that should be used for
- * sorting the table</li>
- * <li>filter: How data should be filtered (only read posts, only unread posts,
- * or all posts)</li>
+ * <li>baseMediaPath: The directory on the user's computer where media (images and videos) are
+ * stored</li>
+ * <li>sortColumn: The column that should be used for sorting the data in the table</li>
+ * <li>sortOrder: The order (ascending or descending) that should be used for sorting the table</li>
+ * <li>filter: How data should be filtered (only read posts, only unread posts, or all posts)</li>
  * </ul>
- * 
- * In addition, there are a number of static constants used for some of these
- * values.
- * 
+ *
+ * <p>
+ * In addition, there are a number of static constants used for some of these values.
+ * </p>
+ *
  * @author tiyb
  */
 @Entity
 @Table(name = "metadata")
 public class Metadata implements Serializable {
 
-	private static final long serialVersionUID = -2517986171637243590L;
+    /**
+     * Static constant list of ways data can be filtered (show only read posts, show only unread
+     * posts, show all posts)
+     */
+    public static final List<String> FILTER_TYPES =
+            Arrays.asList("Filter Read Posts", "Filter Unread Posts", "Do not Filter");
 
-	/**
-	 * Static constant list of ways data can be filtered (show only read posts, show
-	 * only unread posts, show all posts)
-	 */
-	public static final List<String> FILTER_TYPES = Arrays.asList("Filter Read Posts", "Filter Unread Posts",
-			"Do not Filter");
-	/**
-	 * Static constant list of the different columns by which data can be sorted
-	 */
-	public static final List<String> SORT_COLUMNS = Arrays.asList("ID", "Type", "State", "Slug", "Date", "Is Read",
-			"Is Favourite", "Hashtags");
+    /**
+     * Static constant list of the different columns by which data can be sorted
+     */
+    public static final List<String> SORT_COLUMNS =
+            Arrays.asList("ID", "Type", "State", "Slug", "Date", "Is Read", "Is Favourite", "Hashtags");
 
-	/**
-	 * Static constant list of the different ways data can be sorted (ascending or
-	 * descending). Used for both Post column sort orders and Conversation column
-	 * sort orders.
-	 */
-	public static final List<String> SORT_ORDERS = Arrays.asList("Ascending", "Descending");
+    /**
+     * Static constant list of the different ways data can be sorted (ascending or descending). Used
+     * for both Post column sort orders and Conversation column sort orders.
+     */
+    public static final List<String> SORT_ORDERS = Arrays.asList("Ascending", "Descending");
 
-	/**
-	 * Static constant list of the different filters that can be applied to
-	 * favourited posts
-	 */
-	public static final List<String> FAV_FILTERS = Arrays.asList("Show Favourites", "Show Non Favourites",
-			"Show Everything");
+    /**
+     * Static constant list of the different filters that can be applied to favourited posts
+     */
+    public static final List<String> FAV_FILTERS =
+            Arrays.asList("Show Favourites", "Show Non Favourites", "Show Everything");
 
-	/**
-	 * Static list of lengths the "number of records shown" drop-down can be set to
-	 */
-	public static final List<Integer> PAGE_LENGTHS = Arrays.asList(10, 25, 50, 100, -1);
+    /**
+     * Static list of lengths the "number of records shown" drop-down can be set to
+     */
+    public static final List<Integer> PAGE_LENGTHS = Arrays.asList(10, 25, 50, 100, -1);
 
-	/**
-	 * Static list of different display style options for the Conversations page
-	 */
-	public static final List<String> CONVERSATION_DISPLAY_STYLES = Arrays.asList("cloud", "table");
+    /**
+     * Default page length to use, when one hasn't been specified
+     */
+    public static final int DEFAULT_PAGELENGTH = 10;
 
-	/**
-	 * Static list of columns that can be sorted on the Conversations page
-	 */
-	public static final List<String> CONVERSATION_SORT_COLUMNS = Arrays.asList("participantName", "numMessages");
+    /**
+     * Static list of different display style options for the Conversations page
+     */
+    public static final List<String> CONVERSATION_DISPLAY_STYLES = Arrays.asList("cloud", "table");
 
-	/**
-	 * Static list of theme names
-	 */
-	public static final List<String> THEMES = Arrays.asList("base", "black-tie", "blitzer", "cupertino", "dark-hive",
-			"dot-luv", "eggplant", "excite-bike", "flick", "hot-sneaks", "humanity", "le-frog", "mint-choc", "overcast",
-			"pepper-grinder", "redmond", "smoothness", "south-street", "start", "sunny", "swanky-purse", "trontastic",
-			"ui-darkness", "ui-lightness", "vader");
+    /**
+     * Static list of columns that can be sorted on the Conversations page
+     */
+    public static final List<String> CONVERSATION_SORT_COLUMNS = Arrays.asList("participantName", "numMessages");
 
-	/**
-	 * Default theme to use, when one isn't supplied
-	 */
-	public static final String DEFAULT_THEME = "base";
+    /**
+     * Static list of theme names
+     */
+    public static final List<String> THEMES = Arrays.asList("base", "black-tie", "blitzer", "cupertino", "dark-hive",
+            "dot-luv", "eggplant", "excite-bike", "flick", "hot-sneaks", "humanity", "le-frog", "mint-choc", "overcast",
+            "pepper-grinder", "redmond", "smoothness", "south-street", "start", "sunny", "swanky-purse", "trontastic",
+            "ui-darkness", "ui-lightness", "vader");
 
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Id
-	private Integer id;
-	private String baseMediaPath;
-	private String sortColumn;
-	private String sortOrder;
-	private String filter;
-	private String mainTumblrUser;
-	private String mainTumblrUserAvatarUrl;
-	private String favFilter;
-	private Integer pageLength;
-	private Boolean showReadingPane;
-	private Boolean overwritePostData;
-	private Boolean overwriteConvoData;
-	private String conversationDisplayStyle;
-	private String conversationSortColumn;
-	private String conversationSortOrder;
-	private String exportImagesFilePath;
-	private String theme;
-	private String blog;
-	private Boolean isDefault;
+    /**
+     * Default theme to use, when one isn't supplied
+     */
+    public static final String DEFAULT_THEME = "base";
 
-	/**
-	 * Helper function to generate a new Metadata object, with some defaults filled
-	 * in. baseMediaPath, mainTumblrUser, and mainTumblrUserAvatarUrl not set, since
-	 * no defaults make sense for these values.
-	 * 
-	 * @return Metadata object, with some reasonable defaults filled in.
-	 */
-	public static Metadata newDefaultMetadata() {
-		Metadata md = new Metadata();
-		md.setSortColumn(SORT_COLUMNS.get(0));
-		md.setSortOrder(SORT_ORDERS.get(1));
-		md.setFilter(FILTER_TYPES.get(2));
-		md.setFavFilter(FAV_FILTERS.get(2));
-		md.setPageLength(10);
-		md.setShowReadingPane(false);
-		md.setOverwritePostData(false);
-		md.setOverwriteConvoData(false);
-		md.setConversationDisplayStyle(CONVERSATION_DISPLAY_STYLES.get(0));
-		md.setConversationSortColumn(CONVERSATION_SORT_COLUMNS.get(0));
-		md.setConversationSortOrder(SORT_ORDERS.get(0));
-		md.setTheme(DEFAULT_THEME);
-		md.setIsDefault(false);
+    private static final long serialVersionUID = -2517986171637243590L;
 
-		return md;
-	}
+    /**
+     * Unique ID of the object
+     */
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    private Integer id;
 
-	public void updateData(Metadata newDataObject) {
-		this.baseMediaPath = newDataObject.baseMediaPath;
-		this.favFilter = newDataObject.favFilter;
-		this.filter = newDataObject.filter;
-		this.id = newDataObject.id;
-		this.mainTumblrUser = newDataObject.mainTumblrUser;
-		this.mainTumblrUserAvatarUrl = newDataObject.mainTumblrUserAvatarUrl;
-		this.overwriteConvoData = newDataObject.overwriteConvoData;
-		this.overwritePostData = newDataObject.overwritePostData;
-		this.pageLength = newDataObject.pageLength;
-		this.showReadingPane = newDataObject.showReadingPane;
-		this.sortColumn = newDataObject.sortColumn;
-		this.sortOrder = newDataObject.sortOrder;
-		this.conversationDisplayStyle = newDataObject.conversationDisplayStyle;
-		this.conversationSortColumn = newDataObject.conversationSortColumn;
-		this.conversationSortOrder = newDataObject.conversationSortOrder;
-		this.exportImagesFilePath = newDataObject.exportImagesFilePath;
-		this.theme = newDataObject.theme;
-		this.blog = newDataObject.blog;
-		this.isDefault = newDataObject.isDefault;
-	}
+    /**
+     * Path on the file system where media (images/videos) should be stored
+     */
+    private String baseMediaPath;
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Metadata [");
-		if (id != null) {
-			builder.append("id=");
-			builder.append(id);
-			builder.append(", ");
-		}
-		if (baseMediaPath != null) {
-			builder.append("baseMediaPath=");
-			builder.append(baseMediaPath);
-			builder.append(", ");
-		}
-		if (sortColumn != null) {
-			builder.append("sortColumn=");
-			builder.append(sortColumn);
-			builder.append(", ");
-		}
-		if (sortOrder != null) {
-			builder.append("sortOrder=");
-			builder.append(sortOrder);
-			builder.append(", ");
-		}
-		if (filter != null) {
-			builder.append("filter=");
-			builder.append(filter);
-			builder.append(", ");
-		}
-		if (mainTumblrUser != null) {
-			builder.append("mainTumblrUser=");
-			builder.append(mainTumblrUser);
-			builder.append(", ");
-		}
-		if (mainTumblrUserAvatarUrl != null) {
-			builder.append("mainTumblrUserAvatarUrl=");
-			builder.append(mainTumblrUserAvatarUrl);
-			builder.append(", ");
-		}
-		if (favFilter != null) {
-			builder.append("favFilter=");
-			builder.append(favFilter);
-			builder.append(", ");
-		}
-		if (pageLength != null) {
-			builder.append("pageLength=");
-			builder.append(pageLength);
-			builder.append(", ");
-		}
-		if (showReadingPane != null) {
-			builder.append("showReadingPane=");
-			builder.append(showReadingPane);
-			builder.append(", ");
-		}
-		if (overwritePostData != null) {
-			builder.append("overwritePostData=");
-			builder.append(overwritePostData);
-			builder.append(", ");
-		}
-		if (overwriteConvoData != null) {
-			builder.append("overwriteConvoData=");
-			builder.append(overwriteConvoData);
-			builder.append(", ");
-		}
-		if (conversationDisplayStyle != null) {
-			builder.append("conversationDisplayStyle=");
-			builder.append(conversationDisplayStyle);
-			builder.append(", ");
-		}
-		if (conversationSortColumn != null) {
-			builder.append("conversationSortColumn=");
-			builder.append(conversationSortColumn);
-			builder.append(", ");
-		}
-		if (conversationSortOrder != null) {
-			builder.append("conversationSortOrder=");
-			builder.append(conversationSortOrder);
-			builder.append(", ");
-		}
-		if (exportImagesFilePath != null) {
-			builder.append("exportImagesFilePath=");
-			builder.append(exportImagesFilePath);
-			builder.append(", ");
-		}
-		if (blog != null) {
-			builder.append("blog=");
-			builder.append(blog);
-			builder.append(", ");
-		}
-		if (isDefault != null) {
-			builder.append("isDefault=");
-			builder.append(isDefault);
-			builder.append(", ");
-		}
-		if (theme != null) {
-			builder.append("theme=");
-			builder.append(theme);
-		}
-		builder.append("]");
-		return builder.toString();
-	}
+    /**
+     * Column on which to sort the Posts ta ble
+     */
+    private String sortColumn;
 
-	public Integer getId() {
-		return id;
-	}
+    /**
+     * Order by which to sort (asc/desc)
+     */
+    private String sortOrder;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    /**
+     * Whether to filter posts (based on {@link #FILTER_TYPES})
+     */
+    private String filter;
 
-	public String getBaseMediaPath() {
-		return baseMediaPath;
-	}
+    /**
+     * <p>
+     * Name of the Tumblr user for this blog; should always be the same as {@link #blog}.
+     * </p>
+     *
+     * <p>
+     * TODO might remove this at some point, or otherwise reconcile the two members.
+     * </p>
+     */
+    private String mainTumblrUser;
 
-	public void setBaseMediaPath(String baseMediaPath) {
-		this.baseMediaPath = baseMediaPath;
-	}
+    /**
+     * URL to the avatar image for the main Tumblr user.
+     */
+    private String mainTumblrUserAvatarUrl;
 
-	public String getSortColumn() {
-		return sortColumn;
-	}
+    /**
+     * Filter to use for favourited/non-favourited posts; value from {@link #FAV_FILTERS}.
+     */
+    private String favFilter;
 
-	public void setSortColumn(String sortColumn) {
-		this.sortColumn = sortColumn;
-	}
+    /**
+     * Number of posts to show on the posts/index page.
+     */
+    private Integer pageLength;
 
-	public String getSortOrder() {
-		return sortOrder;
-	}
+    /**
+     * Whether to show the reading pane (true) or not (false)
+     */
+    private Boolean showReadingPane;
 
-	public void setSortOrder(String sortOrder) {
-		this.sortOrder = sortOrder;
-	}
+    /**
+     * Whether data should be <i>overwritten</i> when uploading posts (true) or <i>added</i> to the
+     * database (false).
+     */
+    private Boolean overwritePostData;
 
-	public String getFilter() {
-		return filter;
-	}
+    /**
+     * Whether data should be <i>overwritten</i> when uploading conversations (true) or <i>added</i>
+     * to the database (false).
+     */
+    private Boolean overwriteConvoData;
 
-	public void setFilter(String filter) {
-		this.filter = filter;
-	}
+    /**
+     * Style in which to display conversations, per {@link #CONVERSATION_DISPLAY_STYLES}.
+     */
+    private String conversationDisplayStyle;
 
-	public String getMainTumblrUser() {
-		return mainTumblrUser;
-	}
+    /**
+     * Column to use for sorting the conversation table, per {@link #CONVERSATION_SORT_COLUMNS}.
+     */
+    private String conversationSortColumn;
 
-	public void setMainTumblrUser(String mainTumblrUser) {
-		this.mainTumblrUser = mainTumblrUser;
-	}
+    /**
+     * Sort order for conversation table, per {@link #SORT_ORDERS}.
+     */
+    private String conversationSortOrder;
 
-	public String getMainTumblrUserAvatarUrl() {
-		return mainTumblrUserAvatarUrl;
-	}
+    /**
+     * Folder on the file system where images should be exported
+     */
+    private String exportImagesFilePath;
 
-	public void setMainTumblrUserAvatarUrl(String mainTumblrUserAvatarUrl) {
-		this.mainTumblrUserAvatarUrl = mainTumblrUserAvatarUrl;
-	}
+    /**
+     * Theme to use for display, for the given blog, per {@link #THEMES}.
+     */
+    private String theme;
 
-	public String getFavFilter() {
-		return favFilter;
-	}
+    /**
+     * <p>
+     * Name of the blog. Almost always the same as {@link #mainTumblrUser}.
+     * </p>
+     *
+     * <p>
+     * TODO these two fields should be reconciled.
+     * </p>
+     */
+    private String blog;
 
-	public void setFavFilter(String favFilter) {
-		this.favFilter = favFilter;
-	}
+    /**
+     * Whether this blog is the default blog for TEV.
+     */
+    private Boolean isDefault;
 
-	public Integer getPageLength() {
-		return pageLength;
-	}
+    /**
+     * Helper function to generate a new Metadata object, with some defaults filled in.
+     * baseMediaPath, mainTumblrUser, and mainTumblrUserAvatarUrl not set, since no defaults make
+     * sense for these values.
+     *
+     * @return Metadata object, with some reasonable defaults filled in.
+     */
+    public static Metadata newDefaultMetadata() {
+        final Metadata md = new Metadata();
+        md.setSortColumn(SORT_COLUMNS.get(0));
+        md.setSortOrder(SORT_ORDERS.get(1));
+        md.setFilter(FILTER_TYPES.get(2));
+        md.setFavFilter(FAV_FILTERS.get(2));
+        md.setPageLength(DEFAULT_PAGELENGTH);
+        md.setShowReadingPane(false);
+        md.setOverwritePostData(false);
+        md.setOverwriteConvoData(false);
+        md.setConversationDisplayStyle(CONVERSATION_DISPLAY_STYLES.get(0));
+        md.setConversationSortColumn(CONVERSATION_SORT_COLUMNS.get(0));
+        md.setConversationSortOrder(SORT_ORDERS.get(0));
+        md.setTheme(DEFAULT_THEME);
+        md.setIsDefault(false);
 
-	public void setPageLength(Integer pageLength) {
-		this.pageLength = pageLength;
-	}
+        return md;
+    }
 
-	public Boolean getShowReadingPane() {
-		return showReadingPane;
-	}
+    /**
+     * Helper method to update this object's properties with properties from another copy of the
+     * object, <i>including</i> the ID property.
+     *
+     * @param newDataObject Object from which to copy the properties.
+     */
+    public void updateData(final Metadata newDataObject) {
+        this.baseMediaPath = newDataObject.baseMediaPath;
+        this.favFilter = newDataObject.favFilter;
+        this.filter = newDataObject.filter;
+        this.id = newDataObject.id;
+        this.mainTumblrUser = newDataObject.mainTumblrUser;
+        this.mainTumblrUserAvatarUrl = newDataObject.mainTumblrUserAvatarUrl;
+        this.overwriteConvoData = newDataObject.overwriteConvoData;
+        this.overwritePostData = newDataObject.overwritePostData;
+        this.pageLength = newDataObject.pageLength;
+        this.showReadingPane = newDataObject.showReadingPane;
+        this.sortColumn = newDataObject.sortColumn;
+        this.sortOrder = newDataObject.sortOrder;
+        this.conversationDisplayStyle = newDataObject.conversationDisplayStyle;
+        this.conversationSortColumn = newDataObject.conversationSortColumn;
+        this.conversationSortOrder = newDataObject.conversationSortOrder;
+        this.exportImagesFilePath = newDataObject.exportImagesFilePath;
+        this.theme = newDataObject.theme;
+        this.blog = newDataObject.blog;
+        this.isDefault = newDataObject.isDefault;
+    }
 
-	public void setShowReadingPane(Boolean showReadingPane) {
-		this.showReadingPane = showReadingPane;
-	}
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Metadata [");
+        if (id != null) {
+            builder.append("id=");
+            builder.append(id);
+            builder.append(", ");
+        }
+        if (baseMediaPath != null) {
+            builder.append("baseMediaPath=");
+            builder.append(baseMediaPath);
+            builder.append(", ");
+        }
+        if (sortColumn != null) {
+            builder.append("sortColumn=");
+            builder.append(sortColumn);
+            builder.append(", ");
+        }
+        if (sortOrder != null) {
+            builder.append("sortOrder=");
+            builder.append(sortOrder);
+            builder.append(", ");
+        }
+        if (filter != null) {
+            builder.append("filter=");
+            builder.append(filter);
+            builder.append(", ");
+        }
+        if (mainTumblrUser != null) {
+            builder.append("mainTumblrUser=");
+            builder.append(mainTumblrUser);
+            builder.append(", ");
+        }
+        if (mainTumblrUserAvatarUrl != null) {
+            builder.append("mainTumblrUserAvatarUrl=");
+            builder.append(mainTumblrUserAvatarUrl);
+            builder.append(", ");
+        }
+        if (favFilter != null) {
+            builder.append("favFilter=");
+            builder.append(favFilter);
+            builder.append(", ");
+        }
+        if (pageLength != null) {
+            builder.append("pageLength=");
+            builder.append(pageLength);
+            builder.append(", ");
+        }
+        if (showReadingPane != null) {
+            builder.append("showReadingPane=");
+            builder.append(showReadingPane);
+            builder.append(", ");
+        }
+        if (overwritePostData != null) {
+            builder.append("overwritePostData=");
+            builder.append(overwritePostData);
+            builder.append(", ");
+        }
+        if (overwriteConvoData != null) {
+            builder.append("overwriteConvoData=");
+            builder.append(overwriteConvoData);
+            builder.append(", ");
+        }
+        if (conversationDisplayStyle != null) {
+            builder.append("conversationDisplayStyle=");
+            builder.append(conversationDisplayStyle);
+            builder.append(", ");
+        }
+        if (conversationSortColumn != null) {
+            builder.append("conversationSortColumn=");
+            builder.append(conversationSortColumn);
+            builder.append(", ");
+        }
+        if (conversationSortOrder != null) {
+            builder.append("conversationSortOrder=");
+            builder.append(conversationSortOrder);
+            builder.append(", ");
+        }
+        if (exportImagesFilePath != null) {
+            builder.append("exportImagesFilePath=");
+            builder.append(exportImagesFilePath);
+            builder.append(", ");
+        }
+        if (blog != null) {
+            builder.append("blog=");
+            builder.append(blog);
+            builder.append(", ");
+        }
+        if (isDefault != null) {
+            builder.append("isDefault=");
+            builder.append(isDefault);
+            builder.append(", ");
+        }
+        if (theme != null) {
+            builder.append("theme=");
+            builder.append(theme);
+        }
+        builder.append("]");
+        return builder.toString();
+    }
 
-	public Boolean getOverwritePostData() {
-		return overwritePostData;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public void setOverwritePostData(Boolean overwritePostData) {
-		this.overwritePostData = overwritePostData;
-	}
+    public void setId(final Integer id) {
+        this.id = id;
+    }
 
-	public Boolean getOverwriteConvoData() {
-		return overwriteConvoData;
-	}
+    public String getBaseMediaPath() {
+        return baseMediaPath;
+    }
 
-	public void setOverwriteConvoData(Boolean overwriteConvoData) {
-		this.overwriteConvoData = overwriteConvoData;
-	}
+    public void setBaseMediaPath(final String baseMediaPath) {
+        this.baseMediaPath = baseMediaPath;
+    }
 
-	public String getConversationDisplayStyle() {
-		return conversationDisplayStyle;
-	}
+    public String getSortColumn() {
+        return sortColumn;
+    }
 
-	public void setConversationDisplayStyle(String conversationDisplayStyle) {
-		this.conversationDisplayStyle = conversationDisplayStyle;
-	}
+    public void setSortColumn(final String sortColumn) {
+        this.sortColumn = sortColumn;
+    }
 
-	public String getConversationSortColumn() {
-		return conversationSortColumn;
-	}
+    public String getSortOrder() {
+        return sortOrder;
+    }
 
-	public void setConversationSortColumn(String conversationSortColumn) {
-		this.conversationSortColumn = conversationSortColumn;
-	}
+    public void setSortOrder(final String sortOrder) {
+        this.sortOrder = sortOrder;
+    }
 
-	public String getConversationSortOrder() {
-		return conversationSortOrder;
-	}
+    public String getFilter() {
+        return filter;
+    }
 
-	public void setConversationSortOrder(String conversationSortOrder) {
-		this.conversationSortOrder = conversationSortOrder;
-	}
+    public void setFilter(final String filter) {
+        this.filter = filter;
+    }
 
-	public String getExportImagesFilePath() {
-		return exportImagesFilePath;
-	}
+    public String getMainTumblrUser() {
+        return mainTumblrUser;
+    }
 
-	public void setExportImagesFilePath(String exportImagesFilePath) {
-		this.exportImagesFilePath = exportImagesFilePath;
-	}
+    public void setMainTumblrUser(final String mainTumblrUser) {
+        this.mainTumblrUser = mainTumblrUser;
+    }
 
-	public String getTheme() {
-		return theme;
-	}
+    public String getMainTumblrUserAvatarUrl() {
+        return mainTumblrUserAvatarUrl;
+    }
 
-	public void setTheme(String theme) {
-		this.theme = theme;
-	}
+    public void setMainTumblrUserAvatarUrl(final String mainTumblrUserAvatarUrl) {
+        this.mainTumblrUserAvatarUrl = mainTumblrUserAvatarUrl;
+    }
 
-	public String getBlog() {
-		return blog;
-	}
+    public String getFavFilter() {
+        return favFilter;
+    }
 
-	public void setBlog(String blog) {
-		this.blog = blog;
-	}
+    public void setFavFilter(final String favFilter) {
+        this.favFilter = favFilter;
+    }
 
-	public Boolean getIsDefault() {
-		return isDefault;
-	}
+    public Integer getPageLength() {
+        return pageLength;
+    }
 
-	public void setIsDefault(Boolean isDefault) {
-		this.isDefault = isDefault;
-	}
+    public void setPageLength(final Integer pageLength) {
+        this.pageLength = pageLength;
+    }
+
+    public Boolean getShowReadingPane() {
+        return showReadingPane;
+    }
+
+    public void setShowReadingPane(final Boolean showReadingPane) {
+        this.showReadingPane = showReadingPane;
+    }
+
+    public Boolean getOverwritePostData() {
+        return overwritePostData;
+    }
+
+    public void setOverwritePostData(final Boolean overwritePostData) {
+        this.overwritePostData = overwritePostData;
+    }
+
+    public Boolean getOverwriteConvoData() {
+        return overwriteConvoData;
+    }
+
+    public void setOverwriteConvoData(final Boolean overwriteConvoData) {
+        this.overwriteConvoData = overwriteConvoData;
+    }
+
+    public String getConversationDisplayStyle() {
+        return conversationDisplayStyle;
+    }
+
+    public void setConversationDisplayStyle(final String conversationDisplayStyle) {
+        this.conversationDisplayStyle = conversationDisplayStyle;
+    }
+
+    public String getConversationSortColumn() {
+        return conversationSortColumn;
+    }
+
+    public void setConversationSortColumn(final String conversationSortColumn) {
+        this.conversationSortColumn = conversationSortColumn;
+    }
+
+    public String getConversationSortOrder() {
+        return conversationSortOrder;
+    }
+
+    public void setConversationSortOrder(final String conversationSortOrder) {
+        this.conversationSortOrder = conversationSortOrder;
+    }
+
+    public String getExportImagesFilePath() {
+        return exportImagesFilePath;
+    }
+
+    public void setExportImagesFilePath(final String exportImagesFilePath) {
+        this.exportImagesFilePath = exportImagesFilePath;
+    }
+
+    public String getTheme() {
+        return theme;
+    }
+
+    public void setTheme(final String theme) {
+        this.theme = theme;
+    }
+
+    public String getBlog() {
+        return blog;
+    }
+
+    public void setBlog(final String blog) {
+        this.blog = blog;
+    }
+
+    public Boolean getIsDefault() {
+        return isDefault;
+    }
+
+    public void setIsDefault(final Boolean isDefault) {
+        this.isDefault = isDefault;
+    }
 
 }

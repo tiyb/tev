@@ -5,6 +5,12 @@ import org.springframework.stereotype.Repository;
 
 import com.tiyb.tev.datamodel.Answer;
 
+/**
+ * Repo for Answers
+ *
+ * @author tiyb
+ *
+ */
 @Repository
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
 

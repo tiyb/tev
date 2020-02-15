@@ -8,7 +8,7 @@ import javax.persistence.Table;
 
 /**
  * Encapsulates the data for a Post that's being staged for later export
- * 
+ *
  * @author tiyb
  *
  */
@@ -16,26 +16,33 @@ import javax.persistence.Table;
 @Table(name = "stagingposts")
 public class StagingPost implements Serializable {
 
-	private static final long serialVersionUID = -1260427401761905114L;
-	
-	@Id
-	private Long id;
-	private String blog;
+    private static final long serialVersionUID = -1260427401761905114L;
 
-	public Long getId() {
-		return id;
-	}
+    /**
+     * ID of the Post
+     */
+    @Id
+    private Long id;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    /**
+     * Blog for which this post is staged
+     */
+    private String blog;
 
-	public String getBlog() {
-		return blog;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setBlog(String blog) {
-		this.blog = blog;
-	}
+    public void setId(final Long id) {
+        this.id = id;
+    }
+
+    public String getBlog() {
+        return blog;
+    }
+
+    public void setBlog(final String blog) {
+        this.blog = blog;
+    }
 
 }

@@ -7,9 +7,28 @@ import org.springframework.stereotype.Repository;
 
 import com.tiyb.tev.datamodel.Photo;
 
+/**
+ * Repo for Photos
+ *
+ * @author tiyb
+ *
+ */
 @Repository
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
-	List<Photo> findByPostIdOrderByOffset(Long postId);
-	List<Photo> findByPostId(Long postId);
+    /**
+     * Get all photos for a given post, in order of the offset attribute
+     *
+     * @param postId Post ID to search
+     * @return 0 or more Photos
+     */
+    List<Photo> findByPostIdOrderByOffset(Long postId);
+
+    /**
+     * Get all photos for a given post
+     *
+     * @param postId Post ID to search
+     * @return 0 or more Photos
+     */
+    List<Photo> findByPostId(Long postId);
 }

@@ -12,215 +12,273 @@ import javax.persistence.Table;
 
 /**
  * Encapsulates the data needed for a Tumblr "Photo" style of post
- * 
+ *
  * @author tiyb
  */
 @Entity
 @Table(name = "photo")
 public class Photo implements Serializable {
 
-	private static final long serialVersionUID = 454344897567310660L;
-	
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Id
-	private Long id;
-	private Long postId;
-	@Lob
-	@Column(name="caption", length=50000)
-	private String caption;
-	@Column(name="photo_link_url", length=50000)
-	private String photoLinkUrl;
-	@Column(name="photo_offset")
-	private String offset;
-	private Integer width;
-	private Integer height;
-	private String url1280;
-	private String url500;
-	private String url400;
-	private String url250;
-	private String url100;
-	private String url75;
-	
-	public void updateData(Photo newDataObject) {
-		this.caption = newDataObject.caption;
-		this.height = newDataObject.height;
-		//this.id = newDataObject.id;
-		this.offset = newDataObject.offset;
-		this.photoLinkUrl = newDataObject.photoLinkUrl;
-		//this.postId = newDataObject.postId;
-		this.url100 = newDataObject.url100;
-		this.url1280 = newDataObject.url1280;
-		this.url250 = newDataObject.url250;
-		this.url400 = newDataObject.url400;
-		this.url500 = newDataObject.url500;
-		this.url75 = newDataObject.url75;
-		this.width = newDataObject.width;
-	}
+    private static final long serialVersionUID = 454344897567310660L;
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Photo [");
-		if (postId != null) {
-			builder.append("postId=");
-			builder.append(postId);
-			builder.append(", ");
-		}
-		if (caption != null) {
-			builder.append("caption=");
-			builder.append(caption);
-			builder.append(", ");
-		}
-		if (photoLinkUrl != null) {
-			builder.append("photoLinkUrl=");
-			builder.append(photoLinkUrl);
-			builder.append(", ");
-		}
-		if (offset != null) {
-			builder.append("offset=");
-			builder.append(offset);
-			builder.append(", ");
-		}
-		if (width != null) {
-			builder.append("width=");
-			builder.append(width);
-			builder.append(", ");
-		}
-		if (height != null) {
-			builder.append("height=");
-			builder.append(height);
-			builder.append(", ");
-		}
-		if (url1280 != null) {
-			builder.append("url1280=");
-			builder.append(url1280);
-			builder.append(", ");
-		}
-		if (url500 != null) {
-			builder.append("url500=");
-			builder.append(url500);
-			builder.append(", ");
-		}
-		if (url400 != null) {
-			builder.append("url400=");
-			builder.append(url400);
-			builder.append(", ");
-		}
-		if (url250 != null) {
-			builder.append("url250=");
-			builder.append(url250);
-			builder.append(", ");
-		}
-		if (url100 != null) {
-			builder.append("url100=");
-			builder.append(url100);
-			builder.append(", ");
-		}
-		if (url75 != null) {
-			builder.append("url75=");
-			builder.append(url75);
-		}
-		builder.append("]");
-		return builder.toString();
-	}
+    /**
+     * Unique ID of the photo
+     */
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    private Long id;
 
-	public Long getPostId() {
-		return postId;
-	}
+    /**
+     * ID of the post to which this photo belongs
+     */
+    private Long postId;
 
-	public void setPostId(Long postId) {
-		this.postId = postId;
-	}
+    /**
+     * Caption for the photo (copied across all photos in the DB)
+     */
+    @Lob
+    @Column(name = "caption", length = Post.LONG_FIELD_SIZE)
+    private String caption;
 
-	public String getCaption() {
-		return caption;
-	}
+    /**
+     * Photo's URL from Tumblr; in TEV, this field is typically ignored, if there is a 1280 URL
+     */
+    @Column(name = "photo_link_url", length = Post.LONG_FIELD_SIZE)
+    private String photoLinkUrl;
 
-	public void setCaption(String caption) {
-		this.caption = caption;
-	}
+    /**
+     * "Offset" of this photo within the series; in other words, the order in which this photo
+     * should appear.
+     */
+    @Column(name = "photo_offset")
+    private String offset;
 
-	public String getPhotoLinkUrl() {
-		return photoLinkUrl;
-	}
+    /**
+     * Width of the photo; not used, except in writing XML
+     */
+    private Integer width;
 
-	public void setPhotoLinkUrl(String photoLinkUrl) {
-		this.photoLinkUrl = photoLinkUrl;
-	}
+    /**
+     * Height of the photo; not used, except in writing XML
+     */
+    private Integer height;
 
-	public String getOffset() {
-		return offset;
-	}
+    /**
+     * URL to the photo in the given size
+     */
+    private String url1280;
 
-	public void setOffset(String offset) {
-		this.offset = offset;
-	}
+    /**
+     * URL to the photo in the given size
+     */
+    private String url500;
 
-	public Integer getWidth() {
-		return width;
-	}
+    /**
+     * URL to the photo in the given size
+     */
+    private String url400;
 
-	public void setWidth(Integer width) {
-		this.width = width;
-	}
+    /**
+     * URL to the photo in the given size
+     */
+    private String url250;
 
-	public Integer getHeight() {
-		return height;
-	}
+    /**
+     * URL to the photo in the given size
+     */
+    private String url100;
 
-	public void setHeight(Integer height) {
-		this.height = height;
-	}
+    /**
+     * URL to the photo in the given size
+     */
+    private String url75;
 
-	public String getUrl1280() {
-		return url1280;
-	}
+    /**
+     * Helper function to update properties of the object from another copy of the object. Ignores
+     * ID and Post ID.
+     *
+     * @param newDataObject Object from which to copy the properties.
+     */
+    public void updateData(final Photo newDataObject) {
+        this.caption = newDataObject.caption;
+        this.height = newDataObject.height;
+        // this.id = newDataObject.id;
+        this.offset = newDataObject.offset;
+        this.photoLinkUrl = newDataObject.photoLinkUrl;
+        // this.postId = newDataObject.postId;
+        this.url100 = newDataObject.url100;
+        this.url1280 = newDataObject.url1280;
+        this.url250 = newDataObject.url250;
+        this.url400 = newDataObject.url400;
+        this.url500 = newDataObject.url500;
+        this.url75 = newDataObject.url75;
+        this.width = newDataObject.width;
+    }
 
-	public void setUrl1280(String url1280) {
-		this.url1280 = url1280;
-	}
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Photo [");
+        if (postId != null) {
+            builder.append("postId=");
+            builder.append(postId);
+            builder.append(", ");
+        }
+        if (caption != null) {
+            builder.append("caption=");
+            builder.append(caption);
+            builder.append(", ");
+        }
+        if (photoLinkUrl != null) {
+            builder.append("photoLinkUrl=");
+            builder.append(photoLinkUrl);
+            builder.append(", ");
+        }
+        if (offset != null) {
+            builder.append("offset=");
+            builder.append(offset);
+            builder.append(", ");
+        }
+        if (width != null) {
+            builder.append("width=");
+            builder.append(width);
+            builder.append(", ");
+        }
+        if (height != null) {
+            builder.append("height=");
+            builder.append(height);
+            builder.append(", ");
+        }
+        if (url1280 != null) {
+            builder.append("url1280=");
+            builder.append(url1280);
+            builder.append(", ");
+        }
+        if (url500 != null) {
+            builder.append("url500=");
+            builder.append(url500);
+            builder.append(", ");
+        }
+        if (url400 != null) {
+            builder.append("url400=");
+            builder.append(url400);
+            builder.append(", ");
+        }
+        if (url250 != null) {
+            builder.append("url250=");
+            builder.append(url250);
+            builder.append(", ");
+        }
+        if (url100 != null) {
+            builder.append("url100=");
+            builder.append(url100);
+            builder.append(", ");
+        }
+        if (url75 != null) {
+            builder.append("url75=");
+            builder.append(url75);
+        }
+        builder.append("]");
+        return builder.toString();
+    }
 
-	public String getUrl500() {
-		return url500;
-	}
+    public Long getPostId() {
+        return postId;
+    }
 
-	public void setUrl500(String url500) {
-		this.url500 = url500;
-	}
+    public void setPostId(final Long postId) {
+        this.postId = postId;
+    }
 
-	public String getUrl400() {
-		return url400;
-	}
+    public String getCaption() {
+        return caption;
+    }
 
-	public void setUrl400(String url400) {
-		this.url400 = url400;
-	}
+    public void setCaption(final String caption) {
+        this.caption = caption;
+    }
 
-	public String getUrl250() {
-		return url250;
-	}
+    public String getPhotoLinkUrl() {
+        return photoLinkUrl;
+    }
 
-	public void setUrl250(String url250) {
-		this.url250 = url250;
-	}
+    public void setPhotoLinkUrl(final String photoLinkUrl) {
+        this.photoLinkUrl = photoLinkUrl;
+    }
 
-	public String getUrl100() {
-		return url100;
-	}
+    public String getOffset() {
+        return offset;
+    }
 
-	public void setUrl100(String url100) {
-		this.url100 = url100;
-	}
+    public void setOffset(final String offset) {
+        this.offset = offset;
+    }
 
-	public String getUrl75() {
-		return url75;
-	}
+    public Integer getWidth() {
+        return width;
+    }
 
-	public void setUrl75(String url75) {
-		this.url75 = url75;
-	}
+    public void setWidth(final Integer width) {
+        this.width = width;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Integer getHeight() {
+        return height;
+    }
+
+    public void setHeight(final Integer height) {
+        this.height = height;
+    }
+
+    public String getUrl1280() {
+        return url1280;
+    }
+
+    public void setUrl1280(final String url1280) {
+        this.url1280 = url1280;
+    }
+
+    public String getUrl500() {
+        return url500;
+    }
+
+    public void setUrl500(final String url500) {
+        this.url500 = url500;
+    }
+
+    public String getUrl400() {
+        return url400;
+    }
+
+    public void setUrl400(final String url400) {
+        this.url400 = url400;
+    }
+
+    public String getUrl250() {
+        return url250;
+    }
+
+    public void setUrl250(final String url250) {
+        this.url250 = url250;
+    }
+
+    public String getUrl100() {
+        return url100;
+    }
+
+    public void setUrl100(final String url100) {
+        this.url100 = url100;
+    }
+
+    public String getUrl75() {
+        return url75;
+    }
+
+    public void setUrl75(final String url75) {
+        this.url75 = url75;
+    }
+
+    public Long getId() {
+        return id;
+    }
 }

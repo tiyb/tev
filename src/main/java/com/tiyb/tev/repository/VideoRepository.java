@@ -5,6 +5,12 @@ import org.springframework.stereotype.Repository;
 
 import com.tiyb.tev.datamodel.Video;
 
+/**
+ * Repo for Videos
+ *
+ * @author tiyb
+ *
+ */
 @Repository
 public interface VideoRepository extends JpaRepository<Video, Long> {
 
