@@ -328,15 +328,16 @@ public class BlogXmlReader extends TEVXmlReader {
      * @throws XMLParsingException For any errors in parsing the XML document, business or technical
      */
     public static void parseDocument(final InputStream xmlFile, final TEVPostRestController postController,
-            final TEVMetadataRestController mdController, final String blogName) throws XMLParsingException {
-        final boolean isOverwritePosts = mdController.getMetadataForBlog(blogName).getOverwritePostData();
+            final String blogName) throws XMLParsingException {
+        final boolean isOverwritePosts =
+                postController.getMdController().getMetadataForBlog(blogName).getOverwritePostData();
 
         if (isOverwritePosts) {
-            postController.deleteAllRegularsForBlog(blogName);
-            postController.deleteAllAnswersForBlog(blogName);
-            postController.deleteAllLinksForBlog(blogName);
-            postController.deleteAllPhotosForBlog(blogName);
-            postController.deleteAllVideosForBlog(blogName);
+            postController.getRegController().deleteAllRegularsForBlog(blogName);
+            postController.getAnswerController().deleteAllAnswersForBlog(blogName);
+            postController.getLinkController().deleteAllLinksForBlog(blogName);
+            postController.getPhotoController().deleteAllPhotosForBlog(blogName);
+            postController.getVideoController().deleteAllVideosForBlog(blogName);
             postController.deleteAllPostsForBlog(blogName);
             postController.deleteAllHashtagsForBlog(blogName);
             logger.debug("Previous content deleted as part of post XML import");
@@ -434,33 +435,37 @@ public class BlogXmlReader extends TEVXmlReader {
                         case Post.POST_TYPE_REGULAR:
                             final Regular regular = readRegular(reader, post, postRestController);
                             if (isSubmitablePost) {
-                                postRestController.createRegularForBlog(post.getTumblelog(), post.getId(), regular);
+                                postRestController.getRegController().createRegularForBlog(post.getTumblelog(),
+                                        post.getId(), regular);
                             }
                             break;
                         case Post.POST_TYPE_ANSWER:
                             final Answer answer = readAnswer(reader, post, postRestController);
                             if (isSubmitablePost) {
-                                postRestController.createAnswerForBlog(post.getTumblelog(), post.getId(), answer);
+                                postRestController.getAnswerController().createAnswerForBlog(post.getTumblelog(),
+                                        post.getId(), answer);
                             }
                             break;
                         case Post.POST_TYPE_LINK:
                             final Link link = readLink(reader, post, postRestController);
                             if (isSubmitablePost) {
-                                postRestController.createLinkForBlog(post.getTumblelog(), post.getId(), link);
+                                postRestController.getLinkController().createLinkForBlog(post.getTumblelog(),
+                                        post.getId(), link);
                             }
                             break;
                         case Post.POST_TYPE_PHOTO:
                             final List<Photo> photos = readPhotos(reader, post, postRestController);
                             if (isSubmitablePost) {
                                 for (Photo p : photos) {
-                                    postRestController.createPhotoForBlog(post.getTumblelog(), p);
+                                    postRestController.getPhotoController().createPhotoForBlog(post.getTumblelog(), p);
                                 }
                             }
                             break;
                         case Post.POST_TYPE_VIDEO:
                             final Video video = readVideos(reader, post, postRestController);
                             if (isSubmitablePost) {
-                                postRestController.createVideoForBlog(post.getTumblelog(), post.getId(), video);
+                                postRestController.getVideoController().createVideoForBlog(post.getTumblelog(),
+                                        post.getId(), video);
                             }
                             break;
                         default:

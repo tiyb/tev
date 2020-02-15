@@ -15,7 +15,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "answer")
-public class Answer implements Serializable {
+public class Answer implements Serializable, TEVCommonItems<Answer> {
 
     private static final long serialVersionUID = -4839741081483158077L;
 
@@ -67,16 +67,19 @@ public class Answer implements Serializable {
      *
      * @param newDataObject Object from which to copy the fields
      */
-    public void updateData(final Answer newDataObject) {
+    @Override
+    public void updateItem(final Answer newDataObject) {
         this.answer = newDataObject.answer;
         // this.postId = newDataObject.postId;
         this.question = newDataObject.question;
     }
 
+    @Override
     public Long getPostId() {
         return postId;
     }
 
+    @Override
     public void setPostId(final Long postId) {
         this.postId = postId;
     }

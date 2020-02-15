@@ -16,7 +16,7 @@ import javax.validation.constraints.NotBlank;
  */
 @Entity
 @Table(name = "link")
-public class Link implements Serializable {
+public class Link implements Serializable, TEVCommonItems<Link> {
 
     private static final long serialVersionUID = 2074528769160771080L;
 
@@ -50,13 +50,14 @@ public class Link implements Serializable {
      * Helper method used to update this object's properties with another copy of the object. Post
      * ID ignored.
      *
-     * @param newDataObject Object from which to copy the properties
+     * @param newDetails Object from which to copy the properties
      */
-    public void updateData(final Link newDataObject) {
-        this.description = newDataObject.description;
-        // this.postId = newDataObject.postId;
-        this.text = newDataObject.text;
-        this.url = newDataObject.url;
+    @Override
+    public void updateItem(final Link newDetails) {
+        this.description = newDetails.description;
+        // this.postId = newDetails.postId;
+        this.text = newDetails.text;
+        this.url = newDetails.url;
     }
 
     @Override
@@ -86,10 +87,12 @@ public class Link implements Serializable {
         return builder.toString();
     }
 
+    @Override
     public Long getPostId() {
         return postId;
     }
 
+    @Override
     public void setPostId(final Long postId) {
         this.postId = postId;
     }
@@ -117,4 +120,5 @@ public class Link implements Serializable {
     public void setDescription(final String description) {
         this.description = description;
     }
+
 }

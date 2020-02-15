@@ -1,16 +1,9 @@
 package com.tiyb.tev.controller;
 
-import java.io.BufferedInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,23 +18,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tiyb.tev.datamodel.Answer;
 import com.tiyb.tev.datamodel.Hashtag;
-import com.tiyb.tev.datamodel.Link;
-import com.tiyb.tev.datamodel.Photo;
 import com.tiyb.tev.datamodel.Post;
-import com.tiyb.tev.datamodel.Regular;
-import com.tiyb.tev.datamodel.Video;
 import com.tiyb.tev.exception.BlogPostMismatchException;
-import com.tiyb.tev.exception.NoParentPostException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
-import com.tiyb.tev.repository.AnswerRepository;
 import com.tiyb.tev.repository.HashtagRepository;
-import com.tiyb.tev.repository.LinkRepository;
-import com.tiyb.tev.repository.PhotoRepository;
 import com.tiyb.tev.repository.PostRepository;
-import com.tiyb.tev.repository.RegularRepository;
-import com.tiyb.tev.repository.VideoRepository;
 
 /**
  * <p>
@@ -62,11 +44,6 @@ import com.tiyb.tev.repository.VideoRepository;
 @RequestMapping("/api")
 public class TEVPostRestController {
 
-    /**
-     * Used in buffering operations
-     */
-    private static final int BYTE_BUFFER_LENGTH = 1024;
-
     private Logger logger = LoggerFactory.getLogger(TEVPostRestController.class);
 
     /**
@@ -82,40 +59,40 @@ public class TEVPostRestController {
     private HashtagRepository hashtagRepo;
 
     /**
-     * Repo for working with "regular" post data
-     */
-    @Autowired
-    private RegularRepository regularRepo;
-
-    /**
-     * Repo for working with answer post data
-     */
-    @Autowired
-    private AnswerRepository answerRepo;
-
-    /**
-     * Repo for working with link post data
-     */
-    @Autowired
-    private LinkRepository linkRepo;
-
-    /**
-     * Repo for working with photo post data
-     */
-    @Autowired
-    private PhotoRepository photoRepo;
-
-    /**
-     * Repo for working with video post data
-     */
-    @Autowired
-    private VideoRepository videoRepo;
-
-    /**
      * REST controller for working with metadata
      */
     @Autowired
     private TEVMetadataRestController mdController;
+
+    /**
+     * REST controller for working with regular posts
+     */
+    @Autowired
+    private TEVRegularController regController;
+
+    /**
+     * REST controller for working with Answer posts
+     */
+    @Autowired
+    private TEVAnswerController answerController;
+
+    /**
+     * REST Controller for working with Link posts
+     */
+    @Autowired
+    private TEVLinkController linkController;
+
+    /**
+     * REST controller for working with video posts
+     */
+    @Autowired
+    private TEVVideoController videoController;
+
+    /**
+     * REST controller for working with photo posts
+     */
+    @Autowired
+    private TEVPhotoController photoController;
 
     /**
      * GET request for listing all posts for a given blog
@@ -139,8 +116,7 @@ public class TEVPostRestController {
     @PostMapping("/posts/{blog}")
     public Post createPostForBlog(@PathVariable("blog") final String blog, @Valid @RequestBody final Post post) {
         if (!blog.equals(post.getTumblelog())) {
-            logger.error("Post blog and API blog don't match; post blog={}, API blog={}", post.getTumblelog(),
-                    blog);
+            logger.error("Post blog and API blog don't match; post blog={}, API blog={}", post.getTumblelog(), blog);
             throw new BlogPostMismatchException();
         }
         return postRepo.save(post);
@@ -302,54 +278,6 @@ public class TEVPostRestController {
     }
 
     /**
-     * The Tumblr export doesn't always include every image, for some reason. However, in many cases
-     * the images referred to in the image URLs from Tumblr's export XML still exist on Tumblr's
-     * servers. So, in cases where a post is missing its images, this API can be used to fetch the
-     * images from Tumblr's servers (according to their URLs in the XML), download them, and save
-     * them to the media directory being used by TEV, using the naming convention Tumblr would have
-     * used, if the images had been included in the export.
-     *
-     * @param blog   Not used
-     * @param postId The ID of the post to be "fixed"
-     * @return bool indicating whether the action completed successfully or not.
-     */
-    @GetMapping("/posts/{blog}/{id}/fixPhotos")
-    public Boolean fixPhotosForBlogForPost(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
-        String imageDirectory = mdController.getMetadataForBlog(blog).getBaseMediaPath();
-        if (imageDirectory == null || imageDirectory.equals(StringUtils.EMPTY)) {
-            return false;
-        }
-
-        if (imageDirectory.charAt(imageDirectory.length() - 1) != '/') {
-            imageDirectory = imageDirectory.concat("/");
-        }
-
-        final List<Photo> photos = photoRepo.findByPostIdOrderByOffset(postId);
-        boolean response = true;
-
-        for (int i = 0; i < photos.size(); i++) {
-            final Photo photo = photos.get(i);
-            final String url = photo.getUrl1280();
-            final String ext = url.substring(url.lastIndexOf('.'));
-            try {
-                final BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
-                final FileOutputStream out =
-                        new FileOutputStream(String.format("%s%s_%d%s", imageDirectory, photo.getPostId(), i, ext));
-                final byte[] dataBuffer = new byte[BYTE_BUFFER_LENGTH];
-                int bytesRead;
-                while ((bytesRead = in.read(dataBuffer, 0, BYTE_BUFFER_LENGTH)) != -1) {
-                    out.write(dataBuffer, 0, bytesRead);
-                }
-                out.close();
-            } catch (IOException e) {
-                response = false;
-            }
-        }
-        return response;
-    }
-
-    /**
      * GET request for listing all hashtags stored in the system for a given blog
      *
      * @param blog Blog for which hashtags should be returned
@@ -403,578 +331,28 @@ public class TEVPostRestController {
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * GET request for listing all answers for a given blog
-     *
-     * @param blog Blog for which answers should be returned
-     * @return {@link java.util.List List} of all answers in the database
-     */
-    @GetMapping("/posts/{blog}/answers")
-    public List<Answer> getAllAnswersForBlog(@PathVariable("blog") final String blog) {
-        final List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_ANSWER);
-        final List<Answer> answers = new ArrayList<Answer>();
-
-        for (Post post : posts) {
-            final Optional<Answer> answerResponse = answerRepo.findById(post.getId());
-            if (answerResponse.isPresent()) {
-                answers.add(answerResponse.get());
-            }
-        }
-
-        return answers;
+    public TEVMetadataRestController getMdController() {
+        return mdController;
     }
 
-    /**
-     * POST request to submit a Tumblr "answer" into the system for a given blog
-     *
-     * @param blog   Validated against content
-     * @param postId The ID of the post to which this answer refers
-     * @param answer The data to be submitted
-     * @return The same {@link com.tiyb.tev.datamodel.Answer Answer} object that was submitted
-     */
-    @PostMapping("/posts/{blog}/{id}/answer")
-    public Answer createAnswerForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
-            @Valid @RequestBody final Answer answer) {
-        final Optional<Post> post = postRepo.findById(postId);
-        if (!post.isPresent()) {
-            logger.error("Tried to submit answer for a post that doesn't exist: {}", postId);
-            throw new NoParentPostException();
-        } else {
-            assert blog.equals(post.get().getTumblelog());
-        }
-        answer.setPostId(postId);
-        return answerRepo.save(answer);
+    public TEVRegularController getRegController() {
+        return regController;
     }
 
-    /**
-     * GET to return a single answer, by ID
-     *
-     * @param blog   not used
-     * @param postId The Post ID
-     * @return The {@link com.tiyb.tev.datamodel.Answer Answer} details
-     */
-    @GetMapping("/posts/{blog}/{id}/answer")
-    public Answer getAnswerForBlogById(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId) {
-        return answerRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Answer", "id", postId));
+    public TEVAnswerController getAnswerController() {
+        return answerController;
     }
 
-    /**
-     * PUT to update an Answer
-     *
-     * @param blog          Not used
-     * @param postId        The ID of the post to be updated
-     * @param answerDetails The data to be updated
-     * @return The same {@link com.tiyb.tev.datamodel.Answer Answer} object that was submitted
-     */
-    @PutMapping("/posts/{blog}/{id}/answer")
-    public Answer updateAnswerForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
-            @RequestBody final Answer answerDetails) {
-        final Answer ans =
-                answerRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Answer", "id", postId));
-
-        ans.updateData(answerDetails);
-
-        return answerRepo.save(ans);
+    public TEVLinkController getLinkController() {
+        return linkController;
     }
 
-    /**
-     * DEL to delete all "answer" posts in the DB for a given blog
-     *
-     * @param blog Blog for which answers should be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
-     *         details
-     */
-    @DeleteMapping("/posts/{blog}/answers")
-    public ResponseEntity<?> deleteAllAnswersForBlog(@PathVariable("blog") final String blog) {
-        final List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_ANSWER);
-
-        for (Post post : posts) {
-            answerRepo.deleteById(post.getId());
-        }
-
-        return ResponseEntity.ok().build();
+    public TEVVideoController getVideoController() {
+        return videoController;
     }
 
-    /**
-     * DEL to delete a single answer by ID for a given blog
-     *
-     * @param blog   Not used
-     * @param postId the ID of the post to be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
-     *         details
-     */
-    @DeleteMapping("/posts/{blog}/{id}/answer")
-    public ResponseEntity<?> deleteAnswerForBlog(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
-        final Answer ans =
-                answerRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Answer", "id", postId));
-
-        answerRepo.delete(ans);
-
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * GET request for listing all links for a given blog
-     *
-     * @param blog Blog for which to retrieve links
-     * @return {@link java.util.List List} of all links in the database
-     */
-    @GetMapping("/posts/{blog}/links")
-    public List<Link> getAllLinksForBlog(@PathVariable("blog") final String blog) {
-        final List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_LINK);
-        final List<Link> links = new ArrayList<Link>();
-
-        for (Post post : posts) {
-            final Optional<Link> linkResponse = linkRepo.findById(post.getId());
-            if (linkResponse.isPresent()) {
-                links.add(linkResponse.get());
-            }
-        }
-
-        return links;
-    }
-
-    /**
-     * POST request to submit a Tumblr "link" into the system for a given blog
-     *
-     * @param blog   Used for validation purposes
-     * @param postId The ID of the post to which this link refers
-     * @param link   The data to be submitted
-     * @return The same {@link com.tiyb.tev.datamodel.Link Link} object that was submitted
-     */
-    @PostMapping("/posts/{blog}/{id}/link")
-    public Link createLinkForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
-            @Valid @RequestBody final Link link) {
-        final Optional<Post> post = postRepo.findById(postId);
-        if (!post.isPresent()) {
-            logger.error("Tried to submit link for a post that doesn't exist: {}", postId);
-            throw new NoParentPostException();
-        } else {
-            assert blog.equals(post.get().getTumblelog());
-        }
-        link.setPostId(postId);
-        return linkRepo.save(link);
-    }
-
-    /**
-     * GET to return a single link by ID for a given blog
-     *
-     * @param blog   not used
-     * @param postId The Post ID
-     * @return The {@link com.tiyb.tev.datamodel.Link Link} details
-     */
-    @GetMapping("/posts/{blog}/{id}/link")
-    public Link getLinkForBlogById(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId) {
-        return linkRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Link", "id", postId));
-    }
-
-    /**
-     * PUT to update a Link for a given blog
-     *
-     * @param blog        Not used
-     * @param postId      The ID of the post to be updated
-     * @param linkDetails The data to be updated
-     * @return The same {@link com.tiyb.tev.datamodel.Link Link} object that was submitted
-     */
-    @PutMapping("/posts/{blog}/{id}/link")
-    public Link updateLinkForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
-            @RequestBody final Link linkDetails) {
-        final Link link =
-                linkRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Link", "id", postId));
-
-        link.updateData(linkDetails);
-
-        return linkRepo.save(link);
-    }
-
-    /**
-     * DEL to delete all "link" posts in the DB for a given blog
-     *
-     * @param blog Blog for which to delete the links
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
-     *         details
-     */
-    @DeleteMapping("/posts/{blog}/links")
-    public ResponseEntity<?> deleteAllLinksForBlog(@PathVariable("blog") final String blog) {
-        final List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_LINK);
-
-        for (Post post : posts) {
-            linkRepo.deleteById(post.getId());
-        }
-
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * DEL to delete a single link by ID for a given blog
-     *
-     * @param blog   Not used
-     * @param postId the ID of the post to be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
-     *         details
-     */
-    @DeleteMapping("/posts/{blog}/{id}/link")
-    public ResponseEntity<?> deleteLinkForBlog(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
-        final Link link =
-                linkRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Link", "id", postId));
-
-        linkRepo.delete(link);
-
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * GET request for listing all photos for a given blog
-     *
-     * @param blog Blog for which photos should be retrieved
-     * @return {@link java.util.List List} of all photos in the database
-     */
-    @GetMapping("/posts/{blog}/photos")
-    public List<Photo> getAllPhotosForBlog(@PathVariable("blog") final String blog) {
-        final List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_PHOTO);
-        final List<Photo> photos = new ArrayList<Photo>();
-
-        for (Post post : posts) {
-            final Optional<Photo> photoResponse = photoRepo.findById(post.getId());
-            if (photoResponse.isPresent()) {
-                photos.add(photoResponse.get());
-            }
-        }
-
-        return photos;
-    }
-
-    /**
-     * POST request to submit a Tumblr "photo post" into the system for a given blog
-     *
-     * @param blog  For validation purposes
-     * @param photo The data to be submitted
-     * @return The same {@link com.tiyb.tev.datamodel.Photo Photo} object that was submitted
-     */
-    @PostMapping("/posts/{blog}/photo")
-    public Photo createPhotoForBlog(@PathVariable("blog") final String blog, @Valid @RequestBody final Photo photo) {
-        final Optional<Post> post = postRepo.findById(photo.getPostId());
-        if (!post.isPresent()) {
-            logger.error("Tried to submit link for a post that doesn't exist: {}", photo.getPostId());
-            throw new NoParentPostException();
-        } else {
-            assert blog.equals(post.get().getTumblelog());
-        }
-        return photoRepo.save(photo);
-    }
-
-    /**
-     * GET to return a single Photo post by ID for a given blog
-     *
-     * @param blog   Not used
-     * @param postId The Post ID
-     * @return The {@link com.tiyb.tev.datamodel.Photo Photo} details
-     */
-    @GetMapping("/posts/{blog}/{id}/photo")
-    public List<Photo> getPhotoForBlogById(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
-        return photoRepo.findByPostId(postId);
-    }
-
-    /**
-     * PUT to update a Photo
-     *
-     * @param blog         not used
-     * @param postId       The ID of the post to be updated
-     * @param photoDetails The data to be updated
-     * @return The same {@link com.tiyb.tev.datamodel.Photo Photo} object that was submitted
-     */
-    @PutMapping("/posts/{blog}/{id}/photo")
-    public Photo updatePhotoForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
-            @RequestBody final Photo photoDetails) {
-        final Photo photo = photoRepo.findById(photoDetails.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Photo", "id", postId));
-
-        photo.updateData(photoDetails);
-
-        return photoRepo.save(photo);
-    }
-
-    /**
-     * DEL to delete all "photo" posts in the DB for a given blog. Because a given Photo post can
-     * actually have multiple photos in it, the logic is to retrieve all photo posts for the given
-     * blog, then delete each photo for that post.
-     *
-     * @param blog Blog for which photos should be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
-     *         details
-     */
-    @DeleteMapping("/posts/{blog}/photos")
-    public ResponseEntity<?> deleteAllPhotosForBlog(@PathVariable("blog") final String blog) {
-        final List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_PHOTO);
-
-        for (Post post : posts) {
-            final List<Photo> photos = photoRepo.findByPostId(post.getId());
-            for (Photo photo : photos) {
-                photoRepo.delete(photo);
-            }
-        }
-
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * DEL to delete a single photo by ID for a given blog
-     *
-     * @param blog   Not used
-     * @param postId the ID of the post to be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
-     *         details
-     */
-    @DeleteMapping("/posts/{blog}/{id}/photo")
-    public ResponseEntity<?> deletePhotoForBlog(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
-        final Photo photo =
-                photoRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Photo", "id", postId));
-
-        photoRepo.delete(photo);
-
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * GET request for listing all regular posts for a given blog
-     *
-     * @param blog Blog for which posts should be retrieved
-     * @return {@link java.util.List List} of all regular posts in the database
-     */
-    @GetMapping("/posts/{blog}/regulars")
-    public List<Regular> getAllRegularsForBlog(@PathVariable("blog") final String blog) {
-        final List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_REGULAR);
-        final List<Regular> regulars = new ArrayList<Regular>();
-
-        for (Post post : posts) {
-            final Optional<Regular> regResponse = regularRepo.findById(post.getId());
-            if (regResponse.isPresent()) {
-                regulars.add(regResponse.get());
-            }
-        }
-
-        return regulars;
-    }
-
-    /**
-     * POST request to submit a "regular" post into the system. (The naming is awkward, but
-     * "regular" is one type of Tumblr post.)
-     *
-     * @param blog    Used for validation purposes
-     * @param postId  The ID of the post to which this "regular" post content refers
-     * @param regular The data to be submitted
-     * @return The same {@link com.tiyb.tev.datamodel.Regular Regular} object that was submitted.
-     */
-    @PostMapping("/posts/{blog}/{id}/regular")
-    public Regular createRegularForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
-            @Valid @RequestBody final Regular regular) {
-        final Optional<Post> post = postRepo.findById(postId);
-        if (!post.isPresent()) {
-            logger.error("Tried to submit regular for a post that doesn't exist: {}", postId);
-            throw new NoParentPostException();
-        } else {
-            assert blog.equals(post.get().getTumblelog());
-        }
-
-        regular.setPostId(postId);
-        return regularRepo.save(regular);
-    }
-
-    /**
-     * GET to return a single regular post by ID for a given blog
-     *
-     * @param blog   Not used
-     * @param postId The Post ID
-     * @return The {@link com.tiyb.tev.datamodel.Regular Regular} details
-     */
-    @GetMapping("/posts/{blog}/{id}/regular")
-    public Regular getRegularForBlogById(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
-        return regularRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Regular", "id", postId));
-    }
-
-    /**
-     * PUT to update a "Regular"
-     *
-     * @param blog           Not used
-     * @param postId         The ID of the post to be updated
-     * @param regularDetails The data to be updated
-     * @return The same {@link com.tiyb.tev.datamodel.Regular Regular} object that was submitted
-     */
-    @PutMapping("/posts/{blog}/{id}/regular")
-    public Regular updateRegularForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
-            @RequestBody final Regular regularDetails) {
-        final Regular reg =
-                regularRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Regular", "id", postId));
-
-        reg.updateData(regularDetails);
-
-        return regularRepo.save(reg);
-    }
-
-    /**
-     * DEL to delete all "regular" posts in the DB for a given blog
-     *
-     * @param blog Blog for which posts should be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
-     *         details
-     */
-    @DeleteMapping("/posts/{blog}/regulars")
-    public ResponseEntity<?> deleteAllRegularsForBlog(@PathVariable("blog") final String blog) {
-        final List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_REGULAR);
-
-        for (Post post : posts) {
-            final Optional<Regular> response = regularRepo.findById(post.getId());
-            if (!response.isPresent()) {
-                logger.error("Attempting to delete a regular that doesn't exist: {}", post.getId());
-                return ResponseEntity.badRequest().build();
-            }
-
-            regularRepo.delete(response.get());
-        }
-
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * DEL to delete a single regular post by ID for a given blog
-     *
-     * @param blog   Not used
-     * @param postId the ID of the post to be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
-     *         details
-     */
-    @DeleteMapping("/posts/{id}/regular")
-    public ResponseEntity<?> deleteRegularForBlog(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
-        final Regular reg =
-                regularRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
-
-        regularRepo.delete(reg);
-
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * GET request for listing all videos for a given blog
-     *
-     * @param blog Blog for which to return the video posts
-     * @return {@link java.util.List List} of all videos in the database
-     */
-    @GetMapping("/posts/{blog}/videos")
-    public List<Video> getAllVideosForBlog(@PathVariable("blog") final String blog) {
-        final List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_VIDEO);
-        final List<Video> videos = new ArrayList<Video>();
-
-        for (Post post : posts) {
-            final Optional<Video> vidResponse = videoRepo.findById(post.getId());
-            if (vidResponse.isPresent()) {
-                videos.add(vidResponse.get());
-            }
-        }
-
-        return videos;
-    }
-
-    /**
-     * POST request to submit a Tumblr "video post" into the system for a given blog
-     *
-     * @param blog   The blog for which this video is being created
-     * @param postId The ID of the post to which this video content refers
-     * @param video  The data to be submitted
-     * @return The same {@link com.tiyb.tev.datamodel.Video Video} object that was submitted
-     */
-    @PostMapping("/posts/{blog}/{id}/video")
-    public Video createVideoForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
-            @Valid @RequestBody final Video video) {
-        final Optional<Post> post = postRepo.findById(postId);
-        if (!post.isPresent()) {
-            logger.error("Tried to submit a video for a post that doesn't exist: {}", postId);
-            throw new NoParentPostException();
-        } else {
-            assert blog.equals(post.get().getTumblelog());
-        }
-
-        video.setPostId(postId);
-        return videoRepo.save(video);
-    }
-
-    /**
-     * GET to return a single video post by ID for a given blog
-     *
-     * @param blog   Not used
-     * @param postId The Post ID
-     * @return The {@link com.tiyb.tev.datamodel.Video Video} details
-     */
-    @GetMapping("/posts/{blog}/{id}/video")
-    public Video getVideoForBlogById(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId) {
-        return videoRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Video", "id", postId));
-    }
-
-    /**
-     * PUT to update a Video
-     *
-     * @param blog         Not used
-     * @param postId       The ID of the post to be updated
-     * @param videoDetails The data to be updated
-     * @return The same {@link com.tiyb.tev.datamodel.Video Video} object that was submitted
-     */
-    @PutMapping("/posts/{blog}/{id}/video")
-    public Video updateVideoForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
-            @RequestBody final Video videoDetails) {
-        final Video video =
-                videoRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Video", "id", postId));
-
-        video.updateData(videoDetails);
-
-        return videoRepo.save(video);
-    }
-
-    /**
-     * DEL to delete all "video" posts in the DB for a given blog
-     *
-     * @param blog Blog for which videos should be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
-     *         details
-     */
-    @DeleteMapping("/posts/{blog}/videos")
-    public ResponseEntity<?> deleteAllVideosForBlog(@PathVariable("blog") final String blog) {
-        final List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_VIDEO);
-
-        for (Post post : posts) {
-            final Optional<Video> response = videoRepo.findById(post.getId());
-            if (!response.isPresent()) {
-                logger.error("Attempting to delete a video that doesn't exist: {}", post.getId());
-                return ResponseEntity.badRequest().build();
-            }
-
-            videoRepo.delete(response.get());
-        }
-
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * DEL to delete a single video by ID for a given blog
-     *
-     * @param blog   Not used
-     * @param postId the ID of the post to be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
-     *         details
-     */
-    @DeleteMapping("/posts/{blog}/{id}/video")
-    public ResponseEntity<?> deleteVideoForBlog(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
-        final Video video =
-                videoRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Video", "id", postId));
-
-        videoRepo.delete(video);
-
-        return ResponseEntity.ok().build();
+    public TEVPhotoController getPhotoController() {
+        return photoController;
     }
 
 }

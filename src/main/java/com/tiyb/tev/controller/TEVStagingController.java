@@ -171,7 +171,7 @@ public class TEVStagingController {
     @PostMapping("/posts/{blog}/{id}/exportImages")
     public ResponseEntity<?> exportImagesForBlogForPost(@PathVariable("blog") final String blog,
             @PathVariable("id") final Long postID, @RequestBody final String pathForDestination) {
-        if (!postController.fixPhotosForBlogForPost(blog, postID)) {
+        if (!postController.getPhotoController().fixPhotosForBlogForPost(blog, postID)) {
             return new ResponseEntity<String>("Error getting images for post", null, HttpStatus.FAILED_DEPENDENCY);
         }
 

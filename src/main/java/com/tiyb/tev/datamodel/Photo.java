@@ -17,7 +17,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "photo")
-public class Photo implements Serializable {
+public class Photo implements Serializable, TEVCommonItems<Photo> {
 
     private static final long serialVersionUID = 454344897567310660L;
 
@@ -97,22 +97,24 @@ public class Photo implements Serializable {
      * Helper function to update properties of the object from another copy of the object. Ignores
      * ID and Post ID.
      *
-     * @param newDataObject Object from which to copy the properties.
+     * @param newDetails Object from which to copy the properties.
      */
-    public void updateData(final Photo newDataObject) {
-        this.caption = newDataObject.caption;
-        this.height = newDataObject.height;
-        // this.id = newDataObject.id;
-        this.offset = newDataObject.offset;
-        this.photoLinkUrl = newDataObject.photoLinkUrl;
-        // this.postId = newDataObject.postId;
-        this.url100 = newDataObject.url100;
-        this.url1280 = newDataObject.url1280;
-        this.url250 = newDataObject.url250;
-        this.url400 = newDataObject.url400;
-        this.url500 = newDataObject.url500;
-        this.url75 = newDataObject.url75;
-        this.width = newDataObject.width;
+    @Override
+    public void updateItem(final Photo newDetails) {
+        this.caption = newDetails.caption;
+        this.height = newDetails.height;
+        // this.id = newDetails.id;
+        this.offset = newDetails.offset;
+        this.photoLinkUrl = newDetails.photoLinkUrl;
+        // this.postId = newDetails.postId;
+        this.url100 = newDetails.url100;
+        this.url1280 = newDetails.url1280;
+        this.url250 = newDetails.url250;
+        this.url400 = newDetails.url400;
+        this.url500 = newDetails.url500;
+        this.url75 = newDetails.url75;
+        this.width = newDetails.width;
+
     }
 
     @Override
@@ -182,10 +184,12 @@ public class Photo implements Serializable {
         return builder.toString();
     }
 
+    @Override
     public Long getPostId() {
         return postId;
     }
 
+    @Override
     public void setPostId(final Long postId) {
         this.postId = postId;
     }
@@ -281,4 +285,5 @@ public class Photo implements Serializable {
     public Long getId() {
         return id;
     }
+
 }

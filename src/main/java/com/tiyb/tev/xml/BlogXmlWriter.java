@@ -205,7 +205,7 @@ public final class BlogXmlWriter {
      */
     private static void addPhotoBody(final Post post, final XMLStreamWriter writer,
             final TEVPostRestController postController, final String blogName) throws XMLStreamException {
-        final List<Photo> photos = postController.getPhotoForBlogById(blogName, post.getId());
+        final List<Photo> photos = postController.getPhotoController().getPhotoForBlogById(blogName, post.getId());
 
         writer.writeStartElement(BlogXmlReader.PHOTO_TAG_CAPTION);
         writer.writeCharacters(photos.get(0).getCaption());
@@ -288,7 +288,7 @@ public final class BlogXmlWriter {
      */
     private static void addVideoBody(final Post post, final XMLStreamWriter writer,
             final TEVPostRestController postController) throws XMLStreamException {
-        final Video video = postController.getVideoForBlogById(post.getTumblelog(), post.getId());
+        final Video video = postController.getVideoController().getVideoForBlogById(post.getTumblelog(), post.getId());
 
         writer.writeStartElement(VIDEO_TAG_SOURCE);
 
@@ -333,7 +333,8 @@ public final class BlogXmlWriter {
      */
     private static void addAnswerBody(final Post post, final XMLStreamWriter writer,
             final TEVPostRestController postController) throws XMLStreamException {
-        final Answer answer = postController.getAnswerForBlogById(post.getTumblelog(), post.getId());
+        final Answer answer =
+                postController.getAnswerController().getAnswerForBlogById(post.getTumblelog(), post.getId());
 
         writer.writeStartElement(BlogXmlReader.ANSWER_QUESTION_TAG);
         writer.writeCharacters(answer.getQuestion());
@@ -355,7 +356,7 @@ public final class BlogXmlWriter {
      */
     private static void addLinkBody(final Post post, final XMLStreamWriter writer,
             final TEVPostRestController postController) throws XMLStreamException {
-        final Link link = postController.getLinkForBlogById(post.getTumblelog(), post.getId());
+        final Link link = postController.getLinkController().getLinkForBlogById(post.getTumblelog(), post.getId());
 
         writer.writeStartElement(BlogXmlReader.LINK_TAG_TEXT);
         writer.writeCharacters(link.getText());
@@ -381,7 +382,8 @@ public final class BlogXmlWriter {
      */
     private static void addRegularBody(final Post post, final XMLStreamWriter writer,
             final TEVPostRestController postController) throws XMLStreamException {
-        final Regular regular = postController.getRegularForBlogById(post.getTumblelog(), post.getId());
+        final Regular regular =
+                postController.getRegController().getRegularForBlogById(post.getTumblelog(), post.getId());
 
         if (regular.getTitle() != null && regular.getTitle().length() > 0) {
             writer.writeStartElement(BlogXmlReader.REGULAR_TAG_TITLE);

@@ -26,7 +26,7 @@ import com.tiyb.tev.xml.BlogXmlReader;
 
 /**
  * Unit test cases for testing admin functions of the application.
- * 
+ *
  * @author tiyb
  *
  */
@@ -41,7 +41,7 @@ public class TevAdminToolsUnitTests {
 	private TEVAdminToolsController adminRestController;
 	@Autowired
 	private TEVPostRestController postController;
-	
+
 	private static final String MAIN_BLOG_NAME = "mainblog";
 
 	/**
@@ -60,7 +60,7 @@ public class TevAdminToolsUnitTests {
 	/**
 	 * Sets up the posts to a valid state, using the <code>test-post-xml.xml</code>
 	 * input file
-	 * 
+	 *
 	 * @throws FileNotFoundException
 	 */
 	@Before
@@ -74,12 +74,12 @@ public class TevAdminToolsUnitTests {
 
 		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-xml.xml");
 		InputStream xmlFile = new FileInputStream(rawXmlFile);
-		BlogXmlReader.parseDocument(xmlFile, postController, mdRestController, MAIN_BLOG_NAME);
+		BlogXmlReader.parseDocument(xmlFile, postController, MAIN_BLOG_NAME);
 	}
 
 	/**
 	 * Tests that any files not associated with a post are deleted from the folder
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -94,7 +94,7 @@ public class TevAdminToolsUnitTests {
 	/**
 	 * Tests that nothing is deleted when the exact number of files is in the folder
 	 * as expected
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -111,7 +111,7 @@ public class TevAdminToolsUnitTests {
 	/**
 	 * Tests that duplicate images are removed from the folder (the core result of
 	 * the feature)
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -130,7 +130,7 @@ public class TevAdminToolsUnitTests {
 
 	/**
 	 * Test importing images with non-post-related images
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -144,7 +144,7 @@ public class TevAdminToolsUnitTests {
 
 	/**
 	 * Test import where the right number of images exists
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -160,7 +160,7 @@ public class TevAdminToolsUnitTests {
 
 	/**
 	 * Test import where the input folder has duplicates
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -179,7 +179,7 @@ public class TevAdminToolsUnitTests {
 
 	/**
 	 * Test import when there are already images in the destination folder
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Test
@@ -195,7 +195,7 @@ public class TevAdminToolsUnitTests {
 
 		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
 	}
-	
+
 	/**
 	 * Tests functionality for marking all posts read
 	 */
@@ -203,27 +203,27 @@ public class TevAdminToolsUnitTests {
 	public void testMarkingAllPostsRead() {
 		List<Post> allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
 		assertThat(allPosts).isNotNull();
-		
+
 		for(Post p : allPosts) {
 			p.setIsRead(false);
 			postController.updatePostForBlog(p.getTumblelog(), p.getId(), p);
 		}
-		
+
 		allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
 		assertThat(allPosts).isNotNull();
 		for(Post p : allPosts) {
 			assertThat(p.getIsRead()).isEqualTo(false);
 		}
-		
+
 		adminRestController.markAllPostsReadForBlog(MAIN_BLOG_NAME);
-		
+
 		allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
 		assertThat(allPosts).isNotNull();
 		for(Post p : allPosts) {
 			assertThat(p.getIsRead()).isEqualTo(true);
 		}
 	}
-	
+
 	/**
 	 * Tests functionality for marking all posts unread
 	 */
@@ -231,25 +231,25 @@ public class TevAdminToolsUnitTests {
 	public void testMarkingAllPostsUnread() {
 		List<Post> allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
 		assertThat(allPosts).isNotNull();
-		
+
 		for(Post p : allPosts) {
 			p.setIsRead(true);
 			postController.updatePostForBlog(p.getTumblelog(), p.getId(), p);
 		}
-		
+
 		allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
 		assertThat(allPosts).isNotNull();
 		for(Post p : allPosts) {
 			assertThat(p.getIsRead()).isEqualTo(true);
 		}
-		
+
 		adminRestController.markAllPostsUnreadForBlog(MAIN_BLOG_NAME);
-		
+
 		allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
 		assertThat(allPosts).isNotNull();
 		for(Post p : allPosts) {
 			assertThat(p.getIsRead()).isEqualTo(false);
 		}
 	}
-		
+
 }

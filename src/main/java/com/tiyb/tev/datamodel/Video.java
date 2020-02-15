@@ -15,7 +15,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "video")
-public class Video implements Serializable {
+public class Video implements Serializable, TEVCommonItems<Video> {
 
     private static final long serialVersionUID = -1845632885836778430L;
 
@@ -66,17 +66,18 @@ public class Video implements Serializable {
      * Helper function to update the object's properties with properties from another copy of the
      * object. Post ID ignored.
      *
-     * @param newDataObject Object from which to copy the properties
+     * @param newDetails Object from which to copy the properties
      */
-    public void updateData(final Video newDataObject) {
-        this.contentType = newDataObject.contentType;
-        this.duration = newDataObject.duration;
-        this.extension = newDataObject.extension;
-        this.height = newDataObject.height;
-        // this.postId = newDataObject.postId;
-        this.revision = newDataObject.revision;
-        this.videoCaption = newDataObject.videoCaption;
-        this.width = newDataObject.width;
+    @Override
+    public void updateItem(final Video newDetails) {
+        this.contentType = newDetails.contentType;
+        this.duration = newDetails.duration;
+        this.extension = newDetails.extension;
+        this.height = newDetails.height;
+        // this.postId = newDetails.postId;
+        this.revision = newDetails.revision;
+        this.videoCaption = newDetails.videoCaption;
+        this.width = newDetails.width;
     }
 
     @Override
@@ -126,10 +127,12 @@ public class Video implements Serializable {
         return builder.toString();
     }
 
+    @Override
     public Long getPostId() {
         return postId;
     }
 
+    @Override
     public void setPostId(final Long postId) {
         this.postId = postId;
     }
@@ -189,4 +192,5 @@ public class Video implements Serializable {
     public void setVideoCaption(final String videoCaption) {
         this.videoCaption = videoCaption;
     }
+
 }

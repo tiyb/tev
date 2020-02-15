@@ -32,11 +32,13 @@
  * </p>
  *
  * <p>
- * Each class implements an <code>updateData()</code> helper method, which can be used for copying
- * "safe" fields from one object to another. (There are typically one or two fields, such as IDs,
- * that do not get copied during this process.) Because most but not all fields are copied a copy
- * constructor wasn't used. To make it even messier -- but clear to the reader -- every single
- * attribute gets a line of code, with the unsafe attributes commented out. e.g.
+ * Each class implements the {@link com.tiyb.tev.datamodel.TEVCommonItems TEVCommonItems} interface,
+ * which lists methods <i>all</i> of TEV's entity objects must implement. Part of that is the
+ * <code>updateItem()</code> helper method, which can be used for copying "safe" fields from one
+ * object to another. (There are typically one or two fields, such as IDs, that do not get copied
+ * during this process.) Because most but not all fields are copied a copy constructor wasn't used.
+ * To make it even messier -- but clear to the reader -- every single attribute gets a line of code,
+ * with the unsafe attributes commented out. e.g.
  * </p>
  *
  * <pre>

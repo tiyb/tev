@@ -199,7 +199,8 @@ public class TEVAdminToolsController {
 
         final List<Post> photoPosts = getPostsByBlogByType(blog, Post.POST_TYPE_PHOTO);
         for (Post post : photoPosts) {
-            final List<Photo> photosForPost = postController.getPhotoForBlogById(post.getTumblelog(), post.getId());
+            final List<Photo> photosForPost =
+                    postController.getPhotoController().getPhotoForBlogById(post.getTumblelog(), post.getId());
             final int numPhotos = photosForPost.size();
 
             final File[] imagesForPost = folder.listFiles(new FilenameFilter() {

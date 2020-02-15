@@ -323,11 +323,11 @@ public class TEVMetadataRestController {
         convoController.deleteAllConvoMsgsForBlog(md.getBlog());
         convoController.deleteAllConversationsForBlog(md.getBlog());
 
-        postController.deleteAllRegularsForBlog(md.getBlog());
-        postController.deleteAllAnswersForBlog(md.getBlog());
-        postController.deleteAllLinksForBlog(md.getBlog());
-        postController.deleteAllPhotosForBlog(md.getBlog());
-        postController.deleteAllVideosForBlog(md.getBlog());
+        postController.getRegController().deleteAllRegularsForBlog(md.getBlog());
+        postController.getAnswerController().deleteAllAnswersForBlog(md.getBlog());
+        postController.getLinkController().deleteAllLinksForBlog(md.getBlog());
+        postController.getPhotoController().deleteAllPhotosForBlog(md.getBlog());
+        postController.getVideoController().deleteAllVideosForBlog(md.getBlog());
         postController.deleteAllPostsForBlog(md.getBlog());
         postController.deleteAllHashtagsForBlog(md.getBlog());
 

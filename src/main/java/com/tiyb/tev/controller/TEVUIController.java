@@ -161,6 +161,12 @@ public class TEVUIController {
     private TEVPostRestController postController;
 
     /**
+     * REST controller for working with Regulars
+     */
+    @Autowired
+    private TEVRegularController regController;
+
+    /**
      * REST controller for working with conversations
      */
     @Autowired
@@ -297,7 +303,7 @@ public class TEVUIController {
     public String handlePostFileUploadForBlog(@PathVariable("blog") final String blog,
             @RequestParam("file") final MultipartFile file, final RedirectAttributes redirectAttributes) {
         try {
-            BlogXmlReader.parseDocument(file.getInputStream(), postController, mdController, blog);
+            BlogXmlReader.parseDocument(file.getInputStream(), postController, blog);
         } catch (XMLParsingException | IOException e) {
             logger.error("UI Controller failing in handlePostFileUpload due to XML parsing error: ", e);
             return "redirect:/errorbadxml";
@@ -388,20 +394,21 @@ public class TEVUIController {
 
         switch (postType) {
         case Post.POST_TYPE_REGULAR:
-            final Regular reg = postController.getRegularForBlogById(post.getTumblelog(), postID);
+            final Regular reg = regController.getRegularForBlogById(post.getTumblelog(), postID);
             model.addAttribute(MODEL_ATTRIBUTE_REGULAR, reg);
             return "viewers/regular";
         case Post.POST_TYPE_LINK:
-            final Link ln = postController.getLinkForBlogById(blog, postID);
+            final Link ln = postController.getLinkController().getLinkForBlogById(blog, postID);
             model.addAttribute(MODEL_ATTRIBUTE_LINK, ln);
             return "viewers/link";
         case Post.POST_TYPE_ANSWER:
-            final Answer ans = postController.getAnswerForBlogById(blog, postID);
+            final Answer ans = postController.getAnswerController().getAnswerForBlogById(blog, postID);
             model.addAttribute(MODEL_ATTRIBUTE_ANSWER, ans);
             return "viewers/answer";
         case Post.POST_TYPE_PHOTO:
             final List<String> images = new ArrayList<String>();
-            final List<Photo> photos = postController.getPhotoForBlogById(post.getTumblelog(), postID);
+            final List<Photo> photos =
+                    postController.getPhotoController().getPhotoForBlogById(post.getTumblelog(), postID);
             for (int i = 0; i < photos.size(); i++) {
                 final Photo photo = photos.get(i);
                 final String ext = photo.getUrl1280().substring(photo.getUrl1280().lastIndexOf('.'));
@@ -411,7 +418,7 @@ public class TEVUIController {
             model.addAttribute(MODEL_ATTRIBUTE_CAPTION, photos.get(0).getCaption());
             return "viewers/photo";
         case Post.POST_TYPE_VIDEO:
-            final Video vid = postController.getVideoForBlogById(post.getTumblelog(), postID);
+            final Video vid = postController.getVideoController().getVideoForBlogById(post.getTumblelog(), postID);
             model.addAttribute(MODEL_ATTRIBUTE_VIDEO, vid);
             return "viewers/video";
         default:

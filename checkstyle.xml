@@ -73,7 +73,9 @@
 		<module name="EqualsHashCode" />
 		<module name="ExplicitInitialization" />
 		<module name="FallThrough" />
-		<module name="FinalLocalVariable" />
+		<module name="FinalLocalVariable">
+			<property name="severity" value="warning"/>
+		</module>
 		<module name="HiddenField">
 			<property name="ignoreConstructorParameter" value="true"/>
 			<property name="ignoreSetter" value="true"/>
@@ -137,15 +139,21 @@
 			<property name="checkEmptyJavadoc" value="true" />
 		</module>
 		<module name="JavadocTagContinuationIndentation" />
-		<module name="JavadocType" />
+		<module name="JavadocType">
+			<property name="severity" value="warning"/>
+		</module>
 		<module name="JavadocVariable">
 			<property name="ignoreNamePattern" value="logger" />
+			<property name="severity" value="warning"/>
 		</module>
 		<module name="MissingJavadocMethod">
 			<property name="allowMissingPropertyJavadoc" value="true" />
+			<property name="severity" value="warning"/>
 		</module>
 		<module name="MissingJavadocPackage" />
-		<module name="MissingJavadocType" />
+		<module name="MissingJavadocType">
+			<property name="severity" value="warning"/>
+		</module>
 		<module name="NonEmptyAtclauseDescription" />
 
 		<!-- Metrics -->

@@ -15,7 +15,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "regular")
-public class Regular implements Serializable {
+public class Regular implements Serializable, TEVCommonItems<Regular> {
 
     private static final long serialVersionUID = 1029059617501526454L;
 
@@ -41,12 +41,13 @@ public class Regular implements Serializable {
      * Helper method to update the data in this object with properties from another copy of the
      * object. ID ignored.
      *
-     * @param newDataObject Object from which to copy the properties.
+     * @param newDetails Object from which to copy the properties
      */
-    public void updateData(final Regular newDataObject) {
-        this.body = newDataObject.body;
-        // this.postId = newDataObject.postId;
-        this.title = newDataObject.title;
+    @Override
+    public void updateItem(final Regular newDetails) {
+        this.body = newDetails.body;
+        // this.postId = newItem.postId;
+        this.title = newDetails.title;
     }
 
     @Override
@@ -71,10 +72,12 @@ public class Regular implements Serializable {
         return builder.toString();
     }
 
+    @Override
     public Long getPostId() {
         return postId;
     }
 
+    @Override
     public void setPostId(final Long postId) {
         this.postId = postId;
     }
