@@ -17,7 +17,6 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.controller.TEVPostRestController;
 import com.tiyb.tev.datamodel.Answer;
 import com.tiyb.tev.datamodel.Link;
@@ -57,8 +56,8 @@ import com.tiyb.tev.exception.XMLParsingException;
  *
  * <p>
  * The general approach taken is that the
- * {@link #parseDocument(InputStream, TEVPostRestController, TEVMetadataRestController, String)
- * parseDocument()} method sets up some initial variables, the
+ * {@link #parseDocument(InputStream, TEVPostRestController, String) parseDocument()} method sets up
+ * some initial variables, the
  * {@link #readPosts(InputStream, TEVPostRestController, boolean, String) readPosts()} method then
  * goes through the document post-by-post, and as it determines what type each post is, additional
  * methods are called to read the additional, type-specific XML within the post's XML element
