@@ -91,10 +91,6 @@
 		<module name="MissingSwitchDefault" />
 		<module name="MultipleVariableDeclarations" />
 		<module name="NestedForDepth" />
-		<!-- TODO revisit -->
-		<module name="NestedIfDepth">
-			<property name="severity" value="ignore"/>
-		</module>
 		<module name="NestedTryDepth" />
 		<module name="NoClone" />
 		<module name="NoFinalizer" />
@@ -158,26 +154,6 @@
 
 		<!-- Metrics -->
 		<module name="BooleanExpressionComplexity" />
-		<!-- TODO revisit -->
-		<module name="ClassDataAbstractionCoupling">
-			<property name="severity" value="ignore"/>
-		</module>
-		<!-- TODO revisit -->
-		<module name="ClassFanOutComplexity">
-			<property name="severity" value="ignore"/>
-		</module>
-		<!-- TODO revisit -->
-		<module name="CyclomaticComplexity">
-			<property name="severity" value="ignore" />
-		</module>
-		<!-- TODO revisit -->
-		<module name="JavaNCSS">
-			<property name="severity" value="ignore"/>
-		</module>
-		<!-- TODO revisit -->
-		<module name="NPathComplexity">
-			<property name="severity" value="ignore"/>
-		</module>
 
 		<!-- Misc -->
 		<module name="ArrayTypeStyle" />
@@ -215,10 +191,6 @@
 
 		<!-- Size Violations -->
 		<module name="AnonInnerLength" />
-		<!-- TODO revisit -->
-		<module name="ExecutableStatementCount">
-			<property name="severity" value="ignore"/>
-		</module>
 		<module name="MethodCount" />
 		<module name="MethodLength" />
 		<module name="OuterTypeNumber" />
