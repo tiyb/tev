@@ -53,6 +53,7 @@
 		<js>/js/viewerbuttonshandler.js</js>
 		<js>/js/imageViewer.js</js>
 		<js>/js/conversationviewer.js</js>
+		<js>/js/click-photos-handler.js</js>
 	</group>
 	
 	<group name="hashtags">
