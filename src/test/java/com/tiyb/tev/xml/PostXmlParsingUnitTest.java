@@ -466,7 +466,7 @@ public class PostXmlParsingUnitTest {
         assertThat(post).isNotNull();
         assertThat(post.getIsRead()).isEqualTo(true);
 
-        List<Hashtag> hashtags = postController.getAllHashtagsForBlog(MAIN_BLOG_NAME);
+        List<Hashtag> hashtags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
         assertThat(hashtags).isNotNull();
         assertThat(hashtags.size()).isEqualTo(INITIAL_HASHTAGS.size());
 
@@ -479,7 +479,7 @@ public class PostXmlParsingUnitTest {
      */
     @Test
     public void testInitialHashtags() {
-        List<Hashtag> hashtags = postController.getAllHashtagsForBlog(MAIN_BLOG_NAME);
+        List<Hashtag> hashtags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
         assertThat(hashtags).isNotNull();
         assertThat(hashtags.size()).isEqualTo(INITIAL_HASHTAGS.size());
 
@@ -525,7 +525,7 @@ public class PostXmlParsingUnitTest {
      */
     @Test
     public void testHashtagInitialLoad() {
-        List<Hashtag> tags = postController.getAllHashtagsForBlog(MAIN_BLOG_NAME);
+        List<Hashtag> tags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
 
         assertThat(tags).isNotNull();
         assertThat(tags.size()).isEqualTo(INITIAL_HASHTAGS.size());
@@ -536,9 +536,9 @@ public class PostXmlParsingUnitTest {
      */
     @Test
     public void testAddHashtag() {
-        postController.createHashtagForBlog(MAIN_BLOG_NAME, "tag16");
+        postController.getHashtagController().createHashtagForBlog(MAIN_BLOG_NAME, "tag16");
 
-        List<Hashtag> tags = postController.getAllHashtagsForBlog(MAIN_BLOG_NAME);
+        List<Hashtag> tags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
 
         assertThat(tags).isNotNull();
         assertThat(tags.size()).isEqualTo(INITIAL_HASHTAGS.size() + 1);
@@ -549,9 +549,9 @@ public class PostXmlParsingUnitTest {
      */
     @Test
     public void testAddExistingHashtag() {
-        postController.createHashtagForBlog("tag1", MAIN_BLOG_NAME);
+        postController.getHashtagController().createHashtagForBlog("tag1", MAIN_BLOG_NAME);
 
-        List<Hashtag> tags = postController.getAllHashtagsForBlog(MAIN_BLOG_NAME);
+        List<Hashtag> tags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
 
         assertThat(tags).isNotNull();
         assertThat(tags.size()).isEqualTo(INITIAL_HASHTAGS.size());

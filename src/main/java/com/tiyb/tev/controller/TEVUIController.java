@@ -441,7 +441,7 @@ public class TEVUIController {
     public String showHashtagViewerForBlog(final Model model,
             @RequestParam("tempBlogName") final Optional<String> blogParam) {
         final String blog = blogParam.isPresent() ? blogParam.get() : mdController.getDefaultBlogName();
-        final List<Hashtag> hashtags = postController.getAllHashtagsForBlog(blog);
+        final List<Hashtag> hashtags = postController.getHashtagController().getAllHashtagsForBlog(blog);
         model.addAttribute(MODEL_ATTRIBUTE_HASHTAGS, hashtags);
         model.addAttribute(MODEL_ATTRIBUTE_BLOGNAME, blog);
         updateModelWithTheme(model);

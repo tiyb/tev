@@ -206,6 +206,12 @@ public class Metadata implements Serializable {
     private Boolean isDefault;
 
     /**
+     * Whether the hashtag viewer should show hashtags for all blogs (true) or just the default blog
+     * (false)
+     */
+    private Boolean showHashtagsForAllBlogs;
+
+    /**
      * Helper function to generate a new Metadata object, with some defaults filled in.
      * baseMediaPath, mainTumblrUser, and mainTumblrUserAvatarUrl not set, since no defaults make
      * sense for these values.
@@ -227,6 +233,7 @@ public class Metadata implements Serializable {
         md.setConversationSortOrder(SORT_ORDERS.get(0));
         md.setTheme(DEFAULT_THEME);
         md.setIsDefault(false);
+        md.setShowHashtagsForAllBlogs(true);
 
         return md;
     }
@@ -257,106 +264,52 @@ public class Metadata implements Serializable {
         this.theme = newDataObject.theme;
         this.blog = newDataObject.blog;
         this.isDefault = newDataObject.isDefault;
+        this.showHashtagsForAllBlogs = newDataObject.showHashtagsForAllBlogs;
     }
 
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append("Metadata [");
-        if (id != null) {
-            builder.append("id=");
-            builder.append(id);
-            builder.append(", ");
-        }
-        if (baseMediaPath != null) {
-            builder.append("baseMediaPath=");
-            builder.append(baseMediaPath);
-            builder.append(", ");
-        }
-        if (sortColumn != null) {
-            builder.append("sortColumn=");
-            builder.append(sortColumn);
-            builder.append(", ");
-        }
-        if (sortOrder != null) {
-            builder.append("sortOrder=");
-            builder.append(sortOrder);
-            builder.append(", ");
-        }
-        if (filter != null) {
-            builder.append("filter=");
-            builder.append(filter);
-            builder.append(", ");
-        }
-        if (mainTumblrUser != null) {
-            builder.append("mainTumblrUser=");
-            builder.append(mainTumblrUser);
-            builder.append(", ");
-        }
-        if (mainTumblrUserAvatarUrl != null) {
-            builder.append("mainTumblrUserAvatarUrl=");
-            builder.append(mainTumblrUserAvatarUrl);
-            builder.append(", ");
-        }
-        if (favFilter != null) {
-            builder.append("favFilter=");
-            builder.append(favFilter);
-            builder.append(", ");
-        }
-        if (pageLength != null) {
-            builder.append("pageLength=");
-            builder.append(pageLength);
-            builder.append(", ");
-        }
-        if (showReadingPane != null) {
-            builder.append("showReadingPane=");
-            builder.append(showReadingPane);
-            builder.append(", ");
-        }
-        if (overwritePostData != null) {
-            builder.append("overwritePostData=");
-            builder.append(overwritePostData);
-            builder.append(", ");
-        }
-        if (overwriteConvoData != null) {
-            builder.append("overwriteConvoData=");
-            builder.append(overwriteConvoData);
-            builder.append(", ");
-        }
-        if (conversationDisplayStyle != null) {
-            builder.append("conversationDisplayStyle=");
-            builder.append(conversationDisplayStyle);
-            builder.append(", ");
-        }
-        if (conversationSortColumn != null) {
-            builder.append("conversationSortColumn=");
-            builder.append(conversationSortColumn);
-            builder.append(", ");
-        }
-        if (conversationSortOrder != null) {
-            builder.append("conversationSortOrder=");
-            builder.append(conversationSortOrder);
-            builder.append(", ");
-        }
-        if (exportImagesFilePath != null) {
-            builder.append("exportImagesFilePath=");
-            builder.append(exportImagesFilePath);
-            builder.append(", ");
-        }
-        if (blog != null) {
-            builder.append("blog=");
-            builder.append(blog);
-            builder.append(", ");
-        }
-        if (isDefault != null) {
-            builder.append("isDefault=");
-            builder.append(isDefault);
-            builder.append(", ");
-        }
-        if (theme != null) {
-            builder.append("theme=");
-            builder.append(theme);
-        }
+        builder.append("Metadata [id=");
+        builder.append(id);
+        builder.append(", baseMediaPath=");
+        builder.append(baseMediaPath);
+        builder.append(", sortColumn=");
+        builder.append(sortColumn);
+        builder.append(", sortOrder=");
+        builder.append(sortOrder);
+        builder.append(", filter=");
+        builder.append(filter);
+        builder.append(", mainTumblrUser=");
+        builder.append(mainTumblrUser);
+        builder.append(", mainTumblrUserAvatarUrl=");
+        builder.append(mainTumblrUserAvatarUrl);
+        builder.append(", favFilter=");
+        builder.append(favFilter);
+        builder.append(", pageLength=");
+        builder.append(pageLength);
+        builder.append(", showReadingPane=");
+        builder.append(showReadingPane);
+        builder.append(", overwritePostData=");
+        builder.append(overwritePostData);
+        builder.append(", overwriteConvoData=");
+        builder.append(overwriteConvoData);
+        builder.append(", conversationDisplayStyle=");
+        builder.append(conversationDisplayStyle);
+        builder.append(", conversationSortColumn=");
+        builder.append(conversationSortColumn);
+        builder.append(", conversationSortOrder=");
+        builder.append(conversationSortOrder);
+        builder.append(", exportImagesFilePath=");
+        builder.append(exportImagesFilePath);
+        builder.append(", theme=");
+        builder.append(theme);
+        builder.append(", blog=");
+        builder.append(blog);
+        builder.append(", isDefault=");
+        builder.append(isDefault);
+        builder.append(", showHashtagsForAllBlogs=");
+        builder.append(showHashtagsForAllBlogs);
         builder.append("]");
         return builder.toString();
     }
@@ -511,6 +464,14 @@ public class Metadata implements Serializable {
 
     public void setIsDefault(final Boolean isDefault) {
         this.isDefault = isDefault;
+    }
+
+    public Boolean getShowHashtagsForAllBlogs() {
+        return showHashtagsForAllBlogs;
+    }
+
+    public void setShowHashtagsForAllBlogs(final Boolean showHashtagsForAllBlogs) {
+        this.showHashtagsForAllBlogs = showHashtagsForAllBlogs;
     }
 
 }

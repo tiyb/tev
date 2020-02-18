@@ -338,7 +338,7 @@ public class BlogXmlReader extends TEVXmlReader {
             postController.getPhotoController().deleteAllPhotosForBlog(blogName);
             postController.getVideoController().deleteAllVideosForBlog(blogName);
             postController.deleteAllPostsForBlog(blogName);
-            postController.deleteAllHashtagsForBlog(blogName);
+            postController.getHashtagController().deleteAllHashtagsForBlog(blogName);
             logger.debug("Previous content deleted as part of post XML import");
         }
 
@@ -480,7 +480,7 @@ public class BlogXmlReader extends TEVXmlReader {
                                     if (tag.equals(StringUtils.EMPTY)) {
                                         logger.error("A hashtag was empty from this list: {}", post.getTags());
                                     }
-                                    postRestController.createHashtagForBlog(blogName, tag);
+                                    postRestController.getHashtagController().createHashtagForBlog(blogName, tag);
                                 }
                             }
                         }

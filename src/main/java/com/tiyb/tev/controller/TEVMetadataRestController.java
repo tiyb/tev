@@ -329,7 +329,7 @@ public class TEVMetadataRestController {
         postController.getPhotoController().deleteAllPhotosForBlog(md.getBlog());
         postController.getVideoController().deleteAllVideosForBlog(md.getBlog());
         postController.deleteAllPostsForBlog(md.getBlog());
-        postController.deleteAllHashtagsForBlog(md.getBlog());
+        postController.getHashtagController().deleteAllHashtagsForBlog(md.getBlog());
 
         metadataRepo.deleteById(id);
 

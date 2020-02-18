@@ -15,6 +15,16 @@
 <div id="header"></div>
 
 <div class="container-fluid">
+<div id="radioContainer">
+	<div class="ui-widget-content">
+		<fieldset>
+			<label for="showAllBlogsRadio" th:text="#{hashtags.radios.showAllBlogs}" class="ui-checkboxradio-label"></label>
+			<input type="radio" name="showBlogsRadios" id="showAllBlogsRadio" class="ui-checkboxradio"></input>
+			<label for="showDefaultBlogRadio" th:text="#{hashtags.radios.showThisBlog}" class="ui-checkboxradio-label"></label>
+			<input type="radio" name="showBlogsRadios" id="showDefaultBlogRadio" class="ui-checkboxradio"></input>
+		</fieldset>
+	</div>
+</div>
 <table id="tagsTable" class="display" style="table-layout:fixed">
 	<thead>
 		<tr>

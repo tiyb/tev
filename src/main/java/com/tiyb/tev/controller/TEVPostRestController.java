@@ -18,11 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tiyb.tev.datamodel.Hashtag;
 import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.exception.BlogPostMismatchException;
 import com.tiyb.tev.exception.ResourceNotFoundException;
-import com.tiyb.tev.repository.HashtagRepository;
 import com.tiyb.tev.repository.PostRepository;
 
 /**
@@ -51,12 +49,6 @@ public class TEVPostRestController {
      */
     @Autowired
     private PostRepository postRepo;
-
-    /**
-     * Repo for working with hashtag data
-     */
-    @Autowired
-    private HashtagRepository hashtagRepo;
 
     /**
      * REST controller for working with metadata
@@ -93,6 +85,12 @@ public class TEVPostRestController {
      */
     @Autowired
     private TEVPhotoController photoController;
+
+    /**
+     * REST controller for working with hashtags
+     */
+    @Autowired
+    private TEVHashtagController hashtagController;
 
     /**
      * GET request for listing all posts for a given blog
@@ -277,60 +275,6 @@ public class TEVPostRestController {
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * GET request for listing all hashtags stored in the system for a given blog
-     *
-     * @param blog Blog for which hashtags should be returned
-     * @return {@link java.util.List List} of all hashtags in the database
-     */
-    @GetMapping("/hashtags/{blog}")
-    public List<Hashtag> getAllHashtagsForBlog(@PathVariable("blog") final String blog) {
-        return hashtagRepo.findByBlog(blog);
-    }
-
-    /**
-     * POST request to insert a new hashtag into the system for a given blog. If it already exists
-     * the existing hashtag is simply returned (no error is thrown).
-     *
-     * @param blog    Blog for which the hashtag should be inserted
-     * @param hashtag The hashtag to be entered into the system
-     * @return The new/existing hashtag object (with ID)
-     */
-    @PostMapping("/hashtags/{blog}")
-    public Hashtag createHashtagForBlog(@PathVariable("blog") final String blog,
-            @Valid @RequestBody final String hashtag) {
-        Hashtag existingTag = hashtagRepo.findByTagAndBlog(hashtag, blog);
-
-        if (existingTag != null) {
-            existingTag.setCount(existingTag.getCount() + 1);
-            existingTag = hashtagRepo.save(existingTag);
-            return existingTag;
-        }
-
-        Hashtag newTag = new Hashtag();
-        newTag.setTag(hashtag);
-        newTag.setBlog(blog);
-        newTag.setCount(1);
-
-        newTag = hashtagRepo.save(newTag);
-        return newTag;
-    }
-
-    /**
-     * DEL to delete all hashtags in the DB for a given blog
-     *
-     * @param blog Blog for which tags should be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity<>} with the response
-     *         details
-     */
-    @Transactional
-    @DeleteMapping("/hashtags/{blog}")
-    public ResponseEntity<?> deleteAllHashtagsForBlog(@PathVariable("blog") final String blog) {
-        hashtagRepo.deleteByBlog(blog);
-
-        return ResponseEntity.ok().build();
-    }
-
     public TEVMetadataRestController getMdController() {
         return mdController;
     }
@@ -353,6 +297,10 @@ public class TEVPostRestController {
 
     public TEVPhotoController getPhotoController() {
         return photoController;
+    }
+
+    public TEVHashtagController getHashtagController() {
+        return hashtagController;
     }
 
 }
