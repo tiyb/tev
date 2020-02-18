@@ -85,7 +85,9 @@
 		<module name="IllegalThrows" />
 		<module name="IllegalToken" />
 		<module name="IllegalTokenText" />
-		<module name="IllegalType" />
+		<module name="IllegalType">
+			<property name="illegalClassNames" value="HashSet, LinkedHashMap, LinkedHashSet, TreeMap, TreeSet, java.util.HashSet, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeMap, java.util.TreeSet"/>
+		</module>
 		<module name="InnerAssignment" />
 		<module name="MagicNumber" />
 		<module name="MissingSwitchDefault" />
