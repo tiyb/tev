@@ -56,9 +56,9 @@ $(document).ready(function() {
 					click: function(item) {
 						if(metadata.showReadingPane) {
 							$('#contentDisplayReadingPane').show();
-							$('#displayPaneIFrame').prop('src', "/conversationViewer?participant=" + item.target.textContent, "viewer");
+							$('#displayPaneIFrame').prop('src', "/conversationViewer?participant=" + item.target.textContent + "&blog=" + metadata.blog, "viewer");
 						} else {
-							window.open("/conversationViewer?participant=" + item.target.textContent, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
+							window.open("/conversationViewer?participant=" + item.target.textContent + "&blog=" + metadata.blog, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
 						}
 					}
 				}

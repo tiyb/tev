@@ -143,6 +143,7 @@ h2 {
 
 .hashtagspan {
 	cursor: pointer;
+	display: inline-block;
 }
 
 #hashtagWordCloudContainer {
@@ -151,5 +152,6 @@ h2 {
 
 .jqcloud-word {
 	cursor: pointer;
+	display: inline-block;
 }
 

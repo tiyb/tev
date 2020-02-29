@@ -62,6 +62,7 @@ fieldset {
 .clickableTableValue {
 	cursor: pointer;
 	overflow-wrap: break-word;
+	display: inline-block;
 }
 
 .favSpan {
@@ -71,6 +72,7 @@ fieldset {
 	text-align: center;
 	cursor: pointer;
 	font-size: 115%;
+	display: inline-block;
 }
 
 .notFavSpan {
@@ -80,6 +82,7 @@ fieldset {
 	text-align: center;
 	cursor: pointer;
 	font-size: 115%;
+	display: inline-block;
 }
 
 .readSpan {
@@ -89,6 +92,7 @@ fieldset {
 	text-align: center;
 	cursor: pointer;
 	font-size: 115%;
+	display: inline-block;
 }
 
 .notreadSpan {
@@ -96,6 +100,7 @@ fieldset {
 	margin-left: 5%;
 	margin-right: 5%;
 	text-align: center;
+	display: inline-block;
 }
 
 .disabled {
@@ -142,6 +147,7 @@ fieldset {
 
 .jqcloud-word {
 	cursor: pointer;
+	display: inline-block;
 }
 
 #exportedXMLText {
