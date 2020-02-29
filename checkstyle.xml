@@ -161,7 +161,9 @@
 		<module name="ArrayTypeStyle" />
 		<module name="AvoidEscapedUnicodeCharacters" />
 		<module name="CommentsIndentation" />
-		<module name="FinalParameters" />
+		<module name="FinalParameters">
+			<property name="severity" value="warning"/>
+		</module>
 		<module name="OuterTypeFilename" />
 		<module name="TodoComment" />
 		<module name="TrailingComment" />
@@ -181,7 +183,9 @@
 		<module name="ConstantName" />
 		<module name="InterfaceTypeParameterName" />
 		<module name="LambdaParameterName" />
-		<module name="LocalFinalVariableName" />
+		<module name="LocalFinalVariableName">
+			<property name="severity" value="warning"/>
+		</module>
 		<module name="LocalVariableName" />
 		<module name="MemberName" />
 		<module name="MethodName" />
