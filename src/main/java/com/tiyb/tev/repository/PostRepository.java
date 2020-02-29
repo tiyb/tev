@@ -14,7 +14,7 @@ import com.tiyb.tev.datamodel.Post;
  *
  */
 @Repository
-public interface PostRepository extends JpaRepository<Post, Long> {
+public interface PostRepository extends JpaRepository<Post, String> {
 
     /**
      * Get all posts for a given blog, for a particular type

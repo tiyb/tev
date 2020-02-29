@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
@@ -25,10 +24,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tiyb.tev.controller.helper.RepoAbstractor;
 import com.tiyb.tev.datamodel.Photo;
 import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.exception.NoParentPostException;
+import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.repository.PhotoRepository;
 import com.tiyb.tev.repository.PostRepository;
 
@@ -70,19 +69,6 @@ public class TEVPhotoController {
     private TEVMetadataRestController mdController;
 
     /**
-     * Performs some (but not all) of the heavy lifting
-     */
-    private RepoAbstractor<Photo> repoAbstractor;
-
-    /**
-     * Instantiates the RepoAbstractor after the autowired fields have been wired
-     */
-    @PostConstruct
-    private void setUpAbstractor() {
-        repoAbstractor = new RepoAbstractor<Photo>(photoRepo, Post.POST_TYPE_PHOTO, postRepo);
-    }
-
-    /**
      * The Tumblr export doesn't always include every image, for some reason. However, in many cases
      * the images referred to in the image URLs from Tumblr's export XML still exist on Tumblr's
      * servers. So, in cases where a post is missing its images, this API can be used to fetch the
@@ -96,7 +82,7 @@ public class TEVPhotoController {
      */
     @GetMapping("/posts/{blog}/{id}/fixPhotos")
     public Boolean fixPhotosForBlogForPost(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
+            @PathVariable("id") final String postId) {
         String imageDirectory = mdController.getMetadataForBlog(blog).getBaseMediaPath();
         if (imageDirectory == null || imageDirectory.equals(StringUtils.EMPTY)) {
             return false;
@@ -179,7 +165,7 @@ public class TEVPhotoController {
      */
     @GetMapping("/posts/{blog}/{id}/photo")
     public List<Photo> getPhotoForBlogById(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
+            @PathVariable("id") final String postId) {
         return photoRepo.findByPostId(postId);
     }
 
@@ -192,9 +178,14 @@ public class TEVPhotoController {
      * @return The same {@link com.tiyb.tev.datamodel.Photo Photo} object that was submitted
      */
     @PutMapping("/posts/{blog}/{id}/photo")
-    public Photo updatePhotoForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
+    public Photo updatePhotoForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final String postId,
             @RequestBody final Photo photoDetails) {
-        return repoAbstractor.updateItem(postId, photoDetails);
+        final Photo original = photoRepo.findById(photoDetails.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("PHoto", "id", photoDetails.getId()));
+
+        original.updateItem(photoDetails);
+
+        return photoRepo.save(original);
     }
 
     /**
@@ -228,9 +219,14 @@ public class TEVPhotoController {
      * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
      *         details
      */
-    @DeleteMapping("/posts/{blog}/{id}/photo")
+    @DeleteMapping("/posts/{blog}/{id}/photo/{photoId}")
     public ResponseEntity<?> deletePhotoForBlog(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
-        return repoAbstractor.deleteItem(postId);
+            @PathVariable("id") final String postId, @PathVariable("photoId") final Long photoID) {
+        final Photo photo =
+                photoRepo.findById(photoID).orElseThrow(() -> new ResourceNotFoundException("Photo", "id", photoID));
+
+        photoRepo.delete(photo);
+
+        return ResponseEntity.ok().build();
     }
 }

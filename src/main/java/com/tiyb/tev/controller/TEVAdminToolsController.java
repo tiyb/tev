@@ -206,8 +206,7 @@ public class TEVAdminToolsController {
             final File[] imagesForPost = folder.listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(final File dir, final String name) {
-                    final String postID = Long.toString(post.getId());
-                    return name.startsWith(postID);
+                    return name.startsWith(post.getId());
                 }
             });
             if (imagesForPost.length == (numPhotos * 2)) {

@@ -14,14 +14,14 @@ public interface TEVCommonItems<T> {
      *
      * @return postId
      */
-    public Long getPostId();
+    public String getPostId();
 
     /**
      * postId setter
      *
      * @param id postId
      */
-    public void setPostId(Long id);
+    public void setPostId(String id);
 
     /**
      * Method to be implemented by every T type to update its properties with another copy of the

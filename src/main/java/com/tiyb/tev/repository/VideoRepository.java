@@ -12,6 +12,6 @@ import com.tiyb.tev.datamodel.Video;
  *
  */
 @Repository
-public interface VideoRepository extends JpaRepository<Video, Long> {
+public interface VideoRepository extends JpaRepository<Video, String> {
 
 }

@@ -12,6 +12,6 @@ import com.tiyb.tev.datamodel.Answer;
  *
  */
 @Repository
-public interface AnswerRepository extends JpaRepository<Answer, Long> {
+public interface AnswerRepository extends JpaRepository<Answer, String> {
 
 }

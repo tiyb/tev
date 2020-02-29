@@ -79,10 +79,10 @@ public class TEVStagingController {
      * @return {@link java.util.List List} of all "staged post" IDs in the repo
      */
     @GetMapping("/posts/{blog}")
-    public List<Long> getAllPostsForBlog(@PathVariable("blog") final String blog) {
+    public List<String> getAllPostsForBlog(@PathVariable("blog") final String blog) {
         final List<StagingPost> posts = stagingRepo.findByBlog(blog);
 
-        final List<Long> listOfIDs = new ArrayList<Long>();
+        final List<String> listOfIDs = new ArrayList<String>();
 
         for (StagingPost post : posts) {
             listOfIDs.add(post.getId());
@@ -100,7 +100,7 @@ public class TEVStagingController {
      */
     @PostMapping("/posts/{blog}/{id}")
     public StagingPost createStagedPostForBlog(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postID) {
+            @PathVariable("id") final String postID) {
         final StagingPost post = new StagingPost();
         post.setId(postID);
         post.setBlog(blog);
@@ -117,7 +117,7 @@ public class TEVStagingController {
      */
     @DeleteMapping("/posts/{blog}/{id}")
     public ResponseEntity<?> deleteStagedPostForBlog(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long id) {
+            @PathVariable("id") final String id) {
         final StagingPost post =
                 stagingRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("StagedPost", "id", id));
 
@@ -170,7 +170,7 @@ public class TEVStagingController {
      */
     @PostMapping("/posts/{blog}/{id}/exportImages")
     public ResponseEntity<?> exportImagesForBlogForPost(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postID, @RequestBody final String pathForDestination) {
+            @PathVariable("id") final String postID, @RequestBody final String pathForDestination) {
         if (!postController.getPhotoController().fixPhotosForBlogForPost(blog, postID)) {
             return new ResponseEntity<String>("Error getting images for post", null, HttpStatus.FAILED_DEPENDENCY);
         }

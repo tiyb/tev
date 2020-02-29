@@ -80,8 +80,8 @@ public class TEVRegularController {
      * @return The same {@link com.tiyb.tev.datamodel.Regular Regular} object that was submitted.
      */
     @PostMapping("/posts/{blog}/{id}/regular")
-    public Regular createRegularForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
-            @Valid @RequestBody final Regular regular) {
+    public Regular createRegularForBlog(@PathVariable("blog") final String blog,
+            @PathVariable("id") final String postId, @Valid @RequestBody final Regular regular) {
         return repoAbstractor.createForBlog(blog, postId, regular);
     }
 
@@ -94,7 +94,7 @@ public class TEVRegularController {
      */
     @GetMapping("/posts/{blog}/{id}/regular")
     public Regular getRegularForBlogById(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
+            @PathVariable("id") final String postId) {
         return repoAbstractor.getItemById(postId);
     }
 
@@ -107,8 +107,8 @@ public class TEVRegularController {
      * @return The same {@link com.tiyb.tev.datamodel.Regular Regular} object that was submitted
      */
     @PutMapping("/posts/{blog}/{id}/regular")
-    public Regular updateRegularForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
-            @RequestBody final Regular regularDetails) {
+    public Regular updateRegularForBlog(@PathVariable("blog") final String blog,
+            @PathVariable("id") final String postId, @RequestBody final Regular regularDetails) {
         return repoAbstractor.updateItem(postId, regularDetails);
     }
 
@@ -134,7 +134,7 @@ public class TEVRegularController {
      */
     @DeleteMapping("/posts/{id}/regular")
     public ResponseEntity<?> deleteRegularForBlog(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
+            @PathVariable("id") final String postId) {
         return repoAbstractor.deleteItem(postId);
     }
 

@@ -14,7 +14,7 @@ import com.tiyb.tev.datamodel.staging.StagingPost;
  *
  */
 @Repository
-public interface StagingPostRepository extends JpaRepository<StagingPost, Long> {
+public interface StagingPostRepository extends JpaRepository<StagingPost, String> {
 
     /**
      * Get all staged posts for a given blog

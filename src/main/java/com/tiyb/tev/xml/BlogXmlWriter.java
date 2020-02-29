@@ -72,11 +72,11 @@ public final class BlogXmlWriter {
      * @param blogName       Blog for which posts should be retrieved
      * @return String containing the XML document
      */
-    public static String getStagedPostXMLForBlog(final List<Long> postIDs, final TEVPostRestController postController,
+    public static String getStagedPostXMLForBlog(final List<String> postIDs, final TEVPostRestController postController,
             final String blogName) {
         final List<Post> posts = new ArrayList<Post>();
 
-        for (Long id : postIDs) {
+        for (String id : postIDs) {
             final Post post = postController.getPostForBlogById(blogName, id);
             posts.add(post);
         }

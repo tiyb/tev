@@ -66,7 +66,7 @@ public class Post implements Serializable {
      * so Tumblr's ID is always used.)
      */
     @Id
-    private Long id;
+    private String id;
 
     /**
      * Short URL of the post in Tumblr
@@ -274,11 +274,11 @@ public class Post implements Serializable {
         return builder.toString();
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(final Long id) {
+    public void setId(final String id) {
         this.id = id;
     }
 

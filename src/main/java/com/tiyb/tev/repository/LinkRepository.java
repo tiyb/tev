@@ -12,6 +12,6 @@ import com.tiyb.tev.datamodel.Link;
  *
  */
 @Repository
-public interface LinkRepository extends JpaRepository<Link, Long> {
+public interface LinkRepository extends JpaRepository<Link, String> {
 
 }

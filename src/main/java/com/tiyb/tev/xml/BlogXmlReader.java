@@ -514,7 +514,7 @@ public class BlogXmlReader extends TEVXmlReader {
 
             switch (attName) {
             case POST_ATTRIBUTE_ID:
-                post.setId(Long.parseLong(att.getValue()));
+                post.setId(att.getValue());
                 break;
             case POST_ATTRIBUTE_URL:
                 post.setUrl(att.getValue());
@@ -847,7 +847,7 @@ public class BlogXmlReader extends TEVXmlReader {
      *                     added.
      * @throws XMLStreamException For any XML parsing errors
      */
-    private static List<Photo> readPhotoStream(final XMLEventReader reader, final Long postID,
+    private static List<Photo> readPhotoStream(final XMLEventReader reader, final String postID,
             final String photoCaption, final List<Photo> photos) throws XMLStreamException {
         Photo currentPhoto = new Photo();
 

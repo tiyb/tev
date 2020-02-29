@@ -23,7 +23,7 @@ public class Video implements Serializable, TEVCommonItems<Video> {
      * ID of the post to which this video belongs
      */
     @Id
-    private Long postId;
+    private String postId;
 
     /**
      * Video's MIME content type
@@ -128,12 +128,12 @@ public class Video implements Serializable, TEVCommonItems<Video> {
     }
 
     @Override
-    public Long getPostId() {
+    public String getPostId() {
         return postId;
     }
 
     @Override
-    public void setPostId(final Long postId) {
+    public void setPostId(final String postId) {
         this.postId = postId;
     }
 

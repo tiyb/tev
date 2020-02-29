@@ -22,7 +22,7 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
      * @param postId Post ID to search
      * @return 0 or more Photos
      */
-    List<Photo> findByPostIdOrderByOffset(Long postId);
+    List<Photo> findByPostIdOrderByOffset(String postId);
 
     /**
      * Get all photos for a given post
@@ -30,5 +30,5 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
      * @param postId Post ID to search
      * @return 0 or more Photos
      */
-    List<Photo> findByPostId(Long postId);
+    List<Photo> findByPostId(String postId);
 }

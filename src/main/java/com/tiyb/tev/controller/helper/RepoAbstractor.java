@@ -30,7 +30,7 @@ public class RepoAbstractor<T extends TEVCommonItems<T>> {
     /**
      * Generic repo for working with T posts
      */
-    private JpaRepository<T, Long> typeRepo;
+    private JpaRepository<T, String> typeRepo;
 
     /**
      * The specific repo for working with Posts
@@ -47,7 +47,7 @@ public class RepoAbstractor<T extends TEVCommonItems<T>> {
      *
      * @param theTypeName The name of the type of post being worked with
      */
-    public RepoAbstractor(final JpaRepository<T, Long> instanceOfTypeRepo, final String theTypeName,
+    public RepoAbstractor(final JpaRepository<T, String> instanceOfTypeRepo, final String theTypeName,
             final PostRepository instanceOfPostRepo) {
         this.typeName = theTypeName;
         this.postRepo = instanceOfPostRepo;
@@ -62,7 +62,7 @@ public class RepoAbstractor<T extends TEVCommonItems<T>> {
      * @param item   Actual T item
      * @return T item as saved in the DB
      */
-    public T createForBlog(final String blog, final Long itemId, final T item) {
+    public T createForBlog(final String blog, final String itemId, final T item) {
         final Optional<Post> post = postRepo.findById(itemId);
         if (!post.isPresent()) {
             logger.error("Tried to submit {} item for post that doesn't exist: {}", this.typeName, itemId);
@@ -102,7 +102,7 @@ public class RepoAbstractor<T extends TEVCommonItems<T>> {
      * @return T type post
      * @throws ResourceNotFoundException If the item can't be found in the DB
      */
-    public T getItemById(final Long id) throws ResourceNotFoundException {
+    public T getItemById(final String id) throws ResourceNotFoundException {
         final Optional<T> response = typeRepo.findById(id);
 
         if (response.isPresent()) {
@@ -119,7 +119,7 @@ public class RepoAbstractor<T extends TEVCommonItems<T>> {
      * @param itemDetails Updates to be made
      * @return Updated item
      */
-    public T updateItem(final Long postId, final T itemDetails) {
+    public T updateItem(final String postId, final T itemDetails) {
         final T original =
                 typeRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException(typeName, "id", postId));
 
@@ -158,7 +158,7 @@ public class RepoAbstractor<T extends TEVCommonItems<T>> {
      * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
      *         details
      */
-    public ResponseEntity<?> deleteItem(final Long itemId) {
+    public ResponseEntity<?> deleteItem(final String itemId) {
         final T item =
                 typeRepo.findById(itemId).orElseThrow(() -> new ResourceNotFoundException(typeName, "id", itemId));
 

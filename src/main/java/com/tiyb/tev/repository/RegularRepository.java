@@ -12,6 +12,6 @@ import com.tiyb.tev.datamodel.Regular;
  *
  */
 @Repository
-public interface RegularRepository extends JpaRepository<Regular, Long> {
+public interface RegularRepository extends JpaRepository<Regular, String> {
 
 }

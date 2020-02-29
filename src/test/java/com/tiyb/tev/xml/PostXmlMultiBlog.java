@@ -47,7 +47,7 @@ public class PostXmlMultiBlog {
 
     private static final String MAIN_BLOG_NAME = "mainblog";
     private static final String SECOND_BLOG_NAME = "secondblog";
-    private static final long SECONDBLOG_FIRSTPOSID = 180894436690L;
+    private static final String SECONDBLOG_FIRSTPOSID = "180894436690";
 
     private static final List<Hashtag> BLOG1_INITIAL_HASHTAGS = Arrays.asList(new Hashtag("tag1", 4, MAIN_BLOG_NAME),
             new Hashtag("tag2", 4, MAIN_BLOG_NAME), new Hashtag("tag3", 1, MAIN_BLOG_NAME),

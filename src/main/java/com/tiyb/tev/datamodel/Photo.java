@@ -31,7 +31,7 @@ public class Photo implements Serializable, TEVCommonItems<Photo> {
     /**
      * ID of the post to which this photo belongs
      */
-    private Long postId;
+    private String postId;
 
     /**
      * Caption for the photo (copied across all photos in the DB)
@@ -185,12 +185,12 @@ public class Photo implements Serializable, TEVCommonItems<Photo> {
     }
 
     @Override
-    public Long getPostId() {
+    public String getPostId() {
         return postId;
     }
 
     @Override
-    public void setPostId(final Long postId) {
+    public void setPostId(final String postId) {
         this.postId = postId;
     }
 

@@ -14,7 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * Tests for staging posts, ensuring that they are separated by blog
- * 
+ *
  * @author tiyb
  *
  */
@@ -43,19 +43,19 @@ public class TevStagingMultiBlog {
 	 */
 	@Test
 	public void multiBlogStagingPosts() {
-		controller.createStagedPostForBlog(BLOG1_NAME, 1L);
-		controller.createStagedPostForBlog(BLOG2_NAME, 2L);
-		controller.createStagedPostForBlog(BLOG2_NAME, 3L);
+		controller.createStagedPostForBlog(BLOG1_NAME, "1");
+		controller.createStagedPostForBlog(BLOG2_NAME, "2");
+		controller.createStagedPostForBlog(BLOG2_NAME, "3");
 
-		List<Long> posts = controller.getAllPostsForBlog(BLOG1_NAME);
+		List<String> posts = controller.getAllPostsForBlog(BLOG1_NAME);
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(1);
-		assertThat(posts.get(0)).isEqualTo(1L);
+		assertThat(posts.get(0)).isEqualTo("1");
 		posts = controller.getAllPostsForBlog(BLOG2_NAME);
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(2);
-		assertThat(posts.get(0)).isEqualTo(2L);
-		assertThat(posts.get(1)).isEqualTo(3L);
+		assertThat(posts.get(0)).isEqualTo("2");
+		assertThat(posts.get(1)).isEqualTo("3");
 	}
 
 	/**
@@ -63,20 +63,20 @@ public class TevStagingMultiBlog {
 	 */
 	@Test
 	public void testDeletingAStagedost() {
-		controller.createStagedPostForBlog(BLOG1_NAME, 1L);
-		controller.createStagedPostForBlog(BLOG2_NAME, 2L);
-		controller.createStagedPostForBlog(BLOG2_NAME, 3L);
+		controller.createStagedPostForBlog(BLOG1_NAME, "1");
+		controller.createStagedPostForBlog(BLOG2_NAME, "2");
+		controller.createStagedPostForBlog(BLOG2_NAME, "3");
 
-		controller.deleteStagedPostForBlog(BLOG2_NAME, 2L);
+		controller.deleteStagedPostForBlog(BLOG2_NAME, "2");
 
-		List<Long> posts = controller.getAllPostsForBlog(BLOG1_NAME);
+		List<String> posts = controller.getAllPostsForBlog(BLOG1_NAME);
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(1);
-		assertThat(posts.get(0)).isEqualTo(1L);
+		assertThat(posts.get(0)).isEqualTo("1");
 		posts = controller.getAllPostsForBlog(BLOG2_NAME);
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(1);
-		assertThat(posts.get(0)).isEqualTo(3L);
+		assertThat(posts.get(0)).isEqualTo("3");
 	}
 
 	/**
@@ -84,16 +84,16 @@ public class TevStagingMultiBlog {
 	 */
 	@Test
 	public void testDeletingAllStagedPostsFromABlog() {
-		controller.createStagedPostForBlog(BLOG1_NAME, 1L);
-		controller.createStagedPostForBlog(BLOG2_NAME, 2L);
-		controller.createStagedPostForBlog(BLOG2_NAME, 3L);
+		controller.createStagedPostForBlog(BLOG1_NAME, "1");
+		controller.createStagedPostForBlog(BLOG2_NAME, "2");
+		controller.createStagedPostForBlog(BLOG2_NAME, "3");
 
 		controller.deleteAllStagedPostsForBlog(BLOG2_NAME);
 
-		List<Long> posts = controller.getAllPostsForBlog(BLOG1_NAME);
+		List<String> posts = controller.getAllPostsForBlog(BLOG1_NAME);
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(1);
-		assertThat(posts.get(0)).isEqualTo(1L);
+		assertThat(posts.get(0)).isEqualTo("1");
 		posts = controller.getAllPostsForBlog(BLOG2_NAME);
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(0);

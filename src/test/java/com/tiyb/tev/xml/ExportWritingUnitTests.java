@@ -52,11 +52,11 @@ public class ExportWritingUnitTests {
 	@Value("classpath:XML/outputs/response-xml-multiplephotos.xml")
 	Resource multiplePhotoXML;
 
-	private static long ANSWER_POST_ID = 180371366195L;
-	private static long REGULAR_POST_ID = 180894436671L;
-	private static long LINK_POST_ID = 180265557725L;
-	private static long SINGLEPHOTO_POST_ID = 180784644740L;
-	private static long MULTIPLEPHOTO_POST_ID = 180254465582L;
+	private static String ANSWER_POST_ID = "180371366195";
+	private static String REGULAR_POST_ID = "180894436671";
+	private static String LINK_POST_ID = "180265557725";
+	private static String SINGLEPHOTO_POST_ID = "180784644740";
+	private static String MULTIPLEPHOTO_POST_ID = "180254465582";
 
 	private static String MAIN_BLOG_NAME = "mainblog";
 
@@ -106,10 +106,10 @@ public class ExportWritingUnitTests {
 		return expectedResponseString;
 	}
 
-	private void testSinglePostResponse(Resource resource, long postID) throws IOException {
+	private void testSinglePostResponse(Resource resource, String postID) throws IOException {
 		String expectedAnswer = getExpectedResponse(resource);
 
-		List<Long> postIDs = new ArrayList<Long>();
+		List<String> postIDs = new ArrayList<String>();
 		postIDs.add(postID);
 
 		String result = BlogXmlWriter.getStagedPostXMLForBlog(postIDs, postController, MAIN_BLOG_NAME);

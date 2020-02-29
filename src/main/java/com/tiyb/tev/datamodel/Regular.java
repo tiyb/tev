@@ -23,7 +23,7 @@ public class Regular implements Serializable, TEVCommonItems<Regular> {
      * ID of the post to which this 'regular' applies
      */
     @Id
-    private Long postId;
+    private String postId;
 
     /**
      * Title of the post
@@ -73,12 +73,12 @@ public class Regular implements Serializable, TEVCommonItems<Regular> {
     }
 
     @Override
-    public Long getPostId() {
+    public String getPostId() {
         return postId;
     }
 
     @Override
-    public void setPostId(final Long postId) {
+    public void setPostId(final String postId) {
         this.postId = postId;
     }
 

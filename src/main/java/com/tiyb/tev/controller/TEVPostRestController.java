@@ -128,7 +128,7 @@ public class TEVPostRestController {
      * @return The {@link com.tiyb.tev.datamodel.Post Post} details
      */
     @GetMapping("/posts/{blog}/{id}")
-    public Post getPostForBlogById(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId) {
+    public Post getPostForBlogById(@PathVariable("blog") final String blog, @PathVariable("id") final String postId) {
         return postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
     }
 
@@ -142,7 +142,7 @@ public class TEVPostRestController {
      * @return The same {@link com.tiyb.tev.datamodel.Post Post} object that was submitted
      */
     @PutMapping("/posts/{blog}/{id}")
-    public Post updatePostForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
+    public Post updatePostForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final String postId,
             @RequestBody final Post postDetails) {
         final Post post =
                 postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
@@ -165,7 +165,7 @@ public class TEVPostRestController {
      * @return The modified Post
      */
     @PutMapping("/posts/{blog}/{id}/markRead")
-    public Post markPostReadForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId) {
+    public Post markPostReadForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final String postId) {
         Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
 
         assert blog.equals(post.getTumblelog());
@@ -186,7 +186,7 @@ public class TEVPostRestController {
      */
     @PutMapping("/posts/{blog}/{id}/markFavourite")
     public Post markPostFavouriteForBlog(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
+            @PathVariable("id") final String postId) {
         Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
 
         assert blog.equals(post.getTumblelog());
@@ -206,7 +206,8 @@ public class TEVPostRestController {
      * @return The modified Post
      */
     @PutMapping("/posts/{blog}/{id}/markUnread")
-    public Post markPostUnreadForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId) {
+    public Post markPostUnreadForBlog(@PathVariable("blog") final String blog,
+            @PathVariable("id") final String postId) {
         Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
 
         assert blog.equals(post.getTumblelog());
@@ -227,7 +228,7 @@ public class TEVPostRestController {
      */
     @PutMapping("/posts/{blog}/{id}/markNonFavourite")
     public Post markPostNonFavouriteForBlog(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
+            @PathVariable("id") final String postId) {
         Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
 
         assert blog.equals(post.getTumblelog());
@@ -249,7 +250,7 @@ public class TEVPostRestController {
      */
     @DeleteMapping("/posts/{blog}/{id}")
     public ResponseEntity<?> deletePostForBlog(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
+            @PathVariable("id") final String postId) {
         final Post post =
                 postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
 

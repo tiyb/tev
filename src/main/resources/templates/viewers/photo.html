@@ -23,7 +23,7 @@
 </div>
 <script type="text/javascript" th:src="@{/owr/jquery.js}"></script>
 
-<script type="text/javascript" th:text="'var postId = ' + ${post.Id} + ';'"></script>
+<script type="text/javascript" th:utext="${postIDJS}"></script>
 <script type="text/javascript" th:utext="${blogNameJScript}"></script>	
 <script type="text/javascript" th:src="@{/owr/postviewers.js}"></script>
 </body>

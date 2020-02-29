@@ -24,7 +24,7 @@ public class Link implements Serializable, TEVCommonItems<Link> {
      * ID of the post to which this Link points
      */
     @Id
-    private Long postId;
+    private String postId;
 
     /**
      * Text accompanying the link
@@ -88,12 +88,12 @@ public class Link implements Serializable, TEVCommonItems<Link> {
     }
 
     @Override
-    public Long getPostId() {
+    public String getPostId() {
         return postId;
     }
 
     @Override
-    public void setPostId(final Long postId) {
+    public void setPostId(final String postId) {
         this.postId = postId;
     }
 

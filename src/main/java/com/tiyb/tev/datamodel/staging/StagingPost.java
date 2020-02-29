@@ -22,18 +22,18 @@ public class StagingPost implements Serializable {
      * ID of the Post
      */
     @Id
-    private Long id;
+    private String id;
 
     /**
      * Blog for which this post is staged
      */
     private String blog;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(final Long id) {
+    public void setId(final String id) {
         this.id = id;
     }
 

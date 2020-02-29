@@ -33,24 +33,24 @@ public class PhotoRepositoryUnitTest {
 	@Test
 	public void testFindByPostID() {
 		Photo photo1 = new Photo();
-		photo1.setPostId(1L);
+		photo1.setPostId("1");
 		photo1.setCaption("Photo 1");
 		photo1.setOffset("o2");
 		entityManager.persist(photo1);
 		Photo photo2 = new Photo();
-		photo2.setPostId(1L);
+		photo2.setPostId("1");
 		photo2.setCaption("PHoto 2");
 		photo2.setOffset("o1");
 		entityManager.persist(photo2);
 		entityManager.flush();
 
-		List<Photo> returnedPhotos = photoRepo.findByPostIdOrderByOffset(1L);
+		List<Photo> returnedPhotos = photoRepo.findByPostIdOrderByOffset("1");
 
 		assertThat(returnedPhotos.size()).isEqualTo(2);
 		assertThat(returnedPhotos.get(0).getCaption()).isEqualTo(photo2.getCaption());
 		assertThat(returnedPhotos.get(1).getCaption()).isEqualTo(photo1.getCaption());
-		assertThat(returnedPhotos.get(0).getPostId()).isEqualTo(1L);
-		assertThat(returnedPhotos.get(1).getPostId()).isEqualTo(1L);
+		assertThat(returnedPhotos.get(0).getPostId()).isEqualTo("1");
+		assertThat(returnedPhotos.get(1).getPostId()).isEqualTo("1");
 	}
 
 }

@@ -23,7 +23,7 @@ public class Answer implements Serializable, TEVCommonItems<Answer> {
      * ID of the post to which this answer is associated
      */
     @Id
-    private Long postId;
+    private String postId;
 
     /**
      * The Question field
@@ -75,12 +75,12 @@ public class Answer implements Serializable, TEVCommonItems<Answer> {
     }
 
     @Override
-    public Long getPostId() {
+    public String getPostId() {
         return postId;
     }
 
     @Override
-    public void setPostId(final Long postId) {
+    public void setPostId(final String postId) {
         this.postId = postId;
     }
 

@@ -45,7 +45,7 @@ public class PostRepositoryUnitTest {
 		Post post = new Post();
 		post.setDate("Jan 1, 2019");
 		post.setDateGmt("123456");
-		post.setId(1L);
+		post.setId("1");
 		post.setIsFavourite(false);
 		post.setIsRead(false);
 		post.setIsReblog(true);
@@ -60,7 +60,7 @@ public class PostRepositoryUnitTest {
 		entityManager.flush();
 
 		// when
-		Optional<Post> found = postRepo.findById(1L);
+		Optional<Post> found = postRepo.findById("1");
 
 		// then
 		assertThat(found.isPresent());
@@ -85,7 +85,7 @@ public class PostRepositoryUnitTest {
 	@Test
 	public void createPost() {
 		Post post = new Post();
-		post.setId(2L);
+		post.setId("2");
 		post.setDate("Jan 1, 2019");
 
 		Post returnPost = postRepo.save(post);
@@ -101,11 +101,11 @@ public class PostRepositoryUnitTest {
 	@Test
 	public void findAllPosts() {
 		Post post1 = new Post();
-		post1.setId(1L);
+		post1.setId("1");
 		post1.setDate("Jan 1, 2019");
 		entityManager.persist(post1);
 		Post post2 = new Post();
-		post2.setId(2L);
+		post2.setId("2");
 		post2.setDate("Jan 2, 2019");
 		entityManager.persist(post2);
 		entityManager.flush();
@@ -121,19 +121,19 @@ public class PostRepositoryUnitTest {
 	@Test
 	public void findPostsByType() {
 		Post post1 = new Post();
-		post1.setId(1L);
+		post1.setId("1");
 		post1.setType("answer");
 		post1.setDate("Jan 1, 2019");
 		post1.setTumblelog("blog");
 		entityManager.persist(post1);
 		Post post2 = new Post();
-		post2.setId(2L);
+		post2.setId("2");
 		post2.setType("answer");
 		post2.setDate("Jan 2, 2019");
 		post2.setTumblelog("blog");
 		entityManager.persist(post2);
 		Post post3 = new Post();
-		post3.setId(3L);
+		post3.setId("3");
 		post3.setType("link");
 		post3.setDate("Jan 3, 2019");
 		post3.setTumblelog("blog");
@@ -146,15 +146,15 @@ public class PostRepositoryUnitTest {
 		List<Post> answerPosts = postRepo.findByTumblelogAndType("blog", "answer");
 		assertThat(answerPosts).isNotNull();
 		assertThat(answerPosts.size()).isEqualTo(2);
-		assertThat(answerPosts.get(0).getId()).isEqualTo(1L);
+		assertThat(answerPosts.get(0).getId()).isEqualTo("1");
 		assertThat(answerPosts.get(0).getDate()).isEqualTo("Jan 1, 2019");
-		assertThat(answerPosts.get(1).getId()).isEqualTo(2L);
+		assertThat(answerPosts.get(1).getId()).isEqualTo("2");
 		assertThat(answerPosts.get(1).getDate()).isEqualTo("Jan 2, 2019");
 
 		List<Post> linkPosts = postRepo.findByTumblelogAndType("blog", "link");
 		assertThat(linkPosts).isNotNull();
 		assertThat(linkPosts.size()).isEqualTo(1);
-		assertThat(linkPosts.get(0).getId()).isEqualTo(3L);
+		assertThat(linkPosts.get(0).getId()).isEqualTo("3");
 		assertThat(linkPosts.get(0).getDate()).isEqualTo("Jan 3, 2019");
 	}
 
@@ -164,11 +164,11 @@ public class PostRepositoryUnitTest {
 	@Test
 	public void deleteAllPosts() {
 		Post post1 = new Post();
-		post1.setId(1L);
+		post1.setId("1");
 		post1.setDate("Jan 1, 2019");
 		entityManager.persist(post1);
 		Post post2 = new Post();
-		post2.setId(2L);
+		post2.setId("2");
 		post2.setDate("Jan 2, 2019");
 		entityManager.persist(post2);
 		entityManager.flush();

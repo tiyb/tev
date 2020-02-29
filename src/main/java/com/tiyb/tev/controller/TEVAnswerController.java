@@ -77,7 +77,7 @@ public class TEVAnswerController {
      * @return The same {@link com.tiyb.tev.datamodel.Answer Answer} object that was submitted
      */
     @PostMapping("/posts/{blog}/{id}/answer")
-    public Answer createAnswerForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
+    public Answer createAnswerForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final String postId,
             @Valid @RequestBody final Answer answer) {
         return repoAbstractor.createForBlog(blog, postId, answer);
     }
@@ -90,7 +90,8 @@ public class TEVAnswerController {
      * @return The {@link com.tiyb.tev.datamodel.Answer Answer} details
      */
     @GetMapping("/posts/{blog}/{id}/answer")
-    public Answer getAnswerForBlogById(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId) {
+    public Answer getAnswerForBlogById(@PathVariable("blog") final String blog,
+            @PathVariable("id") final String postId) {
         return repoAbstractor.getItemById(postId);
     }
 
@@ -103,7 +104,7 @@ public class TEVAnswerController {
      * @return The same {@link com.tiyb.tev.datamodel.Answer Answer} object that was submitted
      */
     @PutMapping("/posts/{blog}/{id}/answer")
-    public Answer updateAnswerForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
+    public Answer updateAnswerForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final String postId,
             @RequestBody final Answer answerDetails) {
         return repoAbstractor.updateItem(postId, answerDetails);
     }
@@ -130,7 +131,7 @@ public class TEVAnswerController {
      */
     @DeleteMapping("/posts/{blog}/{id}/answer")
     public ResponseEntity<?> deleteAnswerForBlog(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
+            @PathVariable("id") final String postId) {
         return repoAbstractor.deleteItem(postId);
     }
 }

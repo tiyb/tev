@@ -140,6 +140,11 @@ public class TEVUIController {
     /**
      * Standard attribute used for the model
      */
+    private static final String MODEL_ATTRIBUTE_POSTIDJS = "postIDJS";
+
+    /**
+     * Standard attribute used for the model
+     */
     private static final String MODEL_ATTRIBUTE_MDCOLLECTION = "mdCollection";
 
     /**
@@ -289,6 +294,19 @@ public class TEVUIController {
     }
 
     /**
+     * Helper function to add an attribute to the Model for a client-side bit of JS code for setting
+     * a variable with the post's ID. This <i>should</i> have been as simple as setting an attribute
+     * with the value and then setting the JS code in the Thymeleaf page, but for some reason the
+     * initial developer couldn't figure out a way to get single quotes into the generated string...
+     *
+     * @param model  The Model to which the JS code should be added
+     * @param postID The ID of the current post
+     */
+    private void addPostIdJSToModel(final Model model, final String postID) {
+        model.addAttribute(MODEL_ATTRIBUTE_POSTIDJS, String.format("var postId = \"%s\"", postID));
+    }
+
+    /**
      * Handles file uploads, for reading in the Tumblr Post XML Export for a given blog. Actual
      * logic is handled by the <code>parseDocument()</code> method; this method simply calls that
      * class and then (upon success) redirects to the index. Failure redirects to the "bad XML"
@@ -371,11 +389,12 @@ public class TEVUIController {
      * @return The name of the template to use for rendering the output
      */
     @RequestMapping(value = { "/postViewer/{blog}" }, method = RequestMethod.GET)
-    public String showViewer(@PathVariable("blog") final String blog, @RequestParam("id") final Long postID,
+    public String showViewer(@PathVariable("blog") final String blog, @RequestParam("id") final String postID,
             final Model model) {
         final Post post = postController.getPostForBlogById(blog, postID);
         model.addAttribute(MODEL_ATTRIBUTE_POST, post);
         addBlogNameJSToModel(model, blog);
+        addPostIdJSToModel(model, postID);
         model.addAttribute(MODEL_ATTRIBUTE_TAGS, pullOutTagValues(post.getTags()));
         final List<String> availableTypes = mdController.getAllTypes();
         String postType = StringUtils.EMPTY;
@@ -412,7 +431,7 @@ public class TEVUIController {
             for (int i = 0; i < photos.size(); i++) {
                 final Photo photo = photos.get(i);
                 final String ext = photo.getUrl1280().substring(photo.getUrl1280().lastIndexOf('.'));
-                images.add(String.format("%d_%d%s", postID, i, ext));
+                images.add(String.format("%s_%d%s", postID, i, ext));
             }
             model.addAttribute(MODEL_ATTRIBUTE_PHOTOS, images);
             model.addAttribute(MODEL_ATTRIBUTE_CAPTION, photos.get(0).getCaption());
@@ -597,7 +616,7 @@ public class TEVUIController {
         response.setContentType("application/xml");
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Cache-Control", "no-cache");
-        final List<Long> postIDs = stagingController.getAllPostsForBlog(blog);
+        final List<String> postIDs = stagingController.getAllPostsForBlog(blog);
 
         if (postIDs.size() < 1) {
             logger.warn("No posts staged for download");
@@ -605,7 +624,7 @@ public class TEVUIController {
         }
 
         final List<Post> posts = new ArrayList<Post>();
-        for (Long id : postIDs) {
+        for (String id : postIDs) {
             final Post post = postController.getPostForBlogById(blog, id);
             posts.add(post);
         }

@@ -78,7 +78,7 @@ public class TEVLinkController {
      * @return The same {@link com.tiyb.tev.datamodel.Link Link} object that was submitted
      */
     @PostMapping("/posts/{blog}/{id}/link")
-    public Link createLinkForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
+    public Link createLinkForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final String postId,
             @Valid @RequestBody final Link link) {
         return repoAbstractor.createForBlog(blog, postId, link);
     }
@@ -91,7 +91,7 @@ public class TEVLinkController {
      * @return The {@link com.tiyb.tev.datamodel.Link Link} details
      */
     @GetMapping("/posts/{blog}/{id}/link")
-    public Link getLinkForBlogById(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId) {
+    public Link getLinkForBlogById(@PathVariable("blog") final String blog, @PathVariable("id") final String postId) {
         return repoAbstractor.getItemById(postId);
     }
 
@@ -104,7 +104,7 @@ public class TEVLinkController {
      * @return The same {@link com.tiyb.tev.datamodel.Link Link} object that was submitted
      */
     @PutMapping("/posts/{blog}/{id}/link")
-    public Link updateLinkForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
+    public Link updateLinkForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final String postId,
             @RequestBody final Link linkDetails) {
         return repoAbstractor.updateItem(postId, linkDetails);
     }
@@ -131,7 +131,7 @@ public class TEVLinkController {
      */
     @DeleteMapping("/posts/{blog}/{id}/link")
     public ResponseEntity<?> deleteLinkForBlog(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
+            @PathVariable("id") final String postId) {
         return repoAbstractor.deleteItem(postId);
     }
 }

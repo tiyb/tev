@@ -78,7 +78,7 @@ public class TEVVideoController {
      * @return The same {@link com.tiyb.tev.datamodel.Video Video} object that was submitted
      */
     @PostMapping("/posts/{blog}/{id}/video")
-    public Video createVideoForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
+    public Video createVideoForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final String postId,
             @Valid @RequestBody final Video video) {
         return repoAbstractor.createForBlog(blog, postId, video);
     }
@@ -91,7 +91,7 @@ public class TEVVideoController {
      * @return The {@link com.tiyb.tev.datamodel.Video Video} details
      */
     @GetMapping("/posts/{blog}/{id}/video")
-    public Video getVideoForBlogById(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId) {
+    public Video getVideoForBlogById(@PathVariable("blog") final String blog, @PathVariable("id") final String postId) {
         return repoAbstractor.getItemById(postId);
     }
 
@@ -104,7 +104,7 @@ public class TEVVideoController {
      * @return The same {@link com.tiyb.tev.datamodel.Video Video} object that was submitted
      */
     @PutMapping("/posts/{blog}/{id}/video")
-    public Video updateVideoForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final Long postId,
+    public Video updateVideoForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final String postId,
             @RequestBody final Video videoDetails) {
         return repoAbstractor.updateItem(postId, videoDetails);
     }
@@ -131,7 +131,7 @@ public class TEVVideoController {
      */
     @DeleteMapping("/posts/{blog}/{id}/video")
     public ResponseEntity<?> deleteVideoForBlog(@PathVariable("blog") final String blog,
-            @PathVariable("id") final Long postId) {
+            @PathVariable("id") final String postId) {
         return repoAbstractor.deleteItem(postId);
     }
 }

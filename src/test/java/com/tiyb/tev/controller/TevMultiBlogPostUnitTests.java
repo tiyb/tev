@@ -20,7 +20,7 @@ import com.tiyb.tev.exception.BlogPostMismatchException;
  * Unit tests for Posts that are focused on use cases where there are multiple
  * blogs in the DB, not just one. Includes some tests of the Admin Controller
  * and some of the Post controller.
- * 
+ *
  * @author tiyb
  *
  */
@@ -35,10 +35,10 @@ public class TevMultiBlogPostUnitTests {
 	private TEVMetadataRestController mdRestController;
 	@Autowired
 	private TEVAdminToolsController adminController;
-	
+
 	private static final String FIRST_BLOG = "blog1";
 	private static final String SECOND_BLOG = "blog2";
-	
+
 	@Before
 	public void cleanPosts() {
 		restController.deleteAllPostsForBlog(FIRST_BLOG);
@@ -52,24 +52,24 @@ public class TevMultiBlogPostUnitTests {
 	@Test
 	public void twoPostsTwoBlogs() {
 		Post p1 = new Post();
-		p1.setId(1L);
+		p1.setId("1");
 		p1.setTumblelog(FIRST_BLOG);
 		p1 = restController.createPostForBlog(FIRST_BLOG, p1);
 
 		Post p2 = new Post();
-		p2.setId(2L);
+		p2.setId("2");
 		p2.setTumblelog(SECOND_BLOG);
 		p2 = restController.createPostForBlog(SECOND_BLOG, p2);
 
 		List<Post> blogsForOne = restController.getAllPostsForBlog(FIRST_BLOG);
 		assertThat(blogsForOne).isNotNull();
 		assertThat(blogsForOne.size()).isEqualTo(1);
-		assertThat(blogsForOne.get(0).getId()).isEqualTo(1L);
+		assertThat(blogsForOne.get(0).getId()).isEqualTo("1");
 
 		List<Post> blogsForTwo = restController.getAllPostsForBlog(SECOND_BLOG);
 		assertThat(blogsForTwo).isNotNull();
 		assertThat(blogsForTwo.size()).isEqualTo(1);
-		assertThat(blogsForTwo.get(0).getId()).isEqualTo(2L);
+		assertThat(blogsForTwo.get(0).getId()).isEqualTo("2");
 	}
 
 	/**
@@ -81,19 +81,19 @@ public class TevMultiBlogPostUnitTests {
 	public void markReadUnreadCrossBlogs() {
 		// blog 1 posts
 		Post p1 = new Post();
-		p1.setId(1L);
+		p1.setId("1");
 		p1.setTumblelog(FIRST_BLOG);
 		p1.setIsRead(false);
 		p1 = restController.createPostForBlog(FIRST_BLOG, p1);
 		Post p2 = new Post();
-		p2.setId(2L);
+		p2.setId("2");
 		p2.setTumblelog(FIRST_BLOG);
 		p2.setIsRead(false);
 		p2 = restController.createPostForBlog(FIRST_BLOG, p2);
 
 		// blog 2 posts
 		Post p3 = new Post();
-		p3.setId(3L);
+		p3.setId("3");
 		p3.setTumblelog(SECOND_BLOG);
 		p3.setIsRead(false);
 		p3 = restController.createPostForBlog(SECOND_BLOG, p3);
@@ -157,7 +157,7 @@ public class TevMultiBlogPostUnitTests {
 	@Test(expected = BlogPostMismatchException.class)
 	public void createPostWithInvalidBlogName() {
 		Post p = new Post();
-		p.setId(1L);
+		p.setId("1");
 		p.setTumblelog(FIRST_BLOG);
 
 		restController.createPostForBlog(SECOND_BLOG, p);

@@ -57,15 +57,15 @@ public class PostXmlParsingUnitTest {
     @Autowired
     private TEVAdminToolsController adminController;
 
-    private static final long answerPostID = 180371366195L;
-    private static final long linkPostID = 180265557725L;
-    private static final long regularPostID = 180894436671L;
-    private static final long videoPostID = 180782992914L;
-    private static final long firstPhotoPostID = 180784644740L;
-    private static final long secondPhotoPostID = 180254465582L;
-    private static final long addedRegularPostID = 180894436672L;
-    private static final long draftRegularPostID = 190097591599L;
-    private static final long queuedRegularPostID = 778563537472L;
+    private static final String answerPostID = "180371366195";
+    private static final String linkPostID = "180265557725";
+    private static final String regularPostID = "180894436671";
+    private static final String videoPostID = "180782992914";
+    private static final String firstPhotoPostID = "180784644740";
+    private static final String secondPhotoPostID = "180254465582";
+    private static final String addedRegularPostID = "180894436672";
+    private static final String draftRegularPostID = "190097591599";
+    private static final String queuedRegularPostID = "778563537472";
 
     private static final int ORIGINAL_NUM_POSTS = 9;
     private static final int ORIGINAL_NUM_REG_POSTS = 4;
