@@ -151,7 +151,7 @@ public class TEVStagingController {
      *
      * <p>
      * First calls
-     * {@link com.tiyb.tev.controller.TEVPhotoController#fixPhotosForBlogForPost(String, Long)
+     * {@link com.tiyb.tev.controller.TEVPhotoController#fixPhotosForBlogForPost(String, String)
      * fixPhotosForBlog()} to ensure that the photos for the given post are already on disk, then
      * copies them to the target directory. Because of this call to <code>fixPhotosForPost()</code>,
      * there is no sanity check to ensure that the metadata's images directory is correct; that
