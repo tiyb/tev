@@ -63,6 +63,27 @@ public class Video implements Serializable, TEVCommonItems<Video> {
     private String videoCaption;
 
     /**
+     * First "video player" tag for the video
+     */
+    @Lob
+    @Column(name = "video_player", length = Post.LONG_FIELD_SIZE)
+    private String videoPlayer;
+
+    /**
+     * Video player for max width of 500
+     */
+    @Lob
+    @Column(name = "video_player_500", length = Post.LONG_FIELD_SIZE)
+    private String videoPlayer500;
+
+    /**
+     * Video player for max width of 250
+     */
+    @Lob
+    @Column(name = "video_player_250", length = Post.LONG_FIELD_SIZE)
+    private String videoPlayer250;
+
+    /**
      * Helper function to update the object's properties with properties from another copy of the
      * object. Post ID ignored.
      *
@@ -83,46 +104,28 @@ public class Video implements Serializable, TEVCommonItems<Video> {
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append("Video [");
-        if (postId != null) {
-            builder.append("postId=");
-            builder.append(postId);
-            builder.append(", ");
-        }
-        if (contentType != null) {
-            builder.append("contentType=");
-            builder.append(contentType);
-            builder.append(", ");
-        }
-        if (extension != null) {
-            builder.append("extension=");
-            builder.append(extension);
-            builder.append(", ");
-        }
-        if (width != null) {
-            builder.append("width=");
-            builder.append(width);
-            builder.append(", ");
-        }
-        if (height != null) {
-            builder.append("height=");
-            builder.append(height);
-            builder.append(", ");
-        }
-        if (duration != null) {
-            builder.append("duration=");
-            builder.append(duration);
-            builder.append(", ");
-        }
-        if (revision != null) {
-            builder.append("revision=");
-            builder.append(revision);
-            builder.append(", ");
-        }
-        if (videoCaption != null) {
-            builder.append("videoCaption=");
-            builder.append(videoCaption);
-        }
+        builder.append("Video [postId=");
+        builder.append(postId);
+        builder.append(", contentType=");
+        builder.append(contentType);
+        builder.append(", extension=");
+        builder.append(extension);
+        builder.append(", width=");
+        builder.append(width);
+        builder.append(", height=");
+        builder.append(height);
+        builder.append(", duration=");
+        builder.append(duration);
+        builder.append(", revision=");
+        builder.append(revision);
+        builder.append(", videoCaption=");
+        builder.append(videoCaption);
+        builder.append(", videoPlayer=");
+        builder.append(videoPlayer);
+        builder.append(", videoPlayer500=");
+        builder.append(videoPlayer500);
+        builder.append(", videoPlayer250=");
+        builder.append(videoPlayer250);
         builder.append("]");
         return builder.toString();
     }
@@ -191,6 +194,30 @@ public class Video implements Serializable, TEVCommonItems<Video> {
 
     public void setVideoCaption(final String videoCaption) {
         this.videoCaption = videoCaption;
+    }
+
+    public String getVideoPlayer() {
+        return videoPlayer;
+    }
+
+    public void setVideoPlayer(final String videoPlayer) {
+        this.videoPlayer = videoPlayer;
+    }
+
+    public String getVideoPlayer500() {
+        return videoPlayer500;
+    }
+
+    public void setVideoPlayer500(final String videoPlayer500) {
+        this.videoPlayer500 = videoPlayer500;
+    }
+
+    public String getVideoPlayer250() {
+        return videoPlayer250;
+    }
+
+    public void setVideoPlayer250(final String videoPlayer250) {
+        this.videoPlayer250 = videoPlayer250;
     }
 
 }

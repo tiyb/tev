@@ -81,6 +81,16 @@ public class BlogXmlReader extends TEVXmlReader {
     /**
      * XML tag name for the given element
      */
+    public static final String VIDEO_TAG_PLAYER = "video-player";
+
+    /**
+     * XML attribute name for the given item
+     */
+    public static final String VIDEO_ATTRIBUTE_PLAYERWIDTH = "max-width";
+
+    /**
+     * XML tag name for the given element
+     */
     public static final String VIDEO_TAG_REVISION = "revision";
 
     /**
@@ -955,6 +965,21 @@ public class BlogXmlReader extends TEVXmlReader {
                     video.setRevision(readCharacters(reader));
                 } else if (se.getName().getLocalPart().equals(VIDEO_TAG_CAPTION)) {
                     video.setVideoCaption(readCharacters(reader));
+                } else if (se.getName().getLocalPart().equals(VIDEO_TAG_PLAYER)) {
+                    @SuppressWarnings("unchecked")
+                    final Iterator<Attribute> atts = se.getAttributes();
+                    if (atts.hasNext()) {
+                        final Attribute att = atts.next();
+                        if (VIDEO_ATTRIBUTE_PLAYERWIDTH.equals(att.getName().getLocalPart())) {
+                            if ("500".equals(att.getValue())) {
+                                video.setVideoPlayer500(readCharacters(reader));
+                            } else {
+                                video.setVideoPlayer250(readCharacters(reader));
+                            }
+                        }
+                    } else {
+                        video.setVideoPlayer(readCharacters(reader));
+                    }
                 } else if (se.getName().getLocalPart().equals(POST_TAG_HASHTAG)) {
                     final String tag = readCharacters(reader);
                     post.setTags(addTagToString(post.getTags(), tag));
