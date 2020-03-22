@@ -54,7 +54,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build With Maven
-        run: mvn test --file pom.xml -Dfile.encoding=UTF-8
+        run: mvn test -Dfile.encoding=UTF-8 --file pom.xml
 
   test_pull_request_windows_java8:
     runs-on: windows-latest
@@ -71,7 +71,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build With Maven
-        run: mvn test --file pom.xml -Dfile.encoding=UTF-8
+        run: mvn test -Dfile.encoding=UTF-8 --file pom.xml
         
   test_pull_request_mac_java11:
     runs-on: macos-latest
