@@ -102,15 +102,17 @@ h2 {
 }
 
 .message-received {
-	border-radius: 15px 50px;
+	/*border-radius: 15px 50px;*/
 	background: rgba(0, 25, 53, 0.05); 
 	color: rgb(0, 25, 53);
 	text-align: left;
+	margin-right: 50px;
 }
 .message-sent {
-	border-radius: 50px 15px;
+	/*border-radius: 50px 15px;*/
 	background: rgba(0, 25, 53, 0.1); 
 	text-align: right;
+	margin-left: 50px;
 }
 
 
