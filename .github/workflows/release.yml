@@ -5,7 +5,7 @@ name: Handle Release
 jobs:
   generate:
     name: Create release-artifacts
-    runs-on: ubuntu latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout the Repository
         uses: actions/checkout@master
