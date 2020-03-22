@@ -19,7 +19,7 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build With Maven
+      - name: Run JUnit
         run: mvn test --file pom.xml
 
   test_pull_request_ubuntu_java8:
@@ -36,7 +36,7 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build With Maven
+      - name: Run JUnit
         run: mvn test --file pom.xml
         
   test_pull_request_windows_java11:
@@ -53,7 +53,7 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build With Maven
+      - name: Run JUnit
         run: mvn test --file pom.xml
 
   test_pull_request_windows_java8:
@@ -70,7 +70,7 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build With Maven
+      - name: Run JUnit
         run: mvn test --file pom.xml
         
   test_pull_request_mac_java11:
@@ -87,7 +87,7 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build With Maven
+      - name: Run JUnit
         run: mvn test --file pom.xml
 
   test_pull_request_mac_java8:
@@ -104,5 +104,5 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build With Maven
+      - name: Run JUnit
         run: mvn test --file pom.xml
