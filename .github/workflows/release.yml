@@ -1,5 +1,3 @@
-name: Maven Release
-
 on:
   release:
     types: [created]
