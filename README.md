@@ -4,7 +4,7 @@ The **Tumblr Export Viewer**, or **TEV**, is intended to be a standalone viewer 
 
 The application can be downloaded from the [Releases](https://github.com/tiyb/tev/releases/latest) page, and help for the application can be found at the [GitHub wiki](https://github.com/tiyb/tev/wiki/Users).
 
-Additional development help is also welcome. Translation, for example, or tweaks of the UI, would be wonderful additions to the base created here.
+Additional development help is also welcome. Translation, for example, or tweaks of the UI, would be *wonderful* additions to the base created here.
 
 ## Overview
 
