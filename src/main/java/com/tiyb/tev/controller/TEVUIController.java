@@ -2,6 +2,7 @@ package com.tiyb.tev.controller;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -14,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -633,13 +636,24 @@ public class TEVUIController {
     }
 
     /**
-     * Returns the footer
+     * Retrieves the application version number from the application's POM, adds it to the model,
+     * then returns the "footer" page.
      *
-     * @param model not used
+     * @param model For setting the application version, used by Thymeleaf
      * @return name of the template to be used to render the page
      */
     @RequestMapping(value = { "/footer" }, method = RequestMethod.GET)
     public String footer(final Model model) {
+        final MavenXpp3Reader mavenReader = new MavenXpp3Reader();
+        String version = "";
+        try {
+            final org.apache.maven.model.Model mavenModel = mavenReader.read(new FileReader("pom.xml"));
+            version = mavenModel.getVersion();
+        } catch (IOException | XmlPullParserException e) {
+            logger.error("Error getting version from POM", e);
+        }
+
+        model.addAttribute("applicationVersion", version);
         return "footer";
     }
 
