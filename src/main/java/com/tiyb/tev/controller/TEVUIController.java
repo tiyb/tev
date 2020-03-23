@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -647,7 +648,13 @@ public class TEVUIController {
         final MavenXpp3Reader mavenReader = new MavenXpp3Reader();
         String version = "";
         try {
-            final org.apache.maven.model.Model mavenModel = mavenReader.read(new FileReader("pom.xml"));
+            final org.apache.maven.model.Model mavenModel;
+            if (new File("pom.xml").exists()) {
+                mavenModel = mavenReader.read(new FileReader("pom.xml"));
+            } else {
+                mavenModel = mavenReader.read(new InputStreamReader(
+                        TEVUIController.class.getResourceAsStream("/META-INF/maven/com.tiyb/tev/pom.xml")));
+            }
             version = mavenModel.getVersion();
         } catch (IOException | XmlPullParserException e) {
             logger.error("Error getting version from POM", e);
