@@ -13,6 +13,11 @@ $.i18n.properties({
 var metadata;
 
 /**
+ * Holds the list of hashtags (names only), for use in autocomplete
+ */
+var htData;
+
+/**
  * Sets up UI widgets (i.e. sets them up as 'checkbox widgets'); loads
  * settings/metadata from the server; loads data into the table; sets up
  * handlers for the radio buttons
@@ -32,48 +37,81 @@ $(document).ready(function() {
 			$('#showDefaultBlogRadio').prop('checked', true).checkboxradio("refresh");
 		}
 		
-		var tagsTable = $('#tagsTable').DataTable( {
-			"language": {
-				"emptyTable": 	  $.i18n.prop('index_posttable_emptytable'),
-			    "info":           $.i18n.prop('index_posttable_info'),
-			    "infoEmpty":      $.i18n.prop('index_posttable_infoempty'),
-			    "infoFiltered":   $.i18n.prop('index_posttable_infofiltered'),
-			    "lengthMenu":     $.i18n.prop('index_posttable_lengthmenu'),
-			    "loadingRecords": $.i18n.prop('index_posttable_loadingrecords'),
-			    "processing":     $.i18n.prop('index_posttable_processing'),
-			    "search":         $.i18n.prop('index_posttable_search'),
-			    "zeroRecords":    $.i18n.prop('index_posttable_zerorecords'),
-			    "paginate": {
-			        "first":      $.i18n.prop('index_posttable_paginate_first'),
-			        "last":       $.i18n.prop('index_posttable_paginate_last'),
-			        "next":       $.i18n.prop('index_posttable_paginate_next'),
-			        "previous":   $.i18n.prop('index_posttable_paginate_previous')
+		$.ajax({
+			url: metadata.showHashtagsForAllBlogs ? "/api/hashtags" : "api/hashtags/" + blogName,
+			dataSrc: ""
+		}).then(function (htResponseData) {
+			htData = htResponseData.map(function(val) {
+				return val['tag'];
+			});
+			
+			setupAutoComplete();
+			
+			var tagsTable = $('#tagsTable').DataTable( {
+				language: {
+					emptyTable: 	  $.i18n.prop('index_posttable_emptytable'),
+				    info:           $.i18n.prop('index_posttable_info'),
+				    infoEmpty:      $.i18n.prop('index_posttable_infoempty'),
+				    infoFiltered:   $.i18n.prop('index_posttable_infofiltered'),
+				    lengthMenu:     $.i18n.prop('index_posttable_lengthmenu'),
+				    loadingRecords: $.i18n.prop('index_posttable_loadingrecords'),
+				    processing:     $.i18n.prop('index_posttable_processing'),
+				    search:         $.i18n.prop('index_posttable_search'),
+				    zeroRecords:    $.i18n.prop('index_posttable_zerorecords'),
+				    paginate: {
+				        first:      $.i18n.prop('index_posttable_paginate_first'),
+				        last:       $.i18n.prop('index_posttable_paginate_last'),
+				        next:       $.i18n.prop('index_posttable_paginate_next'),
+				        previous:   $.i18n.prop('index_posttable_paginate_previous')
+				    },
+				    aria: {
+				        sortAscending:  $.i18n.prop('index_posttable_aria_sortasc'),
+				        sortDescending: $.i18n.prop('index_posttable_aria_sortdesc')
+				    }		
 			    },
-			    "aria": {
-			        "sortAscending":  $.i18n.prop('index_posttable_aria_sortasc'),
-			        "sortDescending": $.i18n.prop('index_posttable_aria_sortdesc')
-			    }		
-		    },
-			"ajax": {
-				"url": metadata.showHashtagsForAllBlogs ? "/api/hashtags" : "api/hashtags/" + blogName,
-				"dataSrc": ""
-			},
-			"scrollCollapse": true,
-			"paging": false,
-			"columns": [
-				{
-					"data": "tag",
-					"render": function(data,type,row,meta) {
-						return "<span class='hashtagspan'>" + data + "</span>";
+			    data: htResponseData,
+				scrollCollapse: true,
+				paging: false,
+				columns: [
+					{
+						data: "tag",
+						render: function(data,type,row,meta) {
+							return "<span class='hashtagspan'>" + data + "</span>";
+						}
+					},
+					{
+						data: "count"
+					},
+					{
+						render: function(data,type,row,meta) {
+							return "<button class='removeBtn ui-button ui-widget ui-corner-all'>" + $.i18n.prop('htviewer_table_removeBtn') + "</button>";
+						}
 					}
-				},
-				{
-					"data": "count"
-				}
-			],
-		    "autoWidth": false,
-			"orderCellsTop": true
+				],
+			    autoWidth: false,
+				orderCellsTop: true
+			});
+			
+			$('#tagsTable tbody').on('click', 'button.removeBtn', function() {
+				var data = tagsTable.row($(this).parents('tr')).data();
+				console.log(data);
+				var tagName = data.tag;
+				
+				$.ajax({
+					url: "/api/hashtags/",
+					data: tagName,
+					contentType: 'text/plain',
+					type: "DELETE",
+					error: function(xhr,textStatus,errorThrown) {
+						createAnErrorMessage($.i18n.prop('htviewer_deleteht_error', tagName));
+					}
+				}).then(function(data) {
+					createAnInfoMessage($.i18n.prop('htviewer_deleteht_success', tagName));
+					window.location.reload();
+				});
+			});
 		});
+		
 	});
 	
 	$('input[type=radio][name=showBlogsRadios]').change(function() {
@@ -85,8 +123,6 @@ $(document).ready(function() {
 		
 		updateMDAPI();
 	});
-	
-	
 });
 
 /**
@@ -112,4 +148,33 @@ function updateMDAPI() {
  */
 function setupUIWidgets() {
 	$("input[type='radio']").checkboxradio();
+}
+
+/**
+ * Sets up the autocomplete field for new hashtags, first to initialize it with data and then to set up the onChange event to post the new hashtag to the server. Pre-populating the list is only a convenience function, so that the user can see that the HT already exists; choosing an existing item won't change anything.
+ */
+function setupAutoComplete() {
+	$('#newTagTextBox').autocomplete({
+		source: htData,
+		change: function(event, ui) {
+			var newHT = $('#newTagTextBox').val();
+			if(htData.includes(newHT)) {
+				createAnInfoMessage($.i18n.prop('htviewer_newht_exists', newHT));
+				return;
+			}
+			
+			$.ajax({
+				url: '/api/hashtags/' + getCurrentBlogName(),
+				type: 'POST',
+				data: newHT,
+				contentType: 'text/plain',
+				error: function(xhr,textStatus,errorThrown) {
+					createAnErrorMessage($.i18n.prop('htviewer_newht_error', newHT));
+				}
+			}).then(function(data) {
+				createAnInfoMessage($.i18n.prop('htviewer_newht_success', newHT));
+				window.location.reload();
+			});
+		}
+	});
 }

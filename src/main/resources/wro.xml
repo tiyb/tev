@@ -64,6 +64,7 @@
 		<js>/js/taghandler.js</js>
 		<js>/js/helper-functions.js</js>
 		<js>/js/header-footer.js</js>
+		<js>/js/message-areas.js</js>
 	</group>
 	
 	<group name="singleimageviewer">

@@ -203,18 +203,44 @@
 		<module name="ParameterNumber" />
 
 		<!-- Whitespace -->
-		<module name="EmptyForInitializerPad" />
-		<module name="EmptyForIteratorPad" />
-		<module name="EmptyLineSeparator" />
-		<module name="GenericWhitespace" />
-		<module name="MethodParamPad" />
-		<module name="NoLineWrap" />
-		<module name="NoWhitespaceBefore" />
-		<module name="OperatorWrap" />
-		<module name="ParenPad" />
-		<module name="SingleSpaceSeparator" />
-		<module name="TypecastParenPad" />
-		<module name="WhitespaceAfter" />
-		<module name="WhitespaceAround" />
+	<module name="EmptyForInitializerPad">
+		<property name="severity" value="warning" />
+	</module>
+	<module name="EmptyForIteratorPad">
+		<property name="severity" value="warning" />
+	</module>
+	<module name="EmptyLineSeparator">
+		<property name="severity" value="warning" />
+	</module>
+	<module name="GenericWhitespace">
+		<property name="severity" value="warning" />
+	</module>
+	<module name="MethodParamPad">
+		<property name="severity" value="warning" />
+	</module>
+	<module name="NoLineWrap">
+		<property name="severity" value="warning" />
+	</module>
+	<module name="NoWhitespaceBefore">
+		<property name="severity" value="warning" />
+	</module>
+	<module name="OperatorWrap">
+		<property name="severity" value="warning" />
+	</module>
+	<module name="ParenPad">
+		<property name="severity" value="warning" />
+	</module>
+	<module name="SingleSpaceSeparator">
+		<property name="severity" value="warning" />
+	</module>
+	<module name="TypecastParenPad">
+		<property name="severity" value="warning" />
+	</module>
+	<module name="WhitespaceAfter">
+		<property name="severity" value="warning" />
+	</module>
+	<module name="WhitespaceAround">
+		<property name="severity" value="warning" />
+	</module>
 	</module>
 </module>
