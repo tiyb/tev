@@ -37,3 +37,9 @@ input[type=text] {
 	color: rgb(230, 151, 0);
 	font-weight: 700;
 }
+
+.ui-autocomplete-input {
+	color: rgb(230, 151, 0);
+	font-weight: 700;
+}
+

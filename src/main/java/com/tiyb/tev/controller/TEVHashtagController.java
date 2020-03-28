@@ -119,6 +119,27 @@ public class TEVHashtagController {
     }
 
     /**
+     * DEL to delete a particular hashtag from the system, regardless of blog. That means that the
+     * code searches for all HTs that match the given name, and removes each one.
+     *
+     * @param hashtag Name of the hashtag to be deleted
+     * @return {@link org.springframework.http.ResponseEntity ResponseEntity<>} with the response
+     *         details
+     */
+    @DeleteMapping("/hashtags")
+    public ResponseEntity<?> deleteHashTag(@RequestBody final String hashtag) {
+        final List<Hashtag> allHT = hashtagRepo.findAll();
+
+        for (Hashtag ht : allHT) {
+            if (hashtag.equals(ht.getTag())) {
+                hashtagRepo.delete(ht);
+            }
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    /**
      * Package-public method to delete all hashtags in the system, regardless of blog. Used only in
      * JUnit tests; no API associated with the method.
      */
