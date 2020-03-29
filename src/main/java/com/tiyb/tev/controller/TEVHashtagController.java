@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +41,12 @@ public class TEVHashtagController {
     private HashtagRepository hashtagRepo;
 
     /**
+     * Metadata controller
+     */
+    @Autowired
+    private TEVMetadataRestController mdController;
+
+    /**
      * GET request for listing <i>all</i> hashtags in the system, regardless of blog. Because
      * hashtags might be duplicated, logic is included to combine them together. Blog names are also
      * removed, since they can't be combined.
@@ -52,13 +57,14 @@ public class TEVHashtagController {
     public List<Hashtag> getAllHashtags() {
         final List<Hashtag> allHT = hashtagRepo.findAll();
         final HashMap<String, Hashtag> filtered = new HashMap<String, Hashtag>();
+        final String defaultBlogName = mdController.getDefaultBlogName();
 
         for (Hashtag h : allHT) {
             if (filtered.containsKey(h.getTag())) {
                 final Hashtag current = filtered.get(h.getTag());
                 current.setCount(current.getCount() + h.getCount());
+                current.setBlog(defaultBlogName);
             } else {
-                h.setBlog(StringUtils.EMPTY);
                 filtered.put(h.getTag(), h);
             }
         }
