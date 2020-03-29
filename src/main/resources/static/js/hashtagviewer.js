@@ -93,20 +93,24 @@ $(document).ready(function() {
 			});
 			
 			$('#tagsTable tbody').on('click', 'button.removeBtn', function() {
-				var data = tagsTable.row($(this).parents('tr')).data();
-				console.log(data);
-				var tagName = data.tag;
+				var htObject = tagsTable.row($(this).parents('tr')).data();
+				console.log(metadata);
+				
+				var url = "/api/hashtags";
+				if (metadata.showHashtagsForAllBlogs) {
+					url += "?removeAll=true";
+				}
 				
 				$.ajax({
-					url: "/api/hashtags/",
-					data: tagName,
-					contentType: 'text/plain',
+					url: url,
+					data: JSON.stringify(htObject),
+					contentType: 'application/json',
 					type: "DELETE",
 					error: function(xhr,textStatus,errorThrown) {
-						createAnErrorMessage($.i18n.prop('htviewer_deleteht_error', tagName));
+						createAnErrorMessage($.i18n.prop('htviewer_deleteht_error', htObject.tag));
 					}
 				}).then(function(data) {
-					createAnInfoMessage($.i18n.prop('htviewer_deleteht_success', tagName));
+					createAnInfoMessage($.i18n.prop('htviewer_deleteht_success', htObject.tag));
 					window.location.reload();
 				});
 			});
