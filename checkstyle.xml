@@ -10,7 +10,7 @@
 
 <module name="Checker">
 
-	<module name="SuppressWarningsFilter"/>
+	<module name="SuppressWarningsFilter" />
 
 	<!-- Javadoc Comments -->
 	<module name="JavadocPackage"></module>
@@ -31,12 +31,12 @@
 
 	<!-- Whitespace -->
 	<module name="FileTabCharacter" />
-	
-	
+
+
 
 	<module name="TreeWalker">
-		<module name="SuppressWarningsHolder"/>
-	
+		<module name="SuppressWarningsHolder" />
+
 		<module name="ConstantName"></module>
 		<module name="EmptyBlock"></module>
 
@@ -74,11 +74,11 @@
 		<module name="ExplicitInitialization" />
 		<module name="FallThrough" />
 		<module name="FinalLocalVariable">
-			<property name="severity" value="warning"/>
+			<property name="severity" value="warning" />
 		</module>
 		<module name="HiddenField">
-			<property name="ignoreConstructorParameter" value="true"/>
-			<property name="ignoreSetter" value="true"/>
+			<property name="ignoreConstructorParameter" value="true" />
+			<property name="ignoreSetter" value="true" />
 		</module>
 		<module name="IllegalCatch" />
 		<module name="IllegalInstantiation" />
@@ -86,7 +86,8 @@
 		<module name="IllegalToken" />
 		<module name="IllegalTokenText" />
 		<module name="IllegalType">
-			<property name="illegalClassNames" value="HashSet, LinkedHashMap, LinkedHashSet, TreeMap, TreeSet, java.util.HashSet, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeMap, java.util.TreeSet"/>
+			<property name="illegalClassNames"
+				value="HashSet, LinkedHashMap, LinkedHashSet, TreeMap, TreeSet, java.util.HashSet, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeMap, java.util.TreeSet" />
 		</module>
 		<module name="InnerAssignment" />
 		<module name="MagicNumber" />
@@ -136,21 +137,23 @@
 			<property name="checkFirstSentence" value="false" />
 			<property name="checkEmptyJavadoc" value="true" />
 		</module>
-		<module name="JavadocTagContinuationIndentation" />
+		<module name="JavadocTagContinuationIndentation">
+			<property name="severity" value="warning" />
+		</module>
 		<module name="JavadocType">
-			<property name="severity" value="warning"/>
+			<property name="severity" value="warning" />
 		</module>
 		<module name="JavadocVariable">
 			<property name="ignoreNamePattern" value="logger" />
-			<property name="severity" value="warning"/>
+			<property name="severity" value="warning" />
 		</module>
 		<module name="MissingJavadocMethod">
 			<property name="allowMissingPropertyJavadoc" value="true" />
-			<property name="severity" value="warning"/>
+			<property name="severity" value="warning" />
 		</module>
 		<module name="MissingJavadocPackage" />
 		<module name="MissingJavadocType">
-			<property name="severity" value="warning"/>
+			<property name="severity" value="warning" />
 		</module>
 		<module name="NonEmptyAtclauseDescription" />
 
@@ -160,9 +163,11 @@
 		<!-- Misc -->
 		<module name="ArrayTypeStyle" />
 		<module name="AvoidEscapedUnicodeCharacters" />
-		<module name="CommentsIndentation" />
+		<module name="CommentsIndentation">
+			<property name="severity" value="warning" />
+		</module>
 		<module name="FinalParameters">
-			<property name="severity" value="warning"/>
+			<property name="severity" value="warning" />
 		</module>
 		<module name="OuterTypeFilename" />
 		<module name="TodoComment" />
@@ -184,7 +189,7 @@
 		<module name="InterfaceTypeParameterName" />
 		<module name="LambdaParameterName" />
 		<module name="LocalFinalVariableName">
-			<property name="severity" value="warning"/>
+			<property name="severity" value="warning" />
 		</module>
 		<module name="LocalVariableName" />
 		<module name="MemberName" />
@@ -203,44 +208,44 @@
 		<module name="ParameterNumber" />
 
 		<!-- Whitespace -->
-	<module name="EmptyForInitializerPad">
-		<property name="severity" value="warning" />
-	</module>
-	<module name="EmptyForIteratorPad">
-		<property name="severity" value="warning" />
-	</module>
-	<module name="EmptyLineSeparator">
-		<property name="severity" value="warning" />
-	</module>
-	<module name="GenericWhitespace">
-		<property name="severity" value="warning" />
-	</module>
-	<module name="MethodParamPad">
-		<property name="severity" value="warning" />
-	</module>
-	<module name="NoLineWrap">
-		<property name="severity" value="warning" />
-	</module>
-	<module name="NoWhitespaceBefore">
-		<property name="severity" value="warning" />
-	</module>
-	<module name="OperatorWrap">
-		<property name="severity" value="warning" />
-	</module>
-	<module name="ParenPad">
-		<property name="severity" value="warning" />
-	</module>
-	<module name="SingleSpaceSeparator">
-		<property name="severity" value="warning" />
-	</module>
-	<module name="TypecastParenPad">
-		<property name="severity" value="warning" />
-	</module>
-	<module name="WhitespaceAfter">
-		<property name="severity" value="warning" />
-	</module>
-	<module name="WhitespaceAround">
-		<property name="severity" value="warning" />
-	</module>
+		<module name="EmptyForInitializerPad">
+			<property name="severity" value="warning" />
+		</module>
+		<module name="EmptyForIteratorPad">
+			<property name="severity" value="warning" />
+		</module>
+		<module name="EmptyLineSeparator">
+			<property name="severity" value="warning" />
+		</module>
+		<module name="GenericWhitespace">
+			<property name="severity" value="warning" />
+		</module>
+		<module name="MethodParamPad">
+			<property name="severity" value="warning" />
+		</module>
+		<module name="NoLineWrap">
+			<property name="severity" value="warning" />
+		</module>
+		<module name="NoWhitespaceBefore">
+			<property name="severity" value="warning" />
+		</module>
+		<module name="OperatorWrap">
+			<property name="severity" value="warning" />
+		</module>
+		<module name="ParenPad">
+			<property name="severity" value="warning" />
+		</module>
+		<module name="SingleSpaceSeparator">
+			<property name="severity" value="warning" />
+		</module>
+		<module name="TypecastParenPad">
+			<property name="severity" value="warning" />
+		</module>
+		<module name="WhitespaceAfter">
+			<property name="severity" value="warning" />
+		</module>
+		<module name="WhitespaceAround">
+			<property name="severity" value="warning" />
+		</module>
 	</module>
 </module>

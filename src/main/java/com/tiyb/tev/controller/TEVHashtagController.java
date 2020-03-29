@@ -3,6 +3,7 @@ package com.tiyb.tev.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tiyb.tev.datamodel.Hashtag;
@@ -119,21 +121,32 @@ public class TEVHashtagController {
     }
 
     /**
-     * DEL to delete a particular hashtag from the system, regardless of blog. That means that the
-     * code searches for all HTs that match the given name, and removes each one.
+     * DEL to delete a particular hashtag from the system. Can be set to delete the hashtag
+     * regardless of blog, via the removeAll query param, or else it will delete just the specific
+     * hashtag in question from the specific blog.
      *
-     * @param hashtag Name of the hashtag to be deleted
+     * @param hashtagToDelete Hashtag to be deleted
+     * @param removeAll       Indicates whether all instances of the HT should be removed,
+     *                        regardless of blog
      * @return {@link org.springframework.http.ResponseEntity ResponseEntity<>} with the response
      *         details
      */
     @DeleteMapping("/hashtags")
-    public ResponseEntity<?> deleteHashTag(@RequestBody final String hashtag) {
-        final List<Hashtag> allHT = hashtagRepo.findAll();
+    public ResponseEntity<?> deleteHashTag(@RequestBody final Hashtag hashtagToDelete,
+            @RequestParam("removeAll") final Optional<Boolean> removeAll) {
+        final boolean removeAllInstances = removeAll.isPresent() ? removeAll.get() : false;
 
-        for (Hashtag ht : allHT) {
-            if (hashtag.equals(ht.getTag())) {
-                hashtagRepo.delete(ht);
+        if (removeAllInstances) {
+            final List<Hashtag> allHT = hashtagRepo.findAll();
+            for (Hashtag ht : allHT) {
+                if (hashtagToDelete.getTag().equals(ht.getTag())) {
+                    hashtagRepo.delete(ht);
+                }
             }
+        } else {
+            final Hashtag htToDelete =
+                    hashtagRepo.findByTagAndBlog(hashtagToDelete.getTag(), hashtagToDelete.getBlog());
+            hashtagRepo.delete(htToDelete);
         }
 
         return ResponseEntity.ok().build();
