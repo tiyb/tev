@@ -121,10 +121,13 @@ public class TEVHashtagController {
     }
 
     /**
-     * DEL to delete a particular hashtag from the system, regardless of blog. That means that the
-     * code searches for all HTs that match the given name, and removes each one.
+     * DEL to delete a particular hashtag from the system. Can be set to delete the hashtag
+     * regardless of blog, via the removeAll query param, or else it will delete just the specific
+     * hashtag in question from the specific blog.
      *
-     * @param hashtagToDelete Name of the hashtag to be deleted
+     * @param hashtagToDelete Hashtag to be deleted
+     * @param removeAll       Indicates whether all instances of the HT should be removed,
+     *                        regardless of blog
      * @return {@link org.springframework.http.ResponseEntity ResponseEntity<>} with the response
      *         details
      */
