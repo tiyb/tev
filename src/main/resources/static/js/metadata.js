@@ -6,6 +6,11 @@ $.i18n.properties({
 	mode: 'both'
 });
 
+var convoFileUploading = false;
+var postFileUploading = true;
+
+var FILE_UPLOADING_INTERVAL = 4500;
+
 /**
  * Download the static data to populate drop-downs; download metadata to
  * populate the form, set up event handlers
@@ -155,6 +160,20 @@ $(document).ready(function () {
 				createAnErrorMessage($.i18n.prop('md_admintools_importImagesFailure'));
 			}
 		});
+	});
+	
+	$('#postUploadSubmitButton').click(function() {
+		$('#postUploadSubmitButton').hide();
+		uploadFile("post", "postUploadForm");
+		
+		return false;
+	});
+	
+	$('#convoUploadSubmitButton').click(function() {
+		$('#convoUploadSubmitButton').hide();
+		uploadFile("convo", "convoUploadForm");
+		
+		return false;
 	});
 	
 	$('.autoUpdateSetting').change(function() {
@@ -434,4 +453,115 @@ function updateServer() {
 			creaeAnErrorMessage($.i18n.prop('md_submit_failure'));
 		}
 	});	
+}
+
+/**
+ * Helper function used to asynchronously upload a file to the server (either a
+ * post file or a conversation file)
+ * 
+ * @param url
+ *            The URL to which the file should be sent
+ * @param fileType
+ *            The type of file being uploaded: "post" or "convo"
+ */
+function uploadFile(fileType, postUploadForm) {
+	var url;
+	if (fileType == "post") {
+		url = '/postDataUpload/' + blogName;
+		postFileUploading = true;
+	} else if (fileType == "convo") {
+		url = '/conversationDataUpload/' + blogName;
+		convoFileUploading = true;
+	} else {
+		createAnErrorMessage("Tehnical error: Invalid file type");
+		return;
+	}
+	
+	setTimeout(function() {
+		stillUploadingMessage(fileType);
+	}, FILE_UPLOADING_INTERVAL);
+	
+	$.ajax({
+		url : url,
+		type : 'POST',
+		data : new FormData($('#' + postUploadForm)[0]),
+		cache : false,
+		contentType : false,
+		processData : false,
+		xhr : function() {
+			var myXhr = $.ajaxSettings.xhr();
+
+			if (myXhr.upload) {
+				// for handling the progress of the upload
+				myXhr.upload.addEventListener('progress',
+						function(e) {
+							if (e.lengthComputable) {
+								createAnInfoMessage($.i18n.prop(
+										'md_uploadfile_inprogress', e.loaded,
+										e.total));
+							}
+						}, false);
+			}
+			return myXhr;
+		},
+		success : function(data, textStatus) {
+			if (fileType == "post") {
+				postFileUploading = false;
+				$('#postUploadSubmitButton').show();
+			} else {
+				convoFileUploading = false;
+				$('#convoUploadSubmitButton').show();
+			}
+			createAnInfoMessage($.i18n.prop('md_uploadfile_success'));
+		},
+		error : function(xhr, textStatus, errorThrown) {
+			if (fileType == "post") {
+				postFileUploading = false;
+			} else {
+				convoFileUploading = false;
+			}
+			createAnErrorMessage($.i18n.prop('md_uploadfile_failure'));
+		}
+	});
+
+}
+
+/**
+ * Displays a periodic message in the message area, to indicate that a file is
+ * still uploading. Works with both post and convo files; no error checking done
+ * on the param, since it would have been checked earlier in the calling
+ * function.
+ * 
+ * First checks the appropriate flag (convoFileUploading or postFileUploading)
+ * to see if the upload is still occurring; if so, a message is displayed, and
+ * setTimeout() is used to call this function again in a few seconds (controlled
+ * by FILE_UPLOADING_INTERVAL).
+ * 
+ * @param fileType
+ *            Type of file being uploaded, either post or convo
+ */
+function stillUploadingMessage(fileType) {
+	if (fileType == "post") {
+		if (postFileUploading == false) {
+			return;
+		}
+
+		createAnInfoMessage($.i18n
+				.prop('md_uploadfile_stilluploading', "Posts"));
+		setTimeout(function() {
+			stillUploadingMessage("post");
+		}, FILE_UPLOADING_INTERVAL);
+
+		return;
+	}
+
+	if (convoFileUploading == false) {
+		return;
+	}
+
+	createAnInfoMessage($.i18n.prop('md_uploadfile_stilluploading',
+			"Conversations"));
+	setTimeout(function() {
+		stillUploadingMessage("convo");
+	}, FILE_UPLOADING_INTERVAL);
 }
