@@ -65,6 +65,16 @@ fieldset {
 	display: inline-block;
 }
 
+.hashtagspan {
+	cursor: pointer;
+	overflow-wrap: break-word;
+	display: inline-block;
+}
+
+.noclickhashtagspan {
+	overflow-wrap: break-word;
+}
+
 .favSpan {
 	width: 90%;
 	margin-left: 5%;

@@ -3,8 +3,8 @@ package com.tiyb.tev.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.tiyb.tev.datamodel.Hashtag;
 import com.tiyb.tev.datamodel.Metadata;
+import com.tiyb.tev.exception.ExistingTagException;
 
 /**
  * Unit tests for working with Hashtags / the HT REST controller
@@ -30,6 +31,7 @@ public class TevHTRestControllerUnitTests {
     private static final String SECOND_BLOG_NAME = "blog2";
     private static final String FIRST_TAG_VALUE = "tag1";
     private static final String FIRST_BLOG_NAME = "blog1";
+    private static final String THIRD_TAG_VALUE = "tag3";
 
     @Autowired
     TEVHashtagController htController;
@@ -163,6 +165,10 @@ public class TevHTRestControllerUnitTests {
         assertThat(list.size()).isEqualTo(1);
         ht = list.get(0);
         assertThat(ht.getCount()).isEqualTo(1);
+
+        List<Hashtag> allTags = htController.getAllHashtags();
+        assertThat(allTags.size()).isEqualTo(1);
+        assertThat(allTags.get(0).getBlog()).contains(FIRST_BLOG_NAME, SECOND_BLOG_NAME);
     }
 
     /**
@@ -176,8 +182,7 @@ public class TevHTRestControllerUnitTests {
         htController.createHashtagForBlog(FIRST_BLOG_NAME, FIRST_TAG_VALUE);
 
         Hashtag ht = new Hashtag(FIRST_TAG_VALUE, 2, FIRST_BLOG_NAME);
-        Optional<Boolean> removeAll = Optional.of(false);
-        htController.deleteHashTag(ht, removeAll);
+        htController.deleteHashTag(ht);
 
         List<Hashtag> list = htController.getAllHashtagsForBlog(SECOND_BLOG_NAME);
         assertThat(list).isNotNull();
@@ -185,26 +190,6 @@ public class TevHTRestControllerUnitTests {
         Hashtag fromServer = list.get(0);
         assertThat(fromServer.getCount()).isEqualTo(1);
 
-        list = htController.getAllHashtagsForBlog(FIRST_BLOG_NAME);
-        assertThat(list).isNullOrEmpty();
-    }
-
-    /**
-     * Create a tag across multiple blogs, use the "removeAll" function to delete it everywhere, and
-     * verify it was actually deleted
-     */
-    @Test
-    public void deleteAllForTagName() {
-        htController.createHashtagForBlog(FIRST_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(SECOND_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(FIRST_BLOG_NAME, FIRST_TAG_VALUE);
-
-        Hashtag ht = new Hashtag(FIRST_TAG_VALUE, 2, FIRST_BLOG_NAME);
-        Optional<Boolean> removeAll = Optional.of(true);
-        htController.deleteHashTag(ht, removeAll);
-
-        List<Hashtag> list = htController.getAllHashtagsForBlog(SECOND_BLOG_NAME);
-        assertThat(list).isNullOrEmpty();
         list = htController.getAllHashtagsForBlog(FIRST_BLOG_NAME);
         assertThat(list).isNullOrEmpty();
     }
@@ -223,7 +208,7 @@ public class TevHTRestControllerUnitTests {
         assertThat(list).isNotNull();
         assertThat(list.size()).isEqualTo(1);
         Hashtag ht = list.get(0);
-        assertThat(ht.getBlog()).isEqualTo(FIRST_BLOG_NAME);
+        assertThat(ht.getBlog()).contains(FIRST_BLOG_NAME, SECOND_BLOG_NAME);
         assertThat(ht.getCount()).isEqualTo(3);
 
         htController.createHashtagForBlog(SECOND_BLOG_NAME, SECOND_TAG_VALUE);
@@ -233,7 +218,7 @@ public class TevHTRestControllerUnitTests {
         for (Hashtag t : list) {
             if (FIRST_TAG_VALUE.equals(t.getTag())) {
                 assertThat(t.getCount()).isEqualTo(3);
-                assertThat(t.getBlog()).isEqualTo(FIRST_BLOG_NAME);
+                assertThat(t.getBlog()).contains(FIRST_BLOG_NAME, SECOND_BLOG_NAME);
             } else {
                 assertThat(t.getCount()).isEqualTo(1);
                 assertThat(t.getBlog()).isEqualTo(SECOND_BLOG_NAME);
@@ -247,11 +232,83 @@ public class TevHTRestControllerUnitTests {
         for (Hashtag t : list) {
             if (FIRST_TAG_VALUE.equals(t.getTag())) {
                 assertThat(t.getCount()).isEqualTo(3);
-                assertThat(t.getBlog()).isEqualTo(FIRST_BLOG_NAME);
+                assertThat(t.getBlog()).contains(FIRST_BLOG_NAME, SECOND_BLOG_NAME);
             } else {
                 assertThat(t.getCount()).isEqualTo(2);
                 assertThat(t.getBlog()).isEqualTo(SECOND_BLOG_NAME);
             }
         }
+    }
+
+    /**
+     * Tests that a hashtag can be created for no blog
+     */
+    @Test
+    public void createHTForNoBlog() {
+        htController.createHashtagForBlog(FIRST_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(SECOND_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(FIRST_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(SECOND_BLOG_NAME, SECOND_TAG_VALUE);
+        htController.createHashtagForNoBlog(THIRD_TAG_VALUE);
+
+        List<Hashtag> list = htController.getAllHashtags();
+        assertThat(list.size()).isEqualTo(3);
+
+        for (Hashtag t : list) {
+            if (FIRST_TAG_VALUE.equals(t.getTag())) {
+                assertThat(t.getCount()).isEqualTo(3);
+                assertThat(t.getBlog()).contains(FIRST_BLOG_NAME, SECOND_BLOG_NAME);
+            } else if (SECOND_TAG_VALUE.equals(t.getTag())) {
+                assertThat(t.getCount()).isEqualTo(1);
+                assertThat(t.getBlog()).isEqualTo(SECOND_BLOG_NAME);
+            } else if (THIRD_TAG_VALUE.equals(t.getTag())) {
+                assertThat(t.getCount()).isEqualTo(1);
+                assertThat(t.getBlog()).isBlank();
+            } else {
+                assertThat(true).isFalse();
+            }
+        }
+    }
+
+    /**
+     * Tests that a hashtag created with no blog can be deleted
+     */
+    @Test
+    public void deleteBlankBlog() {
+        htController.createHashtagForBlog(FIRST_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(SECOND_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(FIRST_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(SECOND_BLOG_NAME, SECOND_TAG_VALUE);
+        htController.createHashtagForNoBlog(THIRD_TAG_VALUE);
+
+        Hashtag htToDelete = new Hashtag(THIRD_TAG_VALUE, 0, StringUtils.EMPTY);
+        htController.deleteHashTag(htToDelete);
+
+        List<Hashtag> list = htController.getAllHashtags();
+        assertThat(list.size()).isEqualTo(2);
+
+        for (Hashtag t : list) {
+            if (FIRST_TAG_VALUE.equals(t.getTag())) {
+                assertThat(t.getCount()).isEqualTo(3);
+                assertThat(t.getBlog()).contains(FIRST_BLOG_NAME, SECOND_BLOG_NAME);
+            } else if (SECOND_TAG_VALUE.equals(t.getTag())) {
+                assertThat(t.getCount()).isEqualTo(1);
+                assertThat(t.getBlog()).isEqualTo(SECOND_BLOG_NAME);
+            } else if (THIRD_TAG_VALUE.equals(t.getTag())) {
+                assertThat(true).isFalse();
+            } else {
+                assertThat(true).isFalse();
+            }
+        }
+    }
+
+    /**
+     * Tests that a hashtag can't be inserted into the "no blog" namespace if it's already been
+     * created for a blog
+     */
+    @Test(expected = ExistingTagException.class)
+    public void htCantCreateBlankWhenExists() {
+        htController.createHashtagForBlog(FIRST_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForNoBlog(FIRST_TAG_VALUE);
     }
 }
