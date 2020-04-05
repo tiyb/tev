@@ -203,7 +203,7 @@ function setupAutoComplete() {
 			}
 			
 			$.ajax({
-				url: '/api/hashtags/' + getCurrentBlogName(),
+				url: '/api/hashtags/',
 				type: 'POST',
 				data: newHT,
 				contentType: 'text/plain',
