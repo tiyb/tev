@@ -34,6 +34,14 @@ public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
     public List<Hashtag> findByBlog(String blog);
 
     /**
+     * Get all hashtags (regardless of blog) with a given name
+     *
+     * @param tag Tag name
+     * @return List of hashtags
+     */
+    public List<Hashtag> findByTag(String tag);
+
+    /**
      * Delete all hashtags for a given blog
      *
      * @param blog Blog for which to delete the tags

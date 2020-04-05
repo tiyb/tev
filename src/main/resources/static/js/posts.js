@@ -240,8 +240,8 @@ $(document).ready(function() {
 		
 		var urlParams = new URLSearchParams(window.location.search);
 		if(urlParams.has("hashsearch")) {
-			$('#postTable tfoot tr:eq(1) th:eq(3) input').val(urlParams.get("hashsearch"));
-			$('#postTable tfoot tr:eq(1) th:eq(3) input').change();
+			$('#postTable tfoot tr:eq(1) th:eq(' + HASHTAGS_COLUMN_NO + ') input').val(urlParams.get("hashsearch"));
+			$('#postTable tfoot tr:eq(1) th:eq(' + HASHTAGS_COLUMN_NO + ') input').change();
 		}
 		
 	});

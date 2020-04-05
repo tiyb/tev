@@ -3,10 +3,10 @@ package com.tiyb.tev.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tiyb.tev.datamodel.Hashtag;
+import com.tiyb.tev.exception.ExistingTagException;
 import com.tiyb.tev.repository.HashtagRepository;
 
 /**
@@ -35,21 +35,19 @@ import com.tiyb.tev.repository.HashtagRepository;
 public class TEVHashtagController {
 
     /**
+     * String used to separate multiple blog names, when a hashtag shows up in multiple blogs
+     */
+    private static final String BLOG_SEPARATOR = ", ";
+
+    /**
      * Repo for working with hashtags
      */
     @Autowired
     private HashtagRepository hashtagRepo;
 
     /**
-     * Metadata controller
-     */
-    @Autowired
-    private TEVMetadataRestController mdController;
-
-    /**
      * GET request for listing <i>all</i> hashtags in the system, regardless of blog. Because
-     * hashtags might be duplicated, logic is included to combine them together. Blog names are also
-     * removed, since they can't be combined.
+     * hashtags might be duplicated, logic is included to combine them together.
      *
      * @return List of hashtags with their counts.
      */
@@ -57,13 +55,12 @@ public class TEVHashtagController {
     public List<Hashtag> getAllHashtags() {
         final List<Hashtag> allHT = hashtagRepo.findAll();
         final HashMap<String, Hashtag> filtered = new HashMap<String, Hashtag>();
-        final String defaultBlogName = mdController.getDefaultBlogName();
 
         for (Hashtag h : allHT) {
             if (filtered.containsKey(h.getTag())) {
                 final Hashtag current = filtered.get(h.getTag());
                 current.setCount(current.getCount() + h.getCount());
-                current.setBlog(defaultBlogName);
+                current.setBlog(current.getBlog() + BLOG_SEPARATOR + h.getBlog());
             } else {
                 filtered.put(h.getTag(), h);
             }
@@ -112,6 +109,29 @@ public class TEVHashtagController {
     }
 
     /**
+     * <p>
+     * POST request to insert a new hashtag into the system with no blog associated with it. Simply
+     * calls through to the {@link #createHashtagForBlog(String, String) createHashtagForBlog()}
+     * method, passing an empty string for the blog name.
+     * </p>
+     *
+     * <p>
+     * Throws an error if the hashtag already exists in the system, for any other blog
+     * </p>
+     *
+     * @param hashtag Hashtag to be created
+     * @return The new/existing hashtag object (with ID)
+     */
+    @PostMapping("/hashtags/")
+    public Hashtag createHashtagForNoBlog(@Valid @RequestBody final String hashtag) {
+        final List<Hashtag> existingTags = hashtagRepo.findByTag(hashtag);
+        if (existingTags.size() > 0) {
+            throw new ExistingTagException();
+        }
+        return createHashtagForBlog(StringUtils.EMPTY, hashtag);
+    }
+
+    /**
      * DEL to delete all hashtags in the DB for a given blog
      *
      * @param blog Blog for which tags should be deleted
@@ -127,33 +147,16 @@ public class TEVHashtagController {
     }
 
     /**
-     * DEL to delete a particular hashtag from the system. Can be set to delete the hashtag
-     * regardless of blog, via the removeAll query param, or else it will delete just the specific
-     * hashtag in question from the specific blog.
+     * DEL to delete a particular hashtag from the system, for a given blog
      *
      * @param hashtagToDelete Hashtag to be deleted
-     * @param removeAll       Indicates whether all instances of the HT should be removed,
-     *                        regardless of blog
      * @return {@link org.springframework.http.ResponseEntity ResponseEntity<>} with the response
      *         details
      */
     @DeleteMapping("/hashtags")
-    public ResponseEntity<?> deleteHashTag(@RequestBody final Hashtag hashtagToDelete,
-            @RequestParam("removeAll") final Optional<Boolean> removeAll) {
-        final boolean removeAllInstances = removeAll.isPresent() ? removeAll.get() : false;
-
-        if (removeAllInstances) {
-            final List<Hashtag> allHT = hashtagRepo.findAll();
-            for (Hashtag ht : allHT) {
-                if (hashtagToDelete.getTag().equals(ht.getTag())) {
-                    hashtagRepo.delete(ht);
-                }
-            }
-        } else {
-            final Hashtag htToDelete =
-                    hashtagRepo.findByTagAndBlog(hashtagToDelete.getTag(), hashtagToDelete.getBlog());
-            hashtagRepo.delete(htToDelete);
-        }
+    public ResponseEntity<?> deleteHashTag(@RequestBody final Hashtag hashtagToDelete) {
+        final Hashtag htToDelete = hashtagRepo.findByTagAndBlog(hashtagToDelete.getTag(), hashtagToDelete.getBlog());
+        hashtagRepo.delete(htToDelete);
 
         return ResponseEntity.ok().build();
     }
