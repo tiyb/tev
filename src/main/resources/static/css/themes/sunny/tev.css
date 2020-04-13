@@ -14,15 +14,15 @@ a:hover {
 	color: rgb(254, 206, 47);
 }
 
-#postTable_length label {
+.dataTables_length label {
 	color: rgb(234, 245, 247);
 }
 
-#postTable_length option {
+.dataTables_length option {
 	color: rgb(254, 206, 47);
 }
 
-#postTable_length label select {
+.dataTables_length label select {
 	color: rgb(254, 206, 47);
 }
 
