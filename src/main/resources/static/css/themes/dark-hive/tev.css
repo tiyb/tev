@@ -10,15 +10,15 @@ a {
 	color: rgb(51, 51, 51);
 }
 
-#postTable_length label {
+.dataTables_length label {
 	color: rgb(34, 34, 34);
 }
 
-#postTable_length option {
+.dataTables_length option {
 	color: rgb(51, 51, 51);
 }
 
-#postTable_length label select {
+.dataTables_length label select {
 	color: rgb(51, 51, 51);
 }
 
