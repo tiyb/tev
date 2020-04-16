@@ -157,3 +157,8 @@ h2 {
 	display: inline-block;
 }
 
+/* images */
+.clickableImage {
+	cursor: pointer;
+}
+

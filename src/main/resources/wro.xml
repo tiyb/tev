@@ -67,12 +67,6 @@
 		<js>/js/message-areas.js</js>
 	</group>
 	
-	<group name="singleimageviewer">
-		<css>/css/singleimageviewer.css</css>
-		
-		<js>/js/close-on-esc.js</js>
-	</group>
-	
 	<group name="exportedxml">
 		<css>/css/style.css</css>
 		<js>/js/exportedxml.js</js>
