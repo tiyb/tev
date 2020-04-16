@@ -6,6 +6,8 @@
  * that the image is only opened once, so being left as-is for now.
  */
 $(document).ready(function() {
+	$('img').addClass('clickableImage');
+	
 	$('img').click(function() {
 		window.open($(this).attr("src"), '_singlephotoviewer');
 	});
