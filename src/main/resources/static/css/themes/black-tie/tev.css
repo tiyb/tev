@@ -1,39 +1,14 @@
-.favSpan {
-	color: rgb(69, 69, 69);
-	font-weight: bold;
-}
+@import "../tev-theme.css";
 
-.readSpan {
-	color: rgb(69, 69, 69);
-	font-weight: bold;
-}
-
-a {
-	color: rgb(69, 69, 69);
-	font-weight: bold;
-}
-
-.dataTables_length label {
-	color: rgb(227, 227, 227);
-}
-
-.dataTables_length option {
-	color: rgb(69, 69, 69);
-}
-
-.dataTables_length label select {
-	color: rgb(69, 69, 69);
-	font-weight: bold;
-}
-
-.navbar-selected {
-	background-color: rgb(17, 17, 17);
-	background-image: url(images/ui-bg_glass_40_111111_1x400.png);
-	border-top-style: solid;
-	border-top-color: rgb(227, 227, 227);
-	border-top-width: 2px;
-}
-
-.navbar-selected a {
-	color: #e3e3e3;
+:root {
+	--main-text-colour: rgb(69, 69, 69);
+	--bold-text-weight: bold;
+	--bg-text-colour: rgb(227, 227, 227);
+	--hover-text-colour: rgb(69, 69, 69);
+	--navbar-background-colour: rgb(17, 17, 17);
+	--navbar-selected-bg-image: url(/css/themes/black-tie/images/ui-bg_glass_40_111111_1x400.png);
+	--navbar-border-top-style: none;
+	--navbar-border-top-colour: rgb(246, 246, 246);
+	--navbar-border-top-width: 0px;
+	--selected-tab-colour: #e3e3e3;
 }

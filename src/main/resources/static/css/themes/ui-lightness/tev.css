@@ -1,45 +1,14 @@
-.favSpan {
-	color: rgb(28, 148, 196);
-	font-weight: bold;
-}
+@import "../tev-theme.css";
 
-.readSpan {
-	color: rgb(28, 148, 196);
-	font-weight: bold;
+:root {
+	--main-text-colour: rgb(28, 148, 196);
+	--bold-text-weight: 700;
+	--bg-text-colour: rgb(255, 255, 255);
+	--hover-text-colour: rgb(235, 143, 0);
+	--navbar-background-colour: rgb(246, 246, 246);
+	--navbar-selected-bg-image: url(/css/themes/ui-lightness/images/ui-bg_glass_100_f6f6f6_1x400.png);
+	--navbar-border-top-style: none;
+	--navbar-border-top-colour: rgb(246, 246, 246);
+	--navbar-border-top-width: 0px;
+	--selected-tab-colour: #1c94c4;
 }
-
-a {
-	color: rgb(28, 148, 196);
-}
-
-.dataTables_length label {
-	color: rgb(255, 255, 255);
-}
-
-.dataTables_length option {
-	color: rgb(28, 148, 196);
-}
-
-.dataTables_length label select {
-	color: rgb(28, 148, 196);
-}
-
-.navbar-selected {
-	background-color: rgb(246, 246, 246);
-	background-image: url(images/ui-bg_glass_100_f6f6f6_1x400.png);
-}
-
-.navbar-selected a {
-	color: #1c94c4;
-}
-
-input[type=text] {
-	color: rgb(28, 148, 196);
-	font-weight: 700;
-}
-
-.ui-autocomplete-input {
-	color: rgb(28, 148, 196);
-	font-weight: 700;
-}
-
