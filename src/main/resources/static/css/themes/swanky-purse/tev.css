@@ -1,45 +1,13 @@
-.favSpan {
-	color: rgb(79, 66, 33);
-	font-weight: bold;
-}
+@import "../tev-theme.css";
 
-.readSpan {
-	color: rgb(79, 66, 33);
-	font-weight: bold;
+:root {
+	--main-text-colour: rgb(79, 66, 33);
+	--bold-text-weight: 700;
+	--bg-text-colour: rgb(234, 205, 134);
+	--navbar-background-colour: rgb(79, 66, 33);
+	--navbar-selected-bg-image: url(/css/themes/swanky-purse/images/ui-bg_diamond_10_4f4221_10x8.png);
+	--navbar-border-top-style: none;
+	--navbar-border-top-colour: rgb(79, 66, 33);
+	--navbar-border-top-width: 0px;
+	--selected-tab-colour: #f8eec9;
 }
-
-a {
-	color: rgb(79, 66, 33);
-}
-
-.dataTables_length label {
-	color: rgb(234, 205, 134);
-}
-
-.dataTables_length option {
-	color: rgb(79, 66, 33);
-}
-
-.dataTables_length label select {
-	color: rgb(79, 66, 33);
-}
-
-.navbar-selected {
-	background-color: rgb(79, 66, 33);
-	background-image: url(images/ui-bg_diamond_10_4f4221_10x8.png);
-}
-
-.navbar-selected a {
-	color: #f8eec9;
-}
-
-input[type=text] {
-	color: rgb(68, 49, 19);
-	font-weight: 700;
-}
-
-.ui-autocomplete-input {
-	color: rgb(68, 49, 19);
-	font-weight: 700;
-}
-

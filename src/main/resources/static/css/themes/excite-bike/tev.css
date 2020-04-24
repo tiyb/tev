@@ -1,45 +1,14 @@
-.favSpan {
-	color: rgb(230, 151, 0);
-	font-weight: bold;
-}
+@import "../tev-theme.css";
 
-.readSpan {
-	color: rgb(230, 151, 0);
-	font-weight: bold;
+:root {
+	--main-text-colour: rgb(230, 151, 0);
+	--bold-text-weight: 700;
+	--bg-text-colour: rgb(230, 151, 0);
+	--hover-text-colour: rgb(20, 132, 230);
+	--navbar-background-colour: rgb(20, 132, 230);
+	--navbar-selected-bg-image: url(/css/themes/excite-bike/images/ui-bg_diagonals-thick_22_1484e6_40x40.png);
+	--navbar-border-top-style: none;
+	--navbar-border-top-colour: rgb(20, 132, 230);
+	--navbar-border-top-width: 0px;
+	--selected-tab-colour: rgb(255, 255, 255);
 }
-
-a {
-	color: rgb(230, 151, 0);
-}
-
-.dataTables_length label {
-	color: rgb(230, 151, 0);
-}
-
-.dataTables_length option {
-	color: rgb(230, 151, 0);
-}
-
-.dataTables_length label select {
-	color: rgb(230, 151, 0);
-}
-
-.navbar-selected {
-	background-color: rgb(20, 132, 230);
-	background-image: url(images/ui-bg_diagonals-thick_22_1484e6_40x40.png);
-}
-
-.navbar-selected a {
-	color: rgb(255, 255, 255);
-}
-
-input[type=text] {
-	color: rgb(230, 151, 0);
-	font-weight: 700;
-}
-
-.ui-autocomplete-input {
-	color: rgb(230, 151, 0);
-	font-weight: 700;
-}
-

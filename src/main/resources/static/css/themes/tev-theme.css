@@ -1,0 +1,63 @@
+.favSpan {
+	color: var(--main-text-colour);
+	font-weight: var(--bold-text-weight);
+}
+
+.readSpan {
+	color: var(--main-text-colour);
+	font-weight: var(--bold-text-weight);
+}
+
+a:link {
+	color: var(--main-text-colour);
+}
+
+a:visited {
+	color: var(--main-text-colour);
+}
+
+a:hover {
+	color: var(--hover-text-colour);
+}
+
+a:active {
+	colour: var(--hover-text-colour);
+}
+
+.dataTables_length label {
+	color: var(--bg-text-colour);
+}
+
+.dataTables_length option {
+	color: var(--main-text-colour);
+}
+
+.dataTables_length label select {
+	color: var(--main-text-colour);
+}
+
+.dataTables_filter label input {
+	color: var(--main-text-colour);
+}
+
+.navbar-selected {
+	border-top-style: var(--navbar-border-top-style);
+	border-top-color: var(--navbar-border-top-colour);
+	border-top-width: var(--navbar-border-top-width);
+	background-color: var(--navbar-background-colour);
+	background-image: var(--navbar-selected-bg-image);
+}
+
+.navbar-selected a {
+	color: var(--selected-tab-colour);
+}
+
+input[type=text] {
+	color: var(--main-text-colour);
+	font-weight: var(--bold-text-weight);
+}
+
+.ui-autocomplete-input {
+	color: var(--main-text-colour);
+	font-weight: var(--bold-text-weight);
+}
