@@ -533,7 +533,7 @@ public class BlogXmlReader extends TEVXmlReader {
                 post.setUrlWithSlug(att.getValue());
                 break;
             case POST_ATTRIBUTE_TYPE:
-                post.setType(att.getValue());
+                post.setType(att.getValue().toLowerCase());
                 break;
             case POST_ATTRIBUTE_DATEGMT:
                 post.setDateGmt(att.getValue());
