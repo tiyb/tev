@@ -334,6 +334,7 @@ public class BlogXmlReader extends TEVXmlReader {
      * @param xmlFile        {@link java.io.InputStream InputStream} containing the XML document to
      *                       be parsed.
      * @param postController REST controller for the application, used for storing data
+     * @param blogName       Name of the blog being imported
      * @throws XMLParsingException For any errors in parsing the XML document, business or technical
      */
     public static void parseDocument(final InputStream xmlFile, final TEVPostRestController postController,
@@ -855,6 +856,7 @@ public class BlogXmlReader extends TEVXmlReader {
      * @param photoCaption The caption to be used on each photo
      * @param photos       The list of photos that already exists, to which new photos will be
      *                     added.
+     * @return List of parsed photos
      * @throws XMLStreamException For any XML parsing errors
      */
     private static List<Photo> readPhotoStream(final XMLEventReader reader, final String postID,
