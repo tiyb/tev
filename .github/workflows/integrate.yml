@@ -129,7 +129,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add .
-          git commit -m "Updated JavaDoc" -a
+          git commit -m "Updated JavaDoc"
       - name: Push changes back to repo
         uses: ad-m/github-push-action@master
         with:
