@@ -135,7 +135,7 @@ public class TEVHashtagController {
      * DEL to delete all hashtags in the DB for a given blog
      *
      * @param blog Blog for which tags should be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity<>} with the response
+     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
      *         details
      */
     @Transactional
@@ -150,7 +150,7 @@ public class TEVHashtagController {
      * DEL to delete a particular hashtag from the system, for a given blog
      *
      * @param hashtagToDelete Hashtag to be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity<>} with the response
+     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
      *         details
      */
     @DeleteMapping("/hashtags")

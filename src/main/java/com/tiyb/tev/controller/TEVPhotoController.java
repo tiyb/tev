@@ -214,8 +214,9 @@ public class TEVPhotoController {
     /**
      * DEL to delete a single photo by ID for a given blog
      *
-     * @param blog   Not used
-     * @param postId the ID of the post to be deleted
+     * @param blog    Not used
+     * @param postId  the ID of the post to be deleted
+     * @param photoID The ID of the photo to be deleted
      * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
      *         details
      */
