@@ -45,7 +45,8 @@ public class RepoAbstractor<T extends TEVCommonItems<T>> {
     /**
      * Constructor for the object
      *
-     * @param theTypeName The name of the type of post being worked with
+     * @param instanceOfTypeRepo an instance of the repo being worked with
+     * @param theTypeName        The name of the type of post being worked with
      */
     public RepoAbstractor(final JpaRepository<T, String> instanceOfTypeRepo, final String theTypeName,
             final PostRepository instanceOfPostRepo) {

@@ -265,7 +265,7 @@ public class TEVPostRestController {
      * DEL to delete all posts in the DB for a given blog
      *
      * @param blog Blog for which posts should be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity<>} with the response
+     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
      *         details
      */
     @Transactional
