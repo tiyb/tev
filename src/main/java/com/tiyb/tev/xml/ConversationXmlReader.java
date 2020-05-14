@@ -125,6 +125,7 @@ public class ConversationXmlReader extends TEVXmlReader {
      * @param xmlFile         File containing XML to be parsed
      * @param mdController    Used for working with the application's metadata
      * @param convoController Used for updating the database as each conversation/message is parsed
+     * @param blogName        Name of the blog for which conversations are being imported
      */
     public static void parseDocument(final MultipartFile xmlFile, final TEVMetadataRestController mdController,
             final TEVConvoRestController convoController, final String blogName) {
@@ -287,6 +288,8 @@ public class ConversationXmlReader extends TEVXmlReader {
      * @param mainTumblrUserName The Tumblr name of the user of the application
      * @param mainTumblrUserId   The ID assigned to the user of the application by Tumblr
      * @param mdController       Controller used to update the database with conversations/messages
+     * @param convoController    Controller used for working with Conversations
+     * @param blogName           Name of the blog for which conversations are being imported
      * @throws XMLParsingException For any errors parsing the XML
      */
     private static void readConversations(final InputStream xmlFile, final String mainTumblrUserName,
