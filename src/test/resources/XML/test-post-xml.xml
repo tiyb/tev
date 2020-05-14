@@ -2,7 +2,7 @@
 <tumblr version="1.0">
 	<posts>
 		<!--  Regular post -->
-		<post id="180894436671" url="https://mainblog.tumblr.com/post/180894436671" url-with-slug="https://mainblog.tumblr.com/post/180894436671/first-post" type="regular" date-gmt="2018-12-07 16:48:43 GMT" date="Fri, 07 Dec 2018 11:48:43" unix-timestamp="1544201323" format="html" reblog-key="O6pLVlp1" slug="first-post" state="published" is_reblog="true" tumblelog="mainblog">
+		<post id="180894436671" url="https://mainblog.tumblr.com/post/180894436671" url-with-slug="https://mainblog.tumblr.com/post/180894436671/first-post" type="Regular" date-gmt="2018-12-07 16:48:43 GMT" date="Fri, 07 Dec 2018 11:48:43" unix-timestamp="1544201323" format="html" reblog-key="O6pLVlp1" slug="first-post" state="published" is_reblog="true" tumblelog="mainblog">
 			<regular-title>First Post</regular-title>
 			<regular-body>“This is some quoted text,” she said, “so will it be interpreted correctly?” It was a great question &amp;ndash; and this JUnit test would settle it once and for all.</regular-body>
 			<tag>tag1</tag>
