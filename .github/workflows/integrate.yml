@@ -124,6 +124,12 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Generate JavaDoc
         run: mvn javadoc:javadoc
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Updated JavaDoc" -a
       - name: Push changes back to repo
         uses: ad-m/github-push-action@master
         with:
