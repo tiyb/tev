@@ -50,40 +50,37 @@ $(document).ready(function() {
 		$('#headerBlogSelect').selectmenu({change: function(event,ui) {
 			var newBlogName = $('#headerBlogSelect').val();
 			
-			$.ajax({
-				url: '/api/metadata/byBlog/' + newBlogName,
-				method: 'GET'
-			}).then(function(currentMD) {
-				$.ajax({
-					url: '/api/metadata/' + currentMD.id + '/markAsDefault',
-					method: 'PUT'
-				}).then(function(innerData) {
-					location.reload();
-				});
-			});
+			var urlParams = new URLSearchParams(window.location.search);
+			urlParams.set("tempBlogName", newBlogName);
+			var newURL = window.location.href.split('?')[0];
+			newURL += '?' + urlParams.toString();
+			window.location.assign(newURL);
 		}});
 		
-		$.ajax({
-			url: '/api/metadata',
-			method: 'GET'
-		}).then(function(allMDs) {
-			var currentlySelectedBlog = "";
-			
-			for(i = 0; i < allMDs.length; i++) {
-				addOptionToSelect(allMDs[i].blog, "headerBlogSelect", allMDs[i].blog);
-				
-				if(allMDs[i].isDefault) {
-					currentlySelectedBlog = allMDs[i].blog;
+		if(window.location.href.includes("/metadata")) {
+			$('#headerBlogSelectContainer').hide();
+		} else {
+			$.ajax({
+				url: '/api/metadata',
+				method: 'GET'
+			}).then(function(allMDs) {
+				for(i = 0; i < allMDs.length; i++) {
+					addOptionToSelect(allMDs[i].blog, "headerBlogSelect", allMDs[i].blog);
+					
+					if(allMDs[i].isDefault) {
+						currentlySelectedBlog = allMDs[i].blog;
+					}
 				}
-			}
-			
-			$('#headerBlogSelect').val(currentlySelectedBlog).selectmenu("refresh");
-			
-			if(allMDs.length < 2) {
-				$('#headerBlogSelect').selectmenu("disable");
-			}
-			
-		});
+				
+				var currentlySelectedBlog = getCurrentBlogName();
+				$('#headerBlogSelect').val(currentlySelectedBlog).selectmenu("refresh");
+				
+				if(allMDs.length < 2) {
+					$('#headerBlogSelect').selectmenu("disable");
+				}
+				
+			});			
+		}
 	});
 	$('#footer').load("/footer");
 	
