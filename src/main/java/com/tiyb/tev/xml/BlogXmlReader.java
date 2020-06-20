@@ -516,7 +516,6 @@ public class BlogXmlReader extends TEVXmlReader {
      *                     from each element should be added
      */
     private static void readPostAttributes(final StartElement startElement, final Post post) {
-        @SuppressWarnings("unchecked")
         final Iterator<Attribute> atts = startElement.getAttributes();
 
         while (atts.hasNext()) {
@@ -968,7 +967,6 @@ public class BlogXmlReader extends TEVXmlReader {
                 } else if (se.getName().getLocalPart().equals(VIDEO_TAG_CAPTION)) {
                     video.setVideoCaption(readCharacters(reader));
                 } else if (se.getName().getLocalPart().equals(VIDEO_TAG_PLAYER)) {
-                    @SuppressWarnings("unchecked")
                     final Iterator<Attribute> atts = se.getAttributes();
                     if (atts.hasNext()) {
                         final Attribute att = atts.next();

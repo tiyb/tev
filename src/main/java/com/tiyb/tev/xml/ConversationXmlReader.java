@@ -190,7 +190,6 @@ public class ConversationXmlReader extends TEVXmlReader {
                     final StartElement se = event.asStartElement();
 
                     if (se.getName().getLocalPart().equals(PARTICIPANT_TAG)) {
-                        @SuppressWarnings("unchecked")
                         final Iterator<Attribute> atts = se.getAttributes();
                         String participantName = StringUtils.EMPTY;
                         String participantURL = StringUtils.EMPTY;
@@ -212,7 +211,6 @@ public class ConversationXmlReader extends TEVXmlReader {
                             returnParticipant.avatarURL = participantURL;
                         }
                     } else if (se.getName().getLocalPart().equals(MESSAGE_TAG)) {
-                        @SuppressWarnings("unchecked")
                         final Iterator<Attribute> atts = se.getAttributes();
 
                         while (atts.hasNext()) {
@@ -495,7 +493,6 @@ public class ConversationXmlReader extends TEVXmlReader {
      */
     private static String readMessageAttributes(final StartElement startElement,
             final ConversationMessage currentMessage, final String tumblrUserID) {
-        @SuppressWarnings("unchecked")
         final Iterator<Attribute> atts = startElement.getAttributes();
         String participantId = StringUtils.EMPTY;
 
@@ -551,7 +548,6 @@ public class ConversationXmlReader extends TEVXmlReader {
                 final StartElement se = event.asStartElement();
 
                 if (se.getName().getLocalPart().equals(PARTICIPANT_TAG)) {
-                    @SuppressWarnings("unchecked")
                     final Iterator<Attribute> atts = se.getAttributes();
                     while (atts.hasNext()) {
                         final Attribute att = atts.next();
