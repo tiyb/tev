@@ -16,8 +16,8 @@ import com.tiyb.tev.exception.ResourceNotFoundException;
 import com.tiyb.tev.repository.PostRepository;
 
 /**
- * Generic class for working with underlying repos for the various post types (Answer, Regular,
- * ...).
+ * Generic class for working with underlying repos for the various post types
+ * (Answer, Regular, ...).
  *
  * @author tiyb
  *
@@ -45,8 +45,9 @@ public class RepoAbstractor<T extends TEVCommonItems<T>> {
     /**
      * Constructor for the object
      *
-     * @param instanceOfTypeRepo an instance of the repo being worked with
+     * @param instanceOfTypeRepo An instance of the repo being worked with
      * @param theTypeName        The name of the type of post being worked with
+     * @param instanceOfPostRepo An instance of the repo being worked with
      */
     public RepoAbstractor(final JpaRepository<T, String> instanceOfTypeRepo, final String theTypeName,
             final PostRepository instanceOfPostRepo) {
@@ -121,8 +122,8 @@ public class RepoAbstractor<T extends TEVCommonItems<T>> {
      * @return Updated item
      */
     public T updateItem(final String postId, final T itemDetails) {
-        final T original =
-                typeRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException(typeName, "id", postId));
+        final T original = typeRepo.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException(typeName, "id", postId));
 
         original.updateItem(itemDetails);
 
@@ -133,8 +134,8 @@ public class RepoAbstractor<T extends TEVCommonItems<T>> {
      * Deletes all T items from the DB for a given blog
      *
      * @param blog Blog for which T items should be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
-     *         details
+     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
+     *         the response details
      */
     public ResponseEntity<?> deleteAllItemsForBlog(final String blog) {
         final List<Post> posts = postRepo.findByTumblelogAndType(blog, typeName);
@@ -156,12 +157,12 @@ public class RepoAbstractor<T extends TEVCommonItems<T>> {
      * Deletes an item from the DB
      *
      * @param itemId ID of item to be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
-     *         details
+     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
+     *         the response details
      */
     public ResponseEntity<?> deleteItem(final String itemId) {
-        final T item =
-                typeRepo.findById(itemId).orElseThrow(() -> new ResourceNotFoundException(typeName, "id", itemId));
+        final T item = typeRepo.findById(itemId)
+                .orElseThrow(() -> new ResourceNotFoundException(typeName, "id", itemId));
 
         typeRepo.delete(item);
 
