@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.tiyb</groupId>
 	<artifactId>tev</artifactId>
-	<version>v10.3.7</version>
+	<version>v11.0.0</version>
 	<name>tev</name>
 	<description>Tumblr Export Viewer</description>
 
@@ -49,6 +49,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>net.sourceforge.htmlunit</groupId>
+			<artifactId>htmlunit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
@@ -82,13 +88,13 @@
 			<artifactId>wro4j-spring-boot-starter</artifactId>
 			<version>0.7.1</version> <!-- 0.5.1 -->
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-model</artifactId>
 			<version>3.3.9</version>
 		</dependency>
-		
+
 	</dependencies>
 
 	<build>
