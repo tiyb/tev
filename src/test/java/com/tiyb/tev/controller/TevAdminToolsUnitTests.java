@@ -2,12 +2,10 @@ package com.tiyb.tev.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -18,11 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.ResourceUtils;
 
-import com.tiyb.tev.datamodel.Metadata;
+import com.tiyb.tev.TevTestingHelpers;
 import com.tiyb.tev.datamodel.Post;
-import com.tiyb.tev.xml.BlogXmlReader;
 
 /**
  * Unit test cases for testing admin functions of the application.
@@ -35,221 +31,214 @@ import com.tiyb.tev.xml.BlogXmlReader;
 @AutoConfigureMockMvc
 public class TevAdminToolsUnitTests {
 
-	@Autowired
-	private TEVMetadataRestController mdRestController;
-	@Autowired
-	private TEVAdminToolsController adminRestController;
-	@Autowired
-	private TEVPostRestController postController;
+    @Autowired
+    private TEVMetadataRestController mdRestController;
+    @Autowired
+    private TEVAdminToolsController adminRestController;
+    @Autowired
+    private TEVPostRestController postController;
 
-	private static final String MAIN_BLOG_NAME = "mainblog";
+    /**
+     * Don't know what the Rule annotation does, but this is a temporary folder
+     * where images can be created and deleted
+     */
+    @Rule
+    public TemporaryFolder tempMDImageFolder = new TemporaryFolder();
 
-	/**
-	 * Don't know what the Rule annotation does, but this is a temporary folder
-	 * where images can be created and deleted
-	 */
-	@Rule
-	public TemporaryFolder tempMDImageFolder = new TemporaryFolder();
+    /**
+     * Temp folder used for importing images
+     */
+    @Rule
+    public TemporaryFolder tempInputImageFolder = new TemporaryFolder();
 
-	/**
-	 * Temp folder used for importing images
-	 */
-	@Rule
-	public TemporaryFolder tempInputImageFolder = new TemporaryFolder();
+    /**
+     * Sets up the posts to a valid state, using the helper function
+     *
+     * @throws FileNotFoundException
+     */
+    @Before
+    public void setupData() throws FileNotFoundException {
+        Optional<String> baseMediaPath = Optional.of(tempMDImageFolder.getRoot().getAbsolutePath());
+        TevTestingHelpers.initDataForMainBlog(mdRestController, postController, baseMediaPath);
+    }
 
-	/**
-	 * Sets up the posts to a valid state, using the <code>test-post-xml.xml</code>
-	 * input file
-	 *
-	 * @throws FileNotFoundException
-	 */
-	@Before
-	public void setupData() throws FileNotFoundException {
-		Metadata md = mdRestController.getMetadataForBlogOrDefault(MAIN_BLOG_NAME);
-		md.setOverwritePostData(true);
-		md.setBlog(MAIN_BLOG_NAME);
-		md.setIsDefault(true);
-		md.setBaseMediaPath(tempMDImageFolder.getRoot().getAbsolutePath());
-		md = mdRestController.updateMetadata(md.getId(), md);
+    /**
+     * Tests that any files not associated with a post are deleted from the folder
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testCleaningExtraImages() throws IOException {
+        tempMDImageFolder.newFile("blah.txt");
 
-		File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-xml.xml");
-		InputStream xmlFile = new FileInputStream(rawXmlFile);
-		BlogXmlReader.parseDocument(xmlFile, postController, MAIN_BLOG_NAME);
-	}
+        adminRestController.cleanImagesOnHDForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
 
-	/**
-	 * Tests that any files not associated with a post are deleted from the folder
-	 *
-	 * @throws IOException
-	 */
-	@Test
-	public void testCleaningExtraImages() throws IOException {
-		tempMDImageFolder.newFile("blah.txt");
+        assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(0);
+    }
 
-		adminRestController.cleanImagesOnHDForBlog(MAIN_BLOG_NAME);
+    /**
+     * Tests that nothing is deleted when the exact number of files is in the folder
+     * as expected
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testCleaningExactNumImages() throws IOException {
+        tempMDImageFolder.newFile("180784644740_0.gif");
+        tempMDImageFolder.newFile("180254465582_0.gif");
+        tempMDImageFolder.newFile("180254465582_1.gif");
 
-		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(0);
-	}
+        adminRestController.cleanImagesOnHDForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
 
-	/**
-	 * Tests that nothing is deleted when the exact number of files is in the folder
-	 * as expected
-	 *
-	 * @throws IOException
-	 */
-	@Test
-	public void testCleaningExactNumImages() throws IOException {
-		tempMDImageFolder.newFile("180784644740_0.gif");
-		tempMDImageFolder.newFile("180254465582_0.gif");
-		tempMDImageFolder.newFile("180254465582_1.gif");
+        assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
+    }
 
-		adminRestController.cleanImagesOnHDForBlog(MAIN_BLOG_NAME);
+    /**
+     * Tests that duplicate images are removed from the folder (the core result of
+     * the feature)
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testCleaningDoubleImages() throws IOException {
+        tempMDImageFolder.newFile("180784644740_0.gif");
+        tempMDImageFolder.newFile("180784644740_1.gif");
+        tempMDImageFolder.newFile("180254465582_0.gif");
+        tempMDImageFolder.newFile("180254465582_1.gif");
+        tempMDImageFolder.newFile("180254465582_2.gif");
+        tempMDImageFolder.newFile("180254465582_3.gif");
 
-		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
-	}
+        adminRestController.cleanImagesOnHDForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
 
-	/**
-	 * Tests that duplicate images are removed from the folder (the core result of
-	 * the feature)
-	 *
-	 * @throws IOException
-	 */
-	@Test
-	public void testCleaningDoubleImages() throws IOException {
-		tempMDImageFolder.newFile("180784644740_0.gif");
-		tempMDImageFolder.newFile("180784644740_1.gif");
-		tempMDImageFolder.newFile("180254465582_0.gif");
-		tempMDImageFolder.newFile("180254465582_1.gif");
-		tempMDImageFolder.newFile("180254465582_2.gif");
-		tempMDImageFolder.newFile("180254465582_3.gif");
+        assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
+    }
 
-		adminRestController.cleanImagesOnHDForBlog(MAIN_BLOG_NAME);
+    /**
+     * Test importing images with non-post-related images
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testImportingExtraImages() throws IOException {
+        tempInputImageFolder.newFile("blah.txt");
 
-		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
-	}
+        adminRestController.importImagesForBlog(TevTestingHelpers.MAIN_BLOG_NAME,
+                tempInputImageFolder.getRoot().getAbsolutePath());
 
-	/**
-	 * Test importing images with non-post-related images
-	 *
-	 * @throws IOException
-	 */
-	@Test
-	public void testImportingExtraImages() throws IOException {
-		tempInputImageFolder.newFile("blah.txt");
+        assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(0);
+    }
 
-		adminRestController.importImagesForBlog(MAIN_BLOG_NAME, tempInputImageFolder.getRoot().getAbsolutePath());
+    /**
+     * Test import where the right number of images exists
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testImportingExactNumImages() throws IOException {
+        tempInputImageFolder.newFile("180784644740_0.gif");
+        tempInputImageFolder.newFile("180254465582_0.gif");
+        tempInputImageFolder.newFile("180254465582_1.gif");
 
-		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(0);
-	}
+        adminRestController.importImagesForBlog(TevTestingHelpers.MAIN_BLOG_NAME,
+                tempInputImageFolder.getRoot().getAbsolutePath());
 
-	/**
-	 * Test import where the right number of images exists
-	 *
-	 * @throws IOException
-	 */
-	@Test
-	public void testImportingExactNumImages() throws IOException {
-		tempInputImageFolder.newFile("180784644740_0.gif");
-		tempInputImageFolder.newFile("180254465582_0.gif");
-		tempInputImageFolder.newFile("180254465582_1.gif");
+        assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
+    }
 
-		adminRestController.importImagesForBlog(MAIN_BLOG_NAME, tempInputImageFolder.getRoot().getAbsolutePath());
+    /**
+     * Test import where the input folder has duplicates
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testImportingDoubleImages() throws IOException {
+        tempInputImageFolder.newFile("180784644740_0.gif");
+        tempInputImageFolder.newFile("180784644740_1.gif");
+        tempInputImageFolder.newFile("180254465582_0.gif");
+        tempInputImageFolder.newFile("180254465582_1.gif");
+        tempInputImageFolder.newFile("180254465582_2.gif");
+        tempInputImageFolder.newFile("180254465582_3.gif");
 
-		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
-	}
+        adminRestController.importImagesForBlog(TevTestingHelpers.MAIN_BLOG_NAME,
+                tempInputImageFolder.getRoot().getAbsolutePath());
 
-	/**
-	 * Test import where the input folder has duplicates
-	 *
-	 * @throws IOException
-	 */
-	@Test
-	public void testImportingDoubleImages() throws IOException {
-		tempInputImageFolder.newFile("180784644740_0.gif");
-		tempInputImageFolder.newFile("180784644740_1.gif");
-		tempInputImageFolder.newFile("180254465582_0.gif");
-		tempInputImageFolder.newFile("180254465582_1.gif");
-		tempInputImageFolder.newFile("180254465582_2.gif");
-		tempInputImageFolder.newFile("180254465582_3.gif");
+        assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
+    }
 
-		adminRestController.importImagesForBlog(MAIN_BLOG_NAME, tempInputImageFolder.getRoot().getAbsolutePath());
+    /**
+     * Test import when there are already images in the destination folder
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testImportingWithExisting() throws IOException {
+        tempMDImageFolder.newFile("180784644740_0.gif");
+        tempMDImageFolder.newFile("180784644740_1.gif");
+        tempInputImageFolder.newFile("180254465582_0.gif");
+        tempInputImageFolder.newFile("180254465582_1.gif");
+        tempInputImageFolder.newFile("180254465582_2.gif");
+        tempInputImageFolder.newFile("180254465582_3.gif");
 
-		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
-	}
+        adminRestController.importImagesForBlog(TevTestingHelpers.MAIN_BLOG_NAME,
+                tempInputImageFolder.getRoot().getAbsolutePath());
 
-	/**
-	 * Test import when there are already images in the destination folder
-	 *
-	 * @throws IOException
-	 */
-	@Test
-	public void testImportingWithExisting() throws IOException {
-		tempMDImageFolder.newFile("180784644740_0.gif");
-		tempMDImageFolder.newFile("180784644740_1.gif");
-		tempInputImageFolder.newFile("180254465582_0.gif");
-		tempInputImageFolder.newFile("180254465582_1.gif");
-		tempInputImageFolder.newFile("180254465582_2.gif");
-		tempInputImageFolder.newFile("180254465582_3.gif");
+        assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
+    }
 
-		adminRestController.importImagesForBlog(MAIN_BLOG_NAME, tempInputImageFolder.getRoot().getAbsolutePath());
+    /**
+     * Tests functionality for marking all posts read
+     */
+    @Test
+    public void testMarkingAllPostsRead() {
+        List<Post> allPosts = postController.getAllPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        assertThat(allPosts).isNotNull();
 
-		assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
-	}
+        for (Post p : allPosts) {
+            p.setIsRead(false);
+            postController.updatePostForBlog(p.getTumblelog(), p.getId(), p);
+        }
 
-	/**
-	 * Tests functionality for marking all posts read
-	 */
-	@Test
-	public void testMarkingAllPostsRead() {
-		List<Post> allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
-		assertThat(allPosts).isNotNull();
+        allPosts = postController.getAllPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        assertThat(allPosts).isNotNull();
+        for (Post p : allPosts) {
+            assertThat(p.getIsRead()).isEqualTo(false);
+        }
 
-		for(Post p : allPosts) {
-			p.setIsRead(false);
-			postController.updatePostForBlog(p.getTumblelog(), p.getId(), p);
-		}
+        adminRestController.markAllPostsReadForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
 
-		allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
-		assertThat(allPosts).isNotNull();
-		for(Post p : allPosts) {
-			assertThat(p.getIsRead()).isEqualTo(false);
-		}
+        allPosts = postController.getAllPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        assertThat(allPosts).isNotNull();
+        for (Post p : allPosts) {
+            assertThat(p.getIsRead()).isEqualTo(true);
+        }
+    }
 
-		adminRestController.markAllPostsReadForBlog(MAIN_BLOG_NAME);
+    /**
+     * Tests functionality for marking all posts unread
+     */
+    @Test
+    public void testMarkingAllPostsUnread() {
+        List<Post> allPosts = postController.getAllPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        assertThat(allPosts).isNotNull();
 
-		allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
-		assertThat(allPosts).isNotNull();
-		for(Post p : allPosts) {
-			assertThat(p.getIsRead()).isEqualTo(true);
-		}
-	}
+        for (Post p : allPosts) {
+            p.setIsRead(true);
+            postController.updatePostForBlog(p.getTumblelog(), p.getId(), p);
+        }
 
-	/**
-	 * Tests functionality for marking all posts unread
-	 */
-	@Test
-	public void testMarkingAllPostsUnread() {
-		List<Post> allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
-		assertThat(allPosts).isNotNull();
+        allPosts = postController.getAllPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        assertThat(allPosts).isNotNull();
+        for (Post p : allPosts) {
+            assertThat(p.getIsRead()).isEqualTo(true);
+        }
 
-		for(Post p : allPosts) {
-			p.setIsRead(true);
-			postController.updatePostForBlog(p.getTumblelog(), p.getId(), p);
-		}
+        adminRestController.markAllPostsUnreadForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
 
-		allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
-		assertThat(allPosts).isNotNull();
-		for(Post p : allPosts) {
-			assertThat(p.getIsRead()).isEqualTo(true);
-		}
-
-		adminRestController.markAllPostsUnreadForBlog(MAIN_BLOG_NAME);
-
-		allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
-		assertThat(allPosts).isNotNull();
-		for(Post p : allPosts) {
-			assertThat(p.getIsRead()).isEqualTo(false);
-		}
-	}
+        allPosts = postController.getAllPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        assertThat(allPosts).isNotNull();
+        for (Post p : allPosts) {
+            assertThat(p.getIsRead()).isEqualTo(false);
+        }
+    }
 
 }

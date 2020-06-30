@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 
+import com.tiyb.tev.TevTestingHelpers;
 import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.controller.TEVPostRestController;
 import com.tiyb.tev.datamodel.Hashtag;
@@ -84,7 +85,7 @@ public class PostXmlMultiBlog {
         md2.setBlog(SECOND_BLOG_NAME);
         md2 = mdController.updateMetadata(md2.getId(), md2);
 
-        File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-xml.xml");
+        File rawXmlFile = ResourceUtils.getFile(TevTestingHelpers.MAIN_INPUT_XML_FILE);
         InputStream xmlFile = new FileInputStream(rawXmlFile);
         BlogXmlReader.parseDocument(xmlFile, postController, MAIN_BLOG_NAME);
 

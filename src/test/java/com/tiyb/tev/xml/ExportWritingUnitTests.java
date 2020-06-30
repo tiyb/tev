@@ -24,6 +24,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 
+import com.tiyb.tev.TevTestingHelpers;
 import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.controller.TEVPostRestController;
 import com.tiyb.tev.datamodel.Metadata;
@@ -64,7 +65,7 @@ public class ExportWritingUnitTests {
 
     @Before
     public void setupData() throws FileNotFoundException {
-        File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-xml.xml");
+        File rawXmlFile = ResourceUtils.getFile(TevTestingHelpers.MAIN_INPUT_XML_FILE);
         InputStream xmlFile = new FileInputStream(rawXmlFile);
 
         Metadata md = mdController.getMetadataForBlogOrDefault(MAIN_BLOG_NAME);

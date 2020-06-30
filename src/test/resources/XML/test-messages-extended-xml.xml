@@ -4,7 +4,7 @@
 		<!-- one message added to conversation -->
 		<conversation status="ACTIVE">
 			<participants>
-				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+				<participant avatar_url="http://mainblog/avatar">mainblog</participant>
 				<participant avatar_url="http://participant1/avatar">participant1</participant>
 			</participants>
 			<messages>
@@ -27,7 +27,7 @@
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://participant2/avatar">participant2-deact</participant>
-				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+				<participant avatar_url="http://mainblog/avatar">mainblog</participant>
 			</participants>
 			<messages>
 				<message ts="1544012468" participant="t:daPIjnWif90ATTPO_iqMVA" type="TEXT">Message 1</message>
@@ -46,7 +46,7 @@
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://participant3/avatar">participant3-deactivated</participant>
-				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+				<participant avatar_url="http://mainblog/avatar">mainblog</participant>
 			</participants>
 			<messages>
 				<message ts="1544012468" participant="t:ZlQLP95n_Bt3CRXhX-CTqQ" type="TEXT">Message 1</message>
@@ -58,7 +58,7 @@
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://participant4/avatar">participant4-deactivated20190101</participant>
-				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+				<participant avatar_url="http://mainblog/avatar">mainblog</participant>
 			</participants>
 			<messages>
 				<message ts="1544012468" participant="OY3QnUHjX3lZs6orBDaI" type="TEXT">Message 1</message>
@@ -67,7 +67,7 @@
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://participant5/avatar">participant5</participant>
-				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+				<participant avatar_url="http://mainblog/avatar">mainblog</participant>
 			</participants>
 			<messages>
 				<message ts="1544012468" participant="nXzOfmy2olCu9bjO0ScS" type="TEXT">Message 1</message>
@@ -78,7 +78,7 @@
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://participantnn/avatar">participant-newname</participant>
-				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+				<participant avatar_url="http://mainblog/avatar">mainblog</participant>
 			</participants>
 			<messages>
 				<message ts="1544012468" participant="foaiehoihafoei" type="TEXT">Message 1</message>
@@ -89,7 +89,7 @@
 		<conversation status="ACTIVE">
 			<participants>
 				<participant avatar_url="http://goingtobedeac/avatar">goingtobedeactivated-deactivated</participant>
-				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+				<participant avatar_url="http://mainblog/avatar">mainblog</participant>
 			</participants>
 			<messages>
 				<message ts="1544012470" participant="afoiehaifeh" type="TEXT">Message 1</message>
@@ -100,7 +100,7 @@
 		<!-- no change -->
 		<conversation status="ACTIVE">
 			<participants>
-				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+				<participant avatar_url="http://mainblog/avatar">mainblog</participant>
 				<participant avatar_url=""/>
 			</participants>
 			<messages>
@@ -111,7 +111,7 @@
 		<!--  no change -->
 		<conversation status="ACTIVE">
 			<participants>
-				<participant avatar_url="http://mainblog/avatar">blogname</participant>
+				<participant avatar_url="http://mainblog/avatar">mainblog</participant>
 				<participant avatar_url="http://duplicatename/avagar">participant1</participant>
 			</participants>
 			<messages>

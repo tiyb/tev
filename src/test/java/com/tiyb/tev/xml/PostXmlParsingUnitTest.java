@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 
+import com.tiyb.tev.TevTestingHelpers;
 import com.tiyb.tev.controller.TEVAdminToolsController;
 import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.controller.TEVPostRestController;
@@ -106,7 +107,7 @@ public class PostXmlParsingUnitTest {
         md = mdController.updateMetadata(md.getId(), md);
         mdController.markBlogAsDefault(md.getId());
 
-        File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-xml.xml");
+        File rawXmlFile = ResourceUtils.getFile(TevTestingHelpers.MAIN_INPUT_XML_FILE);
         InputStream xmlFile = new FileInputStream(rawXmlFile);
         BlogXmlReader.parseDocument(xmlFile, postController, MAIN_BLOG_NAME);
     }
