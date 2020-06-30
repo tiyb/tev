@@ -18,7 +18,8 @@ import com.tiyb.tev.xml.BlogXmlReader;
 import com.tiyb.tev.xml.ConversationXmlReader;
 
 /**
- * Helper methods/constants used in unit tests
+ * Helper methods/constants used in unit tests. Not a best practice -- maybe
+ * even an anti-pattern -- but good enough for unit tests
  * 
  * @author tiyb
  *
@@ -26,6 +27,7 @@ import com.tiyb.tev.xml.ConversationXmlReader;
 public abstract class TevTestingHelpers {
 
     public final static String MAIN_INPUT_XML_FILE = "classpath:XML/test-post-xml.xml";
+    public final static String SECONDARY_INPUT_XML_FILE = "classpath:XML/test-post-secondblog.xml";
     public final static String MAIN_CONVO_XML_FILE = "classpath:XML/test-messages-xml.xml";
 
     public final static String MAIN_BLOG_NAME = "mainblog";
@@ -44,9 +46,21 @@ public abstract class TevTestingHelpers {
             Optional<String> baseMediaPath) throws FileNotFoundException {
         initMainBlogNoData(mdController, baseMediaPath);
 
-        File rawXmlFile = ResourceUtils.getFile(MAIN_INPUT_XML_FILE);
+        readPostXml(MAIN_INPUT_XML_FILE, postController, MAIN_BLOG_NAME);
+    }
+    
+    public static void initDataForSecondaryBlog(TEVMetadataRestController mdController,
+            TEVPostRestController postController, Optional<String> baseMediaPath) throws FileNotFoundException {
+        initAdditionalBlog(mdController, SECOND_BLOG_NAME);
+        
+        readPostXml(SECONDARY_INPUT_XML_FILE, postController, SECOND_BLOG_NAME);
+    }
+    
+    private static void readPostXml(String xmlFileToLoad, TEVPostRestController postController, String blogName)
+            throws FileNotFoundException {
+        File rawXmlFile = ResourceUtils.getFile(xmlFileToLoad);
         InputStream xmlFile = new FileInputStream(rawXmlFile);
-        BlogXmlReader.parseDocument(xmlFile, postController, MAIN_BLOG_NAME);
+        BlogXmlReader.parseDocument(xmlFile, postController, blogName);
     }
     
     public static void initConvoForMainBlog(TEVMetadataRestController mdController, TEVConvoRestController convoController) throws IOException {
@@ -82,6 +96,7 @@ public abstract class TevTestingHelpers {
         Metadata md = mdController.getMetadataForBlogOrDefault(blogName);
         md.setBlog(blogName);
         md.setIsDefault(false);
+        md.setOverwritePostData(true);
         mdController.updateMetadata(md.getId(), md);
     }
 

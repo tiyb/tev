@@ -3,14 +3,13 @@ package com.tiyb.tev.xml;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
@@ -22,12 +21,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.ResourceUtils;
 
 import com.tiyb.tev.TevTestingHelpers;
 import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.controller.TEVPostRestController;
-import com.tiyb.tev.datamodel.Metadata;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -61,20 +58,9 @@ public class ExportWritingUnitTests {
     private static String SINGLEPHOTO_POST_ID = "180784644740";
     private static String MULTIPLEPHOTO_POST_ID = "180254465582";
 
-    private static String MAIN_BLOG_NAME = "mainblog";
-
     @Before
     public void setupData() throws FileNotFoundException {
-        File rawXmlFile = ResourceUtils.getFile(TevTestingHelpers.MAIN_INPUT_XML_FILE);
-        InputStream xmlFile = new FileInputStream(rawXmlFile);
-
-        Metadata md = mdController.getMetadataForBlogOrDefault(MAIN_BLOG_NAME);
-        md.setOverwritePostData(true);
-        md.setIsDefault(true);
-        md.setBlog(MAIN_BLOG_NAME);
-        md = mdController.updateMetadata(md.getId(), md);
-
-        BlogXmlReader.parseDocument(xmlFile, postController, MAIN_BLOG_NAME);
+        TevTestingHelpers.initDataForMainBlog(mdController, postController, Optional.empty());
     }
 
     @Test
@@ -104,8 +90,8 @@ public class ExportWritingUnitTests {
 
     private String getExpectedResponse(Resource resource) throws IOException {
         File expectedResponseFile = resource.getFile();
-        List<String> expectedResponseStrings =
-                Files.readAllLines(expectedResponseFile.toPath(), StandardCharsets.UTF_8);
+        List<String> expectedResponseStrings = Files.readAllLines(expectedResponseFile.toPath(),
+                StandardCharsets.UTF_8);
         String expectedResponseString = String.join(StringUtils.EMPTY, expectedResponseStrings);
 
         return expectedResponseString;
@@ -117,7 +103,8 @@ public class ExportWritingUnitTests {
         List<String> postIDs = new ArrayList<String>();
         postIDs.add(postID);
 
-        String result = BlogXmlWriter.getStagedPostXMLForBlog(postIDs, postController, MAIN_BLOG_NAME);
+        String result = BlogXmlWriter.getStagedPostXMLForBlog(postIDs, postController,
+                TevTestingHelpers.MAIN_BLOG_NAME);
 
         assertThat(result).isEqualToIgnoringWhitespace(expectedAnswer);
     }

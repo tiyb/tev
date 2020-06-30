@@ -2,12 +2,10 @@ package com.tiyb.tev.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,13 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.ResourceUtils;
 
 import com.tiyb.tev.TevTestingHelpers;
 import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.controller.TEVPostRestController;
 import com.tiyb.tev.datamodel.Hashtag;
-import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
 
@@ -46,28 +42,35 @@ public class PostXmlMultiBlog {
     private static final int SECONDBLOG_NUM_POSTS = 1;
     private static final int SECONDBLOG_NUM_REG_POSTS = 1;
 
-    private static final String MAIN_BLOG_NAME = "mainblog";
-    private static final String SECOND_BLOG_NAME = "secondblog";
     private static final String SECONDBLOG_FIRSTPOSID = "180894436690";
 
-    private static final List<Hashtag> BLOG1_INITIAL_HASHTAGS = Arrays.asList(new Hashtag("tag1", 4, MAIN_BLOG_NAME),
-            new Hashtag("tag2", 4, MAIN_BLOG_NAME), new Hashtag("tag3", 1, MAIN_BLOG_NAME),
-            new Hashtag("tag4", 1, MAIN_BLOG_NAME), new Hashtag("tag5", 1, MAIN_BLOG_NAME),
-            new Hashtag("tag6", 1, MAIN_BLOG_NAME), new Hashtag("tag7", 1, MAIN_BLOG_NAME),
-            new Hashtag("tag8", 1, MAIN_BLOG_NAME), new Hashtag("tag9", 1, MAIN_BLOG_NAME),
-            new Hashtag("tag10", 1, MAIN_BLOG_NAME), new Hashtag("tag11", 1, MAIN_BLOG_NAME),
-            new Hashtag("tag12", 1, MAIN_BLOG_NAME), new Hashtag("tag13", 1, MAIN_BLOG_NAME),
-            new Hashtag("tag14", 1, MAIN_BLOG_NAME), new Hashtag("tag15", 1, MAIN_BLOG_NAME));
+    private static final List<Hashtag> BLOG1_INITIAL_HASHTAGS = Arrays.asList(
+            new Hashtag("tag1", 4, TevTestingHelpers.MAIN_BLOG_NAME),
+            new Hashtag("tag2", 4, TevTestingHelpers.MAIN_BLOG_NAME),
+            new Hashtag("tag3", 1, TevTestingHelpers.MAIN_BLOG_NAME),
+            new Hashtag("tag4", 1, TevTestingHelpers.MAIN_BLOG_NAME),
+            new Hashtag("tag5", 1, TevTestingHelpers.MAIN_BLOG_NAME),
+            new Hashtag("tag6", 1, TevTestingHelpers.MAIN_BLOG_NAME),
+            new Hashtag("tag7", 1, TevTestingHelpers.MAIN_BLOG_NAME),
+            new Hashtag("tag8", 1, TevTestingHelpers.MAIN_BLOG_NAME),
+            new Hashtag("tag9", 1, TevTestingHelpers.MAIN_BLOG_NAME),
+            new Hashtag("tag10", 1, TevTestingHelpers.MAIN_BLOG_NAME),
+            new Hashtag("tag11", 1, TevTestingHelpers.MAIN_BLOG_NAME),
+            new Hashtag("tag12", 1, TevTestingHelpers.MAIN_BLOG_NAME),
+            new Hashtag("tag13", 1, TevTestingHelpers.MAIN_BLOG_NAME),
+            new Hashtag("tag14", 1, TevTestingHelpers.MAIN_BLOG_NAME),
+            new Hashtag("tag15", 1, TevTestingHelpers.MAIN_BLOG_NAME));
 
-    private static final List<Hashtag> BLOG2_INITIAL_HASHTAGS =
-            Arrays.asList(new Hashtag("2ndtag1", 1, SECOND_BLOG_NAME), new Hashtag("tag2", 1, SECOND_BLOG_NAME));
+    private static final List<Hashtag> BLOG2_INITIAL_HASHTAGS = Arrays.asList(
+            new Hashtag("2ndtag1", 1, TevTestingHelpers.SECOND_BLOG_NAME),
+            new Hashtag("tag2", 1, TevTestingHelpers.SECOND_BLOG_NAME));
 
     private static final String DUPLICATED_HT = "tag2";
     private static final int DUPLICATED_HT_COUNT = 5;
 
     /**
-     * Called before each unit test to properly reset the data back to an original state of having
-     * loaded the test XML documents.
+     * Called before each unit test to properly reset the data back to an original
+     * state of having loaded the test XML documents.
      *
      * @throws FileNotFoundException
      */
@@ -75,35 +78,21 @@ public class PostXmlMultiBlog {
     public void setupData() throws FileNotFoundException {
         postController.getHashtagController().deleteAllHTs();
 
-        Metadata md1 = mdController.getMetadataForBlogOrDefault(MAIN_BLOG_NAME);
-        md1.setOverwritePostData(true);
-        md1.setBlog(MAIN_BLOG_NAME);
-        md1 = mdController.updateMetadata(md1.getId(), md1);
-        mdController.markBlogAsDefault(md1.getId());
-        Metadata md2 = mdController.getMetadataForBlogOrDefault(SECOND_BLOG_NAME);
-        md2.setOverwritePostData(true);
-        md2.setBlog(SECOND_BLOG_NAME);
-        md2 = mdController.updateMetadata(md2.getId(), md2);
-
-        File rawXmlFile = ResourceUtils.getFile(TevTestingHelpers.MAIN_INPUT_XML_FILE);
-        InputStream xmlFile = new FileInputStream(rawXmlFile);
-        BlogXmlReader.parseDocument(xmlFile, postController, MAIN_BLOG_NAME);
-
-        rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-secondblog.xml");
-        xmlFile = new FileInputStream(rawXmlFile);
-        BlogXmlReader.parseDocument(xmlFile, postController, SECOND_BLOG_NAME);
+        TevTestingHelpers.initDataForMainBlog(mdController, postController, Optional.empty());
+        TevTestingHelpers.initDataForSecondaryBlog(mdController, postController, Optional.empty());
     }
 
     /**
-     * Simple check that all posts have been loaded; details are checked in other unit tests
+     * Simple check that all posts have been loaded; details are checked in other
+     * unit tests
      */
     @Test
     public void testAllPosts() {
-        List<Post> posts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
+        List<Post> posts = postController.getAllPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
         assertThat(posts).isNotNull();
         assertThat(posts.size()).isEqualTo(ORIGINAL_NUM_POSTS);
 
-        posts = postController.getAllPostsForBlog(SECOND_BLOG_NAME);
+        posts = postController.getAllPostsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
         assertThat(posts).isNotNull();
         assertThat(posts.size()).isEqualTo(SECONDBLOG_NUM_POSTS);
 
@@ -114,7 +103,7 @@ public class PostXmlMultiBlog {
      */
     @Test
     public void testLoadedData() {
-        Post post = postController.getPostForBlogById(SECOND_BLOG_NAME, SECONDBLOG_FIRSTPOSID);
+        Post post = postController.getPostForBlogById(TevTestingHelpers.SECOND_BLOG_NAME, SECONDBLOG_FIRSTPOSID);
         assertThat(post).isNotNull();
         assertThat(post.getDate()).isEqualTo("Fri, 07 Dec 2018 11:48:43");
         assertThat(post.getDateGmt()).isEqualTo("2018-12-07 16:48:43 GMT");
@@ -125,16 +114,16 @@ public class PostXmlMultiBlog {
         assertThat(post.getSlug()).isEqualTo("first-post");
         assertThat(post.getState()).isEqualTo("published");
         assertThat(post.getTags()).isEqualTo("2ndtag1, tag2");
-        assertThat(post.getTumblelog()).isEqualTo(SECOND_BLOG_NAME);
+        assertThat(post.getTumblelog()).isEqualTo(TevTestingHelpers.SECOND_BLOG_NAME);
         assertThat(post.getType()).isEqualTo("regular");
         assertThat(post.getUnixtimestamp()).isEqualTo(1544201323L);
         assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180894436690");
         assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180894436690/first-post");
 
-        assertThat(postController.getRegController().getAllRegularsForBlog(SECOND_BLOG_NAME).size())
+        assertThat(postController.getRegController().getAllRegularsForBlog(TevTestingHelpers.SECOND_BLOG_NAME).size())
                 .isEqualTo(SECONDBLOG_NUM_REG_POSTS);
-        Regular regular =
-                postController.getRegController().getRegularForBlogById(SECOND_BLOG_NAME, SECONDBLOG_FIRSTPOSID);
+        Regular regular = postController.getRegController().getRegularForBlogById(TevTestingHelpers.SECOND_BLOG_NAME,
+                SECONDBLOG_FIRSTPOSID);
         assertThat(regular).isNotNull();
         assertThat(regular.getPostId()).isEqualTo(SECONDBLOG_FIRSTPOSID);
         assertThat(regular.getBody()).isEqualTo("This is a post on the second blog");
@@ -143,18 +132,19 @@ public class PostXmlMultiBlog {
     }
 
     /**
-     * Tests that the initial load of posts generated the right number and count of hashtags for
-     * both blogs
+     * Tests that the initial load of posts generated the right number and count of
+     * hashtags for both blogs
      */
     @Test
     public void testHashtags() {
-        List<Hashtag> hashtags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
+        List<Hashtag> hashtags = postController.getHashtagController()
+                .getAllHashtagsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
         assertThat(hashtags).isNotNull();
         assertThat(hashtags.size()).isEqualTo(BLOG1_INITIAL_HASHTAGS.size());
 
         hashtagTestHelper(hashtags, BLOG1_INITIAL_HASHTAGS);
 
-        hashtags = postController.getHashtagController().getAllHashtagsForBlog(SECOND_BLOG_NAME);
+        hashtags = postController.getHashtagController().getAllHashtagsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
         assertThat(hashtags).isNotNull();
         assertThat(hashtags.size()).isEqualTo(BLOG2_INITIAL_HASHTAGS.size());
 
@@ -162,8 +152,9 @@ public class PostXmlMultiBlog {
     }
 
     /**
-     * Tests that hashtags are properly combined across both blogs. There is one hashtag that exists
-     * in both blogs, so that count for that tag should be the combined value of both.
+     * Tests that hashtags are properly combined across both blogs. There is one
+     * hashtag that exists in both blogs, so that count for that tag should be the
+     * combined value of both.
      */
     @Test
     public void testCombinedHashtags() {
@@ -171,15 +162,16 @@ public class PostXmlMultiBlog {
         assertThat(allHT).isNotNull();
         assertThat(allHT.size()).isEqualTo(BLOG1_INITIAL_HASHTAGS.size() + BLOG2_INITIAL_HASHTAGS.size() - 1);
 
-        for(Hashtag h : allHT) {
-            if(DUPLICATED_HT.equals(h.getTag())) {
+        for (Hashtag h : allHT) {
+            if (DUPLICATED_HT.equals(h.getTag())) {
                 assertThat(h.getCount()).isEqualTo(DUPLICATED_HT_COUNT);
             }
         }
     }
 
     /**
-     * Helper function for testing that the tags coming from the API equal the <i>expected</i> tags
+     * Helper function for testing that the tags coming from the API equal the
+     * <i>expected</i> tags
      *
      * @param tagsFromAPI The tags returned from the Post API
      * @param masterList  The set of expected tags
@@ -204,14 +196,15 @@ public class PostXmlMultiBlog {
      */
     @Test
     public void testAddHashtag() {
-        postController.getHashtagController().createHashtagForBlog(SECOND_BLOG_NAME, "tag16");
+        postController.getHashtagController().createHashtagForBlog(TevTestingHelpers.SECOND_BLOG_NAME, "tag16");
 
-        List<Hashtag> tags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
+        List<Hashtag> tags = postController.getHashtagController()
+                .getAllHashtagsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
 
         assertThat(tags).isNotNull();
         assertThat(tags.size()).isEqualTo(BLOG1_INITIAL_HASHTAGS.size());
 
-        tags = postController.getHashtagController().getAllHashtagsForBlog(SECOND_BLOG_NAME);
+        tags = postController.getHashtagController().getAllHashtagsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
         assertThat(tags).isNotNull();
         assertThat(tags.size()).isEqualTo(BLOG2_INITIAL_HASHTAGS.size() + 1);
     }
