@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,6 +38,11 @@ public class StagedHtmlTests {
         webClient.addRequestHeader("Accept-Language", "en");
 
         HtmlTestingHelpers.restInitDataForMainBlog(restTemplate, serverPort, Optional.empty());
+    }
+
+    @After
+    public void close() {
+        webClient.close();
     }
 
     @Test

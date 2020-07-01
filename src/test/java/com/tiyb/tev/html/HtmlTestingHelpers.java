@@ -17,7 +17,7 @@ public abstract class HtmlTestingHelpers {
 
     public static void restInitDataForMainBlog(TestRestTemplate restTemplate, int serverPort,
             Optional<String> baseMediaPath) {
-        restInitMainBlogNoData(restTemplate, serverPort, baseMediaPath);
+        restInitMainBlogSettings(restTemplate, serverPort, baseMediaPath);
 
         restTemplate.delete(baseUri(serverPort) + "/api/posts/" + TevTestingHelpers.MAIN_BLOG_NAME + "/regulars");
         restTemplate.delete(baseUri(serverPort) + "/api/posts/" + TevTestingHelpers.MAIN_BLOG_NAME + "/answers");
@@ -59,7 +59,7 @@ public abstract class HtmlTestingHelpers {
         }
     }
 
-    public static void restInitMainBlogNoData(TestRestTemplate restTemplate, int serverPort,
+    public static void restInitMainBlogSettings(TestRestTemplate restTemplate, int serverPort,
             Optional<String> baseMediaPath) {
         Metadata md = restTemplate.getForObject(
                 baseUri(serverPort) + "/api/metadata/byBlog/" + TevTestingHelpers.MAIN_BLOG_NAME + "/orDefault",
@@ -68,6 +68,17 @@ public abstract class HtmlTestingHelpers {
         md.setOverwriteConvoData(true);
         md.setMainTumblrUser(TevTestingHelpers.MAIN_BLOG_NAME);
         md.setIsDefault(true);
+        md.setConversationDisplayStyle("table");
+        md.setConversationSortColumn("numMessages");
+        md.setConversationSortOrder("Descending");
+        md.setFavFilter("Show Everything");
+        md.setFilter("Do Not Filter");
+        md.setPageLength(10);
+        md.setShowHashtagsForAllBlogs(true);
+        md.setShowReadingPane(false);
+        md.setSortColumn("ID");
+        md.setSortOrder("Descending");
+        md.setTheme("base");
         if (baseMediaPath.isPresent()) {
             md.setBaseMediaPath(baseMediaPath.get());
         }
