@@ -39,6 +39,26 @@ public class Answer implements Serializable, TEVCommonItems<Answer> {
     @Column(name = "answer", length = Post.LONG_FIELD_SIZE)
     private String answer;
 
+    /**
+     * Pre-loading constructor
+     * 
+     * @param postId   ID of parent post
+     * @param question Question
+     * @param answer   Answer
+     */
+    public Answer(final String postId, final String question, final String answer) {
+        this.postId = postId;
+        this.question = question;
+        this.answer = answer;
+    }
+
+    /**
+     * Empty/default constructor
+     */
+    public Answer() {
+
+    }
+
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
@@ -62,8 +82,8 @@ public class Answer implements Serializable, TEVCommonItems<Answer> {
     }
 
     /**
-     * Helper method used for updating the fields in an Answer with fields from another Answer
-     * object. Ignores ID field.
+     * Helper method used for updating the fields in an Answer with fields from
+     * another Answer object. Ignores ID field.
      *
      * @param newDataObject Object from which to copy the fields
      */

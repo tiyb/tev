@@ -3,13 +3,11 @@ package com.tiyb.tev.xml;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
@@ -23,19 +21,21 @@ import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.tiyb.tev.TevTestingHelpers;
-import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.controller.TEVPostRestController;
+import com.tiyb.tev.datamodel.Answer;
+import com.tiyb.tev.datamodel.Link;
+import com.tiyb.tev.datamodel.Photo;
+import com.tiyb.tev.datamodel.Post;
+import com.tiyb.tev.datamodel.Regular;
+import com.tiyb.tev.datamodel.Video;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ExportWritingUnitTests {
+public class ExportWritingManuallyLoadedUnitTests {
 
     @Autowired
-    private TEVPostRestController postController;
-
-    @Autowired
-    private TEVMetadataRestController mdController;
+    TEVPostRestController postController;
 
     @Value("classpath:XML/outputs/response-xml-answer.xml")
     Resource answerXML;
@@ -59,8 +59,42 @@ public class ExportWritingUnitTests {
     private static String MULTIPLEPHOTO_POST_ID = "180254465582";
 
     @Before
-    public void setupData() throws FileNotFoundException {
-        TevTestingHelpers.initDataForMainBlog(mdController, postController, Optional.empty());
+    public void setupData() {
+        postController.getRegController().deleteAllRegularsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        postController.getAnswerController().deleteAllAnswersForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        postController.getLinkController().deleteAllLinksForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        postController.getPhotoController().deleteAllPhotosForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        postController.getVideoController().deleteAllVideosForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        postController.getHashtagController().deleteAllHashtagsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        postController.deleteAllPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+
+        for (Post post : TevTestingHelpers.postsForUploading) {
+            postController.createPostForBlog(TevTestingHelpers.MAIN_BLOG_NAME, post);
+        }
+
+        for (Regular reg : TevTestingHelpers.regularsForUploading) {
+            postController.getRegController().createRegularForBlog(TevTestingHelpers.MAIN_BLOG_NAME, reg.getPostId(),
+                    reg);
+        }
+
+        for (Answer answer : TevTestingHelpers.answersForUploading) {
+            postController.getAnswerController().createAnswerForBlog(TevTestingHelpers.MAIN_BLOG_NAME,
+                    answer.getPostId(), answer);
+        }
+
+        for (Link link : TevTestingHelpers.linksForUploading) {
+            postController.getLinkController().createLinkForBlog(TevTestingHelpers.MAIN_BLOG_NAME, link.getPostId(),
+                    link);
+        }
+
+        for (Photo photo : TevTestingHelpers.photosForUploading) {
+            postController.getPhotoController().createPhotoForBlog(TevTestingHelpers.MAIN_BLOG_NAME, photo);
+        }
+
+        for (Video vid : TevTestingHelpers.videosForUploading) {
+            postController.getVideoController().createVideoForBlog(TevTestingHelpers.MAIN_BLOG_NAME, vid.getPostId(),
+                    vid);
+        }
     }
 
     @Test
@@ -87,7 +121,7 @@ public class ExportWritingUnitTests {
     public void testExportOfPhotoMultiple() throws IOException {
         testSinglePostResponse(this.multiplePhotoXML, MULTIPLEPHOTO_POST_ID);
     }
-    
+
     private String getExpectedResponse(Resource resource) throws IOException {
         File expectedResponseFile = resource.getFile();
         List<String> expectedResponseStrings = Files.readAllLines(expectedResponseFile.toPath(),
