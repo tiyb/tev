@@ -103,6 +103,19 @@ public abstract class HtmlTestingHelpers {
         md.setBlog(blogName);
         md.setIsDefault(false);
         md.setOverwritePostData(true);
+        md.setOverwriteConvoData(true);
+        md.setMainTumblrUser(blogName);
+        md.setConversationDisplayStyle("table");
+        md.setConversationSortColumn("numMessages");
+        md.setConversationSortOrder("Descending");
+        md.setFavFilter("Show Everything");
+        md.setFilter("Do Not Filter");
+        md.setPageLength(10);
+        md.setShowHashtagsForAllBlogs(true);
+        md.setShowReadingPane(false);
+        md.setSortColumn("ID");
+        md.setSortOrder("Descending");
+        md.setTheme("base");
 
         restTemplate.put(baseUri(serverPort) + "/api/metadata/" + md.getId(), md);
     }
