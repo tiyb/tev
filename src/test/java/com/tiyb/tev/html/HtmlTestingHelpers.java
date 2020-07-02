@@ -58,6 +58,17 @@ public abstract class HtmlTestingHelpers {
                     + vid.getPostId() + "/video", vid, Video.class);
         }
     }
+    
+    public static Metadata getMDFromServer(TestRestTemplate restTemplate, int serverPort, Optional<String> blogName) {
+        String blogForWhichToFetchMD;
+        if(blogName.isPresent()) {
+            blogForWhichToFetchMD = blogName.get();
+        } else {
+            blogForWhichToFetchMD = TevTestingHelpers.MAIN_BLOG_NAME;
+        }
+        
+        return restTemplate.getForObject(baseUri(serverPort) + "/api/metadata/byBlog/" + blogForWhichToFetchMD, Metadata.class);
+    }
 
     public static void restInitMainBlogSettings(TestRestTemplate restTemplate, int serverPort,
             Optional<String> baseMediaPath) {
