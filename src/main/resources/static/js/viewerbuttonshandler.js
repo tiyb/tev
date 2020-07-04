@@ -12,7 +12,7 @@ $(document).ready(function() {
 		dataSrc: "",
 		type: "GET"
 	}).then(function(postData) {
-		if(postData.isFavourite) {
+		if(postData.isFavourite == true) {
 			$("#favouriteButton").text($.i18n.prop("viewer_buttons_unfavourite"));
 		} else {
 			$("#favouriteButton").text($.i18n.prop("viewer_buttons_favourite"));

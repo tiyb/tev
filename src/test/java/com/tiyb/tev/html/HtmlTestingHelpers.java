@@ -4,8 +4,15 @@ import java.util.Optional;
 
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
+import com.gargoylesoftware.htmlunit.ImmediateRefreshHandler;
+import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.javascript.SilentJavaScriptErrorListener;
+import com.tiyb.tev.FullConversation;
 import com.tiyb.tev.TevTestingHelpers;
 import com.tiyb.tev.datamodel.Answer;
+import com.tiyb.tev.datamodel.Conversation;
+import com.tiyb.tev.datamodel.ConversationMessage;
 import com.tiyb.tev.datamodel.Link;
 import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.Photo;
@@ -14,6 +21,26 @@ import com.tiyb.tev.datamodel.Regular;
 import com.tiyb.tev.datamodel.Video;
 
 public abstract class HtmlTestingHelpers {
+
+    public static void restInitConvosForMainBlog(TestRestTemplate restTemplate, int serverPort) {
+        restTemplate
+                .delete(baseUri(serverPort) + "/api/conversations/" + TevTestingHelpers.MAIN_BLOG_NAME + "/messages");
+        restTemplate.delete(baseUri(serverPort) + "/api/conversations/" + TevTestingHelpers.MAIN_BLOG_NAME);
+
+        for (FullConversation fc : TevTestingHelpers.conversationsToUpload) {
+
+            Conversation convoOnServer = restTemplate.postForObject(
+                    baseUri(serverPort) + "/api/conversations/" + fc.getConversation().getBlog(), fc.getConversation(),
+                    Conversation.class);
+
+            for (ConversationMessage message : fc.getMessages()) {
+                message.setConversationId(convoOnServer.getId());
+                restTemplate.postForObject(
+                        baseUri(serverPort) + "/api/conversations/" + convoOnServer.getBlog() + "/messages", message,
+                        ConversationMessage.class);
+            }
+        }
+    }
 
     public static void restInitDataForMainBlog(TestRestTemplate restTemplate, int serverPort,
             Optional<String> baseMediaPath) {
@@ -58,16 +85,17 @@ public abstract class HtmlTestingHelpers {
                     + vid.getPostId() + "/video", vid, Video.class);
         }
     }
-    
+
     public static Metadata getMDFromServer(TestRestTemplate restTemplate, int serverPort, Optional<String> blogName) {
         String blogForWhichToFetchMD;
-        if(blogName.isPresent()) {
+        if (blogName.isPresent()) {
             blogForWhichToFetchMD = blogName.get();
         } else {
             blogForWhichToFetchMD = TevTestingHelpers.MAIN_BLOG_NAME;
         }
-        
-        return restTemplate.getForObject(baseUri(serverPort) + "/api/metadata/byBlog/" + blogForWhichToFetchMD, Metadata.class);
+
+        return restTemplate.getForObject(baseUri(serverPort) + "/api/metadata/byBlog/" + blogForWhichToFetchMD,
+                Metadata.class);
     }
 
     public static void restInitMainBlogSettings(TestRestTemplate restTemplate, int serverPort,
@@ -123,4 +151,22 @@ public abstract class HtmlTestingHelpers {
     public static String baseUri(int serverPort) {
         return "http://localhost:" + serverPort;
     }
+
+    public static WebClient getNewWebClient() {
+        WebClient webClient = new WebClient();
+        webClient.getOptions().setThrowExceptionOnScriptError(false);
+        webClient.getOptions().setPopupBlockerEnabled(false);
+        webClient.getOptions().setRedirectEnabled(true);
+        webClient.getCache().setMaxSize(0);
+        webClient.getOptions().setCssEnabled(true);
+        webClient.getOptions().setJavaScriptEnabled(true);
+        webClient.setCssErrorHandler(new SilentCssErrorHandler());
+        webClient.setJavaScriptErrorListener(new SilentJavaScriptErrorListener());
+        webClient.setIncorrectnessListener(new SilentHtmlIncorrectnessListener());
+        webClient.setRefreshHandler(new ImmediateRefreshHandler());
+        webClient.addRequestHeader("Accept-Language", "en");
+
+        return webClient;
+    }
+
 }

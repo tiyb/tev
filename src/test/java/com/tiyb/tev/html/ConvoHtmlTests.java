@@ -33,12 +33,10 @@ public class ConvoHtmlTests {
 
     @Before
     public void setupSite() {
-        webClient = new WebClient();
-        webClient.getOptions().setThrowExceptionOnScriptError(false);
-        webClient.addRequestHeader("Accept-Language", "en");
+        webClient = HtmlTestingHelpers.getNewWebClient();
 
         HtmlTestingHelpers.restInitDataForMainBlog(restTemplate, serverPort, Optional.empty());
-        // TODO upload convos to server
+        HtmlTestingHelpers.restInitConvosForMainBlog(restTemplate, serverPort);
     }
 
     @After
@@ -47,27 +45,22 @@ public class ConvoHtmlTests {
     }
 
     @Test
-    public void showReadingPane() {
+    public void showReadingPaneOrPopup() {
         assertThat(true).isEqualTo(false);
     }
 
     @Test
-    public void showPopups() {
-        assertThat(true).isEqualTo(false);
-    }
-
-    @Test
-    public void showWordCloud() {
-        assertThat(true).isEqualTo(false);
-    }
-
-    @Test
-    public void showTable() {
+    public void showWordCloudOrTable() {
         assertThat(true).isEqualTo(false);
     }
 
     @Test
     public void openConvo() {
+        assertThat(true).isEqualTo(false);
+    }
+    
+    @Test
+    public void hideConvo() {
         assertThat(true).isEqualTo(false);
     }
 

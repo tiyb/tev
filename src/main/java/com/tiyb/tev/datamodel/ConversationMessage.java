@@ -11,7 +11,8 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 /**
- * Entity containing a message from a conversation, from Tumblr's messaging system.
+ * Entity containing a message from a conversation, from Tumblr's messaging
+ * system.
  *
  * @author tiyb
  */
@@ -56,7 +57,30 @@ public class ConversationMessage implements Serializable {
     private String message;
 
     /**
-     * Helper method for updating all fields with new data; ID and Conversation ID are ignored
+     * Pre-load constructor
+     * 
+     * @param timestamp Timestamp of message
+     * @param received  Whether the message was received (true) or sent (false)
+     * @param type      Type of message (TEXT, IMAGE, or POSTREF)
+     * @param message   The body of the message
+     */
+    public ConversationMessage(final Long timestamp, final Boolean received, final String type, final String message) {
+        this.timestamp = timestamp;
+        this.received = received;
+        this.type = type;
+        this.message = message;
+    }
+
+    /**
+     * Default/empty constructor
+     */
+    public ConversationMessage() {
+
+    }
+
+    /**
+     * Helper method for updating all fields with new data; ID and Conversation ID
+     * are ignored
      *
      * @param newData The data to be copied into this object
      */

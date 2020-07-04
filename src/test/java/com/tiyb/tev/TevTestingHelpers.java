@@ -15,6 +15,8 @@ import com.tiyb.tev.controller.TEVConvoRestController;
 import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.controller.TEVPostRestController;
 import com.tiyb.tev.datamodel.Answer;
+import com.tiyb.tev.datamodel.Conversation;
+import com.tiyb.tev.datamodel.ConversationMessage;
 import com.tiyb.tev.datamodel.Link;
 import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.Photo;
@@ -276,6 +278,157 @@ public abstract class TevTestingHelpers {
             "https://someblog.tumblr.com/", // url
             "This is the link description" // description
     ));
+
+    public final static List<FullConversation> conversationsToUpload = List
+            .of(new FullConversation(new Conversation("participant1", // participant
+                    "http://participant1/avatar", // participant avatar
+                    "t:eMUq2ec6xRwaki33S-DLig", // participant ID
+                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    9 // num messages
+            ), List.of(new ConversationMessage(1544197586L, // TS
+                    false, // received
+                    "TEXT", // type
+                    "Message 1" // message
+            ), new ConversationMessage(1544197605L, // TS
+                    false, // received
+                    "TEXT", // type
+                    "Message 2" // message
+            ), new ConversationMessage(1544197624L, // TS
+                    false, // received
+                    "TEXT", // type
+                    "Message 3" // message
+            ), new ConversationMessage(1544197647L, // TS
+                    false, // received
+                    "IMAGE", // type
+                    "http://www.photourl.com/photo.png" // message
+            ), new ConversationMessage(1544198315L, // TS
+                    false, // received
+                    "TEXT", // type
+                    "Message 5" // message
+            ), new ConversationMessage(1544221130L, // TS
+                    true, // received
+                    "TEXT", // type
+                    "Message 6" // message
+            ), new ConversationMessage(1544221197L, // TS
+                    false, // received
+                    "TEXT", // type
+                    "Message 7" // message
+            ), new ConversationMessage(1544221203L, // TS
+                    true, // received
+                    "TEXT", // type
+                    "Message 8" // message
+            ), new ConversationMessage(1544221221L, // TS
+                    false, // received
+                    "POSTREF", // type
+                    "http://www.tumblr.com/somepost" // message
+            ))), new FullConversation(new Conversation("participant2", // participant
+                    "http://participant2/avatar", // participant avatar
+                    "t:daPIjnWif90ATTPO_iqMVA", // participant ID
+                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    9 // num messages
+            ), List.of(new ConversationMessage(1544012468L, // TS
+                    true, // received
+                    "TEXT", // type
+                    "Message 1" // message
+            ), new ConversationMessage(1544016206L, // TS
+                    false, // received
+                    "TEXT", // type
+                    "Message 2" // message
+            ), new ConversationMessage(1544016402L, // TS
+                    true, // received
+                    "TEXT", // type
+                    "Message 3" // message
+            ), new ConversationMessage(1544016410L, // TS
+                    true, // received
+                    "TEXT", // type
+                    "Message 4" // message
+            ), new ConversationMessage(1544016579L, // TS
+                    true, // received
+                    "TEXT", // type
+                    "Message 5" // message
+            ), new ConversationMessage(1544016582L, // TS
+                    true, // received
+                    "TEXT", // type
+                    "Message 6" // message
+            ), new ConversationMessage(1544022051L, // TS
+                    false, // received
+                    "TEXT", // type
+                    "Message 7" // message
+            ), new ConversationMessage(1544115936L, // TS
+                    true, // received
+                    "TEXT", // type
+                    "Message 8" // message
+            ), new ConversationMessage(1544126671L, // TS
+                    false, // received
+                    "TEXT", // type
+                    "Message 9" // message
+            ))), new FullConversation(new Conversation("participant3", // participant
+                    "http://participant3/avatar", // participant avatar
+                    "", // participant ID
+                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    1 // num messages
+            ), List.of(new ConversationMessage(1544012468L, // TS
+                    false, // received
+                    "TEXT", // type
+                    "Message 1" // message
+            ))), new FullConversation(new Conversation("participant4", // participant
+                    "http://participant4/avatar", // participant avatar
+                    "OY3QnUHjX3lZs6orBDaI", // participant ID
+                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    1 // num messages
+            ), List.of(new ConversationMessage(1544012468L, // TS
+                    true, // received
+                    "TEXT", // type
+                    "Message 1" // message
+            ))), new FullConversation(new Conversation("participant-oldname", // participant
+                    "http://participanton/avatar", // participant avatar
+                    "foaiehoihafoei", // participant ID
+                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    1 // num messages
+            ), List.of(new ConversationMessage(1544012468L, // TS
+                    true, // received
+                    "TEXT", // type
+                    "Message 1" // message
+            ))), new FullConversation(new Conversation("goingtobedeactivated", // participant
+                    "http://goingtobedeac/avatar", // participant avatar
+                    "afoiehaifeh", // participant ID
+                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    2 // num messages
+            ), List.of(new ConversationMessage(1544012470L, // TS
+                    true, // received
+                    "TEXT", // type
+                    "Message 1" // message
+            ), new ConversationMessage(1544012485L, // TS
+                    false, // received
+                    "TEXT", // type
+                    "Message 2" // message
+            ))), new FullConversation(new Conversation("NO NAME", // participant
+                    "", // participant avatar
+                    "foae8yofeiu", // participant ID
+                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    1 // num messages
+            ), List.of(new ConversationMessage(1544012485L, // TS
+                    true, // received
+                    "TEXT", // type
+                    "Message 1" // message
+            ))), new FullConversation(new Conversation("participant1 1", // participant
+                    "http://duplicatename/avatar", // participant avatar
+                    "lihkg", // participant ID
+                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    1 // num messages
+            ), List.of(new ConversationMessage(1544012485L, // TS
+                    true, // received
+                    "TEXT", // type
+                    "Message 1" // message
+            ))));
+
+//    public final static List<FullConversation> conversationsToUpload = List
+//            .of(new FullConversation(new Conversation("participant1", // participant
+//                    "http://participant1/avatar", // participant avatar
+//                    "t:eMUq2ec6xRwaki33S-DLig", // participant ID
+//                    TevTestingHelpers.MAIN_BLOG_NAME // blog
+//            ), List.of(new ConversationMessage())),
+//                    new FullConversation(new Conversation(), List.Of(new ConversationMessage())));
 
     /**
      * Initializes the blog with data from the sample XML file
