@@ -1,5 +1,6 @@
 package com.tiyb.tev.html;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -7,6 +8,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import com.gargoylesoftware.htmlunit.ImmediateRefreshHandler;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.WebWindow;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.SilentJavaScriptErrorListener;
 import com.tiyb.tev.FullConversation;
 import com.tiyb.tev.TevTestingHelpers;
@@ -21,7 +24,7 @@ import com.tiyb.tev.datamodel.Regular;
 import com.tiyb.tev.datamodel.Video;
 
 public abstract class HtmlTestingHelpers {
-
+    
     public static void restInitConvosForMainBlog(TestRestTemplate restTemplate, int serverPort) {
         restTemplate
                 .delete(baseUri(serverPort) + "/api/conversations/" + TevTestingHelpers.MAIN_BLOG_NAME + "/messages");
@@ -97,6 +100,10 @@ public abstract class HtmlTestingHelpers {
         return restTemplate.getForObject(baseUri(serverPort) + "/api/metadata/byBlog/" + blogForWhichToFetchMD,
                 Metadata.class);
     }
+    
+    public static void updateMD(TestRestTemplate restTemplate, int serverPort, Metadata md) {
+        restTemplate.put(baseUri(serverPort) + "/api/metadata/" + md.getId(), md);
+    }
 
     public static void restInitMainBlogSettings(TestRestTemplate restTemplate, int serverPort,
             Optional<String> baseMediaPath) {
@@ -168,5 +175,18 @@ public abstract class HtmlTestingHelpers {
 
         return webClient;
     }
-
+    
+    public static int getNumRealWindows(List<WebWindow> allWindows) {
+        int i = 0;
+        
+        for(WebWindow ww : allWindows) {
+            HtmlPage p = (HtmlPage)ww.getEnclosedPage();
+            String theURL = p.getUrl().toString();
+            if(theURL.contains("localhost")) {
+                i++;
+            }
+        }
+        
+        return i;
+    }
 }
