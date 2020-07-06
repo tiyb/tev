@@ -2,70 +2,87 @@ package com.tiyb.tev.html;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.List;
 import java.util.Optional;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.html.FrameWindow;
+import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
+import com.gargoylesoftware.htmlunit.html.HtmlTable;
+import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
+import com.tiyb.tev.TevTestingHelpers;
+import com.tiyb.tev.datamodel.Metadata;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-public class ConvoHtmlTests {
+public class ConvoHtmlTests extends HtmlTestingClass {
 
-    @LocalServerPort
-    private int serverPort;
+    private static final String CONVERSATION_TABLE_ID = "conversationTable";
+    private static final int FIRST_TABLE_ROW = 2;
+    private static final int COLUMN_PARTICIPANT = 0;
+    private static final int COLUMN_NUMMESSAGES = 1;
 
-    private WebClient webClient;
-
-    @Autowired
-    private TestRestTemplate restTemplate;
+    HtmlTable convoTable;
 
     @Before
-    public void setupSite() {
-        webClient = HtmlTestingHelpers.getNewWebClient();
-
-        HtmlTestingHelpers.restInitDataForMainBlog(restTemplate, serverPort, Optional.empty());
-        HtmlTestingHelpers.restInitConvosForMainBlog(restTemplate, serverPort);
-    }
-
-    @After
-    public void close() {
-        webClient.close();
+    public void setupSite() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
+        restInitDataForMainBlog(Optional.empty());
+        restInitConvosForMainBlog();
+        
+        mainPage = webClient.getPage(baseUri() + "/conversations");
+        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        convoTable = mainPage.getHtmlElementById(CONVERSATION_TABLE_ID);
     }
 
     @Test
-    public void showReadingPaneOrPopup() {
-        assertThat(true).isEqualTo(false);
+    public void toggleViewingButtons() throws IOException {
+        // check initial state of reading pane radio, then select it
+        HtmlRadioButtonInput showReadingPaneBtn = mainPage.getHtmlElementById("showReadingPaneSelected");
+        assertThat(showReadingPaneBtn.isChecked()).isFalse();
+        HtmlRadioButtonInput showPopups = mainPage.getHtmlElementById("showPopupsSelected");
+        assertThat(showPopups.isChecked()).isTrue();
+        HtmlTableCell readingPaneCell = mainPage.getHtmlElementById("contentDisplayReadingPane");
+        assertThat(readingPaneCell.isDisplayed()).isFalse();
+
+        showReadingPaneBtn.click();
+        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        Metadata md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
+        assertThat(md.getShowReadingPane()).isTrue();
+        convoTable = mainPage.getHtmlElementById(CONVERSATION_TABLE_ID);
+        convoTable.getCellAt(FIRST_TABLE_ROW, COLUMN_PARTICIPANT).getFirstElementChild().click();
+        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        assertThat(readingPaneCell.isDisplayed()).isTrue();
+        assertThat(getNumRealWindows(webClient.getWebWindows())).isEqualTo(1);
+        List<FrameWindow> frames = mainPage.getFrames();
+        String contents = frames.get(0).getEnclosedPage().getWebResponse().getContentAsString();
+        assertThat(contents).contains("<title>participant1</title>");
+        assertThat(contents).contains("<span class=\"messageBodySpan\">Message 1</span>");
+
+        showPopups.click();
+        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        assertThat(readingPaneCell.isDisplayed()).isFalse();
+        convoTable.getCellAt(FIRST_TABLE_ROW, COLUMN_PARTICIPANT).getFirstElementChild().click();
+        assertThat(readingPaneCell.isDisplayed()).isFalse();
+        assertThat(getNumRealWindows(webClient.getWebWindows())).isEqualTo(2);
     }
 
-    @Test
-    public void showWordCloudOrTable() {
-        assertThat(true).isEqualTo(false);
-    }
-
-    @Test
-    public void openConvo() {
-        assertThat(true).isEqualTo(false);
-    }
-    
-    @Test
-    public void hideConvo() {
-        assertThat(true).isEqualTo(false);
-    }
-
-    @Test
-    public void unhideAllConvos() {
-        assertThat(true).isEqualTo(false);
-    }
+//    @Test
+//    public void openConvo() {
+//        assertThat(true).isEqualTo(false);
+//    }
+//    
+//    @Test
+//    public void hideConvo() {
+//        // TODO hide/unhide convo button
+//        // TODO hide convo and refresh button
+//        assertThat(true).isEqualTo(false);
+//    }
+//
+//    @Test
+//    public void unhideAllConvos() {
+//        assertThat(true).isEqualTo(false);
+//    }
 }
