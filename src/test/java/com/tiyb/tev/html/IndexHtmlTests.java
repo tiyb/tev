@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.WebWindow;
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.FrameWindow;
@@ -23,8 +24,10 @@ import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlHeading1;
+import com.gargoylesoftware.htmlunit.html.HtmlOption;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
+import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlSpan;
 import com.gargoylesoftware.htmlunit.html.HtmlTable;
 import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
@@ -87,7 +90,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         restInitAdditionalBlog(TevTestingHelpers.SECOND_BLOG_NAME);
 
         mainPage = webClient.getPage(baseUri());
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
 
         postTable = mainPage.getHtmlElementById("postTable");
     }
@@ -135,9 +138,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
     @Test
     public void openPost() throws IOException {
         // click element in table on main page, and get the resultant popup page
-        HtmlPage newPage = postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_ID).getFirstElementChild().click();
-        assertThat(getNumRealWindows(webClient.getWebWindows())).isEqualTo(2);
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        HtmlPage newPage = openPopup();
 
         // verify that the text on the page matches that of the post that was clicked
         DomNodeList<DomNode> h1Fields = newPage.querySelectorAll("h1");
@@ -154,35 +155,40 @@ public class IndexHtmlTests extends HtmlTestingClass {
         HtmlButton favButton = newPage.querySelector("button#favouriteButton");
         assertThat(favButton).isNotNull();
         assertThat(favButton.getVisibleText()).isEqualTo(markFavBtnText);
+
         Post post = restTemplate.getForObject(
-                baseUri() + "/api/posts/" + TevTestingHelpers.MAIN_BLOG_NAME + "/" + FIRST_POST_ID, Post.class);
+                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
+                Post.class);
         assertThat(post.getIsFavourite()).isFalse();
 
         // click the favourite button
         newPage = favButton.click(false, false, false, true);
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
-        assertThat(getNumRealWindows(webClient.getWebWindows())).isEqualTo(2);
+        waitForScript();
+        assertThat(getNumRealWindows()).isEqualTo(2);
         newPage = (HtmlPage) newPage.refresh();
         newPage.initialize();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         favButton = newPage.querySelector("button#favouriteButton");
         assertThat(favButton).isNotNull();
+
         post = restTemplate.getForObject(
-                baseUri() + "/api/posts/" + TevTestingHelpers.MAIN_BLOG_NAME + "/" + FIRST_POST_ID, Post.class);
+                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
+                Post.class);
         assertThat(post.getIsFavourite()).isTrue();
         assertThat(favButton.getVisibleText()).isEqualToNormalizingWhitespace(markNonFavBtnText);
 
         // un-favourite the post
         newPage = favButton.click(false, false, false, true);
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
-        assertThat(getNumRealWindows(webClient.getWebWindows())).isEqualTo(2);
+        waitForScript();
+        assertThat(getNumRealWindows()).isEqualTo(2);
         newPage = (HtmlPage) newPage.refresh();
         newPage.initialize();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         favButton = newPage.querySelector("button#favouriteButton");
         assertThat(favButton).isNotNull();
         post = restTemplate.getForObject(
-                baseUri() + "/api/posts/" + TevTestingHelpers.MAIN_BLOG_NAME + "/" + FIRST_POST_ID, Post.class);
+                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
+                Post.class);
         assertThat(post.getIsFavourite()).isFalse();
         assertThat(favButton.asText()).isEqualTo(markFavBtnText);
 
@@ -191,21 +197,22 @@ public class IndexHtmlTests extends HtmlTestingClass {
         HtmlButton stagingBtn = newPage.querySelector("button#stageForDownloadButton");
         assertThat(stagingBtn).isNotNull();
         assertThat(stagingBtn.asText()).isEqualTo(stagePostButtonText);
-        ResponseEntity<String[]> responseEntity = restTemplate
-                .getForEntity(baseUri() + "/staging-api/posts/" + TevTestingHelpers.MAIN_BLOG_NAME, String[].class);
+
+        ResponseEntity<String[]> responseEntity = restTemplate.getForEntity(
+                String.format("%s/staging-api/posts/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME), String[].class);
         String[] stagedPosts = responseEntity.getBody();
         assertThat(stagedPosts).isEmpty();
 
         // click the staging button, and verify that the post is staged
         newPage = stagingBtn.click(false, false, false, true);
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         newPage = (HtmlPage) newPage.refresh();
         newPage.initialize();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         stagingBtn = newPage.querySelector("button#stageForDownloadButton");
         assertThat(stagingBtn.getVisibleText()).isEqualToNormalizingWhitespace(unstagePostButtonText);
-        responseEntity = restTemplate.getForEntity(baseUri() + "/staging-api/posts/" + TevTestingHelpers.MAIN_BLOG_NAME,
-                String[].class);
+        responseEntity = restTemplate.getForEntity(
+                String.format("%s/staging-api/posts/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME), String[].class);
         stagedPosts = responseEntity.getBody();
         assertThat(stagedPosts.length).isEqualTo(1);
         assertThat(stagedPosts[0]).isEqualToNormalizingWhitespace(FIRST_POST_ID);
@@ -254,7 +261,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(filterNoneButton.isChecked()).isTrue();
 
         filterUnreadButton.click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         assertThat(postTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE - 8);
         assertThat(filterUnreadButton.isChecked()).isTrue();
         assertThat(filterReadButton.isChecked()).isFalse();
@@ -264,7 +271,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(md.getFilter()).isEqualTo("Filter Unread Posts");
 
         filterReadButton.click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         assertThat(postTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE - 1);
         assertThat(filterUnreadButton.isChecked()).isFalse();
         assertThat(filterReadButton.isChecked()).isTrue();
@@ -274,7 +281,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(md.getFilter()).isEqualTo("Filter Read Posts");
 
         filterNoneButton.click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         assertThat(postTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE);
         assertThat(filterUnreadButton.isChecked()).isFalse();
         assertThat(filterReadButton.isChecked()).isFalse();
@@ -291,7 +298,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(showAllBtn.isChecked()).isTrue();
 
         showFavsBtn.click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         assertThat(postTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE - 8);
         assertThat(showFavsBtn.isChecked()).isTrue();
         assertThat(hideFavsBtn.isChecked()).isFalse();
@@ -301,7 +308,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(md.getFavFilter()).isEqualTo("Show Favourites");
 
         hideFavsBtn.click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         assertThat(postTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE - 1);
         assertThat(showFavsBtn.isChecked()).isFalse();
         assertThat(hideFavsBtn.isChecked()).isTrue();
@@ -311,7 +318,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(md.getFavFilter()).isEqualTo("Show Non Favourites");
 
         showAllBtn.click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         assertThat(postTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE);
         assertThat(showFavsBtn.isChecked()).isFalse();
         assertThat(hideFavsBtn.isChecked()).isFalse();
@@ -328,7 +335,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(readingPaneCell.isDisplayed()).isFalse();
 
         showReadingPaneBtn.click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_ID).getFirstElementChild().click();
         assertThat(readingPaneCell.isDisplayed()).isTrue();
         List<FrameWindow> frames = mainPage.getFrames();
@@ -337,7 +344,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(contents).contains("<div id=\"regularContentContainer\">post body text here</div>");
 
         showPopups.click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         assertThat(readingPaneCell.isDisplayed()).isFalse();
         postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_ID).getFirstElementChild().click();
         assertThat(readingPaneCell.isDisplayed()).isFalse();
@@ -349,19 +356,21 @@ public class IndexHtmlTests extends HtmlTestingClass {
     @Test
     public void markPostUnreadFromTable() throws IOException {
         postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_ID).getFirstElementChild().click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         assertThat(postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ).asText()).isEqualToIgnoringWhitespace(readText);
 
         Post postFromServer = restTemplate.getForObject(
-                baseUri() + "/api/posts/" + TevTestingHelpers.MAIN_BLOG_NAME + "/" + FIRST_POST_ID, Post.class);
+                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
+                Post.class);
         assertThat(postFromServer.getIsRead()).isTrue();
 
         postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ).getFirstElementChild().click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         assertThat(postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ).asText())
                 .isEqualToIgnoringWhitespace(nonReadText);
         postFromServer = restTemplate.getForObject(
-                baseUri() + "/api/posts/" + TevTestingHelpers.MAIN_BLOG_NAME + "/" + FIRST_POST_ID, Post.class);
+                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
+                Post.class);
         assertThat(postFromServer.getIsRead()).isFalse();
     }
 
@@ -369,102 +378,167 @@ public class IndexHtmlTests extends HtmlTestingClass {
     public void changeBlogDropdown() throws IOException {
         HtmlSpan blogSelector = mainPage.getHtmlElementById("headerBlogSelect-button");
         mainPage = blogSelector.click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
 
-        DomNodeList<DomNode> blogOptions = mainPage.querySelectorAll("li.ui-menu-item");
-        for (DomNode node : blogOptions) {
-            String blogName = node.asText();
-            if (TevTestingHelpers.SECOND_BLOG_NAME.equals(blogName)) {
-                HtmlDivision div = (HtmlDivision) node.getFirstChild();
-                mainPage = div.click(false, false, false, true);
-                webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
-                String url = mainPage.getUrl().toString();
-                // TODO window.location changes not supported by HTMLUnit?
-                assertThat(true).isFalse();
-                break;
-            }
-        }
+        HtmlSelect blogSwitcher = mainPage.getHtmlElementById("headerBlogSelect");
+        HtmlOption secondBlogOption = blogSwitcher.getOptionByText(TevTestingHelpers.SECOND_BLOG_NAME);
+        mainPage = blogSwitcher.setSelectedAttribute(secondBlogOption, true);
+        mainPage.executeJavaScript("changeViewedBlog();");
+//        String jsScript = String.format("$('#headerBlogSelect').val('%s').selectmenu('refresh').selectmenu('change');",
+//                TevTestingHelpers.SECOND_BLOG_NAME);
+//        mainPage.executeJavaScript(jsScript);
+
+        waitForScript();
+        String url = mainPage.getUrl().toString();
+
+        HtmlPage newPage = (HtmlPage) mainPage.getEnclosingWindow().getEnclosedPage();
+        URL newUrl = newPage.getUrl();
+        String secondUrl = newPage.getUrl().toString();
+        assertThat(true).isFalse();
+
+//        HtmlButton tempBtn = mainPage.getHtmlElementById("tempHiButton");
+//        mainPage = tempBtn.click();
+//        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+//        //HtmlPage newPage = (HtmlPage)mainPage.getEnclosingWindow().getEnclosedPage();
+//        String url = mainPage.getUrl().toString();
+//        assertThat(true).isTrue();
+
+//        DomNodeList<DomNode> blogOptions = mainPage.querySelectorAll("li.ui-menu-item");
+//        for (DomNode node : blogOptions) {
+//            String blogName = node.asText();
+//            if (TevTestingHelpers.SECOND_BLOG_NAME.equals(blogName)) {
+//                HtmlDivision div = (HtmlDivision) node.getFirstChild();
+//                mainPage = div.click(false, false, false, true);
+//                webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+//                HtmlPage newPage = (HtmlPage)mainPage.getEnclosingWindow().getEnclosedPage();
+//                URL theURL = newPage.getUrl();
+//                String url = theURL.toString();
+//                // TODO window.location changes not supported by HTMLUnit?
+//                assertThat(true).isFalse();
+//                break;
+//            }
+//        }
     }
 
     @Test
     public void escButton() throws IOException {
-        // click element in table on main page, and get the resultant popup page
-        HtmlPage newPage = postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_ID).getFirstElementChild().click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
-        assertThat(getNumRealWindows(webClient.getWebWindows())).isEqualTo(2);
+        HtmlPage newPage = openPopup();
 
         // press ESC, and verify that the window closed
         newPage.getDocumentElement().type(KeyboardEvent.DOM_VK_ESCAPE);
-        assertThat(getNumRealWindows(webClient.getWebWindows())).isEqualTo(1);
+        assertThat(getNumRealWindows()).isEqualTo(1);
+    }
+
+    private HtmlPage openPopup() throws IOException {
+        HtmlPage newPage = postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_ID).getFirstElementChild().click();
+        waitForScript();
+        assertThat(getNumRealWindows()).isEqualTo(2);
+
+        return newPage;
     }
 
     @Test
     public void closeButtons() throws IOException {
-        // click element in the table on the main page, and get the resultant popup
-        HtmlPage newPage = postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_ID).getFirstElementChild().click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
-        assertThat(getNumRealWindows(webClient.getWebWindows())).isEqualTo(2);
+        HtmlPage newPage = openPopup();
 
         // click the close button; verify the post is still read
         HtmlButton closeButton = newPage.querySelector("button#closeButton");
         closeButton.click();
-        assertThat(getNumRealWindows(webClient.getWebWindows())).isEqualTo(1);
+        assertThat(getNumRealWindows()).isEqualTo(1);
         Post post = restTemplate.getForObject(
-                baseUri() + "/api/posts/" + TevTestingHelpers.MAIN_BLOG_NAME + "/" + FIRST_POST_ID, Post.class);
+                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
+                Post.class);
         assertThat(post.getIsRead()).isTrue();
         mainPage = (HtmlPage) mainPage.refresh();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         postTable = mainPage.getHtmlElementById("postTable");
         HtmlTableCell cell = postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ);
         assertThat(cell.asText()).isEqualToNormalizingWhitespace(readText);
 
-        // click element in the table on the main page, and get the resultant popup
-        newPage = postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_ID).getFirstElementChild().click();
-        assertThat(getNumRealWindows(webClient.getWebWindows())).isEqualTo(2);
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        newPage = openPopup();
 
         // click the mark unread button, verify the post is unread, and that the window
         // is closed
         HtmlButton markUnreadBtn = newPage.querySelector("button#markReadButton");
         markUnreadBtn.click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
-        assertThat(getNumRealWindows(webClient.getWebWindows())).isEqualTo(1);
+        waitForScript();
+        assertThat(getNumRealWindows()).isEqualTo(1);
         post = restTemplate.getForObject(
-                baseUri() + "/api/posts/" + TevTestingHelpers.MAIN_BLOG_NAME + "/" + FIRST_POST_ID, Post.class);
+                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
+                Post.class);
         assertThat(post.getIsRead()).isFalse();
         mainPage = (HtmlPage) mainPage.refresh();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         postTable = mainPage.getHtmlElementById("postTable");
         cell = postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ);
         assertThat(cell.asText()).isEqualToNormalizingWhitespace(nonReadText);
 
-        // set the table on the main page to hide read posts
+        // filter out read posts
+        HtmlRadioButtonInput filterReadButton = mainPage.getHtmlElementById("filterRead");
+        filterReadButton.click();
+        waitForScript();
+        assertThat(postTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE);
         Metadata md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
-        md.setFilter("Filter Read Posts");
-        updateMD(md);
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
-
-        md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
         assertThat(md.getFilter()).isEqualTo("Filter Read Posts");
 
         // click element in the table on the main page, and get the resultant popup
-        newPage = postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_ID).getFirstElementChild().click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
-        assertThat(getNumRealWindows(webClient.getWebWindows())).isEqualTo(2);
+        newPage = openPopup();
+        post = restTemplate.getForObject(
+                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
+                Post.class);
+        assertThat(post.getIsRead()).isTrue();
 
         HtmlButton closeAndRefreshBtn = newPage.querySelector("button#closeAndRefreshButton");
         assertThat(closeAndRefreshBtn).isNotNull();
         closeAndRefreshBtn.click();
-        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
+        waitForScript();
         // TODO location.reload() not handled by HTMLUnit
-        assertThat(true).isFalse();
-//        assertThat(HtmlTestingHelpers.getNumRealWindows(webClient.getWebWindows())).isEqualTo(1);
-//        page = (HtmlPage)page.refresh();
-//        page.initialize();
-//        webClient.waitForBackgroundJavaScript(HtmlTestingHelpers.WAIT_TIME_FOR_JS);
-//        //assertThat(mdFromJS.getFilter()).isEqualTo("Filter Read Posts");
-//        postTable = page.getHtmlElementById("postTable");
-//        assertThat(postTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE - 1);
+        assertThat(getNumRealWindows()).isEqualTo(1);
+        mainPage = webClient.getPage(baseUri());
+        waitForScript();
+        postTable = mainPage.getHtmlElementById("postTable");
+        assertThat(postTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE - 1);
+    }
+
+    @Test
+    public void testSearchParam() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
+        HtmlPage filteredPage = webClient.getPage(baseUri() + "?hashsearch=tag1");
+        waitForScript();
+        HtmlTable filteredPostTable = filteredPage.getHtmlElementById("postTable");
+        assertThat(filteredPostTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE - 3); // three posts don't have this
+                                                                                       // hashtag
+    }
+
+    @Test
+    public void testClickingHashtagInViewer() throws IOException {
+        HtmlPage popup = openPopup();
+        waitForScript();
+        
+        DomNodeList<DomNode> htSpans = popup.querySelectorAll("span.hashtagspan");
+        for(DomNode n : htSpans) {
+            if("tag1".equals(n.getVisibleText())) {
+                HtmlSpan nAsSpan = (HtmlSpan)n;
+                nAsSpan.click();
+                waitForScript();
+            }
+        }
+        
+        assertThat(getNumRealWindows()).isEqualTo(1);
+        List<WebWindow> windows = webClient.getWebWindows();
+        boolean pageRefreshed = false;
+        HtmlPage newMainPage = null;
+        for(WebWindow win : windows) {
+            String url = win.getEnclosedPage().getUrl().toString();
+            if(url.contains("localhost")) {
+                assertThat(url).contains("hashsearch");
+                pageRefreshed = true;
+                newMainPage = (HtmlPage)win.getEnclosedPage();
+            }
+        }
+        assertThat(pageRefreshed).isTrue();
+        assertThat(newMainPage).isNotNull();
+        HtmlTable newPostTable = newMainPage.getHtmlElementById("postTable");
+        assertThat(newPostTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE - 3);
     }
 
 }

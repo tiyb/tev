@@ -48,13 +48,7 @@ $(document).ready(function() {
 		}
 		
 		$('#headerBlogSelect').selectmenu({change: function(event,ui) {
-			var newBlogName = $('#headerBlogSelect').val();
-			
-			var urlParams = new URLSearchParams(window.location.search);
-			urlParams.set("tempBlogName", newBlogName);
-			var newURL = window.location.href.split('?')[0];
-			newURL += '?' + urlParams.toString();
-			window.location.assign(newURL);
+		  changeViewedBlog();
 		}});
 		
 		if(window.location.href.includes("/metadata")) {
@@ -85,6 +79,16 @@ $(document).ready(function() {
 	$('#footer').load("/footer");
 	
 });
+
+function changeViewedBlog() {
+	var newBlogName = $('#headerBlogSelect').val();
+	
+	var urlParams = new URLSearchParams(window.location.search);
+	urlParams.set("tempBlogName", newBlogName);
+	var newURL = window.location.href.split('?')[0];
+	newURL += '?' + urlParams.toString();
+	window.location.assign(newURL);    
+}
 
 /**
  * Creates a link within the header, with given text for a given page / URL
