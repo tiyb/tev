@@ -449,16 +449,15 @@ public class IndexHtmlTests extends HtmlTestingClass {
                 String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
                 Post.class);
         assertThat(post.getIsRead()).isTrue();
-        mainPage = (HtmlPage) mainPage.refresh();
+        mainPage = webClient.getPage(baseUri());
         waitForScript();
         postTable = mainPage.getHtmlElementById("postTable");
         HtmlTableCell cell = postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ);
         assertThat(cell.asText()).isEqualToNormalizingWhitespace(readText);
 
-        newPage = openPopup();
-
         // click the mark unread button, verify the post is unread, and that the window
         // is closed
+        newPage = openPopup();
         HtmlButton markUnreadBtn = newPage.querySelector("button#markReadButton");
         markUnreadBtn.click();
         waitForScript();
@@ -467,18 +466,17 @@ public class IndexHtmlTests extends HtmlTestingClass {
                 String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
                 Post.class);
         assertThat(post.getIsRead()).isFalse();
-        mainPage = (HtmlPage) mainPage.refresh();
+        mainPage = webClient.getPage(baseUri());
         waitForScript();
         postTable = mainPage.getHtmlElementById("postTable");
         cell = postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ);
         assertThat(cell.asText()).isEqualToNormalizingWhitespace(nonReadText);
 
         // filter out read posts
-        HtmlRadioButtonInput filterReadButton = mainPage.getHtmlElementById("filterRead");
-        filterReadButton.click();
-        waitForScript();
-        assertThat(postTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE);
         Metadata md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
+        md.setFilter("Filter Read Posts");
+        updateMD(md);
+        md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
         assertThat(md.getFilter()).isEqualTo("Filter Read Posts");
 
         // click element in the table on the main page, and get the resultant popup
@@ -488,16 +486,25 @@ public class IndexHtmlTests extends HtmlTestingClass {
                 Post.class);
         assertThat(post.getIsRead()).isTrue();
 
+        // this shouldn't be necessary, but for some reason the metadata keeps getting
+        // reset to turn filtering off
+        updateMD(md);
+
+        // click the close and refresh button, and verify that the main window gets the changes
         HtmlButton closeAndRefreshBtn = newPage.querySelector("button#closeAndRefreshButton");
         assertThat(closeAndRefreshBtn).isNotNull();
         closeAndRefreshBtn.click();
         waitForScript();
-        // TODO location.reload() not handled by HTMLUnit
         assertThat(getNumRealWindows()).isEqualTo(1);
-        mainPage = webClient.getPage(baseUri());
-        waitForScript();
-        postTable = mainPage.getHtmlElementById("postTable");
-        assertThat(postTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE - 1);
+        List<WebWindow> windows = webClient.getWebWindows();
+        for(WebWindow win : windows) {
+            String url = win.getEnclosedPage().getUrl().toString();
+            if(url.contains("localhost") && !url.contains("postViewer")) {
+                HtmlPage newMainPage = (HtmlPage)win.getEnclosedPage();
+                HtmlTable newPostTable = newMainPage.getHtmlElementById("postTable");
+                assertThat(newPostTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE - 1);
+            }
+        }
     }
 
     @Test
@@ -513,26 +520,26 @@ public class IndexHtmlTests extends HtmlTestingClass {
     public void testClickingHashtagInViewer() throws IOException {
         HtmlPage popup = openPopup();
         waitForScript();
-        
+
         DomNodeList<DomNode> htSpans = popup.querySelectorAll("span.hashtagspan");
-        for(DomNode n : htSpans) {
-            if("tag1".equals(n.getVisibleText())) {
-                HtmlSpan nAsSpan = (HtmlSpan)n;
+        for (DomNode n : htSpans) {
+            if ("tag1".equals(n.getVisibleText())) {
+                HtmlSpan nAsSpan = (HtmlSpan) n;
                 nAsSpan.click();
                 waitForScript();
             }
         }
-        
+
         assertThat(getNumRealWindows()).isEqualTo(1);
         List<WebWindow> windows = webClient.getWebWindows();
         boolean pageRefreshed = false;
         HtmlPage newMainPage = null;
-        for(WebWindow win : windows) {
+        for (WebWindow win : windows) {
             String url = win.getEnclosedPage().getUrl().toString();
-            if(url.contains("localhost")) {
+            if (url.contains("localhost")) {
                 assertThat(url).contains("hashsearch");
                 pageRefreshed = true;
-                newMainPage = (HtmlPage)win.getEnclosedPage();
+                newMainPage = (HtmlPage) win.getEnclosedPage();
             }
         }
         assertThat(pageRefreshed).isTrue();

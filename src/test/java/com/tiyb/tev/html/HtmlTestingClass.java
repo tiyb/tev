@@ -1,6 +1,5 @@
 package com.tiyb.tev.html;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.After;
@@ -149,18 +148,16 @@ public abstract class HtmlTestingClass {
             blogForWhichToFetchMD = TevTestingHelpers.MAIN_BLOG_NAME;
         }
 
-        return restTemplate.getForObject(String.format("%s/api/metadata/byBlog/%s", baseUri(), blogForWhichToFetchMD),
-                Metadata.class);
+        return restTemplate.getForObject(
+                String.format("%s/api/metadata/byBlog/%s/orDefault", baseUri(), blogForWhichToFetchMD), Metadata.class);
     }
 
     protected void updateMD(Metadata md) {
-        restTemplate.put(baseUri() + "/api/metadata/" + md.getId(), md);
+        restTemplate.put(String.format("%s/api/metadata/%d", baseUri(), md.getId()), md);
     }
 
     protected void restInitMainBlogSettings(Optional<String> baseMediaPath) {
-        Metadata md = restTemplate.getForObject(
-                String.format("%s/api/metadata/byBlog/%s/orDefault", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME),
-                Metadata.class);
+        Metadata md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
         md.setOverwritePostData(true);
         md.setOverwriteConvoData(true);
         md.setMainTumblrUser(TevTestingHelpers.MAIN_BLOG_NAME);
@@ -181,7 +178,7 @@ public abstract class HtmlTestingClass {
             md.setBaseMediaPath(baseMediaPath.get());
         }
 
-        restTemplate.put(String.format("%s/api/metadata/%d", baseUri(), md.getId()), md);
+        updateMD(md);
     }
 
     protected void restInitAdditionalBlog(String blogName) {
