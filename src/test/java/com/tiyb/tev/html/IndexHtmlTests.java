@@ -360,12 +360,19 @@ public class IndexHtmlTests extends HtmlTestingClass {
     public void changeBlogDropdown() throws IOException {
         mainPage.executeJavaScript("$('#headerBlogSelect').val('secondblog').selectmenu('refresh').trigger('selectmenuselect');");
         waitForScript();
+        assertThat(getNumRealWindows()).isEqualTo(1);
+        boolean windowChecked = true;
         List<WebWindow> windows = webClient.getWebWindows();
         for(WebWindow win : windows) {
             HtmlPage page = (HtmlPage)win.getEnclosedPage();
             String url = page.getUrl().toString();
-            logger.info(url);
+            if(url.contains("localhost")) {
+                assertThat(url).contains("tempBlogName");
+                assertThat(url).contains(TevTestingHelpers.SECOND_BLOG_NAME);
+                windowChecked = true;
+            }
         }
+        assertThat(windowChecked).isTrue();
     }
 
     @Test

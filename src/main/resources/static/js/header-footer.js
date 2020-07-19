@@ -83,18 +83,18 @@ $(document).ready(function() {
 	
 });
 
+/**
+ * Adds a param to the URL to navigate to a different blog.
+ *
+ * <i>Should</i> be using URLSearchParams, or at the very least considering other query params,
+ * but taking this more hack-y approach instea because HtmlUnit doesn't work with URLSearchParams.
+ */
 function changeViewedBlog() {
 	var newBlogName = $('#headerBlogSelect').val();
 	
-	var urlParams = new URLSearchParams(window.location.search);
-	urlParams.set("tempBlogName", newBlogName);
 	var newURL = window.location.href.split('?')[0];
-	newURL += '?';
-	for(var [key,value] of urlParams.entries()) {
-	   newURL += key + "=" + value;
-	   newURL += "&";
-	}
-	window.location.assign(newURL);    
+	newURL += "?tempBlogName=" + newBlogName;
+	window.location.assign(newURL);
 }
 
 /**
