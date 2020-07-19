@@ -50,6 +50,9 @@ $(document).ready(function() {
 		$('#headerBlogSelect').selectmenu({change: function(event,ui) {
 		  changeViewedBlog();
 		}});
+		$('#headerBlogSelect').on("selectmenuselect", function(event,ui) {
+		  changeViewedBlog();
+		});
 		
 		if(window.location.href.includes("/metadata")) {
 			$('#headerBlogSelectContainer').hide();
@@ -86,7 +89,11 @@ function changeViewedBlog() {
 	var urlParams = new URLSearchParams(window.location.search);
 	urlParams.set("tempBlogName", newBlogName);
 	var newURL = window.location.href.split('?')[0];
-	newURL += '?' + urlParams.toString();
+	newURL += '?';
+	for(var [key,value] of urlParams.entries()) {
+	   newURL += key + "=" + value;
+	   newURL += "&";
+	}
 	window.location.assign(newURL);    
 }
 

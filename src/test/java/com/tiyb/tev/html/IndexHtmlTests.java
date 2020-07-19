@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,7 +12,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebWindow;
@@ -24,10 +22,8 @@ import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlHeading1;
-import com.gargoylesoftware.htmlunit.html.HtmlOption;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
-import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlSpan;
 import com.gargoylesoftware.htmlunit.html.HtmlTable;
 import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
@@ -156,9 +152,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(favButton).isNotNull();
         assertThat(favButton.getVisibleText()).isEqualTo(markFavBtnText);
 
-        Post post = restTemplate.getForObject(
-                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
-                Post.class);
+        Post post = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(post.getIsFavourite()).isFalse();
 
         // click the favourite button
@@ -171,9 +165,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         favButton = newPage.querySelector("button#favouriteButton");
         assertThat(favButton).isNotNull();
 
-        post = restTemplate.getForObject(
-                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
-                Post.class);
+        post = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(post.getIsFavourite()).isTrue();
         assertThat(favButton.getVisibleText()).isEqualToNormalizingWhitespace(markNonFavBtnText);
 
@@ -186,9 +178,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         waitForScript();
         favButton = newPage.querySelector("button#favouriteButton");
         assertThat(favButton).isNotNull();
-        post = restTemplate.getForObject(
-                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
-                Post.class);
+        post = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(post.getIsFavourite()).isFalse();
         assertThat(favButton.asText()).isEqualTo(markFavBtnText);
 
@@ -198,9 +188,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(stagingBtn).isNotNull();
         assertThat(stagingBtn.asText()).isEqualTo(stagePostButtonText);
 
-        ResponseEntity<String[]> responseEntity = restTemplate.getForEntity(
-                String.format("%s/staging-api/posts/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME), String[].class);
-        String[] stagedPosts = responseEntity.getBody();
+        String[] stagedPosts = getStagedPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
         assertThat(stagedPosts).isEmpty();
 
         // click the staging button, and verify that the post is staged
@@ -211,9 +199,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         waitForScript();
         stagingBtn = newPage.querySelector("button#stageForDownloadButton");
         assertThat(stagingBtn.getVisibleText()).isEqualToNormalizingWhitespace(unstagePostButtonText);
-        responseEntity = restTemplate.getForEntity(
-                String.format("%s/staging-api/posts/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME), String[].class);
-        stagedPosts = responseEntity.getBody();
+        stagedPosts = getStagedPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
         assertThat(stagedPosts.length).isEqualTo(1);
         assertThat(stagedPosts[0]).isEqualToNormalizingWhitespace(FIRST_POST_ID);
     }
@@ -359,65 +345,27 @@ public class IndexHtmlTests extends HtmlTestingClass {
         waitForScript();
         assertThat(postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ).asText()).isEqualToIgnoringWhitespace(readText);
 
-        Post postFromServer = restTemplate.getForObject(
-                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
-                Post.class);
+        Post postFromServer = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(postFromServer.getIsRead()).isTrue();
 
         postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ).getFirstElementChild().click();
         waitForScript();
         assertThat(postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ).asText())
                 .isEqualToIgnoringWhitespace(nonReadText);
-        postFromServer = restTemplate.getForObject(
-                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
-                Post.class);
+        postFromServer = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(postFromServer.getIsRead()).isFalse();
     }
 
     @Test
     public void changeBlogDropdown() throws IOException {
-        HtmlSpan blogSelector = mainPage.getHtmlElementById("headerBlogSelect-button");
-        mainPage = blogSelector.click();
+        mainPage.executeJavaScript("$('#headerBlogSelect').val('secondblog').selectmenu('refresh').trigger('selectmenuselect');");
         waitForScript();
-
-        HtmlSelect blogSwitcher = mainPage.getHtmlElementById("headerBlogSelect");
-        HtmlOption secondBlogOption = blogSwitcher.getOptionByText(TevTestingHelpers.SECOND_BLOG_NAME);
-        mainPage = blogSwitcher.setSelectedAttribute(secondBlogOption, true);
-        mainPage.executeJavaScript("changeViewedBlog();");
-//        String jsScript = String.format("$('#headerBlogSelect').val('%s').selectmenu('refresh').selectmenu('change');",
-//                TevTestingHelpers.SECOND_BLOG_NAME);
-//        mainPage.executeJavaScript(jsScript);
-
-        waitForScript();
-        String url = mainPage.getUrl().toString();
-
-        HtmlPage newPage = (HtmlPage) mainPage.getEnclosingWindow().getEnclosedPage();
-        URL newUrl = newPage.getUrl();
-        String secondUrl = newPage.getUrl().toString();
-        assertThat(true).isFalse();
-
-//        HtmlButton tempBtn = mainPage.getHtmlElementById("tempHiButton");
-//        mainPage = tempBtn.click();
-//        webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
-//        //HtmlPage newPage = (HtmlPage)mainPage.getEnclosingWindow().getEnclosedPage();
-//        String url = mainPage.getUrl().toString();
-//        assertThat(true).isTrue();
-
-//        DomNodeList<DomNode> blogOptions = mainPage.querySelectorAll("li.ui-menu-item");
-//        for (DomNode node : blogOptions) {
-//            String blogName = node.asText();
-//            if (TevTestingHelpers.SECOND_BLOG_NAME.equals(blogName)) {
-//                HtmlDivision div = (HtmlDivision) node.getFirstChild();
-//                mainPage = div.click(false, false, false, true);
-//                webClient.waitForBackgroundJavaScript(WAIT_TIME_FOR_JS);
-//                HtmlPage newPage = (HtmlPage)mainPage.getEnclosingWindow().getEnclosedPage();
-//                URL theURL = newPage.getUrl();
-//                String url = theURL.toString();
-//                // TODO window.location changes not supported by HTMLUnit?
-//                assertThat(true).isFalse();
-//                break;
-//            }
-//        }
+        List<WebWindow> windows = webClient.getWebWindows();
+        for(WebWindow win : windows) {
+            HtmlPage page = (HtmlPage)win.getEnclosedPage();
+            String url = page.getUrl().toString();
+            logger.info(url);
+        }
     }
 
     @Test
@@ -445,13 +393,8 @@ public class IndexHtmlTests extends HtmlTestingClass {
         HtmlButton closeButton = newPage.querySelector("button#closeButton");
         closeButton.click();
         assertThat(getNumRealWindows()).isEqualTo(1);
-        Post post = restTemplate.getForObject(
-                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
-                Post.class);
+        Post post = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(post.getIsRead()).isTrue();
-        mainPage = webClient.getPage(baseUri());
-        waitForScript();
-        postTable = mainPage.getHtmlElementById("postTable");
         HtmlTableCell cell = postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ);
         assertThat(cell.asText()).isEqualToNormalizingWhitespace(readText);
 
@@ -462,9 +405,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         markUnreadBtn.click();
         waitForScript();
         assertThat(getNumRealWindows()).isEqualTo(1);
-        post = restTemplate.getForObject(
-                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
-                Post.class);
+        post = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(post.getIsRead()).isFalse();
         mainPage = webClient.getPage(baseUri());
         waitForScript();
@@ -481,30 +422,34 @@ public class IndexHtmlTests extends HtmlTestingClass {
 
         // click element in the table on the main page, and get the resultant popup
         newPage = openPopup();
-        post = restTemplate.getForObject(
-                String.format("%s/api/posts/%s/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID),
-                Post.class);
+        post = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(post.getIsRead()).isTrue();
 
         // this shouldn't be necessary, but for some reason the metadata keeps getting
         // reset to turn filtering off
         updateMD(md);
 
-        // click the close and refresh button, and verify that the main window gets the changes
+        // click the close and refresh button, and verify that the main window gets the
+        // changes
         HtmlButton closeAndRefreshBtn = newPage.querySelector("button#closeAndRefreshButton");
         assertThat(closeAndRefreshBtn).isNotNull();
-        closeAndRefreshBtn.click();
+        newPage = closeAndRefreshBtn.click();
+        waitForScript();
+        mainPage.refresh();
         waitForScript();
         assertThat(getNumRealWindows()).isEqualTo(1);
         List<WebWindow> windows = webClient.getWebWindows();
-        for(WebWindow win : windows) {
+        boolean mainPageChecked = false;
+        for (WebWindow win : windows) {
             String url = win.getEnclosedPage().getUrl().toString();
-            if(url.contains("localhost") && !url.contains("postViewer")) {
-                HtmlPage newMainPage = (HtmlPage)win.getEnclosedPage();
+            if (url.contains("localhost") && !url.contains("postViewer")) {
+                HtmlPage newMainPage = (HtmlPage) win.getEnclosedPage();
                 HtmlTable newPostTable = newMainPage.getHtmlElementById("postTable");
                 assertThat(newPostTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE - 1);
+                mainPageChecked = true;
             }
         }
+        assertThat(mainPageChecked).isTrue();
     }
 
     @Test

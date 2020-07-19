@@ -34,8 +34,6 @@ public class ConvoHtmlTests extends HtmlTestingClass {
     private static final int COLUMN_PARTICIPANT = 0;
     private static final int COLUMN_NUMMESSAGES = 1;
 
-    HtmlTable convoTable;
-
     @Before
     public void setupSite() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         restInitDataForMainBlog(Optional.empty());
@@ -43,7 +41,6 @@ public class ConvoHtmlTests extends HtmlTestingClass {
 
         mainPage = webClient.getPage(baseUri() + "/conversations");
         waitForScript();
-        convoTable = mainPage.getHtmlElementById(CONVERSATION_TABLE_ID);
     }
 
     @Test
@@ -61,7 +58,7 @@ public class ConvoHtmlTests extends HtmlTestingClass {
         waitForScript();
         Metadata md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
         assertThat(md.getShowReadingPane()).isTrue();
-        convoTable = mainPage.getHtmlElementById(CONVERSATION_TABLE_ID);
+        HtmlTable convoTable = mainPage.getHtmlElementById(CONVERSATION_TABLE_ID);
         convoTable.getCellAt(FIRST_TABLE_ROW, COLUMN_PARTICIPANT).getFirstElementChild().click();
         waitForScript();
         assertThat(readingPaneCell.isDisplayed()).isTrue();
@@ -86,8 +83,8 @@ public class ConvoHtmlTests extends HtmlTestingClass {
         assertThat(showWordCloud.isChecked()).isFalse();
         HtmlRadioButtonInput showTable = mainPage.getHtmlElementById("showTableSelected");
         assertThat(showTable.isChecked()).isTrue();
-        HtmlDivision convoTable = mainPage.getHtmlElementById("conversationTableContainer");
-        assertThat(convoTable.isDisplayed()).isTrue();
+        HtmlDivision convoTableContainer = mainPage.getHtmlElementById("conversationTableContainer");
+        assertThat(convoTableContainer.isDisplayed()).isTrue();
         HtmlDivision convoCloud = mainPage.getHtmlElementById("conversationWordCloudContainerContainer");
         assertThat(convoCloud.isDisplayed()).isFalse();
 
@@ -105,6 +102,7 @@ public class ConvoHtmlTests extends HtmlTestingClass {
     @Test
     public void openConvo() throws IOException {
         // open popup
+        HtmlTable convoTable = mainPage.getHtmlElementById(CONVERSATION_TABLE_ID);
         HtmlPage popup = convoTable.getCellAt(FIRST_TABLE_ROW, COLUMN_PARTICIPANT).getFirstElementChild().click();
         assertThat(getNumRealWindows()).isEqualTo(2);
 
@@ -126,7 +124,7 @@ public class ConvoHtmlTests extends HtmlTestingClass {
     @Test
     public void hideConvo() throws IOException {
         assertThat(getNumRealWindows()).isEqualTo(1);
-        convoTable = mainPage.getHtmlElementById(CONVERSATION_TABLE_ID);
+        HtmlTable convoTable = mainPage.getHtmlElementById(CONVERSATION_TABLE_ID);
         assertThat(convoTable.getRowCount()).isEqualTo(CONVERSATION_TABLE_NUM_ROWS);
 
         // open popup, then mark conversation hidden (which should close the window)
@@ -138,16 +136,14 @@ public class ConvoHtmlTests extends HtmlTestingClass {
         waitForScript();
         assertThat(getNumRealWindows()).isEqualTo(1);
 
-        Conversation convo1 = restTemplate.getForObject(String.format("%s/api/conversations/%s/%s", baseUri(),
-                TevTestingHelpers.MAIN_BLOG_NAME, "participant1"), Conversation.class);
+        Conversation convo1 = getConversation(TevTestingHelpers.MAIN_BLOG_NAME, "participant1");
         assertThat(convo1.getHideConversation()).isTrue();
 
         // update conversation, un-hide it again, then re-open the window and click the
         // hide and refresh button
         convo1.setHideConversation(false);
 
-        restTemplate.put(String.format("%s/api/conversations/%s/%d", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME,
-                convo1.getId()), convo1);
+        updateConversation(convo1);
         popup = convoTable.getCellAt(FIRST_TABLE_ROW, COLUMN_PARTICIPANT).getFirstElementChild().click();
         assertThat(getNumRealWindows()).isEqualTo(2);
         HtmlButton hideAndRefresh = popup.getHtmlElementById("hideConvoAndRefreshBtn");
@@ -155,8 +151,7 @@ public class ConvoHtmlTests extends HtmlTestingClass {
         waitForScript();
         assertThat(getNumRealWindows()).isEqualTo(1);
 
-        convo1 = restTemplate.getForObject(String.format("%s/api/conversations/%s/%s", baseUri(),
-                TevTestingHelpers.MAIN_BLOG_NAME, "participant1"), Conversation.class);
+        convo1 = getConversation(TevTestingHelpers.MAIN_BLOG_NAME, "participant1");
         assertThat(convo1.getHideConversation()).isTrue();
 
         mainPage = (HtmlPage) mainPage.refresh();
