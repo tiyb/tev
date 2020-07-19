@@ -9,13 +9,9 @@ import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import com.tiyb.tev.TevTestingHelpers;
+import com.tiyb.tev.TevTestingClass;
 import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.controller.TEVPostRestController;
 import com.tiyb.tev.datamodel.Hashtag;
@@ -28,10 +24,7 @@ import com.tiyb.tev.datamodel.Regular;
  * @author tiyb
  *
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-public class PostXmlMultiBlog {
+public class PostXmlMultiBlog extends TevTestingClass {
 
     @Autowired
     private TEVPostRestController postController;
@@ -44,26 +37,17 @@ public class PostXmlMultiBlog {
 
     private static final String SECONDBLOG_FIRSTPOSID = "180894436690";
 
-    private static final List<Hashtag> BLOG1_INITIAL_HASHTAGS = Arrays.asList(
-            new Hashtag("tag1", 4, TevTestingHelpers.MAIN_BLOG_NAME),
-            new Hashtag("tag2", 4, TevTestingHelpers.MAIN_BLOG_NAME),
-            new Hashtag("tag3", 1, TevTestingHelpers.MAIN_BLOG_NAME),
-            new Hashtag("tag4", 1, TevTestingHelpers.MAIN_BLOG_NAME),
-            new Hashtag("tag5", 1, TevTestingHelpers.MAIN_BLOG_NAME),
-            new Hashtag("tag6", 1, TevTestingHelpers.MAIN_BLOG_NAME),
-            new Hashtag("tag7", 1, TevTestingHelpers.MAIN_BLOG_NAME),
-            new Hashtag("tag8", 1, TevTestingHelpers.MAIN_BLOG_NAME),
-            new Hashtag("tag9", 1, TevTestingHelpers.MAIN_BLOG_NAME),
-            new Hashtag("tag10", 1, TevTestingHelpers.MAIN_BLOG_NAME),
-            new Hashtag("tag11", 1, TevTestingHelpers.MAIN_BLOG_NAME),
-            new Hashtag("tag12", 1, TevTestingHelpers.MAIN_BLOG_NAME),
-            new Hashtag("tag13", 1, TevTestingHelpers.MAIN_BLOG_NAME),
-            new Hashtag("tag14", 1, TevTestingHelpers.MAIN_BLOG_NAME),
-            new Hashtag("tag15", 1, TevTestingHelpers.MAIN_BLOG_NAME));
+    private static final List<Hashtag> BLOG1_INITIAL_HASHTAGS = Arrays.asList(new Hashtag("tag1", 4, MAIN_BLOG_NAME),
+            new Hashtag("tag2", 4, MAIN_BLOG_NAME), new Hashtag("tag3", 1, MAIN_BLOG_NAME),
+            new Hashtag("tag4", 1, MAIN_BLOG_NAME), new Hashtag("tag5", 1, MAIN_BLOG_NAME),
+            new Hashtag("tag6", 1, MAIN_BLOG_NAME), new Hashtag("tag7", 1, MAIN_BLOG_NAME),
+            new Hashtag("tag8", 1, MAIN_BLOG_NAME), new Hashtag("tag9", 1, MAIN_BLOG_NAME),
+            new Hashtag("tag10", 1, MAIN_BLOG_NAME), new Hashtag("tag11", 1, MAIN_BLOG_NAME),
+            new Hashtag("tag12", 1, MAIN_BLOG_NAME), new Hashtag("tag13", 1, MAIN_BLOG_NAME),
+            new Hashtag("tag14", 1, MAIN_BLOG_NAME), new Hashtag("tag15", 1, MAIN_BLOG_NAME));
 
-    private static final List<Hashtag> BLOG2_INITIAL_HASHTAGS = Arrays.asList(
-            new Hashtag("2ndtag1", 1, TevTestingHelpers.SECOND_BLOG_NAME),
-            new Hashtag("tag2", 1, TevTestingHelpers.SECOND_BLOG_NAME));
+    private static final List<Hashtag> BLOG2_INITIAL_HASHTAGS = Arrays
+            .asList(new Hashtag("2ndtag1", 1, SECOND_BLOG_NAME), new Hashtag("tag2", 1, SECOND_BLOG_NAME));
 
     private static final String DUPLICATED_HT = "tag2";
     private static final int DUPLICATED_HT_COUNT = 5;
@@ -78,8 +62,8 @@ public class PostXmlMultiBlog {
     public void setupData() throws FileNotFoundException {
         postController.getHashtagController().deleteAllHTs();
 
-        TevTestingHelpers.initDataForMainBlog(mdController, postController, Optional.empty());
-        TevTestingHelpers.initDataForSecondaryBlog(mdController, postController, Optional.empty());
+        initDataForMainBlog(mdController, postController, Optional.empty());
+        initDataForSecondaryBlog(mdController, postController, Optional.empty());
     }
 
     /**
@@ -88,11 +72,11 @@ public class PostXmlMultiBlog {
      */
     @Test
     public void testAllPosts() {
-        List<Post> posts = postController.getAllPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Post> posts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
         assertThat(posts).isNotNull();
         assertThat(posts.size()).isEqualTo(ORIGINAL_NUM_POSTS);
 
-        posts = postController.getAllPostsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        posts = postController.getAllPostsForBlog(SECOND_BLOG_NAME);
         assertThat(posts).isNotNull();
         assertThat(posts.size()).isEqualTo(SECONDBLOG_NUM_POSTS);
 
@@ -103,7 +87,7 @@ public class PostXmlMultiBlog {
      */
     @Test
     public void testLoadedData() {
-        Post post = postController.getPostForBlogById(TevTestingHelpers.SECOND_BLOG_NAME, SECONDBLOG_FIRSTPOSID);
+        Post post = postController.getPostForBlogById(SECOND_BLOG_NAME, SECONDBLOG_FIRSTPOSID);
         assertThat(post).isNotNull();
         assertThat(post.getDate()).isEqualTo("Fri, 07 Dec 2018 11:48:43");
         assertThat(post.getDateGmt()).isEqualTo("2018-12-07 16:48:43 GMT");
@@ -114,15 +98,15 @@ public class PostXmlMultiBlog {
         assertThat(post.getSlug()).isEqualTo("first-post");
         assertThat(post.getState()).isEqualTo("published");
         assertThat(post.getTags()).isEqualTo("2ndtag1, tag2");
-        assertThat(post.getTumblelog()).isEqualTo(TevTestingHelpers.SECOND_BLOG_NAME);
+        assertThat(post.getTumblelog()).isEqualTo(SECOND_BLOG_NAME);
         assertThat(post.getType()).isEqualTo("regular");
         assertThat(post.getUnixtimestamp()).isEqualTo(1544201323L);
         assertThat(post.getUrl()).isEqualTo("https://mainblog.tumblr.com/post/180894436690");
         assertThat(post.getUrlWithSlug()).isEqualTo("https://mainblog.tumblr.com/post/180894436690/first-post");
 
-        assertThat(postController.getRegController().getAllRegularsForBlog(TevTestingHelpers.SECOND_BLOG_NAME).size())
+        assertThat(postController.getRegController().getAllRegularsForBlog(SECOND_BLOG_NAME).size())
                 .isEqualTo(SECONDBLOG_NUM_REG_POSTS);
-        Regular regular = postController.getRegController().getRegularForBlogById(TevTestingHelpers.SECOND_BLOG_NAME,
+        Regular regular = postController.getRegController().getRegularForBlogById(SECOND_BLOG_NAME,
                 SECONDBLOG_FIRSTPOSID);
         assertThat(regular).isNotNull();
         assertThat(regular.getPostId()).isEqualTo(SECONDBLOG_FIRSTPOSID);
@@ -137,14 +121,13 @@ public class PostXmlMultiBlog {
      */
     @Test
     public void testHashtags() {
-        List<Hashtag> hashtags = postController.getHashtagController()
-                .getAllHashtagsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Hashtag> hashtags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
         assertThat(hashtags).isNotNull();
         assertThat(hashtags.size()).isEqualTo(BLOG1_INITIAL_HASHTAGS.size());
 
         hashtagTestHelper(hashtags, BLOG1_INITIAL_HASHTAGS);
 
-        hashtags = postController.getHashtagController().getAllHashtagsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        hashtags = postController.getHashtagController().getAllHashtagsForBlog(SECOND_BLOG_NAME);
         assertThat(hashtags).isNotNull();
         assertThat(hashtags.size()).isEqualTo(BLOG2_INITIAL_HASHTAGS.size());
 
@@ -196,15 +179,14 @@ public class PostXmlMultiBlog {
      */
     @Test
     public void testAddHashtag() {
-        postController.getHashtagController().createHashtagForBlog(TevTestingHelpers.SECOND_BLOG_NAME, "tag16");
+        postController.getHashtagController().createHashtagForBlog(SECOND_BLOG_NAME, "tag16");
 
-        List<Hashtag> tags = postController.getHashtagController()
-                .getAllHashtagsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Hashtag> tags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
 
         assertThat(tags).isNotNull();
         assertThat(tags.size()).isEqualTo(BLOG1_INITIAL_HASHTAGS.size());
 
-        tags = postController.getHashtagController().getAllHashtagsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        tags = postController.getHashtagController().getAllHashtagsForBlog(SECOND_BLOG_NAME);
         assertThat(tags).isNotNull();
         assertThat(tags.size()).isEqualTo(BLOG2_INITIAL_HASHTAGS.size() + 1);
     }

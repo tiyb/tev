@@ -12,15 +12,11 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import com.tiyb.tev.TevTestingHelpers;
+import com.tiyb.tev.TevTestingClass;
 import com.tiyb.tev.controller.TEVPostRestController;
 import com.tiyb.tev.datamodel.Answer;
 import com.tiyb.tev.datamodel.Link;
@@ -29,10 +25,7 @@ import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.datamodel.Regular;
 import com.tiyb.tev.datamodel.Video;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-public class ExportWritingManuallyLoadedUnitTests {
+public class ExportWritingManuallyLoadedUnitTests extends TevTestingClass {
 
     @Autowired
     TEVPostRestController postController;
@@ -60,40 +53,36 @@ public class ExportWritingManuallyLoadedUnitTests {
 
     @Before
     public void setupData() {
-        postController.getRegController().deleteAllRegularsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
-        postController.getAnswerController().deleteAllAnswersForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
-        postController.getLinkController().deleteAllLinksForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
-        postController.getPhotoController().deleteAllPhotosForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
-        postController.getVideoController().deleteAllVideosForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
-        postController.getHashtagController().deleteAllHashtagsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
-        postController.deleteAllPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        postController.getRegController().deleteAllRegularsForBlog(MAIN_BLOG_NAME);
+        postController.getAnswerController().deleteAllAnswersForBlog(MAIN_BLOG_NAME);
+        postController.getLinkController().deleteAllLinksForBlog(MAIN_BLOG_NAME);
+        postController.getPhotoController().deleteAllPhotosForBlog(MAIN_BLOG_NAME);
+        postController.getVideoController().deleteAllVideosForBlog(MAIN_BLOG_NAME);
+        postController.getHashtagController().deleteAllHashtagsForBlog(MAIN_BLOG_NAME);
+        postController.deleteAllPostsForBlog(MAIN_BLOG_NAME);
 
-        for (Post post : TevTestingHelpers.postsForUploading) {
-            postController.createPostForBlog(TevTestingHelpers.MAIN_BLOG_NAME, post);
+        for (Post post : postsForUploading) {
+            postController.createPostForBlog(MAIN_BLOG_NAME, post);
         }
 
-        for (Regular reg : TevTestingHelpers.regularsForUploading) {
-            postController.getRegController().createRegularForBlog(TevTestingHelpers.MAIN_BLOG_NAME, reg.getPostId(),
-                    reg);
+        for (Regular reg : regularsForUploading) {
+            postController.getRegController().createRegularForBlog(MAIN_BLOG_NAME, reg.getPostId(), reg);
         }
 
-        for (Answer answer : TevTestingHelpers.answersForUploading) {
-            postController.getAnswerController().createAnswerForBlog(TevTestingHelpers.MAIN_BLOG_NAME,
-                    answer.getPostId(), answer);
+        for (Answer answer : answersForUploading) {
+            postController.getAnswerController().createAnswerForBlog(MAIN_BLOG_NAME, answer.getPostId(), answer);
         }
 
-        for (Link link : TevTestingHelpers.linksForUploading) {
-            postController.getLinkController().createLinkForBlog(TevTestingHelpers.MAIN_BLOG_NAME, link.getPostId(),
-                    link);
+        for (Link link : linksForUploading) {
+            postController.getLinkController().createLinkForBlog(MAIN_BLOG_NAME, link.getPostId(), link);
         }
 
-        for (Photo photo : TevTestingHelpers.photosForUploading) {
-            postController.getPhotoController().createPhotoForBlog(TevTestingHelpers.MAIN_BLOG_NAME, photo);
+        for (Photo photo : photosForUploading) {
+            postController.getPhotoController().createPhotoForBlog(MAIN_BLOG_NAME, photo);
         }
 
-        for (Video vid : TevTestingHelpers.videosForUploading) {
-            postController.getVideoController().createVideoForBlog(TevTestingHelpers.MAIN_BLOG_NAME, vid.getPostId(),
-                    vid);
+        for (Video vid : videosForUploading) {
+            postController.getVideoController().createVideoForBlog(MAIN_BLOG_NAME, vid.getPostId(), vid);
         }
     }
 
@@ -137,8 +126,7 @@ public class ExportWritingManuallyLoadedUnitTests {
         List<String> postIDs = new ArrayList<String>();
         postIDs.add(postID);
 
-        String result = BlogXmlWriter.getStagedPostXMLForBlog(postIDs, postController,
-                TevTestingHelpers.MAIN_BLOG_NAME);
+        String result = BlogXmlWriter.getStagedPostXMLForBlog(postIDs, postController, MAIN_BLOG_NAME);
 
         assertThat(result).isEqualToIgnoringWhitespace(expectedAnswer);
     }

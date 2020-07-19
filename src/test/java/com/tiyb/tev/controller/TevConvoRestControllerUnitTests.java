@@ -6,13 +6,9 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import com.tiyb.tev.TevTestingHelpers;
+import com.tiyb.tev.TevTestingClass;
 import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.ConversationMessage;
 
@@ -33,10 +29,7 @@ import com.tiyb.tev.datamodel.ConversationMessage;
  * same post; 5) verify all of the fields are the same
  * </p>
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-public class TevConvoRestControllerUnitTests {
+public class TevConvoRestControllerUnitTests extends TevTestingClass {
 
     @Autowired
     private TEVConvoRestController restController;
@@ -46,8 +39,8 @@ public class TevConvoRestControllerUnitTests {
      */
     @Before
     public void cleanConversations() {
-        restController.deleteAllConvoMsgsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
-        restController.deleteAllConversationsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        restController.deleteAllConvoMsgsForBlog(MAIN_BLOG_NAME);
+        restController.deleteAllConversationsForBlog(MAIN_BLOG_NAME);
     }
 
     /**
@@ -57,7 +50,7 @@ public class TevConvoRestControllerUnitTests {
     public void updateConversation() {
         Conversation original = new Conversation();
 
-        Conversation modified = restController.createConversationForBlog(TevTestingHelpers.MAIN_BLOG_NAME, original);
+        Conversation modified = restController.createConversationForBlog(MAIN_BLOG_NAME, original);
         assertThat(modified).isNotNull();
 
         modified.setNumMessages(5);
@@ -66,10 +59,10 @@ public class TevConvoRestControllerUnitTests {
         modified.setParticipantId("pid123");
         modified.setHideConversation(true);
 
-        restController.updateConversationForBlog(TevTestingHelpers.MAIN_BLOG_NAME, modified.getId(), modified);
+        restController.updateConversationForBlog(MAIN_BLOG_NAME, modified.getId(), modified);
 
-        Conversation finalFromServer = restController
-                .getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME, "new participant");
+        Conversation finalFromServer = restController.getConversationForBlogByParticipant(MAIN_BLOG_NAME,
+                "new participant");
 
         assertThat(finalFromServer).isNotNull();
         assertThat(finalFromServer).isEqualToComparingFieldByField(modified);
@@ -87,18 +80,16 @@ public class TevConvoRestControllerUnitTests {
         original.setId(1L);
         original.setHideConversation(false);
         original.setParticipant(participantName);
-        original.setBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        original.setBlog(MAIN_BLOG_NAME);
 
-        original = restController.createConversationForBlog(TevTestingHelpers.MAIN_BLOG_NAME, original);
+        original = restController.createConversationForBlog(MAIN_BLOG_NAME, original);
         assertThat(original).isNotNull();
 
-        Conversation newConvo = restController.ignoreConversationForBlog(TevTestingHelpers.MAIN_BLOG_NAME,
-                participantName);
+        Conversation newConvo = restController.ignoreConversationForBlog(MAIN_BLOG_NAME, participantName);
         assertThat(newConvo).isNotNull();
         assertThat(newConvo.getHideConversation()).isEqualTo(true);
 
-        Conversation finalConvo = restController.getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME,
-                participantName);
+        Conversation finalConvo = restController.getConversationForBlogByParticipant(MAIN_BLOG_NAME, participantName);
         assertThat(finalConvo).isNotNull();
         assertThat(finalConvo.getHideConversation()).isEqualTo(true);
     }
@@ -115,18 +106,16 @@ public class TevConvoRestControllerUnitTests {
         original.setId(1L);
         original.setHideConversation(true);
         original.setParticipant(participantName);
-        original.setBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        original.setBlog(MAIN_BLOG_NAME);
 
-        original = restController.createConversationForBlog(TevTestingHelpers.MAIN_BLOG_NAME, original);
+        original = restController.createConversationForBlog(MAIN_BLOG_NAME, original);
         assertThat(original).isNotNull();
 
-        Conversation newConvo = restController.unignoreConversationForBlog(TevTestingHelpers.MAIN_BLOG_NAME,
-                participantName);
+        Conversation newConvo = restController.unignoreConversationForBlog(MAIN_BLOG_NAME, participantName);
         assertThat(newConvo).isNotNull();
         assertThat(newConvo.getHideConversation()).isEqualTo(false);
 
-        Conversation finalConvo = restController.getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME,
-                participantName);
+        Conversation finalConvo = restController.getConversationForBlogByParticipant(MAIN_BLOG_NAME, participantName);
         assertThat(finalConvo).isNotNull();
         assertThat(finalConvo.getHideConversation()).isEqualTo(false);
     }
@@ -147,25 +136,24 @@ public class TevConvoRestControllerUnitTests {
         convo1.setId(1L);
         convo1.setParticipant(participant1);
         convo1.setHideConversation(true);
-        restController.createConversationForBlog(TevTestingHelpers.MAIN_BLOG_NAME, convo1);
+        restController.createConversationForBlog(MAIN_BLOG_NAME, convo1);
         Conversation convo2 = new Conversation();
         convo2.setId(2L);
         convo2.setParticipant(participant2);
         convo2.setHideConversation(true);
-        restController.createConversationForBlog(TevTestingHelpers.MAIN_BLOG_NAME, convo2);
+        restController.createConversationForBlog(MAIN_BLOG_NAME, convo2);
 
-        List<Conversation> allConvos = restController.getAllConversationsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Conversation> allConvos = restController.getAllConversationsForBlog(MAIN_BLOG_NAME);
         assertThat(allConvos).isNotNull();
         assertThat(allConvos.size()).isEqualTo(2);
 
-        List<Conversation> allUnHiddenConvos = restController
-                .getUnhiddenConversationsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Conversation> allUnHiddenConvos = restController.getUnhiddenConversationsForBlog(MAIN_BLOG_NAME);
         assertThat(allUnHiddenConvos).isNotNull();
         assertThat(allUnHiddenConvos.size()).isEqualTo(0);
 
-        restController.unignoreAllConversationsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        restController.unignoreAllConversationsForBlog(MAIN_BLOG_NAME);
 
-        List<Conversation> finalList = restController.getUnhiddenConversationsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Conversation> finalList = restController.getUnhiddenConversationsForBlog(MAIN_BLOG_NAME);
         assertThat(finalList).isNotNull();
         assertThat(finalList.size()).isEqualTo(2);
     }
@@ -176,13 +164,12 @@ public class TevConvoRestControllerUnitTests {
     @Test
     public void updateConvoMsg() {
         Conversation convo = new Conversation();
-        convo.setBlog(TevTestingHelpers.MAIN_BLOG_NAME);
-        convo = restController.createConversationForBlog(TevTestingHelpers.MAIN_BLOG_NAME, convo);
+        convo.setBlog(MAIN_BLOG_NAME);
+        convo = restController.createConversationForBlog(MAIN_BLOG_NAME, convo);
         ConversationMessage original = new ConversationMessage();
         original.setConversationId(convo.getId());
 
-        ConversationMessage modified = restController.createConvoMessageForBlog(TevTestingHelpers.MAIN_BLOG_NAME,
-                original);
+        ConversationMessage modified = restController.createConvoMessageForBlog(MAIN_BLOG_NAME, original);
         assertThat(modified).isNotNull();
 
         modified.setMessage("message");
@@ -190,10 +177,10 @@ public class TevConvoRestControllerUnitTests {
         modified.setTimestamp(25L);
         modified.setType("IMAGE");
 
-        restController.updateConvoMsgForBlog(TevTestingHelpers.MAIN_BLOG_NAME, modified.getId(), modified);
+        restController.updateConvoMsgForBlog(MAIN_BLOG_NAME, modified.getId(), modified);
 
-        List<ConversationMessage> finalFromServer = restController
-                .getConvoMsgForBlogByConvoID(TevTestingHelpers.MAIN_BLOG_NAME, convo.getId());
+        List<ConversationMessage> finalFromServer = restController.getConvoMsgForBlogByConvoID(MAIN_BLOG_NAME,
+                convo.getId());
 
         assertThat(finalFromServer).isNotNull();
         assertThat(finalFromServer.size()).isEqualTo(1);

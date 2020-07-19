@@ -9,8 +9,6 @@ import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
@@ -28,15 +26,41 @@ import com.gargoylesoftware.htmlunit.html.HtmlSpan;
 import com.gargoylesoftware.htmlunit.html.HtmlTable;
 import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
 import com.gargoylesoftware.htmlunit.javascript.host.event.KeyboardEvent;
-import com.tiyb.tev.TevTestingHelpers;
 import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.Post;
 
+/**
+ * Unit tests for the index/main page of the website, utilizing HtmlUnit. Trying
+ * to strike a balance between combining steps together into one test (so as to
+ * minimize runtime, since it takes HtmlUnit to long to load before each test),
+ * and having a good level of granularity so that test successes/failures
+ * <i>mean</i> something.
+ * 
+ * @author tiyb
+ *
+ */
 public class IndexHtmlTests extends HtmlTestingClass {
 
-    Logger logger = LoggerFactory.getLogger(IndexHtmlTests.class);
+    /**
+     * The main table holding posts; used in numerous tests.
+     */
     HtmlTable postTable;
 
+    // numerous constants used throughout the tests
+    private static final int NUM_ITEMS_IN_TABLE = 12; // 9 rows of data, 1 header, 2 footer
+    private static final String FIRST_POST_ID = "778563537472";
+    private static final int FIRST_POST_ROW_NO = 3;
+
+    private static final int COLUMN_ID = 0;
+    private static final int COLUMN_TYPE = 1;
+    private static final int COLUMN_STATE = 2;
+    private static final int COLUMN_SLUG = 3;
+    private static final int COLUMN_HASHTAG = 4;
+    private static final int COLUMN_DATE = 5;
+    private static final int COLUMN_FAV = 6;
+    private static final int COLUMN_READ = 7;
+
+    // values retrieved from i18n property files
     @Value("${main.title}")
     private String indexPageTitle;
 
@@ -67,23 +91,13 @@ public class IndexHtmlTests extends HtmlTestingClass {
     @Value("${viewer_buttons_unmarkfordownload}")
     private String unstagePostButtonText;
 
-    private static final int NUM_ITEMS_IN_TABLE = 12; // 9 rows of data, 1 header, 2 footer
-    private static final String FIRST_POST_ID = "778563537472";
-    private static final int FIRST_POST_ROW_NO = 3;
-
-    private static final int COLUMN_ID = 0;
-    private static final int COLUMN_TYPE = 1;
-    private static final int COLUMN_STATE = 2;
-    private static final int COLUMN_SLUG = 3;
-    private static final int COLUMN_HASHTAG = 4;
-    private static final int COLUMN_DATE = 5;
-    private static final int COLUMN_FAV = 6;
-    private static final int COLUMN_READ = 7;
-
+    /**
+     * Retrieves the main page, and sets up the postTable member
+     */
     @Before
     public void setupWC() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         restInitDataForMainBlog(Optional.empty());
-        restInitAdditionalBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        restInitAdditionalBlog(SECOND_BLOG_NAME);
 
         mainPage = webClient.getPage(baseUri());
         waitForScript();
@@ -91,6 +105,10 @@ public class IndexHtmlTests extends HtmlTestingClass {
         postTable = mainPage.getHtmlElementById("postTable");
     }
 
+    /**
+     * Tests that the main application is able to load, and that the data showing up
+     * is correct
+     */
     @Test
     public void loadApplication() {
         assertThat(mainPage.getTitleText()).isEqualTo(this.indexPageTitle);
@@ -152,7 +170,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(favButton).isNotNull();
         assertThat(favButton.getVisibleText()).isEqualTo(markFavBtnText);
 
-        Post post = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
+        Post post = getPostFromRest(MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(post.getIsFavourite()).isFalse();
 
         // click the favourite button
@@ -165,7 +183,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         favButton = newPage.querySelector("button#favouriteButton");
         assertThat(favButton).isNotNull();
 
-        post = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
+        post = getPostFromRest(MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(post.getIsFavourite()).isTrue();
         assertThat(favButton.getVisibleText()).isEqualToNormalizingWhitespace(markNonFavBtnText);
 
@@ -178,7 +196,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         waitForScript();
         favButton = newPage.querySelector("button#favouriteButton");
         assertThat(favButton).isNotNull();
-        post = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
+        post = getPostFromRest(MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(post.getIsFavourite()).isFalse();
         assertThat(favButton.asText()).isEqualTo(markFavBtnText);
 
@@ -188,7 +206,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(stagingBtn).isNotNull();
         assertThat(stagingBtn.asText()).isEqualTo(stagePostButtonText);
 
-        String[] stagedPosts = getStagedPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        String[] stagedPosts = getStagedPostsForBlog(MAIN_BLOG_NAME);
         assertThat(stagedPosts).isEmpty();
 
         // click the staging button, and verify that the post is staged
@@ -199,7 +217,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         waitForScript();
         stagingBtn = newPage.querySelector("button#stageForDownloadButton");
         assertThat(stagingBtn.getVisibleText()).isEqualToNormalizingWhitespace(unstagePostButtonText);
-        stagedPosts = getStagedPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        stagedPosts = getStagedPostsForBlog(MAIN_BLOG_NAME);
         assertThat(stagedPosts.length).isEqualTo(1);
         assertThat(stagedPosts[0]).isEqualToNormalizingWhitespace(FIRST_POST_ID);
     }
@@ -253,7 +271,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(filterReadButton.isChecked()).isFalse();
         assertThat(filterNoneButton.isChecked()).isFalse();
 
-        Metadata md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
+        Metadata md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
         assertThat(md.getFilter()).isEqualTo("Filter Unread Posts");
 
         filterReadButton.click();
@@ -263,7 +281,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(filterReadButton.isChecked()).isTrue();
         assertThat(filterNoneButton.isChecked()).isFalse();
 
-        md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
+        md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
         assertThat(md.getFilter()).isEqualTo("Filter Read Posts");
 
         filterNoneButton.click();
@@ -273,7 +291,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(filterReadButton.isChecked()).isFalse();
         assertThat(filterNoneButton.isChecked()).isTrue();
 
-        md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
+        md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
         assertThat(md.getFilter()).isEqualTo("Do not Filter");
 
         HtmlRadioButtonInput showFavsBtn = mainPage.getHtmlElementById("showFavourites");
@@ -290,7 +308,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(hideFavsBtn.isChecked()).isFalse();
         assertThat(showAllBtn.isChecked()).isFalse();
 
-        md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
+        md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
         assertThat(md.getFavFilter()).isEqualTo("Show Favourites");
 
         hideFavsBtn.click();
@@ -300,7 +318,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(hideFavsBtn.isChecked()).isTrue();
         assertThat(showAllBtn.isChecked()).isFalse();
 
-        md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
+        md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
         assertThat(md.getFavFilter()).isEqualTo("Show Non Favourites");
 
         showAllBtn.click();
@@ -310,7 +328,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(hideFavsBtn.isChecked()).isFalse();
         assertThat(showAllBtn.isChecked()).isTrue();
 
-        md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
+        md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
         assertThat(md.getFavFilter()).isEqualTo("Show Everything");
 
         HtmlRadioButtonInput showReadingPaneBtn = mainPage.getHtmlElementById("showReadingPaneSelected");
@@ -339,42 +357,59 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(additionalOptionsDiv.isDisplayed()).isFalse();
     }
 
+    /**
+     * Tests that posts can be properly marked read/unread from the table on the
+     * main page
+     */
     @Test
     public void markPostUnreadFromTable() throws IOException {
         postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_ID).getFirstElementChild().click();
         waitForScript();
         assertThat(postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ).asText()).isEqualToIgnoringWhitespace(readText);
 
-        Post postFromServer = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
+        Post postFromServer = getPostFromRest(MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(postFromServer.getIsRead()).isTrue();
 
         postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ).getFirstElementChild().click();
         waitForScript();
         assertThat(postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ).asText())
                 .isEqualToIgnoringWhitespace(nonReadText);
-        postFromServer = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
+        postFromServer = getPostFromRest(MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(postFromServer.getIsRead()).isFalse();
     }
 
+    /**
+     * Changes the drop-down in the header to change the selected blog, and verifies
+     * that content for the new blog shows up
+     */
     @Test
     public void changeBlogDropdown() throws IOException {
-        mainPage.executeJavaScript("$('#headerBlogSelect').val('secondblog').selectmenu('refresh').trigger('selectmenuselect');");
+        mainPage.executeJavaScript(
+                "$('#headerBlogSelect').val('secondblog').selectmenu('refresh').trigger('selectmenuselect');");
         waitForScript();
         assertThat(getNumRealWindows()).isEqualTo(1);
         boolean windowChecked = true;
         List<WebWindow> windows = webClient.getWebWindows();
-        for(WebWindow win : windows) {
-            HtmlPage page = (HtmlPage)win.getEnclosedPage();
+        for (WebWindow win : windows) {
+            HtmlPage page = (HtmlPage) win.getEnclosedPage();
             String url = page.getUrl().toString();
-            if(url.contains("localhost")) {
+            if (url.contains("localhost")) {
                 assertThat(url).contains("tempBlogName");
-                assertThat(url).contains(TevTestingHelpers.SECOND_BLOG_NAME);
+                assertThat(url).contains(SECOND_BLOG_NAME);
+
+                HtmlTable newPostTable = page.getHtmlElementById("postTable");
+                assertThat(newPostTable.getRowCount()).isEqualTo(4); // two header, one footer, and one row to say "no
+                                                                     // contents"
                 windowChecked = true;
             }
         }
         assertThat(windowChecked).isTrue();
     }
 
+    /**
+     * Loads the pop-up, and then hits the Esc button to confirm that the popup is
+     * closed
+     */
     @Test
     public void escButton() throws IOException {
         HtmlPage newPage = openPopup();
@@ -384,6 +419,12 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(getNumRealWindows()).isEqualTo(1);
     }
 
+    /**
+     * Helper function to open a popup-window by clicking the first post in the
+     * table
+     * 
+     * @return HtmlPage with the new window
+     */
     private HtmlPage openPopup() throws IOException {
         HtmlPage newPage = postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_ID).getFirstElementChild().click();
         waitForScript();
@@ -392,6 +433,13 @@ public class IndexHtmlTests extends HtmlTestingClass {
         return newPage;
     }
 
+    /**
+     * Various tests around the close buttons: 1) simply click the Close button, and
+     * verify that the post is still read; 2) Click the Mark Unread button, and
+     * verify that the post is no longer read; 3) set the main page to filter unread
+     * posts, open popup and click the Close and Refresh button and confirm that the
+     * main page is refreshed without the post that is now read.
+     */
     @Test
     public void closeButtons() throws IOException {
         HtmlPage newPage = openPopup();
@@ -400,7 +448,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         HtmlButton closeButton = newPage.querySelector("button#closeButton");
         closeButton.click();
         assertThat(getNumRealWindows()).isEqualTo(1);
-        Post post = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
+        Post post = getPostFromRest(MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(post.getIsRead()).isTrue();
         HtmlTableCell cell = postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ);
         assertThat(cell.asText()).isEqualToNormalizingWhitespace(readText);
@@ -412,7 +460,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         markUnreadBtn.click();
         waitForScript();
         assertThat(getNumRealWindows()).isEqualTo(1);
-        post = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
+        post = getPostFromRest(MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(post.getIsRead()).isFalse();
         mainPage = webClient.getPage(baseUri());
         waitForScript();
@@ -421,15 +469,15 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(cell.asText()).isEqualToNormalizingWhitespace(nonReadText);
 
         // filter out read posts
-        Metadata md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
+        Metadata md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
         md.setFilter("Filter Read Posts");
         updateMD(md);
-        md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
+        md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
         assertThat(md.getFilter()).isEqualTo("Filter Read Posts");
 
         // click element in the table on the main page, and get the resultant popup
         newPage = openPopup();
-        post = getPostFromRest(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_POST_ID);
+        post = getPostFromRest(MAIN_BLOG_NAME, FIRST_POST_ID);
         assertThat(post.getIsRead()).isTrue();
 
         // this shouldn't be necessary, but for some reason the metadata keeps getting
@@ -459,6 +507,10 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(mainPageChecked).isTrue();
     }
 
+    /**
+     * Verify that the main page filters itself when the hashsearch query param is
+     * added
+     */
     @Test
     public void testSearchParam() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         HtmlPage filteredPage = webClient.getPage(baseUri() + "?hashsearch=tag1");
@@ -468,6 +520,10 @@ public class IndexHtmlTests extends HtmlTestingClass {
                                                                                        // hashtag
     }
 
+    /**
+     * Tests that when a hashtag is clicked in the post viewer, the main page is
+     * refreshed and filtered on that tag
+     */
     @Test
     public void testClickingHashtagInViewer() throws IOException {
         HtmlPage popup = openPopup();

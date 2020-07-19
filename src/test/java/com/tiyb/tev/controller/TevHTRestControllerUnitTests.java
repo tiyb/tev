@@ -8,13 +8,9 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import com.tiyb.tev.TevTestingHelpers;
+import com.tiyb.tev.TevTestingClass;
 import com.tiyb.tev.datamodel.Hashtag;
 import com.tiyb.tev.exception.ExistingTagException;
 
@@ -23,10 +19,7 @@ import com.tiyb.tev.exception.ExistingTagException;
  *
  * @author tiyb
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-public class TevHTRestControllerUnitTests {
+public class TevHTRestControllerUnitTests extends TevTestingClass {
 
     private static final String SECOND_TAG_VALUE = "tag2";
     private static final String FIRST_TAG_VALUE = "tag1";
@@ -46,8 +39,8 @@ public class TevHTRestControllerUnitTests {
         htController.deleteAllHTs();
         mdController.deleteAllMD();
 
-        TevTestingHelpers.initMainBlogNoData(mdController, Optional.empty());
-        TevTestingHelpers.initAdditionalBlog(mdController, TevTestingHelpers.SECOND_BLOG_NAME);
+        initMainBlogNoData(mdController, Optional.empty());
+        initAdditionalBlog(mdController, SECOND_BLOG_NAME);
 
         htController.deleteAllHTs();
     }
@@ -57,25 +50,25 @@ public class TevHTRestControllerUnitTests {
      */
     @Test
     public void testCreatingTag() {
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
 
-        List<Hashtag> list = htController.getAllHashtagsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Hashtag> list = htController.getAllHashtagsForBlog(MAIN_BLOG_NAME);
         assertThat(list).isNotNull();
         assertThat(list.size()).isEqualTo(1);
         Hashtag ht = list.get(0);
-        assertThat(ht.getBlog()).isEqualTo(TevTestingHelpers.MAIN_BLOG_NAME);
+        assertThat(ht.getBlog()).isEqualTo(MAIN_BLOG_NAME);
         assertThat(ht.getCount()).isEqualTo(1);
         assertThat(ht.getTag()).isEqualTo(FIRST_TAG_VALUE);
 
-        list = htController.getAllHashtagsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        list = htController.getAllHashtagsForBlog(MAIN_BLOG_NAME);
         assertThat(list).isNotNull();
         assertThat(list.size()).isEqualTo(1);
         ht = list.get(0);
-        assertThat(ht.getBlog()).isEqualTo(TevTestingHelpers.MAIN_BLOG_NAME);
+        assertThat(ht.getBlog()).isEqualTo(MAIN_BLOG_NAME);
         assertThat(ht.getCount()).isEqualTo(1);
         assertThat(ht.getTag()).isEqualTo(FIRST_TAG_VALUE);
 
-        list = htController.getAllHashtagsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        list = htController.getAllHashtagsForBlog(SECOND_BLOG_NAME);
         assertThat(list).isNullOrEmpty();
     }
 
@@ -84,17 +77,17 @@ public class TevHTRestControllerUnitTests {
      */
     @Test
     public void testAddingCount() {
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
-        List<Hashtag> list = htController.getAllHashtagsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        List<Hashtag> list = htController.getAllHashtagsForBlog(MAIN_BLOG_NAME);
         assertThat(list).isNotNull();
         assertThat(list.size()).isEqualTo(1);
 
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
-        list = htController.getAllHashtagsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        list = htController.getAllHashtagsForBlog(MAIN_BLOG_NAME);
         assertThat(list).isNotNull();
         assertThat(list.size()).isEqualTo(1);
         Hashtag ht = list.get(0);
-        assertThat(ht.getBlog()).isEqualTo(TevTestingHelpers.MAIN_BLOG_NAME);
+        assertThat(ht.getBlog()).isEqualTo(MAIN_BLOG_NAME);
         assertThat(ht.getTag()).isEqualTo(FIRST_TAG_VALUE);
         assertThat(ht.getCount()).isEqualTo(2);
     }
@@ -104,18 +97,18 @@ public class TevHTRestControllerUnitTests {
      */
     @Test
     public void testCreatingMultipleTags() {
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, SECOND_TAG_VALUE);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, SECOND_TAG_VALUE);
 
-        List<Hashtag> list = htController.getAllHashtagsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Hashtag> list = htController.getAllHashtagsForBlog(MAIN_BLOG_NAME);
         assertThat(list).isNotNull();
         assertThat(list.size()).isEqualTo(2);
         Hashtag ht = list.get(0);
-        assertThat(ht.getBlog()).isEqualTo(TevTestingHelpers.MAIN_BLOG_NAME);
+        assertThat(ht.getBlog()).isEqualTo(MAIN_BLOG_NAME);
         assertThat(ht.getCount()).isEqualTo(1);
         assertThat(ht.getTag()).isEqualTo(FIRST_TAG_VALUE);
         ht = list.get(1);
-        assertThat(ht.getBlog()).isEqualTo(TevTestingHelpers.MAIN_BLOG_NAME);
+        assertThat(ht.getBlog()).isEqualTo(MAIN_BLOG_NAME);
         assertThat(ht.getCount()).isEqualTo(1);
         assertThat(ht.getTag()).isEqualTo(SECOND_TAG_VALUE);
     }
@@ -125,14 +118,14 @@ public class TevHTRestControllerUnitTests {
      */
     @Test
     public void creatingMultipleTagsInMultipleBlogs() {
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(TevTestingHelpers.SECOND_BLOG_NAME, SECOND_TAG_VALUE);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(SECOND_BLOG_NAME, SECOND_TAG_VALUE);
 
-        List<Hashtag> list = htController.getAllHashtagsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Hashtag> list = htController.getAllHashtagsForBlog(MAIN_BLOG_NAME);
         assertThat(list).isNotNull();
         assertThat(list.size()).isEqualTo(1);
 
-        list = htController.getAllHashtagsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        list = htController.getAllHashtagsForBlog(SECOND_BLOG_NAME);
         assertThat(list).isNotNull();
         assertThat(list.size()).isEqualTo(1);
     }
@@ -143,17 +136,17 @@ public class TevHTRestControllerUnitTests {
      */
     @Test
     public void testAddingToOnlyOneBlog() {
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(TevTestingHelpers.SECOND_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(SECOND_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
 
-        List<Hashtag> list = htController.getAllHashtagsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Hashtag> list = htController.getAllHashtagsForBlog(MAIN_BLOG_NAME);
         assertThat(list).isNotNull();
         assertThat(list.size()).isEqualTo(1);
         Hashtag ht = list.get(0);
         assertThat(ht.getCount()).isEqualTo(2);
 
-        list = htController.getAllHashtagsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        list = htController.getAllHashtagsForBlog(SECOND_BLOG_NAME);
         assertThat(list).isNotNull();
         assertThat(list.size()).isEqualTo(1);
         ht = list.get(0);
@@ -161,8 +154,7 @@ public class TevHTRestControllerUnitTests {
 
         List<Hashtag> allTags = htController.getAllHashtags();
         assertThat(allTags.size()).isEqualTo(1);
-        assertThat(allTags.get(0).getBlog()).contains(TevTestingHelpers.MAIN_BLOG_NAME,
-                TevTestingHelpers.SECOND_BLOG_NAME);
+        assertThat(allTags.get(0).getBlog()).contains(MAIN_BLOG_NAME, SECOND_BLOG_NAME);
     }
 
     /**
@@ -171,20 +163,20 @@ public class TevHTRestControllerUnitTests {
      */
     @Test
     public void deleteNameForOneBlog() {
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(TevTestingHelpers.SECOND_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(SECOND_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
 
-        Hashtag ht = new Hashtag(FIRST_TAG_VALUE, 2, TevTestingHelpers.MAIN_BLOG_NAME);
+        Hashtag ht = new Hashtag(FIRST_TAG_VALUE, 2, MAIN_BLOG_NAME);
         htController.deleteHashTag(ht);
 
-        List<Hashtag> list = htController.getAllHashtagsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        List<Hashtag> list = htController.getAllHashtagsForBlog(SECOND_BLOG_NAME);
         assertThat(list).isNotNull();
         assertThat(list.size()).isEqualTo(1);
         Hashtag fromServer = list.get(0);
         assertThat(fromServer.getCount()).isEqualTo(1);
 
-        list = htController.getAllHashtagsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        list = htController.getAllHashtagsForBlog(MAIN_BLOG_NAME);
         assertThat(list).isNullOrEmpty();
     }
 
@@ -194,42 +186,42 @@ public class TevHTRestControllerUnitTests {
      */
     @Test
     public void testMergedList() {
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(TevTestingHelpers.SECOND_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(SECOND_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
 
         List<Hashtag> list = htController.getAllHashtags();
         assertThat(list).isNotNull();
         assertThat(list.size()).isEqualTo(1);
         Hashtag ht = list.get(0);
-        assertThat(ht.getBlog()).contains(TevTestingHelpers.MAIN_BLOG_NAME, TevTestingHelpers.SECOND_BLOG_NAME);
+        assertThat(ht.getBlog()).contains(MAIN_BLOG_NAME, SECOND_BLOG_NAME);
         assertThat(ht.getCount()).isEqualTo(3);
 
-        htController.createHashtagForBlog(TevTestingHelpers.SECOND_BLOG_NAME, SECOND_TAG_VALUE);
+        htController.createHashtagForBlog(SECOND_BLOG_NAME, SECOND_TAG_VALUE);
 
         list = htController.getAllHashtags();
         assertThat(list.size()).isEqualTo(2);
         for (Hashtag t : list) {
             if (FIRST_TAG_VALUE.equals(t.getTag())) {
                 assertThat(t.getCount()).isEqualTo(3);
-                assertThat(t.getBlog()).contains(TevTestingHelpers.MAIN_BLOG_NAME, TevTestingHelpers.SECOND_BLOG_NAME);
+                assertThat(t.getBlog()).contains(MAIN_BLOG_NAME, SECOND_BLOG_NAME);
             } else {
                 assertThat(t.getCount()).isEqualTo(1);
-                assertThat(t.getBlog()).isEqualTo(TevTestingHelpers.SECOND_BLOG_NAME);
+                assertThat(t.getBlog()).isEqualTo(SECOND_BLOG_NAME);
             }
         }
 
-        htController.createHashtagForBlog(TevTestingHelpers.SECOND_BLOG_NAME, SECOND_TAG_VALUE);
+        htController.createHashtagForBlog(SECOND_BLOG_NAME, SECOND_TAG_VALUE);
 
         list = htController.getAllHashtags();
         assertThat(list.size()).isEqualTo(2);
         for (Hashtag t : list) {
             if (FIRST_TAG_VALUE.equals(t.getTag())) {
                 assertThat(t.getCount()).isEqualTo(3);
-                assertThat(t.getBlog()).contains(TevTestingHelpers.MAIN_BLOG_NAME, TevTestingHelpers.SECOND_BLOG_NAME);
+                assertThat(t.getBlog()).contains(MAIN_BLOG_NAME, SECOND_BLOG_NAME);
             } else {
                 assertThat(t.getCount()).isEqualTo(2);
-                assertThat(t.getBlog()).isEqualTo(TevTestingHelpers.SECOND_BLOG_NAME);
+                assertThat(t.getBlog()).isEqualTo(SECOND_BLOG_NAME);
             }
         }
     }
@@ -239,10 +231,10 @@ public class TevHTRestControllerUnitTests {
      */
     @Test
     public void createHTForNoBlog() {
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(TevTestingHelpers.SECOND_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(TevTestingHelpers.SECOND_BLOG_NAME, SECOND_TAG_VALUE);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(SECOND_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(SECOND_BLOG_NAME, SECOND_TAG_VALUE);
         htController.createHashtagForNoBlog(THIRD_TAG_VALUE);
 
         List<Hashtag> list = htController.getAllHashtags();
@@ -251,10 +243,10 @@ public class TevHTRestControllerUnitTests {
         for (Hashtag t : list) {
             if (FIRST_TAG_VALUE.equals(t.getTag())) {
                 assertThat(t.getCount()).isEqualTo(3);
-                assertThat(t.getBlog()).contains(TevTestingHelpers.MAIN_BLOG_NAME, TevTestingHelpers.SECOND_BLOG_NAME);
+                assertThat(t.getBlog()).contains(MAIN_BLOG_NAME, SECOND_BLOG_NAME);
             } else if (SECOND_TAG_VALUE.equals(t.getTag())) {
                 assertThat(t.getCount()).isEqualTo(1);
-                assertThat(t.getBlog()).isEqualTo(TevTestingHelpers.SECOND_BLOG_NAME);
+                assertThat(t.getBlog()).isEqualTo(SECOND_BLOG_NAME);
             } else if (THIRD_TAG_VALUE.equals(t.getTag())) {
                 assertThat(t.getCount()).isEqualTo(1);
                 assertThat(t.getBlog()).isBlank();
@@ -269,10 +261,10 @@ public class TevHTRestControllerUnitTests {
      */
     @Test
     public void deleteBlankBlog() {
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(TevTestingHelpers.SECOND_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(TevTestingHelpers.SECOND_BLOG_NAME, SECOND_TAG_VALUE);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(SECOND_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(SECOND_BLOG_NAME, SECOND_TAG_VALUE);
         htController.createHashtagForNoBlog(THIRD_TAG_VALUE);
 
         Hashtag htToDelete = new Hashtag(THIRD_TAG_VALUE, 0, StringUtils.EMPTY);
@@ -284,10 +276,10 @@ public class TevHTRestControllerUnitTests {
         for (Hashtag t : list) {
             if (FIRST_TAG_VALUE.equals(t.getTag())) {
                 assertThat(t.getCount()).isEqualTo(3);
-                assertThat(t.getBlog()).contains(TevTestingHelpers.MAIN_BLOG_NAME, TevTestingHelpers.SECOND_BLOG_NAME);
+                assertThat(t.getBlog()).contains(MAIN_BLOG_NAME, SECOND_BLOG_NAME);
             } else if (SECOND_TAG_VALUE.equals(t.getTag())) {
                 assertThat(t.getCount()).isEqualTo(1);
-                assertThat(t.getBlog()).isEqualTo(TevTestingHelpers.SECOND_BLOG_NAME);
+                assertThat(t.getBlog()).isEqualTo(SECOND_BLOG_NAME);
             } else if (THIRD_TAG_VALUE.equals(t.getTag())) {
                 assertThat(true).isFalse();
             } else {
@@ -302,7 +294,7 @@ public class TevHTRestControllerUnitTests {
      */
     @Test(expected = ExistingTagException.class)
     public void htCantCreateBlankWhenExists() {
-        htController.createHashtagForBlog(TevTestingHelpers.MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
         htController.createHashtagForNoBlog(FIRST_TAG_VALUE);
     }
 }

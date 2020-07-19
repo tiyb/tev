@@ -22,7 +22,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
 import com.gargoylesoftware.htmlunit.html.HtmlSpan;
 import com.gargoylesoftware.htmlunit.html.HtmlTable;
 import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
-import com.tiyb.tev.TevTestingHelpers;
 import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.Metadata;
 
@@ -56,7 +55,7 @@ public class ConvoHtmlTests extends HtmlTestingClass {
         // set to show reading pane, and open a conversation
         showReadingPaneBtn.click();
         waitForScript();
-        Metadata md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
+        Metadata md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
         assertThat(md.getShowReadingPane()).isTrue();
         HtmlTable convoTable = mainPage.getHtmlElementById(CONVERSATION_TABLE_ID);
         convoTable.getCellAt(FIRST_TABLE_ROW, COLUMN_PARTICIPANT).getFirstElementChild().click();
@@ -72,7 +71,7 @@ public class ConvoHtmlTests extends HtmlTestingClass {
         showPopups.click();
         waitForScript();
         assertThat(readingPaneCell.isDisplayed()).isFalse();
-        md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
+        md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
         assertThat(md.getShowReadingPane()).isFalse();
         convoTable.getCellAt(FIRST_TABLE_ROW, COLUMN_PARTICIPANT).getFirstElementChild().click();
         assertThat(readingPaneCell.isDisplayed()).isFalse();
@@ -136,7 +135,7 @@ public class ConvoHtmlTests extends HtmlTestingClass {
         waitForScript();
         assertThat(getNumRealWindows()).isEqualTo(1);
 
-        Conversation convo1 = getConversation(TevTestingHelpers.MAIN_BLOG_NAME, "participant1");
+        Conversation convo1 = getConversation(MAIN_BLOG_NAME, "participant1");
         assertThat(convo1.getHideConversation()).isTrue();
 
         // update conversation, un-hide it again, then re-open the window and click the
@@ -151,7 +150,7 @@ public class ConvoHtmlTests extends HtmlTestingClass {
         waitForScript();
         assertThat(getNumRealWindows()).isEqualTo(1);
 
-        convo1 = getConversation(TevTestingHelpers.MAIN_BLOG_NAME, "participant1");
+        convo1 = getConversation(MAIN_BLOG_NAME, "participant1");
         assertThat(convo1.getHideConversation()).isTrue();
 
         mainPage = (HtmlPage) mainPage.refresh();

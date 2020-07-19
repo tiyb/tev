@@ -8,7 +8,11 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 
 import com.tiyb.tev.controller.TEVConvoRestController;
@@ -33,16 +37,19 @@ import com.tiyb.tev.xml.ConversationXmlReader;
  * @author tiyb
  *
  */
-public abstract class TevTestingHelpers {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+public abstract class TevTestingClass {
 
-    public final static String MAIN_INPUT_XML_FILE = "classpath:XML/test-post-xml.xml";
-    public final static String SECONDARY_INPUT_XML_FILE = "classpath:XML/test-post-secondblog.xml";
-    public final static String MAIN_CONVO_XML_FILE = "classpath:XML/test-messages-xml.xml";
+    private final static String MAIN_INPUT_XML_FILE = "classpath:XML/test-post-xml.xml";
+    private final static String SECONDARY_INPUT_XML_FILE = "classpath:XML/test-post-secondblog.xml";
+    private final static String MAIN_CONVO_XML_FILE = "classpath:XML/test-messages-xml.xml";
 
-    public final static String MAIN_BLOG_NAME = "mainblog";
-    public final static String SECOND_BLOG_NAME = "secondblog";
+    protected final static String MAIN_BLOG_NAME = "mainblog";
+    protected final static String SECOND_BLOG_NAME = "secondblog";
 
-    public final static List<Post> postsForUploading = List.of(new Post("180894436671", // id
+    protected final static List<Post> postsForUploading = List.of(new Post("180894436671", // id
             "https://mainblog.tumblr.com/post/180894436671", // url
             "https://mainblog.tumblr.com/post/180894436671/first-post", // url with slug
             "2018-12-07 16:48:43 GMT", // date GMT
@@ -197,7 +204,7 @@ public abstract class TevTestingHelpers {
             null // width
     ));
 
-    public final static List<Regular> regularsForUploading = List.of(new Regular("180894436671", // post ID
+    protected final static List<Regular> regularsForUploading = List.of(new Regular("180894436671", // post ID
             "First Post", // title
             "“This is some quoted text,” she said, “so will it be interpreted correctly?” It was a great question &ndash; and this JUnit test would settle it once and for all." // body
     ), new Regular("190097591599", // post ID
@@ -211,7 +218,7 @@ public abstract class TevTestingHelpers {
             "post body text here" // body
     ));
 
-    public final static List<Photo> photosForUploading = List.of(new Photo("180784644740", // post ID
+    protected final static List<Photo> photosForUploading = List.of(new Photo("180784644740", // post ID
             "This is the caption for a photo post", // caption
             "http://bit.ly/some-photo", // photo link url
             null, // offset
@@ -249,7 +256,7 @@ public abstract class TevTestingHelpers {
             "photo 4 75.jpg" // url 75
     ));
 
-    public final static List<Video> videosForUploading = List.of(new Video("180782992914", // post ID
+    protected final static List<Video> videosForUploading = List.of(new Video("180782992914", // post ID
             "video/mp4", // content type
             "mp4", // extension
             854, // width
@@ -268,22 +275,22 @@ public abstract class TevTestingHelpers {
                     + "&lt;/video&gt;\n" + "            " // video player 250
     ));
 
-    public final static List<Answer> answersForUploading = List.of(new Answer("180371366195", // post ID
+    protected final static List<Answer> answersForUploading = List.of(new Answer("180371366195", // post ID
             "Question text", // question
             "Answer text" // answer
     ));
 
-    public final static List<Link> linksForUploading = List.of(new Link("180265557725", // post ID
+    protected final static List<Link> linksForUploading = List.of(new Link("180265557725", // post ID
             "Tumblr", // text
             "https://someblog.tumblr.com/", // url
             "This is the link description" // description
     ));
 
-    public final static List<FullConversation> conversationsToUpload = List
+    protected final static List<FullConversation> conversationsToUpload = List
             .of(new FullConversation(new Conversation("participant1", // participant
                     "http://participant1/avatar", // participant avatar
                     "t:eMUq2ec6xRwaki33S-DLig", // participant ID
-                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    MAIN_BLOG_NAME, // blog
                     9 // num messages
             ), List.of(new ConversationMessage(1544197586L, // TS
                     false, // received
@@ -324,7 +331,7 @@ public abstract class TevTestingHelpers {
             ))), new FullConversation(new Conversation("participant2", // participant
                     "http://participant2/avatar", // participant avatar
                     "t:daPIjnWif90ATTPO_iqMVA", // participant ID
-                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    MAIN_BLOG_NAME, // blog
                     9 // num messages
             ), List.of(new ConversationMessage(1544012468L, // TS
                     true, // received
@@ -365,7 +372,7 @@ public abstract class TevTestingHelpers {
             ))), new FullConversation(new Conversation("participant3", // participant
                     "http://participant3/avatar", // participant avatar
                     "", // participant ID
-                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    MAIN_BLOG_NAME, // blog
                     1 // num messages
             ), List.of(new ConversationMessage(1544012468L, // TS
                     false, // received
@@ -374,7 +381,7 @@ public abstract class TevTestingHelpers {
             ))), new FullConversation(new Conversation("participant4", // participant
                     "http://participant4/avatar", // participant avatar
                     "OY3QnUHjX3lZs6orBDaI", // participant ID
-                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    MAIN_BLOG_NAME, // blog
                     1 // num messages
             ), List.of(new ConversationMessage(1544012468L, // TS
                     true, // received
@@ -383,7 +390,7 @@ public abstract class TevTestingHelpers {
             ))), new FullConversation(new Conversation("participant-oldname", // participant
                     "http://participanton/avatar", // participant avatar
                     "foaiehoihafoei", // participant ID
-                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    MAIN_BLOG_NAME, // blog
                     1 // num messages
             ), List.of(new ConversationMessage(1544012468L, // TS
                     true, // received
@@ -392,7 +399,7 @@ public abstract class TevTestingHelpers {
             ))), new FullConversation(new Conversation("goingtobedeactivated", // participant
                     "http://goingtobedeac/avatar", // participant avatar
                     "afoiehaifeh", // participant ID
-                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    MAIN_BLOG_NAME, // blog
                     2 // num messages
             ), List.of(new ConversationMessage(1544012470L, // TS
                     true, // received
@@ -405,7 +412,7 @@ public abstract class TevTestingHelpers {
             ))), new FullConversation(new Conversation("NO NAME", // participant
                     "", // participant avatar
                     "foae8yofeiu", // participant ID
-                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    MAIN_BLOG_NAME, // blog
                     1 // num messages
             ), List.of(new ConversationMessage(1544012485L, // TS
                     true, // received
@@ -414,21 +421,13 @@ public abstract class TevTestingHelpers {
             ))), new FullConversation(new Conversation("participant1 1", // participant
                     "http://duplicatename/avatar", // participant avatar
                     "lihkg", // participant ID
-                    TevTestingHelpers.MAIN_BLOG_NAME, // blog
+                    MAIN_BLOG_NAME, // blog
                     1 // num messages
             ), List.of(new ConversationMessage(1544012485L, // TS
                     true, // received
                     "TEXT", // type
                     "Message 1" // message
             ))));
-
-//    public final static List<FullConversation> conversationsToUpload = List
-//            .of(new FullConversation(new Conversation("participant1", // participant
-//                    "http://participant1/avatar", // participant avatar
-//                    "t:eMUq2ec6xRwaki33S-DLig", // participant ID
-//                    TevTestingHelpers.MAIN_BLOG_NAME // blog
-//            ), List.of(new ConversationMessage())),
-//                    new FullConversation(new Conversation(), List.Of(new ConversationMessage())));
 
     /**
      * Initializes the blog with data from the sample XML file
@@ -439,28 +438,28 @@ public abstract class TevTestingHelpers {
      * @throws FileNotFoundException If the input XML file can' be loaded for some
      *                               reason
      */
-    public static void initDataForMainBlog(TEVMetadataRestController mdController, TEVPostRestController postController,
+    protected static void initDataForMainBlog(TEVMetadataRestController mdController, TEVPostRestController postController,
             Optional<String> baseMediaPath) throws FileNotFoundException {
         initMainBlogNoData(mdController, baseMediaPath);
 
         readPostXml(MAIN_INPUT_XML_FILE, postController, MAIN_BLOG_NAME);
     }
 
-    public static void initDataForSecondaryBlog(TEVMetadataRestController mdController,
+    protected static void initDataForSecondaryBlog(TEVMetadataRestController mdController,
             TEVPostRestController postController, Optional<String> baseMediaPath) throws FileNotFoundException {
         initAdditionalBlog(mdController, SECOND_BLOG_NAME);
 
         readPostXml(SECONDARY_INPUT_XML_FILE, postController, SECOND_BLOG_NAME);
     }
 
-    private static void readPostXml(String xmlFileToLoad, TEVPostRestController postController, String blogName)
+    protected static void readPostXml(String xmlFileToLoad, TEVPostRestController postController, String blogName)
             throws FileNotFoundException {
         File rawXmlFile = ResourceUtils.getFile(xmlFileToLoad);
         InputStream xmlFile = new FileInputStream(rawXmlFile);
         BlogXmlReader.parseDocument(xmlFile, postController, blogName);
     }
 
-    public static void initConvoForMainBlog(TEVMetadataRestController mdController,
+    protected static void initConvoForMainBlog(TEVMetadataRestController mdController,
             TEVConvoRestController convoController) throws IOException {
         initMainBlogNoData(mdController, Optional.empty());
 
@@ -476,7 +475,7 @@ public abstract class TevTestingHelpers {
      * @param mdController  REST controller for working with metdata
      * @param baseMediaPath Optional path to be used for media
      */
-    public static void initMainBlogNoData(TEVMetadataRestController mdController, Optional<String> baseMediaPath) {
+    protected static void initMainBlogNoData(TEVMetadataRestController mdController, Optional<String> baseMediaPath) {
         Metadata md = mdController.getMetadataForBlogOrDefault(MAIN_BLOG_NAME);
         md.setBlog(MAIN_BLOG_NAME);
         md.setMainTumblrUser(MAIN_BLOG_NAME);
@@ -490,7 +489,7 @@ public abstract class TevTestingHelpers {
         mdController.updateMetadata(md.getId(), md);
     }
 
-    public static void initAdditionalBlog(TEVMetadataRestController mdController, String blogName) {
+    protected static void initAdditionalBlog(TEVMetadataRestController mdController, String blogName) {
         Metadata md = mdController.getMetadataForBlogOrDefault(blogName);
         md.setBlog(blogName);
         md.setIsDefault(false);

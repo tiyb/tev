@@ -11,16 +11,12 @@ import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 
 import com.tiyb.tev.FullConversation;
-import com.tiyb.tev.TevTestingHelpers;
+import com.tiyb.tev.TevTestingClass;
 import com.tiyb.tev.controller.TEVConvoRestController;
 import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.datamodel.Conversation;
@@ -28,10 +24,7 @@ import com.tiyb.tev.datamodel.ConversationMessage;
 import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.exception.XMLParsingException;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-public class ManualConversationUnitTests {
+public class ManualConversationUnitTests extends TevTestingClass {
 
     @Autowired
     private TEVConvoRestController convoRestController;
@@ -52,12 +45,12 @@ public class ManualConversationUnitTests {
 
     @Before
     public void setup() {
-        TevTestingHelpers.initMainBlogNoData(mdRestController, Optional.empty());
-        
-        convoRestController.deleteAllConvoMsgsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
-        convoRestController.deleteAllConversationsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        initMainBlogNoData(mdRestController, Optional.empty());
 
-        for (FullConversation fc : TevTestingHelpers.conversationsToUpload) {
+        convoRestController.deleteAllConvoMsgsForBlog(MAIN_BLOG_NAME);
+        convoRestController.deleteAllConversationsForBlog(MAIN_BLOG_NAME);
+
+        for (FullConversation fc : conversationsToUpload) {
             Conversation convoOnServer = convoRestController.createConversationForBlog(fc.getConversation().getBlog(),
                     fc.getConversation());
 
@@ -76,56 +69,56 @@ public class ManualConversationUnitTests {
      */
     @Test
     public void checkConversations() {
-        List<Conversation> convos = convoRestController.getAllConversationsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Conversation> convos = convoRestController.getAllConversationsForBlog(MAIN_BLOG_NAME);
 
         assertThat(convos).isNotNull();
         assertThat(convos.size()).isEqualTo(TOTAL_NUM_CONVOS);
 
-        Conversation firstConvo = convoRestController
-                .getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME, convo1Participant);
+        Conversation firstConvo = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME,
+                convo1Participant);
         assertThat(firstConvo).isNotNull();
         assertThat(firstConvo.getNumMessages()).isEqualTo(9);
         assertThat(firstConvo.getParticipantAvatarUrl()).isEqualTo("http://participant1/avatar");
 
-        Conversation secondConvo = convoRestController
-                .getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME, convo2Participant);
+        Conversation secondConvo = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME,
+                convo2Participant);
         assertThat(secondConvo).isNotNull();
         assertThat(secondConvo.getNumMessages()).isEqualTo(9);
         assertThat(secondConvo.getParticipantAvatarUrl()).isEqualTo("http://participant2/avatar");
 
-        Conversation thirdConvo = convoRestController
-                .getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME, convo3Participant);
+        Conversation thirdConvo = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME,
+                convo3Participant);
         assertThat(thirdConvo).isNotNull();
         assertThat(thirdConvo.getNumMessages()).isEqualTo(1);
 
-        Conversation fourthConvo = convoRestController
-                .getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME, convo4Participant);
+        Conversation fourthConvo = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME,
+                convo4Participant);
         assertThat(fourthConvo).isNotNull();
         assertThat(fourthConvo.getNumMessages()).isEqualTo(1);
 
-        Conversation changedConvo = convoRestController.getConversationForBlogByParticipantIdOrName(
-                TevTestingHelpers.MAIN_BLOG_NAME, oldNameParticipantId, "");
+        Conversation changedConvo = convoRestController.getConversationForBlogByParticipantIdOrName(MAIN_BLOG_NAME,
+                oldNameParticipantId, "");
         assertThat(changedConvo).isNotNull();
         assertThat(changedConvo.getNumMessages()).isEqualTo(1);
         assertThat(changedConvo.getParticipant()).isEqualTo("participant-oldname");
         assertThat(changedConvo.getParticipantAvatarUrl()).isEqualTo("http://participanton/avatar");
 
-        Conversation toBeDeactConvo = convoRestController
-                .getConversationForBlogByParticipantIdOrName(TevTestingHelpers.MAIN_BLOG_NAME, tobeDeactivatedId, "");
+        Conversation toBeDeactConvo = convoRestController.getConversationForBlogByParticipantIdOrName(MAIN_BLOG_NAME,
+                tobeDeactivatedId, "");
         assertThat(toBeDeactConvo).isNotNull();
         assertThat(toBeDeactConvo.getNumMessages()).isEqualTo(2);
         assertThat(toBeDeactConvo.getParticipant()).isEqualTo("goingtobedeactivated");
         assertThat(toBeDeactConvo.getParticipantAvatarUrl()).isEqualTo("http://goingtobedeac/avatar");
 
-        Conversation blankParticipantConvo = convoRestController
-                .getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME, blankParticipant);
+        Conversation blankParticipantConvo = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME,
+                blankParticipant);
         assertThat(blankParticipantConvo).isNotNull();
         assertThat(blankParticipantConvo.getNumMessages()).isEqualTo(1);
         assertThat(blankParticipantConvo.getParticipant()).isEqualTo("NO NAME");
         assertThat(blankParticipantConvo.getParticipantAvatarUrl()).isEmpty();
 
-        Conversation dupNameConvo = convoRestController
-                .getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME, duplicateParticipant);
+        Conversation dupNameConvo = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME,
+                duplicateParticipant);
         assertThat(dupNameConvo).isNotNull();
         assertThat(dupNameConvo.getNumMessages()).isEqualTo(1);
         assertThat(dupNameConvo.getParticipant()).isEqualTo("participant1 1");
@@ -139,7 +132,7 @@ public class ManualConversationUnitTests {
      */
     @Test
     public void checkBlankParticipantLoading() {
-        List<Conversation> convos = convoRestController.getAllConversationsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Conversation> convos = convoRestController.getAllConversationsForBlog(MAIN_BLOG_NAME);
 
         assertThat(convos).isNotNull();
         assertThat(convos.size()).isEqualTo(TOTAL_NUM_CONVOS);
@@ -160,8 +153,8 @@ public class ManualConversationUnitTests {
      */
     @Test
     public void testRetrieveConvoWithNoId() {
-        Conversation returnedConvo = convoRestController
-                .getConversationForBlogByParticipantIdOrName(TevTestingHelpers.MAIN_BLOG_NAME, "", convo3Participant);
+        Conversation returnedConvo = convoRestController.getConversationForBlogByParticipantIdOrName(MAIN_BLOG_NAME, "",
+                convo3Participant);
         assertThat(returnedConvo).isNotNull();
         assertThat(returnedConvo.getNumMessages()).isEqualTo(1);
         assertThat(returnedConvo.getParticipant()).isEqualTo(convo3Participant);
@@ -177,10 +170,8 @@ public class ManualConversationUnitTests {
      */
     @Test
     public void checkConvo1Messages() {
-        Conversation convo = convoRestController.getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME,
-                convo1Participant);
-        List<ConversationMessage> msgs = convoRestController
-                .getConvoMsgForBlogByConvoID(TevTestingHelpers.MAIN_BLOG_NAME, convo.getId());
+        Conversation convo = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME, convo1Participant);
+        List<ConversationMessage> msgs = convoRestController.getConvoMsgForBlogByConvoID(MAIN_BLOG_NAME, convo.getId());
         assertThat(msgs).isNotNull();
         assertThat(msgs.size()).isEqualTo(9);
 
@@ -238,10 +229,8 @@ public class ManualConversationUnitTests {
      */
     @Test
     public void checkConvo2Messages() {
-        Conversation convo = convoRestController.getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME,
-                convo2Participant);
-        List<ConversationMessage> msgs = convoRestController
-                .getConvoMsgForBlogByConvoID(TevTestingHelpers.MAIN_BLOG_NAME, convo.getId());
+        Conversation convo = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME, convo2Participant);
+        List<ConversationMessage> msgs = convoRestController.getConvoMsgForBlogByConvoID(MAIN_BLOG_NAME, convo.getId());
         assertThat(msgs).isNotNull();
         assertThat(msgs.size()).isEqualTo(9);
 
@@ -299,10 +288,8 @@ public class ManualConversationUnitTests {
      */
     @Test
     public void checkConvo3Messages() {
-        Conversation convo = convoRestController.getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME,
-                convo3Participant);
-        List<ConversationMessage> msgs = convoRestController
-                .getConvoMsgForBlogByConvoID(TevTestingHelpers.MAIN_BLOG_NAME, convo.getId());
+        Conversation convo = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME, convo3Participant);
+        List<ConversationMessage> msgs = convoRestController.getConvoMsgForBlogByConvoID(MAIN_BLOG_NAME, convo.getId());
         assertThat(msgs).isNotNull();
         assertThat(msgs.size()).isEqualTo(1);
 
@@ -320,10 +307,8 @@ public class ManualConversationUnitTests {
      */
     @Test
     public void checkConvo4Messages() {
-        Conversation convo = convoRestController.getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME,
-                convo4Participant);
-        List<ConversationMessage> msgs = convoRestController
-                .getConvoMsgForBlogByConvoID(TevTestingHelpers.MAIN_BLOG_NAME, convo.getId());
+        Conversation convo = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME, convo4Participant);
+        List<ConversationMessage> msgs = convoRestController.getConvoMsgForBlogByConvoID(MAIN_BLOG_NAME, convo.getId());
         assertThat(msgs).isNotNull();
         assertThat(msgs.size()).isEqualTo(1);
 
@@ -344,61 +329,55 @@ public class ManualConversationUnitTests {
      */
     @Test
     public void testAddingConvos() throws IOException {
-        List<Conversation> convos = convoRestController.getAllConversationsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Conversation> convos = convoRestController.getAllConversationsForBlog(MAIN_BLOG_NAME);
         assertThat(convos.size()).isEqualTo(TOTAL_NUM_CONVOS);
 
         for (Conversation convo : convos) {
             convo.setHideConversation(true);
-            convoRestController.updateConversationForBlog(TevTestingHelpers.MAIN_BLOG_NAME, convo.getId(), convo);
+            convoRestController.updateConversationForBlog(MAIN_BLOG_NAME, convo.getId(), convo);
         }
 
-        Metadata md = mdRestController.getMetadataForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        Metadata md = mdRestController.getMetadataForBlog(MAIN_BLOG_NAME);
         md.setOverwriteConvoData(false);
         md = mdRestController.updateMetadata(md.getId(), md);
 
         File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-messages-extended-xml.xml");
         InputStream xmlFile = new FileInputStream(rawXmlFile);
         MockMultipartFile mockFile = new MockMultipartFile("testmessages", xmlFile);
-        ConversationXmlReader.parseDocument(mockFile, mdRestController, convoRestController,
-                TevTestingHelpers.MAIN_BLOG_NAME);
+        ConversationXmlReader.parseDocument(mockFile, mdRestController, convoRestController, MAIN_BLOG_NAME);
 
-        convos = convoRestController.getAllConversationsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        convos = convoRestController.getAllConversationsForBlog(MAIN_BLOG_NAME);
         assertThat(convos).isNotNull();
         assertThat(convos.size()).isEqualTo(TOTAL_NUM_CONVOS + 1);
 
-        Conversation convo = convoRestController.getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME,
-                convo1Participant);
+        Conversation convo = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME, convo1Participant);
         assertThat(convo).isNotNull();
         assertThat(convo.getHideConversation()).isEqualTo(false);
-        List<ConversationMessage> messages = convoRestController
-                .getConvoMsgForBlogByConvoID(TevTestingHelpers.MAIN_BLOG_NAME, convo.getId());
+        List<ConversationMessage> messages = convoRestController.getConvoMsgForBlogByConvoID(MAIN_BLOG_NAME,
+                convo.getId());
         assertThat(messages).isNotNull();
         assertThat(messages.size()).isEqualTo(10);
 
-        convo = convoRestController.getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME,
-                convo2Participant);
+        convo = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME, convo2Participant);
         assertThat(convo).isNotNull();
         assertThat(convo.getHideConversation()).isEqualTo(true);
 
-        convo = convoRestController.getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME,
-                convo3Participant);
+        convo = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME, convo3Participant);
         assertThat(convo).isNotNull();
         assertThat(convo.getHideConversation()).isEqualTo(false);
         assertThat(convo.getNumMessages()).isEqualTo(2);
-        messages = convoRestController.getConvoMsgForBlogByConvoID(TevTestingHelpers.MAIN_BLOG_NAME, convo.getId());
+        messages = convoRestController.getConvoMsgForBlogByConvoID(MAIN_BLOG_NAME, convo.getId());
         assertThat(messages).isNotNull();
         assertThat(messages.size()).isEqualTo(2);
 
-        convo = convoRestController.getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME,
-                convo4Participant);
+        convo = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME, convo4Participant);
         assertThat(convo).isNotNull();
         assertThat(convo.getHideConversation()).isEqualTo(true);
 
-        convo = convoRestController.getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME,
-                convo5Participant);
+        convo = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME, convo5Participant);
         assertThat(convo).isNotNull();
         assertThat(convo.getHideConversation()).isEqualTo(false);
-        messages = convoRestController.getConvoMsgForBlogByConvoID(TevTestingHelpers.MAIN_BLOG_NAME, convo.getId());
+        messages = convoRestController.getConvoMsgForBlogByConvoID(MAIN_BLOG_NAME, convo.getId());
         assertThat(messages).isNotNull();
         assertThat(messages.size()).isEqualTo(1);
 
@@ -408,16 +387,15 @@ public class ManualConversationUnitTests {
         assertThat(message.getReceived()).isEqualTo(true);
         assertThat(message.getTimestamp()).isEqualTo(1544012468L);
 
-        convo = convoRestController.getConversationForBlogByParticipantIdOrName(TevTestingHelpers.MAIN_BLOG_NAME,
-                oldNameParticipantId, "");
+        convo = convoRestController.getConversationForBlogByParticipantIdOrName(MAIN_BLOG_NAME, oldNameParticipantId,
+                "");
         assertThat(convo).isNotNull();
         assertThat(convo.getHideConversation()).isEqualTo(false);
         assertThat(convo.getNumMessages()).isEqualTo(1);
         assertThat(convo.getParticipant()).isEqualTo("participant-newname");
         assertThat(convo.getParticipantAvatarUrl()).isEqualTo("http://participantnn/avatar");
 
-        convo = convoRestController.getConversationForBlogByParticipantIdOrName(TevTestingHelpers.MAIN_BLOG_NAME,
-                tobeDeactivatedId, "");
+        convo = convoRestController.getConversationForBlogByParticipantIdOrName(MAIN_BLOG_NAME, tobeDeactivatedId, "");
         assertThat(convo).isNotNull();
         assertThat(convo.getHideConversation()).isEqualTo(true);
         assertThat(convo.getNumMessages()).isEqualTo(2);
@@ -436,7 +414,6 @@ public class ManualConversationUnitTests {
         InputStream xmlFile = new FileInputStream(rawXmlFile);
         MockMultipartFile mockFile = new MockMultipartFile("testmessages", xmlFile);
 
-        ConversationXmlReader.parseDocument(mockFile, mdRestController, convoRestController,
-                TevTestingHelpers.MAIN_BLOG_NAME);
+        ConversationXmlReader.parseDocument(mockFile, mdRestController, convoRestController, MAIN_BLOG_NAME);
     }
 }

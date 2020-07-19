@@ -14,22 +14,15 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import com.tiyb.tev.TevTestingHelpers;
+import com.tiyb.tev.TevTestingClass;
 import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.controller.TEVPostRestController;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-public class ExportWritingUnitTests {
+public class ExportWritingUnitTests extends TevTestingClass {
 
     @Autowired
     private TEVPostRestController postController;
@@ -60,7 +53,7 @@ public class ExportWritingUnitTests {
 
     @Before
     public void setupData() throws FileNotFoundException {
-        TevTestingHelpers.initDataForMainBlog(mdController, postController, Optional.empty());
+        initDataForMainBlog(mdController, postController, Optional.empty());
     }
 
     @Test
@@ -87,7 +80,7 @@ public class ExportWritingUnitTests {
     public void testExportOfPhotoMultiple() throws IOException {
         testSinglePostResponse(this.multiplePhotoXML, MULTIPLEPHOTO_POST_ID);
     }
-    
+
     private String getExpectedResponse(Resource resource) throws IOException {
         File expectedResponseFile = resource.getFile();
         List<String> expectedResponseStrings = Files.readAllLines(expectedResponseFile.toPath(),
@@ -103,8 +96,7 @@ public class ExportWritingUnitTests {
         List<String> postIDs = new ArrayList<String>();
         postIDs.add(postID);
 
-        String result = BlogXmlWriter.getStagedPostXMLForBlog(postIDs, postController,
-                TevTestingHelpers.MAIN_BLOG_NAME);
+        String result = BlogXmlWriter.getStagedPostXMLForBlog(postIDs, postController, MAIN_BLOG_NAME);
 
         assertThat(result).isEqualToIgnoringWhitespace(expectedAnswer);
     }

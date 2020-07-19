@@ -10,15 +10,11 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 
-import com.tiyb.tev.TevTestingHelpers;
+import com.tiyb.tev.TevTestingClass;
 import com.tiyb.tev.controller.TEVConvoRestController;
 import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.datamodel.Conversation;
@@ -32,10 +28,7 @@ import com.tiyb.tev.datamodel.Metadata;
  * @author tiyb
  *
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-public class ConversationXmlMultiBlog {
+public class ConversationXmlMultiBlog extends TevTestingClass {
 
     @Autowired
     private TEVConvoRestController convoRestController;
@@ -57,12 +50,12 @@ public class ConversationXmlMultiBlog {
      */
     @Before
     public void Setup() throws IOException {
-        Metadata md1 = mdRestController.getMetadataForBlogOrDefault(TevTestingHelpers.MAIN_BLOG_NAME);
-        md1.setMainTumblrUser(TevTestingHelpers.MAIN_BLOG_NAME);
+        Metadata md1 = mdRestController.getMetadataForBlogOrDefault(MAIN_BLOG_NAME);
+        md1.setMainTumblrUser(MAIN_BLOG_NAME);
         md1.setOverwriteConvoData(true);
         md1 = mdRestController.updateMetadata(md1.getId(), md1);
-        Metadata md2 = mdRestController.getMetadataForBlogOrDefault(TevTestingHelpers.SECOND_BLOG_NAME);
-        md2.setMainTumblrUser(TevTestingHelpers.SECOND_BLOG_NAME);
+        Metadata md2 = mdRestController.getMetadataForBlogOrDefault(SECOND_BLOG_NAME);
+        md2.setMainTumblrUser(SECOND_BLOG_NAME);
         md2.setOverwriteConvoData(true);
         md2 = mdRestController.updateMetadata(md2.getId(), md2);
 
@@ -70,19 +63,17 @@ public class ConversationXmlMultiBlog {
         InputStream xmlFile = new FileInputStream(rawXmlFile);
         MockMultipartFile mockFile = new MockMultipartFile("testmessages", xmlFile);
 
-        convoRestController.deleteAllConvoMsgsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
-        convoRestController.deleteAllConversationsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
-        ConversationXmlReader.parseDocument(mockFile, mdRestController, convoRestController,
-                TevTestingHelpers.MAIN_BLOG_NAME);
+        convoRestController.deleteAllConvoMsgsForBlog(MAIN_BLOG_NAME);
+        convoRestController.deleteAllConversationsForBlog(MAIN_BLOG_NAME);
+        ConversationXmlReader.parseDocument(mockFile, mdRestController, convoRestController, MAIN_BLOG_NAME);
 
         rawXmlFile = ResourceUtils.getFile("classpath:XML/test-messages-secondblog-xml.xml");
         xmlFile = new FileInputStream(rawXmlFile);
         mockFile = new MockMultipartFile("testmessages2", xmlFile);
 
-        convoRestController.deleteAllConvoMsgsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
-        convoRestController.deleteAllConversationsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
-        ConversationXmlReader.parseDocument(mockFile, mdRestController, convoRestController,
-                TevTestingHelpers.SECOND_BLOG_NAME);
+        convoRestController.deleteAllConvoMsgsForBlog(SECOND_BLOG_NAME);
+        convoRestController.deleteAllConversationsForBlog(SECOND_BLOG_NAME);
+        ConversationXmlReader.parseDocument(mockFile, mdRestController, convoRestController, SECOND_BLOG_NAME);
     }
 
     /**
@@ -90,23 +81,23 @@ public class ConversationXmlMultiBlog {
      */
     @Test
     public void checkConversations() {
-        List<Conversation> convos = convoRestController.getAllConversationsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Conversation> convos = convoRestController.getAllConversationsForBlog(MAIN_BLOG_NAME);
         assertThat(convos).isNotNull();
         assertThat(convos.size()).isEqualTo(TOTAL_NUM_B1_CONVOS);
 
-        convos = convoRestController.getAllConversationsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        convos = convoRestController.getAllConversationsForBlog(SECOND_BLOG_NAME);
         assertThat(convos).isNotNull();
         assertThat(convos.size()).isEqualTo(TOTAL_NUM_B2_CONVOS);
 
-        Conversation firstConvo = convoRestController
-                .getConversationForBlogByParticipant(TevTestingHelpers.SECOND_BLOG_NAME, b2FirstParticipant);
+        Conversation firstConvo = convoRestController.getConversationForBlogByParticipant(SECOND_BLOG_NAME,
+                b2FirstParticipant);
         assertThat(firstConvo).isNotNull();
         assertThat(firstConvo.getNumMessages()).isEqualTo(9);
         assertThat(firstConvo.getParticipant()).isEqualTo(b2FirstParticipant);
         assertThat(firstConvo.getParticipantAvatarUrl()).isEqualTo("http://secondblogparticipant1/avatar");
 
-        Conversation dupConvo = convoRestController
-                .getConversationForBlogByParticipant(TevTestingHelpers.SECOND_BLOG_NAME, b2DupParticipant);
+        Conversation dupConvo = convoRestController.getConversationForBlogByParticipant(SECOND_BLOG_NAME,
+                b2DupParticipant);
         assertThat(dupConvo).isNotNull();
         assertThat(dupConvo.getNumMessages()).isEqualTo(2);
         assertThat(dupConvo.getParticipant()).isEqualTo(b2DupParticipant);
@@ -118,14 +109,13 @@ public class ConversationXmlMultiBlog {
      */
     @Test
     public void sameParticipantMultiBlogs() {
-        Conversation convo1 = convoRestController.getConversationForBlogByParticipant(TevTestingHelpers.MAIN_BLOG_NAME,
-                b2DupParticipant);
+        Conversation convo1 = convoRestController.getConversationForBlogByParticipant(MAIN_BLOG_NAME, b2DupParticipant);
         assertThat(convo1).isNotNull();
         assertThat(convo1.getParticipantAvatarUrl()).isEqualTo("http://participant1/avatar");
         assertThat(convo1.getNumMessages()).isEqualTo(9);
 
-        Conversation convo2 = convoRestController
-                .getConversationForBlogByParticipant(TevTestingHelpers.SECOND_BLOG_NAME, b2DupParticipant);
+        Conversation convo2 = convoRestController.getConversationForBlogByParticipant(SECOND_BLOG_NAME,
+                b2DupParticipant);
         assertThat(convo2).isNotNull();
         assertThat(convo2.getParticipantAvatarUrl()).isEqualTo("http://participant1/avatar");
         assertThat(convo2.getNumMessages()).isEqualTo(2);
@@ -137,10 +127,10 @@ public class ConversationXmlMultiBlog {
      */
     @Test
     public void checkConvo1Messages() {
-        Conversation convo = convoRestController.getConversationForBlogByParticipant(TevTestingHelpers.SECOND_BLOG_NAME,
+        Conversation convo = convoRestController.getConversationForBlogByParticipant(SECOND_BLOG_NAME,
                 b2FirstParticipant);
-        List<ConversationMessage> msgs = convoRestController
-                .getConvoMsgForBlogByConvoID(TevTestingHelpers.SECOND_BLOG_NAME, convo.getId());
+        List<ConversationMessage> msgs = convoRestController.getConvoMsgForBlogByConvoID(SECOND_BLOG_NAME,
+                convo.getId());
         assertThat(msgs).isNotNull();
         assertThat(msgs.size()).isEqualTo(9);
 
@@ -196,10 +186,10 @@ public class ConversationXmlMultiBlog {
      */
     @Test
     public void checkConvo2Messages() {
-        Conversation convo = convoRestController.getConversationForBlogByParticipant(TevTestingHelpers.SECOND_BLOG_NAME,
+        Conversation convo = convoRestController.getConversationForBlogByParticipant(SECOND_BLOG_NAME,
                 b2DupParticipant);
-        List<ConversationMessage> msgs = convoRestController
-                .getConvoMsgForBlogByConvoID(TevTestingHelpers.SECOND_BLOG_NAME, convo.getId());
+        List<ConversationMessage> msgs = convoRestController.getConvoMsgForBlogByConvoID(SECOND_BLOG_NAME,
+                convo.getId());
         assertThat(msgs).isNotNull();
         assertThat(msgs.size()).isEqualTo(2);
 
@@ -221,16 +211,15 @@ public class ConversationXmlMultiBlog {
     @Test
     public void testAddingConvos() {
         Conversation newConvo = new Conversation();
-        newConvo.setBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        newConvo.setBlog(SECOND_BLOG_NAME);
         newConvo.setParticipant("brandnewparticipant");
-        newConvo = convoRestController.createConversationForBlog(TevTestingHelpers.SECOND_BLOG_NAME, newConvo);
+        newConvo = convoRestController.createConversationForBlog(SECOND_BLOG_NAME, newConvo);
 
-        List<Conversation> b1Convos = convoRestController.getAllConversationsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Conversation> b1Convos = convoRestController.getAllConversationsForBlog(MAIN_BLOG_NAME);
         assertThat(b1Convos).isNotNull();
         assertThat(b1Convos.size()).isEqualTo(TOTAL_NUM_B1_CONVOS);
 
-        List<Conversation> b2Convos = convoRestController
-                .getAllConversationsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        List<Conversation> b2Convos = convoRestController.getAllConversationsForBlog(SECOND_BLOG_NAME);
         assertThat(b2Convos).isNotNull();
         assertThat(b2Convos.size()).isEqualTo(TOTAL_NUM_B2_CONVOS + 1);
     }

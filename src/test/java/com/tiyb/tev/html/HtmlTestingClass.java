@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -13,7 +12,6 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.HttpHeader;
@@ -25,7 +23,7 @@ import com.gargoylesoftware.htmlunit.html.FrameWindow;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.SilentJavaScriptErrorListener;
 import com.tiyb.tev.FullConversation;
-import com.tiyb.tev.TevTestingHelpers;
+import com.tiyb.tev.TevTestingClass;
 import com.tiyb.tev.datamodel.Answer;
 import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.ConversationMessage;
@@ -43,11 +41,10 @@ import com.tiyb.tev.datamodel.Video;
  * @author tiyb
  *
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @TestPropertySource("classpath:static/js/i18n/messages.properties")
-public abstract class HtmlTestingClass {
+public abstract class HtmlTestingClass extends TevTestingClass {
 
     private final static int WAIT_TIME_FOR_JS = 60000;
 
@@ -107,11 +104,10 @@ public abstract class HtmlTestingClass {
      * Deletes any existing conversation data, first, to load it all from scratch.
      */
     protected void restInitConvosForMainBlog() {
-        restTemplate
-                .delete(String.format("%s/api/conversations/%s/messages", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME));
-        restTemplate.delete(String.format("%s/api/conversations/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME));
+        restTemplate.delete(String.format("%s/api/conversations/%s/messages", baseUri(), MAIN_BLOG_NAME));
+        restTemplate.delete(String.format("%s/api/conversations/%s", baseUri(), MAIN_BLOG_NAME));
 
-        for (FullConversation fc : TevTestingHelpers.conversationsToUpload) {
+        for (FullConversation fc : conversationsToUpload) {
 
             Conversation convoOnServer = restTemplate.postForObject(
                     baseUri() + "/api/conversations/" + fc.getConversation().getBlog(), fc.getConversation(),
@@ -135,43 +131,45 @@ public abstract class HtmlTestingClass {
     protected void restInitDataForMainBlog(Optional<String> baseMediaPath) {
         restInitMainBlogSettings(baseMediaPath);
 
-        restTemplate.delete(String.format("%s/api/posts/%s/regulars", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME));
-        restTemplate.delete(String.format("%s/api/posts/%s/answers", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME));
-        restTemplate.delete(String.format("%s/api/posts/%s/links", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME));
-        restTemplate.delete(String.format("%s/api/posts/%s/photos", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME));
-        restTemplate.delete(String.format("%s/api/posts/%s/videos", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME));
-        restTemplate.delete(String.format("%s/api/hashtags/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME));
-        restTemplate.delete(String.format("%s/api/posts/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME));
+        restTemplate.delete(String.format("%s/api/posts/%s/regulars", baseUri(), MAIN_BLOG_NAME));
+        restTemplate.delete(String.format("%s/api/posts/%s/answers", baseUri(), MAIN_BLOG_NAME));
+        restTemplate.delete(String.format("%s/api/posts/%s/links", baseUri(), MAIN_BLOG_NAME));
+        restTemplate.delete(String.format("%s/api/posts/%s/photos", baseUri(), MAIN_BLOG_NAME));
+        restTemplate.delete(String.format("%s/api/posts/%s/videos", baseUri(), MAIN_BLOG_NAME));
+        restTemplate.delete(String.format("%s/api/hashtags/%s", baseUri(), MAIN_BLOG_NAME));
+        restTemplate.delete(String.format("%s/api/posts/%s", baseUri(), MAIN_BLOG_NAME));
 
-        for (Post post : TevTestingHelpers.postsForUploading) {
-            restTemplate.postForObject(String.format("%s/api/posts/%s", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME),
-                    post, Post.class);
+        for (Post post : postsForUploading) {
+            restTemplate.postForObject(String.format("%s/api/posts/%s", baseUri(), MAIN_BLOG_NAME), post, Post.class);
         }
 
-        for (Regular reg : TevTestingHelpers.regularsForUploading) {
-            restTemplate.postForObject(String.format("%s/api/posts/%s/%s/regular", baseUri(),
-                    TevTestingHelpers.MAIN_BLOG_NAME, reg.getPostId()), reg, Regular.class);
-        }
-
-        for (Answer answer : TevTestingHelpers.answersForUploading) {
-            restTemplate.postForObject(String.format("%s/api/posts/%s/%s/answer", baseUri(),
-                    TevTestingHelpers.MAIN_BLOG_NAME, answer.getPostId()), answer, Answer.class);
-        }
-
-        for (Link link : TevTestingHelpers.linksForUploading) {
-            restTemplate.postForObject(String.format("%s/api/posts/%s/%s/link", baseUri(),
-                    TevTestingHelpers.MAIN_BLOG_NAME, link.getPostId()), link, Link.class);
-        }
-
-        for (Photo photo : TevTestingHelpers.photosForUploading) {
+        for (Regular reg : regularsForUploading) {
             restTemplate.postForObject(
-                    String.format("%s/api/posts/%s/photo", baseUri(), TevTestingHelpers.MAIN_BLOG_NAME), photo,
+                    String.format("%s/api/posts/%s/%s/regular", baseUri(), MAIN_BLOG_NAME, reg.getPostId()), reg,
+                    Regular.class);
+        }
+
+        for (Answer answer : answersForUploading) {
+            restTemplate.postForObject(
+                    String.format("%s/api/posts/%s/%s/answer", baseUri(), MAIN_BLOG_NAME, answer.getPostId()), answer,
+                    Answer.class);
+        }
+
+        for (Link link : linksForUploading) {
+            restTemplate.postForObject(
+                    String.format("%s/api/posts/%s/%s/link", baseUri(), MAIN_BLOG_NAME, link.getPostId()), link,
+                    Link.class);
+        }
+
+        for (Photo photo : photosForUploading) {
+            restTemplate.postForObject(String.format("%s/api/posts/%s/photo", baseUri(), MAIN_BLOG_NAME), photo,
                     Photo.class);
         }
 
-        for (Video vid : TevTestingHelpers.videosForUploading) {
-            restTemplate.postForObject(String.format("%s/api/posts/%s/%s/video", baseUri(),
-                    TevTestingHelpers.MAIN_BLOG_NAME, vid.getPostId()), vid, Video.class);
+        for (Video vid : videosForUploading) {
+            restTemplate.postForObject(
+                    String.format("%s/api/posts/%s/%s/video", baseUri(), MAIN_BLOG_NAME, vid.getPostId()), vid,
+                    Video.class);
         }
     }
 
@@ -187,7 +185,7 @@ public abstract class HtmlTestingClass {
         if (blogName.isPresent()) {
             blogForWhichToFetchMD = blogName.get();
         } else {
-            blogForWhichToFetchMD = TevTestingHelpers.MAIN_BLOG_NAME;
+            blogForWhichToFetchMD = MAIN_BLOG_NAME;
         }
 
         return restTemplate.getForObject(
@@ -209,10 +207,10 @@ public abstract class HtmlTestingClass {
      * @param baseMediaPath (Optional) path to use for media for this blog
      */
     protected void restInitMainBlogSettings(Optional<String> baseMediaPath) {
-        Metadata md = getMDFromServer(Optional.of(TevTestingHelpers.MAIN_BLOG_NAME));
+        Metadata md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
         md.setOverwritePostData(true);
         md.setOverwriteConvoData(true);
-        md.setMainTumblrUser(TevTestingHelpers.MAIN_BLOG_NAME);
+        md.setMainTumblrUser(MAIN_BLOG_NAME);
         md.setIsDefault(true);
         md.setConversationDisplayStyle("table");
         md.setConversationSortColumn("numMessages");

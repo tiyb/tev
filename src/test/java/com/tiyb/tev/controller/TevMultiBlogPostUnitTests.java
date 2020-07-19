@@ -6,13 +6,9 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import com.tiyb.tev.TevTestingHelpers;
+import com.tiyb.tev.TevTestingClass;
 import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.Post;
 import com.tiyb.tev.exception.BlogPostMismatchException;
@@ -25,10 +21,7 @@ import com.tiyb.tev.exception.BlogPostMismatchException;
  * @author tiyb
  *
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-public class TevMultiBlogPostUnitTests {
+public class TevMultiBlogPostUnitTests extends TevTestingClass {
 
     @Autowired
     private TEVPostRestController restController;
@@ -39,8 +32,8 @@ public class TevMultiBlogPostUnitTests {
 
     @Before
     public void cleanPosts() {
-        restController.deleteAllPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
-        restController.deleteAllPostsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        restController.deleteAllPostsForBlog(MAIN_BLOG_NAME);
+        restController.deleteAllPostsForBlog(SECOND_BLOG_NAME);
     }
 
     /**
@@ -51,20 +44,20 @@ public class TevMultiBlogPostUnitTests {
     public void twoPostsTwoBlogs() {
         Post p1 = new Post();
         p1.setId("1");
-        p1.setTumblelog(TevTestingHelpers.MAIN_BLOG_NAME);
-        p1 = restController.createPostForBlog(TevTestingHelpers.MAIN_BLOG_NAME, p1);
+        p1.setTumblelog(MAIN_BLOG_NAME);
+        p1 = restController.createPostForBlog(MAIN_BLOG_NAME, p1);
 
         Post p2 = new Post();
         p2.setId("2");
-        p2.setTumblelog(TevTestingHelpers.SECOND_BLOG_NAME);
-        p2 = restController.createPostForBlog(TevTestingHelpers.SECOND_BLOG_NAME, p2);
+        p2.setTumblelog(SECOND_BLOG_NAME);
+        p2 = restController.createPostForBlog(SECOND_BLOG_NAME, p2);
 
-        List<Post> blogsForOne = restController.getAllPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Post> blogsForOne = restController.getAllPostsForBlog(MAIN_BLOG_NAME);
         assertThat(blogsForOne).isNotNull();
         assertThat(blogsForOne.size()).isEqualTo(1);
         assertThat(blogsForOne.get(0).getId()).isEqualTo("1");
 
-        List<Post> blogsForTwo = restController.getAllPostsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        List<Post> blogsForTwo = restController.getAllPostsForBlog(SECOND_BLOG_NAME);
         assertThat(blogsForTwo).isNotNull();
         assertThat(blogsForTwo.size()).isEqualTo(1);
         assertThat(blogsForTwo.get(0).getId()).isEqualTo("2");
@@ -80,24 +73,24 @@ public class TevMultiBlogPostUnitTests {
         // blog 1 posts
         Post p1 = new Post();
         p1.setId("1");
-        p1.setTumblelog(TevTestingHelpers.MAIN_BLOG_NAME);
+        p1.setTumblelog(MAIN_BLOG_NAME);
         p1.setIsRead(false);
-        p1 = restController.createPostForBlog(TevTestingHelpers.MAIN_BLOG_NAME, p1);
+        p1 = restController.createPostForBlog(MAIN_BLOG_NAME, p1);
         Post p2 = new Post();
         p2.setId("2");
-        p2.setTumblelog(TevTestingHelpers.MAIN_BLOG_NAME);
+        p2.setTumblelog(MAIN_BLOG_NAME);
         p2.setIsRead(false);
-        p2 = restController.createPostForBlog(TevTestingHelpers.MAIN_BLOG_NAME, p2);
+        p2 = restController.createPostForBlog(MAIN_BLOG_NAME, p2);
 
         // blog 2 posts
         Post p3 = new Post();
         p3.setId("3");
-        p3.setTumblelog(TevTestingHelpers.SECOND_BLOG_NAME);
+        p3.setTumblelog(SECOND_BLOG_NAME);
         p3.setIsRead(false);
-        p3 = restController.createPostForBlog(TevTestingHelpers.SECOND_BLOG_NAME, p3);
+        p3 = restController.createPostForBlog(SECOND_BLOG_NAME, p3);
 
         // test blog 1 initial state
-        List<Post> b1Posts = restController.getAllPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        List<Post> b1Posts = restController.getAllPostsForBlog(MAIN_BLOG_NAME);
         assertThat(b1Posts).isNotNull();
         assertThat(b1Posts.size()).isEqualTo(2);
         for (Post p : b1Posts) {
@@ -105,7 +98,7 @@ public class TevMultiBlogPostUnitTests {
         }
 
         // test blog 2 initial state
-        List<Post> b2Posts = restController.getAllPostsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        List<Post> b2Posts = restController.getAllPostsForBlog(SECOND_BLOG_NAME);
         assertThat(b2Posts).isNotNull();
         assertThat(b2Posts.size()).isEqualTo(1);
         for (Post p : b2Posts) {
@@ -113,16 +106,16 @@ public class TevMultiBlogPostUnitTests {
         }
 
         // mark all posts read for b1
-        adminController.markAllPostsReadForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        adminController.markAllPostsReadForBlog(MAIN_BLOG_NAME);
 
         // b1 should all be read; b2 should all be unread
-        b1Posts = restController.getAllPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        b1Posts = restController.getAllPostsForBlog(MAIN_BLOG_NAME);
         assertThat(b1Posts).isNotNull();
         assertThat(b1Posts.size()).isEqualTo(2);
         for (Post p : b1Posts) {
             assertThat(p.getIsRead()).isEqualTo(true);
         }
-        b2Posts = restController.getAllPostsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        b2Posts = restController.getAllPostsForBlog(SECOND_BLOG_NAME);
         assertThat(b2Posts).isNotNull();
         assertThat(b2Posts.size()).isEqualTo(1);
         for (Post p : b2Posts) {
@@ -130,17 +123,17 @@ public class TevMultiBlogPostUnitTests {
         }
 
         // mark all undread for b1; read for b2
-        adminController.markAllPostsUnreadForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
-        adminController.markAllPostsReadForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        adminController.markAllPostsUnreadForBlog(MAIN_BLOG_NAME);
+        adminController.markAllPostsReadForBlog(SECOND_BLOG_NAME);
 
         // b1 should all be unread; b2 should all be read
-        b1Posts = restController.getAllPostsForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        b1Posts = restController.getAllPostsForBlog(MAIN_BLOG_NAME);
         assertThat(b1Posts).isNotNull();
         assertThat(b1Posts.size()).isEqualTo(2);
         for (Post p : b1Posts) {
             assertThat(p.getIsRead()).isEqualTo(false);
         }
-        b2Posts = restController.getAllPostsForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        b2Posts = restController.getAllPostsForBlog(SECOND_BLOG_NAME);
         assertThat(b2Posts).isNotNull();
         assertThat(b2Posts.size()).isEqualTo(1);
         for (Post p : b2Posts) {
@@ -156,9 +149,9 @@ public class TevMultiBlogPostUnitTests {
     public void createPostWithInvalidBlogName() {
         Post p = new Post();
         p.setId("1");
-        p.setTumblelog(TevTestingHelpers.MAIN_BLOG_NAME);
+        p.setTumblelog(MAIN_BLOG_NAME);
 
-        restController.createPostForBlog(TevTestingHelpers.SECOND_BLOG_NAME, p);
+        restController.createPostForBlog(SECOND_BLOG_NAME, p);
     }
 
     /**
@@ -166,19 +159,19 @@ public class TevMultiBlogPostUnitTests {
      */
     @Test
     public void multipleMetadata() {
-        Metadata md1 = mdRestController.getMetadataForBlogOrDefault(TevTestingHelpers.MAIN_BLOG_NAME);
+        Metadata md1 = mdRestController.getMetadataForBlogOrDefault(MAIN_BLOG_NAME);
         md1.setBaseMediaPath("media path for blog 1");
         md1 = mdRestController.updateMetadata(md1.getId(), md1);
 
-        Metadata md2 = mdRestController.getMetadataForBlogOrDefault(TevTestingHelpers.SECOND_BLOG_NAME);
+        Metadata md2 = mdRestController.getMetadataForBlogOrDefault(SECOND_BLOG_NAME);
         md2.setBaseMediaPath("media path for blog 2");
         md2 = mdRestController.updateMetadata(md2.getId(), md2);
 
-        Metadata response = mdRestController.getMetadataForBlog(TevTestingHelpers.MAIN_BLOG_NAME);
+        Metadata response = mdRestController.getMetadataForBlog(MAIN_BLOG_NAME);
         assertThat(response).isNotNull();
         assertThat(response.getBaseMediaPath()).isEqualTo("media path for blog 1");
 
-        response = mdRestController.getMetadataForBlog(TevTestingHelpers.SECOND_BLOG_NAME);
+        response = mdRestController.getMetadataForBlog(SECOND_BLOG_NAME);
         assertThat(response).isNotNull();
         assertThat(response.getBaseMediaPath()).isEqualTo("media path for blog 2");
     }
