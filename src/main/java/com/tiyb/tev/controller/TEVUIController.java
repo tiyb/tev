@@ -369,7 +369,7 @@ public class TEVUIController {
         if (blog.equals(defaultBlogName)) {
             return "redirect:/conversations";
         } else {
-            return String.format("redirect:/conversations" + TEMPBLOGNAME_PARAM + "=%s", blog);
+            return String.format("redirect:/conversations?%s=%s", TEMPBLOGNAME_PARAM, blog);
         }
     }
 
