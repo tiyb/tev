@@ -338,4 +338,15 @@ public abstract class HtmlTestingClass extends TevTestingClass {
                 .getForEntity(String.format("%s/staging-api/posts/%s", baseUri(), blogName), String[].class);
         return responseEntity.getBody();
     }
+
+    /**
+     * Returns Metadata objects for all blogs in the system
+     * 
+     * @return Array of Metadata objects
+     */
+    protected Metadata[] getAllMDObjects() {
+        ResponseEntity<Metadata[]> responseEntity = restTemplate
+                .getForEntity(String.format("%s/api/metadata", baseUri()), Metadata[].class);
+        return responseEntity.getBody();
+    }
 }
