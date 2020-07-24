@@ -53,8 +53,14 @@
 		<js>/js/viewerbuttonshandler.js</js>
 		<js>/js/imageViewer.js</js>
 		<js>/js/videoviewer.js</js>
-		<js>/js/conversationviewer.js</js>
 		<js>/js/click-photos-handler.js</js>
+	</group>
+	
+	<group name="conversationviewer">
+        <css>/css/postviewer.css</css>
+        
+        <js>/js/close-on-esc.js</js>
+        <js>/js/conversationviewer.js</js>
 	</group>
 	
 	<group name="hashtags">

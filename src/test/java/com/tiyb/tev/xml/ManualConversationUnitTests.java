@@ -45,7 +45,7 @@ public class ManualConversationUnitTests extends TevTestingClass {
 
     @Before
     public void setup() {
-        initMainBlogNoData(mdRestController, Optional.empty());
+        initMainBlogMetadataata(mdRestController, Optional.empty());
 
         convoRestController.deleteAllConvoMsgsForBlog(MAIN_BLOG_NAME);
         convoRestController.deleteAllConversationsForBlog(MAIN_BLOG_NAME);

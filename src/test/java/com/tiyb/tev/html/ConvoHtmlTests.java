@@ -25,14 +25,25 @@ import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
 import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.Metadata;
 
+/**
+ * Unit tests for testing the main conversation screen, as well as the
+ * conversation viewer popup
+ * 
+ * @author tiyb
+ *
+ */
 public class ConvoHtmlTests extends HtmlTestingClass {
 
     private static final String CONVERSATION_TABLE_ID = "conversationTable";
     private static final int CONVERSATION_TABLE_NUM_ROWS = 10;
     private static final int FIRST_TABLE_ROW = 2;
     private static final int COLUMN_PARTICIPANT = 0;
+    @SuppressWarnings("unused")
     private static final int COLUMN_NUMMESSAGES = 1;
 
+    /**
+     * Retrieves the main conversation page
+     */
     @Before
     public void setupSite() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         restInitDataForMainBlog(Optional.empty());
@@ -42,6 +53,10 @@ public class ConvoHtmlTests extends HtmlTestingClass {
         waitForScript();
     }
 
+    /**
+     * Verifies that the viewing buttons have the desired effect: First reading
+     * pane, then conversation viewer (table vs. cloud)
+     */
     @Test
     public void toggleViewingButtons() throws IOException {
         // check initial state of reading pane radio, then select it
@@ -98,6 +113,10 @@ public class ConvoHtmlTests extends HtmlTestingClass {
         assertThat(convoCloud.isDisplayed()).isFalse();
     }
 
+    /**
+     * Opens a conversation viewer (in pop-up), and checks that some of the contents
+     * of the first conversation show up properly
+     */
     @Test
     public void openConvo() throws IOException {
         // open popup
@@ -120,17 +139,24 @@ public class ConvoHtmlTests extends HtmlTestingClass {
         assertThat(firstMessage.getVisibleText()).isEqualToNormalizingWhitespace("Message 1");
     }
 
+    /**
+     * Tests that the conversation viewer can be used to hide a conversation (and
+     * that it properly disappears from the table), and then tests the close anad
+     * refresh button
+     */
     @Test
-    public void hideConvo() throws IOException {
+    public void hideConvo() throws IOException, InterruptedException {
         assertThat(getNumRealWindows()).isEqualTo(1);
         HtmlTable convoTable = mainPage.getHtmlElementById(CONVERSATION_TABLE_ID);
         assertThat(convoTable.getRowCount()).isEqualTo(CONVERSATION_TABLE_NUM_ROWS);
 
         // open popup, then mark conversation hidden (which should close the window)
         HtmlPage popup = convoTable.getCellAt(FIRST_TABLE_ROW, COLUMN_PARTICIPANT).getFirstElementChild().click();
+        waitForScript();
         assertThat(getNumRealWindows()).isEqualTo(2);
 
         HtmlButton hideConvoBtn = popup.getHtmlElementById("hideConvoBtn");
+        popup = null;
         hideConvoBtn.click(false, false, false, true);
         waitForScript();
         assertThat(getNumRealWindows()).isEqualTo(1);
@@ -141,13 +167,14 @@ public class ConvoHtmlTests extends HtmlTestingClass {
         // update conversation, un-hide it again, then re-open the window and click the
         // hide and refresh button
         convo1.setHideConversation(false);
-
         updateConversation(convo1);
         popup = convoTable.getCellAt(FIRST_TABLE_ROW, COLUMN_PARTICIPANT).getFirstElementChild().click();
+        waitForScript();
         assertThat(getNumRealWindows()).isEqualTo(2);
         HtmlButton hideAndRefresh = popup.getHtmlElementById("hideConvoAndRefreshBtn");
-        hideAndRefresh.click();
+        hideAndRefresh.click(false, false, false, true);
         waitForScript();
+        popup = null;
         assertThat(getNumRealWindows()).isEqualTo(1);
 
         convo1 = getConversation(MAIN_BLOG_NAME, "participant1");
@@ -159,8 +186,38 @@ public class ConvoHtmlTests extends HtmlTestingClass {
         assertThat(convoTable.getRowCount()).isEqualTo(CONVERSATION_TABLE_NUM_ROWS - 1);
     }
 
-//    @Test
-//    public void unhideAllConvos() {
-//        assertThat(true).isEqualTo(false);
-//    }
+    /**
+     * Hides a couple of conversations and verifies that they disappear from the
+     * page, then clicks the "unhide all" button to verify that they come back
+     */
+    @Test
+    public void unhideAllConvos() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
+        HtmlTable convoTable = mainPage.getHtmlElementById(CONVERSATION_TABLE_ID);
+        assertThat(convoTable.getRowCount()).isEqualTo(CONVERSATION_TABLE_NUM_ROWS);
+
+        Conversation convo = getConversation(MAIN_BLOG_NAME, "participant1");
+        convo.setHideConversation(true);
+        updateConversation(convo);
+
+        HtmlPage newPage = webClient.getPage(baseUri() + "/conversations");
+        waitForScript();
+        convoTable = newPage.getHtmlElementById(CONVERSATION_TABLE_ID);
+        assertThat(convoTable.getRowCount()).isEqualTo(CONVERSATION_TABLE_NUM_ROWS - 1);
+
+        convo = getConversation(MAIN_BLOG_NAME, "participant2");
+        convo.setHideConversation(true);
+        updateConversation(convo);
+        newPage = webClient.getPage(baseUri() + "/conversations");
+        waitForScript();
+        convoTable = newPage.getHtmlElementById(CONVERSATION_TABLE_ID);
+        assertThat(convoTable.getRowCount()).isEqualTo(CONVERSATION_TABLE_NUM_ROWS - 2);
+
+        HtmlButton unhideAllButton = newPage.getHtmlElementById("unhideAllConversationsBtn");
+        unhideAllButton.click();
+        waitForScript();
+        newPage = webClient.getPage(baseUri() + "/conversations");
+        waitForScript();
+        convoTable = newPage.getHtmlElementById(CONVERSATION_TABLE_ID);
+        assertThat(convoTable.getRowCount()).isEqualTo(CONVERSATION_TABLE_NUM_ROWS);
+    }
 }

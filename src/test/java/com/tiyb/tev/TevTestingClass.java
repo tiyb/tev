@@ -435,33 +435,59 @@ public abstract class TevTestingClass {
      * @param mdController   REST controller for working with metadata
      * @param postController REST controller for working with post data
      * @param baseMediaPath  Optional path to be used for media
-     * @throws FileNotFoundException If the input XML file can' be loaded for some
+     * @throws FileNotFoundException If the input XML file can't be loaded for some
      *                               reason
      */
-    protected static void initDataForMainBlog(TEVMetadataRestController mdController, TEVPostRestController postController,
-            Optional<String> baseMediaPath) throws FileNotFoundException {
-        initMainBlogNoData(mdController, baseMediaPath);
+    protected static void initDataForMainBlog(TEVMetadataRestController mdController,
+            TEVPostRestController postController, Optional<String> baseMediaPath) throws FileNotFoundException {
+        initMainBlogMetadataata(mdController, baseMediaPath);
 
         readPostXml(MAIN_INPUT_XML_FILE, postController, MAIN_BLOG_NAME);
     }
 
+    /**
+     * Initializes the secondary blog with data from the sample XL file
+     * 
+     * @param mdController   REST controller for working with metadata
+     * @param postController REST controller for working with post data
+     * @param baseMediaPath  Optional path to be used for media
+     * @throws FileNotFoundException If the input XML file can't be loaded for some
+     *                               reason
+     */
     protected static void initDataForSecondaryBlog(TEVMetadataRestController mdController,
             TEVPostRestController postController, Optional<String> baseMediaPath) throws FileNotFoundException {
-        initAdditionalBlog(mdController, SECOND_BLOG_NAME);
+        initAdditionalBlogMetadata(mdController, SECOND_BLOG_NAME);
 
         readPostXml(SECONDARY_INPUT_XML_FILE, postController, SECOND_BLOG_NAME);
     }
 
-    protected static void readPostXml(String xmlFileToLoad, TEVPostRestController postController, String blogName)
+    /**
+     * Helper method used for both main and secondary blogs for reading in an XML
+     * file
+     * 
+     * @param xmlFileToLoad  File to be read
+     * @param postController REST controller for working with posts
+     * @param blogName       Name of the blog for which the import is happening
+     * @throws FileNotFoundException If the input XML file can't be read for some
+     *                               reason
+     */
+    private static void readPostXml(String xmlFileToLoad, TEVPostRestController postController, String blogName)
             throws FileNotFoundException {
         File rawXmlFile = ResourceUtils.getFile(xmlFileToLoad);
         InputStream xmlFile = new FileInputStream(rawXmlFile);
         BlogXmlReader.parseDocument(xmlFile, postController, blogName);
     }
 
+    /**
+     * Reads in the Conversation sample XML file for the main blog
+     * 
+     * @param mdController    REST controller for metadata
+     * @param convoController REST controller for conversation data
+     * @throws IOException If the XML file can't be read
+     */
     protected static void initConvoForMainBlog(TEVMetadataRestController mdController,
             TEVConvoRestController convoController) throws IOException {
-        initMainBlogNoData(mdController, Optional.empty());
+        initMainBlogMetadataata(mdController, Optional.empty());
 
         File rawXmlFile = ResourceUtils.getFile(MAIN_CONVO_XML_FILE);
         InputStream xmlFile = new FileInputStream(rawXmlFile);
@@ -475,7 +501,8 @@ public abstract class TevTestingClass {
      * @param mdController  REST controller for working with metdata
      * @param baseMediaPath Optional path to be used for media
      */
-    protected static void initMainBlogNoData(TEVMetadataRestController mdController, Optional<String> baseMediaPath) {
+    protected static void initMainBlogMetadataata(TEVMetadataRestController mdController,
+            Optional<String> baseMediaPath) {
         Metadata md = mdController.getMetadataForBlogOrDefault(MAIN_BLOG_NAME);
         md.setBlog(MAIN_BLOG_NAME);
         md.setMainTumblrUser(MAIN_BLOG_NAME);
@@ -489,7 +516,13 @@ public abstract class TevTestingClass {
         mdController.updateMetadata(md.getId(), md);
     }
 
-    protected static void initAdditionalBlog(TEVMetadataRestController mdController, String blogName) {
+    /**
+     * Initializes metadata for a secondary blog
+     * 
+     * @param mdController REST controller for working with metadata
+     * @param blogName     Name of the blog to be initialized
+     */
+    protected static void initAdditionalBlogMetadata(TEVMetadataRestController mdController, String blogName) {
         Metadata md = mdController.getMetadataForBlogOrDefault(blogName);
         md.setBlog(blogName);
         md.setIsDefault(false);

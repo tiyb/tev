@@ -7,7 +7,7 @@ $.i18n.properties({
 $(document).ready(function() {
 	$('#hideConvoBtn').click(function() {
 		$.ajax({
-			url: "/api/conversations/" + blogName + "/" + participant + "/ignoreConvo",
+			url: "/api/conversations/" + blogName + "/byParticipant/" + participant + "/ignoreConvo",
 			dataSrc: "",
 			type: "PUT"
 		}).then(function(data) {
@@ -17,7 +17,7 @@ $(document).ready(function() {
 	
 	$('#hideConvoAndRefreshBtn').click(function() {
 		$.ajax({
-			url: "/api/conversations/" + blogName + "/" + participant + "/ignoreConvo",
+			url: "/api/conversations/" + blogName + "/byParticipant/" + participant + "/ignoreConvo",
 			dataSrc: "",
 			type: "PUT"
 		}).then(function(data) {

@@ -73,6 +73,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
         webClient.getOptions().setPopupBlockerEnabled(false);
         webClient.getOptions().setRedirectEnabled(true);
         webClient.getCache().setMaxSize(0);
+        webClient.getCache().clear();
         webClient.getOptions().setCssEnabled(true);
         webClient.getOptions().setJavaScriptEnabled(true);
         webClient.setCssErrorHandler(new SilentCssErrorHandler());
@@ -312,8 +313,8 @@ public abstract class HtmlTestingClass extends TevTestingClass {
      * @return A Conversation object
      */
     protected Conversation getConversation(String blogName, String participantName) {
-        return restTemplate.getForObject(
-                String.format("%s/api/conversations/%s/%s", baseUri(), blogName, participantName), Conversation.class);
+        String url = String.format("%s/api/conversations/%s/byParticipant/%s", baseUri(), blogName, participantName);
+        return restTemplate.getForObject(url, Conversation.class);
     }
 
     /**

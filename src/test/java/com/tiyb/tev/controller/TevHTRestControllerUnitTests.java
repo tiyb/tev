@@ -39,8 +39,8 @@ public class TevHTRestControllerUnitTests extends TevTestingClass {
         htController.deleteAllHTs();
         mdController.deleteAllMD();
 
-        initMainBlogNoData(mdController, Optional.empty());
-        initAdditionalBlog(mdController, SECOND_BLOG_NAME);
+        initMainBlogMetadataata(mdController, Optional.empty());
+        initAdditionalBlogMetadata(mdController, SECOND_BLOG_NAME);
 
         htController.deleteAllHTs();
     }
