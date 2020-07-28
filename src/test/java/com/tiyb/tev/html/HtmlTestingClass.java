@@ -27,6 +27,7 @@ import com.tiyb.tev.TevTestingClass;
 import com.tiyb.tev.datamodel.Answer;
 import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.ConversationMessage;
+import com.tiyb.tev.datamodel.Hashtag;
 import com.tiyb.tev.datamodel.Link;
 import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.Photo;
@@ -132,16 +133,11 @@ public abstract class HtmlTestingClass extends TevTestingClass {
     protected void restInitDataForMainBlog(Optional<String> baseMediaPath) {
         restInitMainBlogSettings(baseMediaPath);
 
-        restTemplate.delete(String.format("%s/api/posts/%s/regulars", baseUri(), MAIN_BLOG_NAME));
-        restTemplate.delete(String.format("%s/api/posts/%s/answers", baseUri(), MAIN_BLOG_NAME));
-        restTemplate.delete(String.format("%s/api/posts/%s/links", baseUri(), MAIN_BLOG_NAME));
-        restTemplate.delete(String.format("%s/api/posts/%s/photos", baseUri(), MAIN_BLOG_NAME));
-        restTemplate.delete(String.format("%s/api/posts/%s/videos", baseUri(), MAIN_BLOG_NAME));
-        restTemplate.delete(String.format("%s/api/hashtags/%s", baseUri(), MAIN_BLOG_NAME));
-        restTemplate.delete(String.format("%s/api/posts/%s", baseUri(), MAIN_BLOG_NAME));
+        deletePostDataForBlog(MAIN_BLOG_NAME);
 
         for (Post post : postsForUploading) {
             restTemplate.postForObject(String.format("%s/api/posts/%s", baseUri(), MAIN_BLOG_NAME), post, Post.class);
+            setHashtags(MAIN_BLOG_NAME, post.getTags());
         }
 
         for (Regular reg : regularsForUploading) {
@@ -171,6 +167,61 @@ public abstract class HtmlTestingClass extends TevTestingClass {
             restTemplate.postForObject(
                     String.format("%s/api/posts/%s/%s/video", baseUri(), MAIN_BLOG_NAME, vid.getPostId()), vid,
                     Video.class);
+        }
+    }
+
+    /**
+     * Sets up initial settings + post data for the "main" blog via REST calls.
+     * Leverages {@link #restInitMainBlogSettings(Optional)} method to initialize
+     * the settings.
+     */
+    protected void restInitDataForSecondBlog() {
+        restInitAdditionalBlog(SECOND_BLOG_NAME);
+
+        deletePostDataForBlog(SECOND_BLOG_NAME);
+
+        for (Post post : postsForUploadingForSecondBlog) {
+            restTemplate.postForObject(String.format("%s/api/posts/%s", baseUri(), SECOND_BLOG_NAME), post, Post.class);
+            setHashtags(SECOND_BLOG_NAME, post.getTags());
+        }
+
+        for (Regular reg : regularsForUploadingSecondBlog) {
+            String url = String.format("%s/api/posts/%s/%s/regular", baseUri(), SECOND_BLOG_NAME, reg.getPostId());
+            restTemplate.postForObject(url, reg, Regular.class);
+        }
+    }
+
+    /**
+     * Removes post data from the DB for a given blog
+     * 
+     * @param blogName Name of the blog for which to remove data
+     */
+    private void deletePostDataForBlog(String blogName) {
+        restTemplate.delete(String.format("%s/api/posts/%s/regulars", baseUri(), blogName));
+        restTemplate.delete(String.format("%s/api/posts/%s/answers", baseUri(), blogName));
+        restTemplate.delete(String.format("%s/api/posts/%s/links", baseUri(), blogName));
+        restTemplate.delete(String.format("%s/api/posts/%s/photos", baseUri(), blogName));
+        restTemplate.delete(String.format("%s/api/posts/%s/videos", baseUri(), blogName));
+        restTemplate.delete(String.format("%s/api/hashtags/%s", baseUri(), blogName));
+        restTemplate.delete(String.format("%s/api/posts/%s", baseUri(), blogName));
+    }
+
+    /**
+     * Adds a set of hashtags to the DB for a given blog
+     * 
+     * @param blogName Name of the blog for which the hshtags should be added
+     * @param tags     String containing a comma-separated list of tags
+     */
+    private void setHashtags(String blogName, String tags) {
+        if (tags.length() < 1) {
+            return;
+        }
+
+        String[] individualTags = tags.split(",");
+        String url = String.format("%s/api/hashtags/%s", baseUri(), blogName);
+        for (int i = 0; i < individualTags.length; i++) {
+            individualTags[i] = individualTags[i].trim();
+            restTemplate.postForObject(url, individualTags[i], Hashtag.class);
         }
     }
 
@@ -336,6 +387,17 @@ public abstract class HtmlTestingClass extends TevTestingClass {
     protected String[] getStagedPostsForBlog(String blogName) {
         ResponseEntity<String[]> responseEntity = restTemplate
                 .getForEntity(String.format("%s/staging-api/posts/%s", baseUri(), blogName), String[].class);
+        return responseEntity.getBody();
+    }
+
+    /**
+     * Return all hashtags
+     * 
+     * @return Array of Hashtag objects
+     */
+    protected Hashtag[] getAllHashtags() {
+        ResponseEntity<Hashtag[]> responseEntity = restTemplate
+                .getForEntity(String.format("%s/api/hashtags", baseUri()), Hashtag[].class);
         return responseEntity.getBody();
     }
 

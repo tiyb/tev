@@ -294,7 +294,7 @@ public class TEVUIController {
      * @param blogName The name of the current blog
      */
     private void addBlogNameJSToModel(final Model model, final String blogName) {
-        model.addAttribute(MODEL_ATTRIBUTE_BLOGNAMEJS, String.format("var blogName = \"%s\"", blogName));
+        model.addAttribute(MODEL_ATTRIBUTE_BLOGNAMEJS, String.format("var blogName = \"%s\";", blogName));
     }
 
     /**

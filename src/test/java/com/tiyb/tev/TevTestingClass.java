@@ -204,6 +204,25 @@ public abstract class TevTestingClass {
             null // width
     ));
 
+    protected final static List<Post> postsForUploadingForSecondBlog = List.of(new Post("180894436690", // id
+            "https://mainblog.tumblr.com/post/180894436690", // url
+            "https://mainblog.tumblr.com/post/180894436690/first-post", // url with slug
+            "2018-12-07 16:48:43 GMT", // date GMT
+            "Fri, 07 Dec 2018 11:48:43", // date
+            1544201323L, // unixtimestamp
+            "O6pLVlp1", // reblog key
+            "first-post", // slug
+            true, // is reblog
+            SECOND_BLOG_NAME, // tumblelog
+            "regular", // type
+            false, // is read
+            "2ndtag1, tag2", // tags
+            false, // is favourite
+            "published", // state
+            null, // height
+            null // width
+    ));
+
     protected final static List<Regular> regularsForUploading = List.of(new Regular("180894436671", // post ID
             "First Post", // title
             "“This is some quoted text,” she said, “so will it be interpreted correctly?” It was a great question &ndash; and this JUnit test would settle it once and for all." // body
@@ -216,6 +235,11 @@ public abstract class TevTestingClass {
     ), new Regular("190894436671", // post ID
             "Post with no tags", // title
             "post body text here" // body
+    ));
+
+    protected final static List<Regular> regularsForUploadingSecondBlog = List.of(new Regular("180894436690", // post ID
+            "First Post", // title
+            "This is a post on the second blog" // body
     ));
 
     protected final static List<Photo> photosForUploading = List.of(new Photo("180784644740", // post ID
