@@ -3,6 +3,7 @@ package com.tiyb.tev.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -20,12 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tiyb.tev.datamodel.Hashtag;
 import com.tiyb.tev.exception.ExistingTagException;
+import com.tiyb.tev.exception.InvalidTagException;
 import com.tiyb.tev.repository.HashtagRepository;
 
 /**
  * REST controller for working with hashtags. Doesn't use
- * {@link com.tiyb.tev.controller.helper.RepoAbstractor RepoAbstractor}, since the code is slightly
- * different from working with posts.
+ * {@link com.tiyb.tev.controller.helper.RepoAbstractor RepoAbstractor}, since
+ * the code is slightly different from working with posts.
  *
  * @author tiyb
  *
@@ -35,7 +37,8 @@ import com.tiyb.tev.repository.HashtagRepository;
 public class TEVHashtagController {
 
     /**
-     * String used to separate multiple blog names, when a hashtag shows up in multiple blogs
+     * String used to separate multiple blog names, when a hashtag shows up in
+     * multiple blogs
      */
     private static final String BLOG_SEPARATOR = ", ";
 
@@ -46,8 +49,9 @@ public class TEVHashtagController {
     private HashtagRepository hashtagRepo;
 
     /**
-     * GET request for listing <i>all</i> hashtags in the system, regardless of blog. Because
-     * hashtags might be duplicated, logic is included to combine them together.
+     * GET request for listing <i>all</i> hashtags in the system, regardless of
+     * blog. Because hashtags might be duplicated, logic is included to combine them
+     * together.
      *
      * @return List of hashtags with their counts.
      */
@@ -81,8 +85,8 @@ public class TEVHashtagController {
     }
 
     /**
-     * POST request to insert a new hashtag into the system for a given blog. If it already exists
-     * the existing hashtag is simply returned (no error is thrown).
+     * POST request to insert a new hashtag into the system for a given blog. If it
+     * already exists the existing hashtag is simply returned (no error is thrown).
      *
      * @param blog    Blog for which the hashtag should be inserted
      * @param hashtag The hashtag to be entered into the system
@@ -110,13 +114,15 @@ public class TEVHashtagController {
 
     /**
      * <p>
-     * POST request to insert a new hashtag into the system with no blog associated with it. Simply
-     * calls through to the {@link #createHashtagForBlog(String, String) createHashtagForBlog()}
-     * method, passing an empty string for the blog name.
+     * POST request to insert a new hashtag into the system with no blog associated
+     * with it. Simply calls through to the
+     * {@link #createHashtagForBlog(String, String) createHashtagForBlog()} method,
+     * passing an empty string for the blog name.
      * </p>
      *
      * <p>
-     * Throws an error if the hashtag already exists in the system, for any other blog
+     * Throws an error if the hashtag already exists in the system, for any other
+     * blog
      * </p>
      *
      * @param hashtag Hashtag to be created
@@ -135,11 +141,11 @@ public class TEVHashtagController {
      * DEL to delete all hashtags in the DB for a given blog
      *
      * @param blog Blog for which tags should be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
-     *         details
+     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
+     *         the response details
      */
     @Transactional
-    @DeleteMapping("/hashtags/{blog}")
+    @DeleteMapping("/hashtags/forBlog/{blog}")
     public ResponseEntity<?> deleteAllHashtagsForBlog(@PathVariable("blog") final String blog) {
         hashtagRepo.deleteByBlog(blog);
 
@@ -149,21 +155,25 @@ public class TEVHashtagController {
     /**
      * DEL to delete a particular hashtag from the system, for a given blog
      *
-     * @param hashtagToDelete Hashtag to be deleted
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
-     *         details
+     * @param hashtagToDelete ID of the Hashtag to be deleted
+     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
+     *         the response details
      */
-    @DeleteMapping("/hashtags")
-    public ResponseEntity<?> deleteHashTag(@RequestBody final Hashtag hashtagToDelete) {
-        final Hashtag htToDelete = hashtagRepo.findByTagAndBlog(hashtagToDelete.getTag(), hashtagToDelete.getBlog());
-        hashtagRepo.delete(htToDelete);
+    @DeleteMapping("/hashtags/{id}")
+    public ResponseEntity<?> deleteHashTag(@PathVariable("id") final Long hashtagToDelete) {
+        final Optional<Hashtag> htToDelete = hashtagRepo.findById(hashtagToDelete);
+        if (htToDelete.isEmpty()) {
+            throw new InvalidTagException();
+        }
+
+        hashtagRepo.delete(htToDelete.get());
 
         return ResponseEntity.ok().build();
     }
 
     /**
-     * Package-public method to delete all hashtags in the system, regardless of blog. Used only in
-     * JUnit tests; no API associated with the method.
+     * Package-public method to delete all hashtags in the system, regardless of
+     * blog. Used only in JUnit tests; no API associated with the method.
      */
     public void deleteAllHTs() {
         hashtagRepo.deleteAll();

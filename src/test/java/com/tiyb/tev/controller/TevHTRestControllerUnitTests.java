@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,12 +162,14 @@ public class TevHTRestControllerUnitTests extends TevTestingClass {
      */
     @Test
     public void deleteNameForOneBlog() {
-        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        Hashtag ht1 = htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
         htController.createHashtagForBlog(SECOND_BLOG_NAME, FIRST_TAG_VALUE);
-        htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        Hashtag ht3 = htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
+        
+        assertThat(ht1.getId()).isEqualTo(ht3.getId());
 
-        Hashtag ht = new Hashtag(FIRST_TAG_VALUE, 2, MAIN_BLOG_NAME);
-        htController.deleteHashTag(ht);
+        //Hashtag ht = new Hashtag(FIRST_TAG_VALUE, 2, MAIN_BLOG_NAME);
+        htController.deleteHashTag(ht3.getId());
 
         List<Hashtag> list = htController.getAllHashtagsForBlog(SECOND_BLOG_NAME);
         assertThat(list).isNotNull();
@@ -265,10 +266,9 @@ public class TevHTRestControllerUnitTests extends TevTestingClass {
         htController.createHashtagForBlog(SECOND_BLOG_NAME, FIRST_TAG_VALUE);
         htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
         htController.createHashtagForBlog(SECOND_BLOG_NAME, SECOND_TAG_VALUE);
-        htController.createHashtagForNoBlog(THIRD_TAG_VALUE);
+        Hashtag ht5 = htController.createHashtagForNoBlog(THIRD_TAG_VALUE);
 
-        Hashtag htToDelete = new Hashtag(THIRD_TAG_VALUE, 0, StringUtils.EMPTY);
-        htController.deleteHashTag(htToDelete);
+        htController.deleteHashTag(ht5.getId());
 
         List<Hashtag> list = htController.getAllHashtags();
         assertThat(list.size()).isEqualTo(2);

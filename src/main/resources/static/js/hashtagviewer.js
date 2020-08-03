@@ -18,6 +18,11 @@ var metadata;
 var htData;
 
 /**
+ * Holds the list of hashtag objects
+ */
+var htObjects;
+
+/**
  * Initializes the page; gets metadata, gets the Hashtag data, and loads it all
  * into the page
  */
@@ -38,6 +43,7 @@ $(document).ready(function() {
 			url: theUrl,
 			dataSrc: ""
 		}).then(function (htResponseData) {
+            htObjects = htResponseData;
 			htData = htResponseData.map(function(val) {
 				return val['tag'];
 			});
@@ -138,24 +144,32 @@ function loadDataIntoTable(hashtagArray, tableObject) {
 function addRemoveBtnClickHandlers(tableObject) {
 	$('#tagsTable tbody').on('click', 'button.removeBtn', function() {
 		var htObject = tableObject.row($(this).parents('tr')).data();
-		var hashtag = {
-			tag: $(htObject[0]).text(),
-			blog: htObject[1],
-			count: htObject[2]
-		};
+        var htText = $(htObject[0]).text();
+        var htID = -1;
+        
+        for (i = 0; i < htObjects.length; i++) {
+            alert(htObjects[i].id + " " + htObjects[i].tag);
+            if (htObjects[i].tag == htText) {
+                htID = htObjects[i].id;
+                break;
+            }
+        }
+        if (htID == -1) {
+            createAnErrorMessage($.i18n.prop('htviewer_deleteht_error', htText));
+            return;
+        }
 		
-		var url = "/api/hashtags";
+		var url = "/api/hashtags/" + htID;
+        alert(url);
 		
 		$.ajax({
 			url: url,
-			data: JSON.stringify(hashtag),
-			contentType: 'application/json',
 			type: "DELETE",
 			error: function(xhr,textStatus,errorThrown) {
-				createAnErrorMessage($.i18n.prop('htviewer_deleteht_error', hashtag.tag));
+				createAnErrorMessage($.i18n.prop('htviewer_deleteht_error', htText));
 			}
 		}).then(function(data) {
-			createAnInfoMessage($.i18n.prop('htviewer_deleteht_success', hashtag.tag));
+			createAnInfoMessage($.i18n.prop('htviewer_deleteht_success', htText));
 			window.location.reload();
 		});
 	});	

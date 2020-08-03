@@ -1,5 +1,7 @@
 package com.tiyb.tev.html;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 import org.junit.After;
@@ -202,7 +204,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
         restTemplate.delete(String.format("%s/api/posts/%s/links", baseUri(), blogName));
         restTemplate.delete(String.format("%s/api/posts/%s/photos", baseUri(), blogName));
         restTemplate.delete(String.format("%s/api/posts/%s/videos", baseUri(), blogName));
-        restTemplate.delete(String.format("%s/api/hashtags/%s", baseUri(), blogName));
+        restTemplate.delete(String.format("%s/api/hashtags/forBlog/%s", baseUri(), blogName));
         restTemplate.delete(String.format("%s/api/posts/%s", baseUri(), blogName));
     }
 
@@ -399,6 +401,22 @@ public abstract class HtmlTestingClass extends TevTestingClass {
         ResponseEntity<Hashtag[]> responseEntity = restTemplate
                 .getForEntity(String.format("%s/api/hashtags", baseUri()), Hashtag[].class);
         return responseEntity.getBody();
+    }
+
+    /**
+     * Deletes all hashtags from the server.
+     * 
+     * @throws URISyntaxException Thrown if the URL for deleting the hashtag can't
+     *                            be created properly
+     */
+    protected void deleteAllHashtags() throws URISyntaxException {
+        Hashtag[] allTags = getAllHashtags();
+
+        for (int i = 0; i < allTags.length; i++) {
+            String htUrl = String.format("%s/api/hashtags/%d", baseUri(), allTags[i].getId());
+            URI uri = new URI(htUrl);
+            restTemplate.delete(uri);
+        }
     }
 
     /**
