@@ -158,9 +158,9 @@ $(document).ready(function() {
 					});
 					if(metadata.showReadingPane) {
 						$('#contentDisplayReadingPane').show();
-						$('#displayPaneIFrame').prop('src', "/postViewer/" + metadata.blog + "?id=" + postID, "viewer");
+						$('#displayPaneIFrame').prop('src', getUrlForItem(metadata.blog, postID), "viewer");
 					} else {
-						window.open("/postViewer/" + metadata.blog + "?id=" + postID, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
+						window.open(getUrlForItem(metadata.blog, postID), "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
 					}
 				});
 				$('#postTable').on('order.dt', function() {
@@ -532,4 +532,25 @@ function getFormattedDate(inputDate) {
  */
 function setUIWidgets() {
 	$("input[type='radio']").checkboxradio();
+}
+
+/**
+ * Helper function to generate a URL for the viewer post, taking into account 
+ * whether the main blog is selected or an alternate is selected.
+ *
+ * @param blogName Name of default blog
+ * @param postID   ID of post to view
+ * @returns A string with a URL for the post viewer
+ */
+function getUrlForItem(blogName, postID) {
+    var postUrl = "/postViewer/" + blogName + "?id=" + postID;
+    
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("tempBlogName")) {
+        postUrl = "/postViewer/" + urlParams.get("tempBlogName") + "?id=" + postID;
+    } else {
+        postUrl = "/postViewer/" + blogName + "?id=" + postID;
+    }
+    
+    return postUrl;
 }
