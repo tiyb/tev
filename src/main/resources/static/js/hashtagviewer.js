@@ -174,7 +174,8 @@ function updateMDAPI() {
 			createAnErrorMessage($.i18n.prop('index_errorsubmittingdata'));
 		}
 	}).then(function(data) {
-		window.location.reload();
+        createAnInfoMessage($.i18n.prop('htviewer_metadataupdate_success', hashtag.tag));
+        window.location.reload();
 	});	
 }
 

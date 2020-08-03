@@ -70,7 +70,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
     @Before
     public void setupWebClient() {
         webClient = new WebClient(BrowserVersion.CHROME);
-        webClient.getOptions().setThrowExceptionOnScriptError(false); 
+        webClient.getOptions().setThrowExceptionOnScriptError(false);
         webClient.getOptions().setPopupBlockerEnabled(false);
         webClient.getOptions().setRedirectEnabled(true);
         webClient.getCache().setMaxSize(0);
