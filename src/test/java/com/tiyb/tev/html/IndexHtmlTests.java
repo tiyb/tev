@@ -97,7 +97,8 @@ public class IndexHtmlTests extends HtmlTestingClass {
     @Before
     public void setupWC() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         restInitDataForMainBlog(Optional.empty());
-        restInitAdditionalBlog(SECOND_BLOG_NAME);
+        restInitDataForSecondBlog();
+        // restInitAdditionalBlog(SECOND_BLOG_NAME);
 
         mainPage = webClient.getPage(baseUri());
         waitForScript();
@@ -220,6 +221,21 @@ public class IndexHtmlTests extends HtmlTestingClass {
         stagedPosts = getStagedPostsForBlog(MAIN_BLOG_NAME);
         assertThat(stagedPosts.length).isEqualTo(1);
         assertThat(stagedPosts[0]).isEqualToNormalizingWhitespace(FIRST_POST_ID);
+    }
+
+    /**
+     * Loads the non-default blog, and verifies that opening a post happens in the
+     * context of the correct blog
+     */
+    @Test
+    public void openPostForNonDefaultBlog() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
+        mainPage = webClient.getPage(baseUri() + "?tempBlogName=secondblog");
+        waitForScript();
+        postTable = mainPage.getHtmlElementById("postTable");
+
+        HtmlPage popup = openPopup();
+        String popupUrl = popup.getDocumentElement().getBaseURI();
+        assertThat(popupUrl).contains("/postViewer/secondblog");
     }
 
     /**
@@ -512,7 +528,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
      * added
      */
     @Test
-    public void testSearchParam() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
+    public void searchParam() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         HtmlPage filteredPage = webClient.getPage(baseUri() + "?hashsearch=tag1");
         waitForScript();
         HtmlTable filteredPostTable = filteredPage.getHtmlElementById("postTable");
@@ -525,7 +541,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
      * refreshed and filtered on that tag
      */
     @Test
-    public void testClickingHashtagInViewer() throws IOException {
+    public void clickHashtagInViewer() throws IOException {
         HtmlPage popup = openPopup();
         waitForScript();
 
