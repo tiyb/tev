@@ -46,7 +46,13 @@ public class HashtagsHtmlTests extends HtmlTestingClass {
 
         assertThat(tagsTable.getRowCount()).isEqualTo(18);
     }
-
+    
+//    @Test
+//    public void tagInMultipleBlogs() {
+//        // TODO remove button shouldn't show if a tag is in multiple blogs
+//        assertThat(true).isFalse();
+//    }
+//
 //    @Test
 //    public void createHT() {
 //        assertThat(true).isEqualTo(false);

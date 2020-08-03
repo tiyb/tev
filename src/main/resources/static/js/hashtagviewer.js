@@ -32,8 +32,10 @@ $(document).ready(function() {
 		
 		initRadios();
 		
+		var theUrl = metadata.showHashtagsForAllBlogs ? "/api/hashtags" : "api/hashtags/" + blogName;
+		
 		$.ajax({
-			url: metadata.showHashtagsForAllBlogs ? "/api/hashtags" : "api/hashtags/" + blogName,
+			url: theUrl,
 			dataSrc: ""
 		}).then(function (htResponseData) {
 			htData = htResponseData.map(function(val) {
@@ -55,11 +57,10 @@ $(document).ready(function() {
  * indicates that all blogs should be shown, or just the current
  */
 function initRadios() {
-	if (metadata.showHashtagsForAllBlogs) {
+	if (metadata.showHashtagsForAllBlogs == true) {
 		$('#showAllBlogsRadio').prop('checked', true).checkboxradio("refresh");
 	} else {
-		$('#showDefaultBlogRadio').prop('checked', true).checkboxradio(
-				"refresh");
+		$('#showDefaultBlogRadio').prop('checked', true).checkboxradio("refresh");
 	}
 }
 
