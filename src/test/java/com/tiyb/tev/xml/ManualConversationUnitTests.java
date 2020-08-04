@@ -15,12 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.ResourceUtils;
 
-import com.tiyb.tev.FullConversation;
 import com.tiyb.tev.TevTestingClass;
 import com.tiyb.tev.controller.TEVConvoRestController;
 import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.ConversationMessage;
+import com.tiyb.tev.datamodel.FullConversation;
 import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.exception.XMLParsingException;
 
@@ -328,7 +328,7 @@ public class ManualConversationUnitTests extends TevTestingClass {
      * @throws IOException
      */
     @Test
-    public void testAddingConvos() throws IOException {
+    public void addConvo() throws IOException {
         List<Conversation> convos = convoRestController.getAllConversationsForBlog(MAIN_BLOG_NAME);
         assertThat(convos.size()).isEqualTo(TOTAL_NUM_CONVOS);
 

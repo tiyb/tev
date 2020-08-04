@@ -33,7 +33,7 @@ public class TevMetadataRestControllerUnitTests {
 	 * Tests that validation works for valid post types
 	 */
 	@Test
-	public void testValidPostTypes() {
+	public void validPostTypes() {
 		assertThat(TEVMetadataRestController.isValidType("answer", TEVMetadataRestController.POST_TYPES))
 				.isEqualTo(true);
 		assertThat(TEVMetadataRestController.isValidType("link", TEVMetadataRestController.POST_TYPES)).isEqualTo(true);
@@ -49,7 +49,7 @@ public class TevMetadataRestControllerUnitTests {
 	 * Tests that validation works for invalid post types
 	 */
 	@Test
-	public void testInvalidPostTypes() {
+	public void invalidPostTypes() {
 		assertThat(TEVMetadataRestController.isValidType("blah", TEVMetadataRestController.POST_TYPES))
 				.isEqualTo(false);
 	}
@@ -61,7 +61,7 @@ public class TevMetadataRestControllerUnitTests {
 	 * MD objects in the DB
 	 */
 	@Test(expected = NoMetadataFoundException.class)
-	public void testNoBlogsReturnsRightException() {
+	public void noBlogsReturnsCorrectException() {
 		cleanAllMDObjects();
 		mdController.getDefaultBlogName();
 	}
@@ -79,7 +79,7 @@ public class TevMetadataRestControllerUnitTests {
 	 * </ol>
 	 */
 	@Test
-	public void testMDCreation() {
+	public void metadataCreation() {
 		cleanAllMDObjects();
 		Metadata md1 = mdController.getMetadataForBlogOrDefault("blog1");
 		assertThat(md1).isNotNull();

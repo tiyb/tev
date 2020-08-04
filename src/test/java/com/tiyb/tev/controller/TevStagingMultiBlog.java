@@ -54,7 +54,7 @@ public class TevStagingMultiBlog extends TevTestingClass {
      * Deletion of a staged post doesn't impact others
      */
     @Test
-    public void testDeletingAStagedost() {
+    public void deleteAStagedost() {
         controller.createStagedPostForBlog(MAIN_BLOG_NAME, "1");
         controller.createStagedPostForBlog(SECOND_BLOG_NAME, "2");
         controller.createStagedPostForBlog(SECOND_BLOG_NAME, "3");
@@ -75,7 +75,7 @@ public class TevStagingMultiBlog extends TevTestingClass {
      * Deleting all staged posts for a blog doesn't impact other blogs
      */
     @Test
-    public void testDeletingAllStagedPostsFromABlog() {
+    public void deleteAllStagedPostsFromABlog() {
         controller.createStagedPostForBlog(MAIN_BLOG_NAME, "1");
         controller.createStagedPostForBlog(SECOND_BLOG_NAME, "2");
         controller.createStagedPostForBlog(SECOND_BLOG_NAME, "3");

@@ -57,28 +57,28 @@ public class ExportWritingUnitTests extends TevTestingClass {
     }
 
     @Test
-    public void testExportOfRegular() throws IOException {
-        testSinglePostResponse(regularXML, REGULAR_POST_ID);
+    public void exportRegular() throws IOException {
+        checkSinglePostResponse(regularXML, REGULAR_POST_ID);
     }
 
     @Test
-    public void testExportOfAnswer() throws IOException {
-        testSinglePostResponse(answerXML, ANSWER_POST_ID);
+    public void exportAnswer() throws IOException {
+        checkSinglePostResponse(answerXML, ANSWER_POST_ID);
     }
 
     @Test
-    public void testExportOfLink() throws IOException {
-        testSinglePostResponse(linkXML, LINK_POST_ID);
+    public void exportLink() throws IOException {
+        checkSinglePostResponse(linkXML, LINK_POST_ID);
     }
 
     @Test
-    public void testExportOfPhoto() throws IOException {
-        testSinglePostResponse(singlePhotoXML, SINGLEPHOTO_POST_ID);
+    public void exportPhoto() throws IOException {
+        checkSinglePostResponse(singlePhotoXML, SINGLEPHOTO_POST_ID);
     }
 
     @Test
-    public void testExportOfPhotoMultiple() throws IOException {
-        testSinglePostResponse(this.multiplePhotoXML, MULTIPLEPHOTO_POST_ID);
+    public void exportMultiplePhotos() throws IOException {
+        checkSinglePostResponse(this.multiplePhotoXML, MULTIPLEPHOTO_POST_ID);
     }
 
     private String getExpectedResponse(Resource resource) throws IOException {
@@ -90,7 +90,7 @@ public class ExportWritingUnitTests extends TevTestingClass {
         return expectedResponseString;
     }
 
-    private void testSinglePostResponse(Resource resource, String postID) throws IOException {
+    private void checkSinglePostResponse(Resource resource, String postID) throws IOException {
         String expectedAnswer = getExpectedResponse(resource);
 
         List<String> postIDs = new ArrayList<String>();

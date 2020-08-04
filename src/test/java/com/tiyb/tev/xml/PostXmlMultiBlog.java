@@ -71,7 +71,7 @@ public class PostXmlMultiBlog extends TevTestingClass {
      * unit tests
      */
     @Test
-    public void testAllPosts() {
+    public void allPosts() {
         List<Post> posts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
         assertThat(posts).isNotNull();
         assertThat(posts.size()).isEqualTo(ORIGINAL_NUM_POSTS);
@@ -86,7 +86,7 @@ public class PostXmlMultiBlog extends TevTestingClass {
      * tests that the one and only post for the 2nd blog has loaded successfully
      */
     @Test
-    public void testLoadedData() {
+    public void loadedData() {
         Post post = postController.getPostForBlogById(SECOND_BLOG_NAME, SECONDBLOG_FIRSTPOSID);
         assertThat(post).isNotNull();
         assertThat(post.getDate()).isEqualTo("Fri, 07 Dec 2018 11:48:43");
@@ -120,7 +120,7 @@ public class PostXmlMultiBlog extends TevTestingClass {
      * hashtags for both blogs
      */
     @Test
-    public void testHashtags() {
+    public void hashtags() {
         List<Hashtag> hashtags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
         assertThat(hashtags).isNotNull();
         assertThat(hashtags.size()).isEqualTo(BLOG1_INITIAL_HASHTAGS.size());
@@ -140,7 +140,7 @@ public class PostXmlMultiBlog extends TevTestingClass {
      * combined value of both.
      */
     @Test
-    public void testCombinedHashtags() {
+    public void combinedHashtags() {
         List<Hashtag> allHT = postController.getHashtagController().getAllHashtags();
         assertThat(allHT).isNotNull();
         assertThat(allHT.size()).isEqualTo(BLOG1_INITIAL_HASHTAGS.size() + BLOG2_INITIAL_HASHTAGS.size() - 1);
@@ -178,7 +178,7 @@ public class PostXmlMultiBlog extends TevTestingClass {
      * Test adding a new hashtag to the 2nd blog, after the initial load
      */
     @Test
-    public void testAddHashtag() {
+    public void addHashtag() {
         postController.getHashtagController().createHashtagForBlog(SECOND_BLOG_NAME, "tag16");
 
         List<Hashtag> tags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);

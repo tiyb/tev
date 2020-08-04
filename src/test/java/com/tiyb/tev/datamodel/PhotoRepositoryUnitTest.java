@@ -31,7 +31,7 @@ public class PhotoRepositoryUnitTest {
 	 * Verifies that photos can be retrieved via Post ID
 	 */
 	@Test
-	public void testFindByPostID() {
+	public void findByPostID() {
 		Photo photo1 = new Photo();
 		photo1.setPostId("1");
 		photo1.setCaption("Photo 1");

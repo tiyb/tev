@@ -1,9 +1,6 @@
-package com.tiyb.tev;
+package com.tiyb.tev.datamodel;
 
 import java.util.List;
-
-import com.tiyb.tev.datamodel.Conversation;
-import com.tiyb.tev.datamodel.ConversationMessage;
 
 /**
  * Some of the IDs for conversations and conversation messages get generated

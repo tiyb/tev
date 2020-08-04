@@ -102,7 +102,7 @@ public class PostXmlParsingUnitTest extends TevTestingClass {
      * unit tests
      */
     @Test
-    public void testAllPosts() {
+    public void allPosts() {
         List<Post> posts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
         assertThat(posts).isNotNull();
         assertThat(posts.size()).isEqualTo(ORIGINAL_NUM_POSTS);
@@ -134,7 +134,7 @@ public class PostXmlParsingUnitTest extends TevTestingClass {
      * TEVPostRestController#getPostsByType(String)}
      */
     @Test(expected = InvalidTypeException.class)
-    public void testInvalidPostType() {
+    public void invalidPostType() {
         adminController.getPostsByBlogByType(MAIN_BLOG_NAME, "blah");
     }
 
@@ -143,7 +143,7 @@ public class PostXmlParsingUnitTest extends TevTestingClass {
      * the DB (there is one)
      */
     @Test
-    public void testAnswer() {
+    public void answer() {
         Post post = postController.getPostForBlogById(MAIN_BLOG_NAME, answerPostID);
         assertThat(post).isNotNull();
         assertThat(post.getDate()).isEqualTo("Thu, 22 Nov 2018 03:26:25");
@@ -174,7 +174,7 @@ public class PostXmlParsingUnitTest extends TevTestingClass {
      * DB (there is one)
      */
     @Test
-    public void testLink() {
+    public void link() {
         Post post = postController.getPostForBlogById(MAIN_BLOG_NAME, linkPostID);
         assertThat(post).isNotNull();
         assertThat(post.getDate()).isEqualTo("Mon, 19 Nov 2018 01:09:08");
@@ -206,7 +206,7 @@ public class PostXmlParsingUnitTest extends TevTestingClass {
      * the DB (there is one)
      */
     @Test
-    public void testRegular() {
+    public void regular() {
         Post post = postController.getPostForBlogById(MAIN_BLOG_NAME, regularPostID);
         assertThat(post).isNotNull();
         assertThat(post.getDate()).isEqualTo("Fri, 07 Dec 2018 11:48:43");
@@ -240,7 +240,7 @@ public class PostXmlParsingUnitTest extends TevTestingClass {
      * left in anyway.
      */
     @Test
-    public void testIgnoredDraft() {
+    public void ignoredDraft() {
         Post post = postController.getPostForBlogById(MAIN_BLOG_NAME, draftRegularPostID);
 
         assertThat(post).isNotNull();
@@ -252,7 +252,7 @@ public class PostXmlParsingUnitTest extends TevTestingClass {
      * skipped, which is no longer relevant; it was kept nonetheless.
      */
     @Test
-    public void testIgnoredQueued() {
+    public void ignoredQueued() {
         Post post = postController.getPostForBlogById(MAIN_BLOG_NAME, queuedRegularPostID);
 
         assertThat(post).isNotNull();
@@ -263,7 +263,7 @@ public class PostXmlParsingUnitTest extends TevTestingClass {
      * DB (there is one)
      */
     @Test
-    public void testVideo() {
+    public void video() {
         Post post = postController.getPostForBlogById(MAIN_BLOG_NAME, videoPostID);
         assertThat(post).isNotNull();
         assertThat(post.getDate()).isEqualTo("Tue, 04 Dec 2018 01:09:21");
@@ -299,7 +299,7 @@ public class PostXmlParsingUnitTest extends TevTestingClass {
      * DB (there are three, spread across two posts)
      */
     @Test
-    public void testPhotos() {
+    public void photos() {
         Post post = postController.getPostForBlogById(MAIN_BLOG_NAME, firstPhotoPostID);
         assertThat(post).isNotNull();
         assertThat(post.getDate()).isEqualTo("Tue, 04 Dec 2018 02:17:52");
@@ -402,7 +402,7 @@ public class PostXmlParsingUnitTest extends TevTestingClass {
      * @throws FileNotFoundException
      */
     @Test
-    public void testAddingPosts() throws FileNotFoundException {
+    public void addPosts() throws FileNotFoundException {
         List<Post> posts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
         assertThat(posts.size()).isEqualTo(ORIGINAL_NUM_POSTS);
 
@@ -470,7 +470,7 @@ public class PostXmlParsingUnitTest extends TevTestingClass {
      * hashtags
      */
     @Test
-    public void testInitialHashtags() {
+    public void initialHashtags() {
         List<Hashtag> hashtags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
         assertThat(hashtags).isNotNull();
         assertThat(hashtags.size()).isEqualTo(INITIAL_HASHTAGS.size());
@@ -506,7 +506,7 @@ public class PostXmlParsingUnitTest extends TevTestingClass {
      * @throws FileNotFoundException
      */
     @Test(expected = XMLParsingException.class)
-    public void testBadXmlUpload() throws FileNotFoundException {
+    public void badXmlUpload() throws FileNotFoundException {
         File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-badxml.txt");
         InputStream xmlFile = new FileInputStream(rawXmlFile);
 
@@ -517,7 +517,7 @@ public class PostXmlParsingUnitTest extends TevTestingClass {
      * Simple check that all hashtags have been loaded
      */
     @Test
-    public void testHashtagInitialLoad() {
+    public void hashtagInitialLoad() {
         List<Hashtag> tags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
 
         assertThat(tags).isNotNull();
@@ -528,7 +528,7 @@ public class PostXmlParsingUnitTest extends TevTestingClass {
      * Test adding a new hashtag, after the initial load
      */
     @Test
-    public void testAddHashtag() {
+    public void addHashtag() {
         postController.getHashtagController().createHashtagForBlog(MAIN_BLOG_NAME, "tag16");
 
         List<Hashtag> tags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
@@ -541,7 +541,7 @@ public class PostXmlParsingUnitTest extends TevTestingClass {
      * Test adding a hashtag that already exists in the system
      */
     @Test
-    public void testAddExistingHashtag() {
+    public void addExistingHashtag() {
         postController.getHashtagController().createHashtagForBlog("tag1", MAIN_BLOG_NAME);
 
         List<Hashtag> tags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);

@@ -21,6 +21,7 @@ import com.tiyb.tev.controller.TEVPostRestController;
 import com.tiyb.tev.datamodel.Answer;
 import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.ConversationMessage;
+import com.tiyb.tev.datamodel.FullConversation;
 import com.tiyb.tev.datamodel.Link;
 import com.tiyb.tev.datamodel.Metadata;
 import com.tiyb.tev.datamodel.Photo;

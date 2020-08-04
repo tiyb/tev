@@ -158,7 +158,7 @@ public class ConversationXmlParsingUnitTests extends TevTestingClass {
      * proper set has been done for inserting the data into the DB.
      */
     @Test
-    public void testRetrieveConvoWithNoId() {
+    public void retrieveConvoWithNoId() {
         Conversation returnedConvo = convoRestController.getConversationForBlogByParticipantIdOrName(MAIN_BLOG_NAME, "",
                 convo3Participant);
         assertThat(returnedConvo).isNotNull();
@@ -334,7 +334,7 @@ public class ConversationXmlParsingUnitTests extends TevTestingClass {
      * @throws IOException
      */
     @Test
-    public void testAddingConvos() throws IOException {
+    public void addConvo() throws IOException {
         List<Conversation> convos = convoRestController.getAllConversationsForBlog(MAIN_BLOG_NAME);
         assertThat(convos.size()).isEqualTo(TOTAL_NUM_CONVOS);
 
@@ -415,7 +415,7 @@ public class ConversationXmlParsingUnitTests extends TevTestingClass {
      * @throws IOException
      */
     @Test(expected = XMLParsingException.class)
-    public void testBadXml() throws IOException {
+    public void badXml() throws IOException {
         File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-messages-badxml.txt");
         InputStream xmlFile = new FileInputStream(rawXmlFile);
         MockMultipartFile mockFile = new MockMultipartFile("testmessages", xmlFile);

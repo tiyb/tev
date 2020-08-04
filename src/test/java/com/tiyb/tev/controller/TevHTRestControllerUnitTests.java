@@ -186,7 +186,7 @@ public class TevHTRestControllerUnitTests extends TevTestingClass {
      * function to verify that they are merging correctly
      */
     @Test
-    public void testMergedList() {
+    public void mergeList() {
         htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);
         htController.createHashtagForBlog(SECOND_BLOG_NAME, FIRST_TAG_VALUE);
         htController.createHashtagForBlog(MAIN_BLOG_NAME, FIRST_TAG_VALUE);

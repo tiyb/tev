@@ -61,7 +61,7 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
      * @throws IOException
      */
     @Test
-    public void testCleaningExtraImages() throws IOException {
+    public void cleanExtraImages() throws IOException {
         tempMDImageFolder.newFile("blah.txt");
 
         adminRestController.cleanImagesOnHDForBlog(MAIN_BLOG_NAME);
@@ -76,7 +76,7 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
      * @throws IOException
      */
     @Test
-    public void testCleaningExactNumImages() throws IOException {
+    public void cleanExactNumImages() throws IOException {
         tempMDImageFolder.newFile("180784644740_0.gif");
         tempMDImageFolder.newFile("180254465582_0.gif");
         tempMDImageFolder.newFile("180254465582_1.gif");
@@ -93,7 +93,7 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
      * @throws IOException
      */
     @Test
-    public void testCleaningDoubleImages() throws IOException {
+    public void cleanDoubleImages() throws IOException {
         tempMDImageFolder.newFile("180784644740_0.gif");
         tempMDImageFolder.newFile("180784644740_1.gif");
         tempMDImageFolder.newFile("180254465582_0.gif");
@@ -112,7 +112,7 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
      * @throws IOException
      */
     @Test
-    public void testImportingExtraImages() throws IOException {
+    public void importExtraImages() throws IOException {
         tempInputImageFolder.newFile("blah.txt");
 
         adminRestController.importImagesForBlog(MAIN_BLOG_NAME, tempInputImageFolder.getRoot().getAbsolutePath());
@@ -126,7 +126,7 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
      * @throws IOException
      */
     @Test
-    public void testImportingExactNumImages() throws IOException {
+    public void importExactNumImages() throws IOException {
         tempInputImageFolder.newFile("180784644740_0.gif");
         tempInputImageFolder.newFile("180254465582_0.gif");
         tempInputImageFolder.newFile("180254465582_1.gif");
@@ -142,7 +142,7 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
      * @throws IOException
      */
     @Test
-    public void testImportingDoubleImages() throws IOException {
+    public void importDoubleImages() throws IOException {
         tempInputImageFolder.newFile("180784644740_0.gif");
         tempInputImageFolder.newFile("180784644740_1.gif");
         tempInputImageFolder.newFile("180254465582_0.gif");
@@ -161,7 +161,7 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
      * @throws IOException
      */
     @Test
-    public void testImportingWithExisting() throws IOException {
+    public void importWithExisting() throws IOException {
         tempMDImageFolder.newFile("180784644740_0.gif");
         tempMDImageFolder.newFile("180784644740_1.gif");
         tempInputImageFolder.newFile("180254465582_0.gif");
@@ -178,7 +178,7 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
      * Tests functionality for marking all posts read
      */
     @Test
-    public void testMarkingAllPostsRead() {
+    public void markAllPostsRead() {
         List<Post> allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
         assertThat(allPosts).isNotNull();
 
@@ -206,7 +206,7 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
      * Tests functionality for marking all posts unread
      */
     @Test
-    public void testMarkingAllPostsUnread() {
+    public void markAllPostsUnread() {
         List<Post> allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
         assertThat(allPosts).isNotNull();
 
