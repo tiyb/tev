@@ -148,7 +148,6 @@ function addRemoveBtnClickHandlers(tableObject) {
         var htID = -1;
         
         for (i = 0; i < htObjects.length; i++) {
-            alert(htObjects[i].id + " " + htObjects[i].tag);
             if (htObjects[i].tag == htText) {
                 htID = htObjects[i].id;
                 break;
@@ -160,7 +159,6 @@ function addRemoveBtnClickHandlers(tableObject) {
         }
 		
 		var url = "/api/hashtags/" + htID;
-        alert(url);
 		
 		$.ajax({
 			url: url,
