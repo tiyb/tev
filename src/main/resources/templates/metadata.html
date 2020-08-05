@@ -32,6 +32,7 @@
 	<div id="footer"></div>
 
 	<script th:if="${noBlogsCreated}" type="text/javascript">var noBlogsCreated = true;</script>
+	<script th:unless="${noBlogsCreated}" type="text/javascript">var noBlogsCreated = false;</script>
 	
 	<script type="text/javascript" th:src="@{/owr/jquery.js}"></script>
 
