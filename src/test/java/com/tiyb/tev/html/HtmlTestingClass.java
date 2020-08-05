@@ -199,6 +199,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
      * @param blogName Name of the blog for which to remove data
      */
     private void deletePostDataForBlog(String blogName) {
+        restTemplate.delete(String.format("%s/staging-api/posts/%s", baseUri(), blogName));
         restTemplate.delete(String.format("%s/api/posts/%s/regulars", baseUri(), blogName));
         restTemplate.delete(String.format("%s/api/posts/%s/answers", baseUri(), blogName));
         restTemplate.delete(String.format("%s/api/posts/%s/links", baseUri(), blogName));

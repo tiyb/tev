@@ -41,6 +41,8 @@ import com.tiyb.tev.datamodel.Post;
  */
 public class IndexHtmlTests extends HtmlTestingClass {
 
+    private static final String POST_TABLE = "postTable";
+
     /**
      * The main table holding posts; used in numerous tests.
      */
@@ -103,7 +105,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         mainPage = webClient.getPage(baseUri());
         waitForScript();
 
-        postTable = mainPage.getHtmlElementById("postTable");
+        postTable = mainPage.getHtmlElementById(POST_TABLE);
     }
 
     /**
@@ -231,7 +233,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
     public void openPostForNonDefaultBlog() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         mainPage = webClient.getPage(baseUri() + "?tempBlogName=secondblog");
         waitForScript();
-        postTable = mainPage.getHtmlElementById("postTable");
+        postTable = mainPage.getHtmlElementById(POST_TABLE);
 
         HtmlPage popup = openPopup();
         String popupUrl = popup.getDocumentElement().getBaseURI();
@@ -413,7 +415,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
                 assertThat(url).contains("tempBlogName");
                 assertThat(url).contains(SECOND_BLOG_NAME);
 
-                HtmlTable newPostTable = page.getHtmlElementById("postTable");
+                HtmlTable newPostTable = page.getHtmlElementById(POST_TABLE);
                 assertThat(newPostTable.getRowCount()).isEqualTo(4); // two header, one footer, and one row to say "no
                                                                      // contents"
                 windowChecked = true;
@@ -480,7 +482,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         assertThat(post.getIsRead()).isFalse();
         mainPage = webClient.getPage(baseUri());
         waitForScript();
-        postTable = mainPage.getHtmlElementById("postTable");
+        postTable = mainPage.getHtmlElementById(POST_TABLE);
         cell = postTable.getCellAt(FIRST_POST_ROW_NO, COLUMN_READ);
         assertThat(cell.asText()).isEqualToNormalizingWhitespace(nonReadText);
 
@@ -515,7 +517,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
             String url = win.getEnclosedPage().getUrl().toString();
             if (url.contains("localhost") && !url.contains("postViewer")) {
                 HtmlPage newMainPage = (HtmlPage) win.getEnclosedPage();
-                HtmlTable newPostTable = newMainPage.getHtmlElementById("postTable");
+                HtmlTable newPostTable = newMainPage.getHtmlElementById(POST_TABLE);
                 assertThat(newPostTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE - 1);
                 mainPageChecked = true;
             }
@@ -531,7 +533,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
     public void searchParam() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         HtmlPage filteredPage = webClient.getPage(baseUri() + "?hashsearch=tag1");
         waitForScript();
-        HtmlTable filteredPostTable = filteredPage.getHtmlElementById("postTable");
+        HtmlTable filteredPostTable = filteredPage.getHtmlElementById(POST_TABLE);
         assertThat(filteredPostTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE - 3); // three posts don't have this
                                                                                        // hashtag
     }
@@ -568,7 +570,7 @@ public class IndexHtmlTests extends HtmlTestingClass {
         }
         assertThat(pageRefreshed).isTrue();
         assertThat(newMainPage).isNotNull();
-        HtmlTable newPostTable = newMainPage.getHtmlElementById("postTable");
+        HtmlTable newPostTable = newMainPage.getHtmlElementById(POST_TABLE);
         assertThat(newPostTable.getRowCount()).isEqualTo(NUM_ITEMS_IN_TABLE - 3);
     }
 

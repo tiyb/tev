@@ -27,6 +27,8 @@ import com.tiyb.tev.datamodel.Hashtag;
  */
 public class HashtagsHtmlTests extends HtmlTestingClass {
 
+    private static final String TAGS_TABLE = "tagsTable";
+
     private HtmlTable tagsTable;
 
     @Value("${htviewer_table_removeBtn}")
@@ -45,7 +47,7 @@ public class HashtagsHtmlTests extends HtmlTestingClass {
 
         mainPage = webClient.getPage(baseUri() + "/hashtagViewer");
         waitForScript();
-        tagsTable = mainPage.getHtmlElementById("tagsTable");
+        tagsTable = mainPage.getHtmlElementById(TAGS_TABLE);
     }
 
     /**
@@ -64,7 +66,7 @@ public class HashtagsHtmlTests extends HtmlTestingClass {
         assertThat(cell.asText()).isEqualToNormalizingWhitespace("2ndtag1");
 
         cell = tagsTable.getCellAt(3, 1);
-        assertThat(cell.asText()).isEqualToNormalizingWhitespace("mainblog");
+        assertThat(cell.asText()).isEqualToNormalizingWhitespace(MAIN_BLOG_NAME);
 
         cell = tagsTable.getCellAt(4, 2);
         assertThat(cell.asText()).isEqualToNormalizingWhitespace("1");
@@ -115,7 +117,7 @@ public class HashtagsHtmlTests extends HtmlTestingClass {
         showFromCurrentButton = mainPage.getHtmlElementById("showDefaultBlogRadio");
         assertThat(showFromCurrentButton.isChecked()).isTrue();
 
-        tagsTable = mainPage.getHtmlElementById("tagsTable");
+        tagsTable = mainPage.getHtmlElementById(TAGS_TABLE);
         assertThat(tagsTable.getRowCount()).isEqualTo(17);
 
         HtmlTableCell cell = tagsTable.getCellAt(9, 1);
@@ -139,7 +141,7 @@ public class HashtagsHtmlTests extends HtmlTestingClass {
 
         mainPage = webClient.getPage(baseUri() + "/hashtagViewer");
         waitForScript();
-        tagsTable = mainPage.getHtmlElementById("tagsTable");
+        tagsTable = mainPage.getHtmlElementById(TAGS_TABLE);
         assertThat(tagsTable.getRowCount()).isEqualTo(19);
         
         HtmlTableCell cell = tagsTable.getCellAt(3, 1);
@@ -162,7 +164,7 @@ public class HashtagsHtmlTests extends HtmlTestingClass {
         mainPage = webClient.getPage(baseUri() + "/hashtagViewer");
         waitForScript();
 
-        tagsTable = mainPage.getHtmlElementById("tagsTable");
+        tagsTable = mainPage.getHtmlElementById(TAGS_TABLE);
         assertThat(tagsTable.getRowCount()).isEqualTo(17);
     }
 }

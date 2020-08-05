@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.Page;
@@ -30,6 +31,9 @@ import com.tiyb.tev.datamodel.Metadata;
  *
  */
 public class MainSettingPageHtmlTests extends HtmlTestingClass {
+
+    @Value("${md_createBlog_errorMessage}")
+    private String pleaseEnterBlogErrorMessage;
 
     /**
      * Sets up the main and secondary blogs, and retrieves the settings page
@@ -96,8 +100,7 @@ public class MainSettingPageHtmlTests extends HtmlTestingClass {
         DomNodeList<DomNode> children = errorsDiv.getChildNodes();
         assertThat(children.size()).isEqualTo(1);
         HtmlDivision childDiv = (HtmlDivision) children.get(0);
-        assertThat(childDiv.getVisibleText())
-                .isEqualToNormalizingWhitespace("Please enter the name of the blog you want to import from Tumblr.");
+        assertThat(childDiv.getVisibleText()).isEqualToNormalizingWhitespace(pleaseEnterBlogErrorMessage);
     }
 
     /**
