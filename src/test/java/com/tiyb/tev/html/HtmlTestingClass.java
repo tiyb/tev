@@ -1,5 +1,7 @@
 package com.tiyb.tev.html;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
@@ -21,7 +23,10 @@ import com.gargoylesoftware.htmlunit.ImmediateRefreshHandler;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebWindow;
+import com.gargoylesoftware.htmlunit.html.DomNode;
+import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.FrameWindow;
+import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.SilentJavaScriptErrorListener;
 import com.tiyb.tev.TevTestingClass;
@@ -71,7 +76,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
      */
     @Before
     public void setupWebClient() {
-        webClient = new WebClient(BrowserVersion.CHROME);
+        webClient = new WebClient(); //BrowserVersion.CHROME
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         webClient.getOptions().setPopupBlockerEnabled(false);
         webClient.getOptions().setRedirectEnabled(true);
@@ -248,6 +253,26 @@ public abstract class HtmlTestingClass extends TevTestingClass {
     }
 
     /**
+     * Gets metadata for a given blog from the server via REST calls. Will
+     * <i>not</i> use the "or default" option provided by the API.
+     * 
+     * @param blogName Name of the blog for which to retrieve the data
+     * @return Metadata object for the given blog (or the default MD object if none
+     *         existed)
+     */
+    protected Metadata getMDFromServerNotDefault(Optional<String> blogName) {
+        String blogForWhichToFetchMD;
+        if (blogName.isPresent()) {
+            blogForWhichToFetchMD = blogName.get();
+        } else {
+            blogForWhichToFetchMD = MAIN_BLOG_NAME;
+        }
+
+        return restTemplate.getForObject(String.format("%s/api/metadata/byBlog/%s", baseUri(), blogForWhichToFetchMD),
+                Metadata.class);
+    }
+
+    /**
      * Updates a MD object via REST
      * 
      * @param md The object to be updated
@@ -263,6 +288,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
      */
     protected void restInitMainBlogSettings(Optional<String> baseMediaPath) {
         Metadata md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
+        md.setBlog(MAIN_BLOG_NAME);
         md.setOverwritePostData(true);
         md.setOverwriteConvoData(true);
         md.setMainTumblrUser(MAIN_BLOG_NAME);
@@ -277,7 +303,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
         md.setShowReadingPane(false);
         md.setSortColumn("ID");
         md.setSortOrder("Descending");
-        md.setTheme("base");
+        md.setTheme(Metadata.DEFAULT_THEME); 
         md.setShowReadingPane(false);
         if (baseMediaPath.isPresent()) {
             md.setBaseMediaPath(baseMediaPath.get());
@@ -309,7 +335,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
         md.setShowReadingPane(false);
         md.setSortColumn("ID");
         md.setSortOrder("Descending");
-        md.setTheme("base");
+        md.setTheme(Metadata.DEFAULT_THEME);
 
         updateMD(md);
     }
@@ -430,4 +456,5 @@ public abstract class HtmlTestingClass extends TevTestingClass {
                 .getForEntity(String.format("%s/api/metadata", baseUri()), Metadata[].class);
         return responseEntity.getBody();
     }
+
 }

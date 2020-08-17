@@ -12,6 +12,46 @@ var postFileUploading = true;
 var FILE_UPLOADING_INTERVAL = 4500;
 
 /**
+ * Sends values from the form to the server to update the Metadata
+ */
+function updateServer() {
+    alert("entering update server function"); // TODO
+    metadataObject.baseMediaPath = $('#baseMediaPath').val();
+    metadataObject.blog = $('#blogNameInput').val();
+    metadataObject.mainTumblrUser = $('#mainUser').val();
+    metadataObject.mainTumblrUserAvatarUrl = $('#mainUserAvatarUrl').val();
+    metadataObject.sortOrder = $('#sortOrderDropdown').val();
+    metadataObject.conversationSortOrder = $('#conversationSortOrderDropdown').val();
+    metadataObject.sortColumn = $('#sortByDropdown').val();
+    metadataObject.conversationSortColumn = $('#conversationSortColumnDropdown').val();
+    metadataObject.filter = $('#filterDropdown').val();
+    metadataObject.favFilter = $('#favsDropdown').val();
+    metadataObject.pageLength = $('#pageLengthDropdown').val();
+    metadataObject.showReadingPane = $('#showReadingPaneDropdown').val();
+    metadataObject.overwritePostData = $('#overwritePostsDropdown').val();
+    metadataObject.overwriteConvoData = $('#overwriteConvosDropdown').val();
+    metadataObject.conversationDisplayStyle = $('#conversationDisplayDropdown').val();
+    metadataObject.imageExportPath = $('#imageExportPath').val();
+    metadataObject.theme = $('#themesDropdown').val();
+    
+    $.ajax({
+        url: '/api/metadata/' + metadataObject.id,
+        method: 'PUT',
+        data: JSON.stringify(metadataObject),
+        contentType: 'application/json',
+        success: function(data, textStatus, xhr) {
+            alert("server updated successfully"); // TODO
+            createAnInfoMessage($.i18n.prop('md_submit_success'));
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            alert("server not updated successfully"); // TODO
+            creaeAnErrorMessage($.i18n.prop('md_submit_failure'));
+        }
+    }); 
+    alert("leaving update server function"); // TODO
+}
+
+/**
  * Download the static data to populate drop-downs; download metadata to
  * populate the form, set up event handlers
  */
@@ -69,14 +109,14 @@ $(document).ready(function () {
 						url: '/api/metadata/' + metadataObject.id + '/markAsDefault',
 						method: 'PUT'
 					}).then(function(data) {
+                        createAnInfoMessage($.i18n.prop('md_submit_success'));
 						location.reload();
 					});
 				});
 			}
-				
 		});
 		
-		$('#headerBlogSelect').selectmenu("disable");				
+		$('#headerBlogSelect').selectmenu("disable");	
 	});
 	
 	$.ajax({
@@ -92,6 +132,7 @@ $(document).ready(function () {
 					url: '/api/metadata/' + metadataObject.id,
 					method: 'DELETE',
 					success: function(data, textStatus, hxr) {
+                        createAnInfoMessage($.i18n.prop('md_submit_success'));
 						window.location = "/metadata";
 					},
 					error: function(xhr, textStatus, errorThrown) {
@@ -177,9 +218,10 @@ $(document).ready(function () {
 	});
 	
 	$('.autoUpdateSetting').change(function() {
+        alert("change event fired"); // TODO remove
 		updateServer();
+        alert("finished calling updateServer"); // TODO remove
 	});
-	
 });
 
 /**
@@ -417,42 +459,6 @@ function fillDropdownsWithValues(data) {
 	
 	addOptionToSelect("true", "overwriteConvosDropdown", $.i18n.prop('md_overwriteConvosYes'));
 	addOptionToSelect("false", "overwriteConvosDropdown", $.i18n.prop('md_overwriteConvosNo'));	
-}
-
-/**
- * Sends values from the form to the server to update the Metadata
- */
-function updateServer() {
-	metadataObject.baseMediaPath = $('#baseMediaPath').val();
-	metadataObject.blog = $('#blogNameInput').val();
-	metadataObject.mainTumblrUser = $('#mainUser').val();
-	metadataObject.mainTumblrUserAvatarUrl = $('#mainUserAvatarUrl').val();
-	metadataObject.sortOrder = $('#sortOrderDropdown').val();
-	metadataObject.conversationSortOrder = $('#conversationSortOrderDropdown').val();
-	metadataObject.sortColumn = $('#sortByDropdown').val();
-	metadataObject.conversationSortColumn = $('#conversationSortColumnDropdown').val();
-	metadataObject.filter = $('#filterDropdown').val();
-	metadataObject.favFilter = $('#favsDropdown').val();
-	metadataObject.pageLength = $('#pageLengthDropdown').val();
-	metadataObject.showReadingPane = $('#showReadingPaneDropdown').val();
-	metadataObject.overwritePostData = $('#overwritePostsDropdown').val();
-	metadataObject.overwriteConvoData = $('#overwriteConvosDropdown').val();
-	metadataObject.conversationDisplayStyle = $('#conversationDisplayDropdown').val();
-	metadataObject.imageExportPath = $('#imageExportPath').val();
-	metadataObject.theme = $('#themesDropdown').val();
-	
-	$.ajax({
-		url: '/api/metadata/' + metadataObject.id,
-		method: 'PUT',
-		data: JSON.stringify(metadataObject),
-		contentType: 'application/json',
-		success: function(data, textStatus, xhr) {
-			createAnInfoMessage($.i18n.prop('md_submit_success'));
-		},
-		error: function(xhr, textStatus, errorThrown) {
-			creaeAnErrorMessage($.i18n.prop('md_submit_failure'));
-		}
-	});	
 }
 
 /**
