@@ -5,7 +5,7 @@
 $(document).ready(function() {
 	$(document).keydown(function(e) {
 		// ESC
-		if (e.keyCode == 27) {
+		if (e.keyCode === 27) {
 			window.close();
 		}
 	});

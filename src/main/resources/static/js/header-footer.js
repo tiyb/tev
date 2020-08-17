@@ -1,4 +1,27 @@
 /**
+ * Creates a link within the header, with given text for a given page / URL
+ * 
+ * @param spanName
+ *            The span to which this link should be added
+ * @param linkText
+ *            The text to display
+ * @param linkUrl
+ *            The URL for the link
+ * @param isSelected
+ *            Indicates whether the link should be shown as 'selected' or not
+ */
+function addLinkToHeader(spanName, linkText, linkUrl, isSelected) {
+    var linkContent = "";
+    if(isSelected) {
+        linkContent = "<span class='navbar-selected'><a href='" + linkUrl + "'>" + linkText + "</a></span>";
+    } else {
+        linkContent = "<a href='" + linkUrl + "'>" + linkText + "</a>";
+    }
+    
+    $(linkContent).appendTo('#' + spanName);
+}
+
+/**
  * Loads the header and footer HTML from the server, and then builds the
  * links/text in the header based on the URL of the current page. (i.e. links
  * for every page other than the current one, which is given a span with the
@@ -66,10 +89,6 @@ $(document).ready(function() {
 			}).then(function(allMDs) {
 				for(i = 0; i < allMDs.length; i++) {
 					addOptionToSelect(allMDs[i].blog, "headerBlogSelect", allMDs[i].blog);
-					
-					if(allMDs[i].isDefault) {
-						currentlySelectedBlog = allMDs[i].blog;
-					}
 				}
 				
 				var currentlySelectedBlog = getCurrentBlogName();
@@ -85,26 +104,3 @@ $(document).ready(function() {
 	$('#footer').load("/footer");
 	
 });
-
-/**
- * Creates a link within the header, with given text for a given page / URL
- * 
- * @param spanName
- *            The span to which this link should be added
- * @param linkText
- *            The text to display
- * @param linkUrl
- *            The URL for the link
- * @param isSelected
- *            Indicates whether the link should be shown as 'selected' or not
- */
-function addLinkToHeader(spanName, linkText, linkUrl, isSelected) {
-	var linkContent = "";
-	if(isSelected) {
-		linkContent = "<span class='navbar-selected'><a href='" + linkUrl + "'>" + linkText + "</a></span>";
-	} else {
-		var linkContent = "<a href='" + linkUrl + "'>" + linkText + "</a>";
-	}
-	
-	$(linkContent).appendTo('#' + spanName);
-}

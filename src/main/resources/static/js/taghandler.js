@@ -6,7 +6,7 @@
 $(document).ready(function() {
 	$(document).on('click', 'span[class=hashtagspan]', function() {
 		var newHostURL = "/index?hashsearch=" + encodeURI($(this).text());
-		if (window.opener == null) {
+		if (window.opener === null) {
 			location.replace(newHostURL);
 		} else {
 			window.parent.opener.location.replace(newHostURL);

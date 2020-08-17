@@ -12,177 +12,6 @@ var postFileUploading = true;
 var FILE_UPLOADING_INTERVAL = 4500;
 
 /**
- * Download the static data to populate drop-downs; download metadata to
- * populate the form, set up event handlers
- */
-$(document).ready(function () {
-	setUIWidgets();
-
-	$.ajax({
-		url: "/api/metadata/staticListData",
-		method: "GET",
-		data: ""
-	}).then(function(data) {
-		fillDropdownsWithValues(data);
-		
-		$.ajax({
-			url: "/api/metadata/byBlog/" + blogName,
-			data: ""
-		}).then(function(data) {
-			metadataObject = data;
-			$('#baseMediaPath').val(metadataObject.baseMediaPath);
-			$('#blogNameInput').val(metadataObject.blog);
-			$('#sortOrderDropdown').val(metadataObject.sortOrder).selectmenu('refresh');
-			$('#conversationSortOrderDropdown').val(metadataObject.conversationSortOrder).selectmenu('refresh');
-			$('#sortByDropdown').val(metadataObject.sortColumn).selectmenu('refresh');
-			$('#conversationSortColumnDropdown').val(metadataObject.conversationSortColumn).selectmenu('refresh');
-			$('#filterDropdown').val(metadataObject.filter).selectmenu('refresh');
-			$('#favsDropdown').val(metadataObject.favFilter).selectmenu('refresh');
-			$('#pageLengthDropdown').val(metadataObject.pageLength).selectmenu('refresh');
-			$('#conversationDisplayDropdown').val(metadataObject.conversationDisplayStyle).selectmenu('refresh');
-			$('#themesDropdown').val(metadataObject.theme).selectmenu('refresh');
-			$('#mainUser').val(metadataObject.mainTumblrUser);
-			$('#mainUserAvatarUrl').val(metadataObject.mainTumblrUserAvatarUrl);
-			$('#imageExportPath').val(metadataObject.exportImagesFilePath);
-			if(metadataObject.showReadingPane == "true") {
-				$('#showReadingPaneDropdown').val('true').selectmenu('refresh');
-			} else {
-				$('#showReadingPaneDropdown').val('false').selectmenu('refresh');
-			}
-			if(metadataObject.overwritePostData) {
-				$('#overwritePostsDropdown').val('true').selectmenu('refresh');
-			} else {
-				$('#overwritePostsDropdown').val('false').selectmenu('refresh');
-			}
-			if(metadataObject.overwriteConvoData) {
-				$('#overwriteConvosDropdown').val('true').selectmenu('refresh');
-			} else {
-				$('#overwriteConvosDropdown').val('false').selectmenu('refresh');
-			}
-			
-			if(metadataObject.isDefault) {
-				$('#setDefaultBlogButton').hide();
-			} else {
-				$('#blogIsDefaultMessage').hide();
-				$('#setDefaultBlogButton').click(function() {
-					$.ajax({
-						url: '/api/metadata/' + metadataObject.id + '/markAsDefault',
-						method: 'PUT'
-					}).then(function(data) {
-						location.reload();
-					});
-				});
-			}
-				
-		});
-		
-		$('#headerBlogSelect').selectmenu("disable");				
-	});
-	
-	$.ajax({
-		url: '/api/metadata',
-		method: 'GET',
-		data: ''
-	}).then(function(data) {
-		if(data.length == 1) {
-			$('#deleteBlogButton').hide();
-		} else {
-			$('#deleteBlogButton').click(function() {
-				$.ajax({
-					url: '/api/metadata/' + metadataObject.id,
-					method: 'DELETE',
-					success: function(data, textStatus, hxr) {
-						window.location = "/metadata";
-					},
-					error: function(xhr, textStatus, errorThrown) {
-						createAnErrorMessage($.i18n.prop('md_deleteBlog_errorMessage'));
-					}
-				});
-			});			
-		}
-	});
-	
-	$('#markAllPostsReadButton').click(function() {
-		$.ajax({
-			url: '/admintools/posts/' + metadataObject.blog + '/markAllRead',
-			type: 'GET',
-			success: function(data, textStatus, xhr) {
-				createAnInfoMessage($.i18n.prop('md_admintools_markAllReadSuccess'));
-			},
-			error: function(xhr, textStatus, errorThrown) {
-				createAnErrorMessage($.i18n.prop('md_admintools_markAllReadFailure'));
-			}
-		});
-	});
-	
-	$('#markAllPostsUnreadButton').click(function() {
-		$.ajax({
-			url: '/admintools/posts/' + metadataObject.blog + '/markAllUnread',
-			type: 'GET',
-			success: function(data, textStatus, xhr) {
-				createAnInfoMessage($.i18n.prop('md_admintools_markAllUnreadSuccess'));
-			},
-			error: function(xhr, textStatus, errorThrown) {
-				createAnErrorMessage($.i18n.prop('md_admintools_markAllUnreadFailure'));
-			}
-		});
-	});
-	
-	$('#cleanImagesButton').click(function() {
-		$.ajax({
-			url: '/admintools/posts/' + metadataObject.blog + '/cleanImagesOnHD',
-			type: 'GET',
-			success: function(data, textStatus, xhr) {
-				createAnInfoMessage($.i18n.prop('md_admintools_cleanImagesSuccess'));
-			},
-			error: function(xhr, textStatus, errorThrown) {
-				createAnErrorMessage($.i18n.prop('md_admintools_cleanImagesFailure'));
-			}
-		});
-	});
-	
-	$('#importImagesButton').click(function() {
-		if($('#importImagesPath').val().length < 1) {
-			createAnErrorMessage($.i18n.prop('md_admintools_importImagesBadPath'));
-			return;
-		}
-		
-		$.ajax({
-			url: '/admintools/posts/' + metadataObject.blog + '/importImages',
-			type: 'POST',
-			data: $('#importImagesPath').val(),
-			async: false,
-			contentType: 'text/plain',
-			success: function(data, textStatus, xhr) {
-				createAnInfoMessage($.i18n.prop('md_admintools_importImagesSuccess'));
-			},
-			error: function(xhr, textStatus, errorThrown) {
-				createAnErrorMessage($.i18n.prop('md_admintools_importImagesFailure'));
-			}
-		});
-	});
-	
-	$('#postUploadSubmitButton').click(function() {
-		$('#postUploadSubmitButton').hide();
-		uploadFile("post", "postUploadForm");
-		
-		return false;
-	});
-	
-	$('#convoUploadSubmitButton').click(function() {
-		$('#convoUploadSubmitButton').hide();
-		uploadFile("convo", "convoUploadForm");
-		
-		return false;
-	});
-	
-	$('.autoUpdateSetting').change(function() {
-		updateServer();
-	});
-	
-});
-
-/**
  * Returns a translated name for a column
  * 
  * @param columnName
@@ -193,28 +22,20 @@ function getTranslatedNameForColumn(columnName) {
 	switch(columnName) {
 	case "ID":
 		return $.i18n.prop('md_columnnames_id');
-		break;
 	case "Type":
 		return $.i18n.prop('md_columnnames_type');
-		break;
 	case "Slug":
 		return $.i18n.prop('md_columnnames_slug');
-		break;
 	case "Date":
 		return $.i18n.prop('md_columnnames_date');
-		break;
 	case "Is Read":
 		return $.i18n.prop('md_columnnames_isread');
-		break;
 	case "Is Favourite":
 		return $.i18n.prop('md_columnnames_isfavourite');
-		break;
 	case "State":
 		return $.i18n.prop('md_columnnames_state');
-		break;
 	case "Hashtags":
 		return $.i18n.prop('md_columnnames_hashtags');
-		break;
 	}
 }
 
@@ -229,10 +50,8 @@ function getTranslatedNameForConversationColumn(columnName) {
 	switch(columnName) {
 	case "participantName":
 		return $.i18n.prop('md_convocolumnnames_participant');
-		break;
 	case "numMessages":
 		return $.i18n.prop('md_convocolumnnames_nummessages');
-		break;
 	}
 }
 
@@ -247,10 +66,8 @@ function getTranslatedSortOrder(sortOrder) {
 	switch(sortOrder) {
 	case "Ascending":
 		return $.i18n.prop('md_sortorders_asc');
-		break;
 	case "Descending":
 		return $.i18n.prop('md_sortorders_desc');
-		break;
 	}
 }
 
@@ -265,13 +82,10 @@ function getTranslatedFilterTypes(filterType) {
 	switch(filterType) {
 	case "Filter Read Posts":
 		return $.i18n.prop('md_filters_filterread');
-		break;
 	case "Filter Unread Posts":
 		return $.i18n.prop('md_filters_filterunread');
-		break;
 	case "Do not Filter":
 		return $.i18n.prop('md_filters_filternothing');
-		break;
 	}
 }
 
@@ -286,13 +100,10 @@ function getTranslatedFavFilters(favFilter) {
 	switch(favFilter) {
 	case "Show Favourites":
 		return $.i18n.prop('md_favfilters_showfavourited');
-		break;
 	case "Show Non Favourites":
 		return $.i18n.prop('md_favfilters_shownonfavourited');
-		break;
 	case "Show Everything":
 		return $.i18n.prop('md_favfilters_showeverything');
-		break;
 	}
 }
 
@@ -307,19 +118,14 @@ function getTranslatedPageLength(pageLength) {
 	switch(pageLength) {
 	case 10:
 		return $.i18n.prop('md_pagelengths_10');
-		break;
 	case 25:
 		return $.i18n.prop('md_pagelengths_25');
-		break;
 	case 50:
 		return $.i18n.prop('md_pagelengths_50');
-		break;
 	case 100:
 		return $.i18n.prop('md_pagelengths_100');
-		break;
 	case -1:
 		return $.i18n.prop('md_pagelengths_all');
-		break;
 	}
 }
 
@@ -334,10 +140,8 @@ function getTranslatedConversationStyle(conversationStyle) {
 	switch(conversationStyle) {
 	case "cloud":
 		return $.i18n.prop('md_conversationStyles_cloud');
-		break;
 	case "table":
 		return $.i18n.prop('md_conversationStyles_table');
-		break;
 	}
 }
 
@@ -350,6 +154,42 @@ function getTranslatedConversationStyle(conversationStyle) {
  */
 function getTranslatedTheme(themeID) {
 	return $.i18n.prop('md_themes_' + themeID);
+}
+
+/**
+ * Sends values from the form to the server to update the Metadata
+ */
+function updateServer() {
+    metadataObject.baseMediaPath = $('#baseMediaPath').val();
+    metadataObject.blog = $('#blogNameInput').val();
+    metadataObject.mainTumblrUser = $('#mainUser').val();
+    metadataObject.mainTumblrUserAvatarUrl = $('#mainUserAvatarUrl').val();
+    metadataObject.sortOrder = $('#sortOrderDropdown').val();
+    metadataObject.conversationSortOrder = $('#conversationSortOrderDropdown').val();
+    metadataObject.sortColumn = $('#sortByDropdown').val();
+    metadataObject.conversationSortColumn = $('#conversationSortColumnDropdown').val();
+    metadataObject.filter = $('#filterDropdown').val();
+    metadataObject.favFilter = $('#favsDropdown').val();
+    metadataObject.pageLength = $('#pageLengthDropdown').val();
+    metadataObject.showReadingPane = $('#showReadingPaneDropdown').val();
+    metadataObject.overwritePostData = $('#overwritePostsDropdown').val();
+    metadataObject.overwriteConvoData = $('#overwriteConvosDropdown').val();
+    metadataObject.conversationDisplayStyle = $('#conversationDisplayDropdown').val();
+    metadataObject.imageExportPath = $('#imageExportPath').val();
+    metadataObject.theme = $('#themesDropdown').val();
+    
+    $.ajax({
+        url: '/api/metadata/' + metadataObject.id,
+        method: 'PUT',
+        data: JSON.stringify(metadataObject),
+        contentType: 'application/json',
+        success: function(data, textStatus, xhr) {
+            createAnInfoMessage($.i18n.prop('md_submit_success'));
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            creaeAnErrorMessage($.i18n.prop('md_submit_failure'));
+        }
+    }); 
 }
 
 /**
@@ -409,50 +249,54 @@ function fillDropdownsWithValues(data) {
 	$.each(data.themes, function(i, obj) {
 		addOptionToSelect(obj, "themesDropdown", getTranslatedTheme(obj));
 	});
-	addOptionToSelect("true", "showReadingPaneDropdown", $.i18n.prop('md_showReadingPaneYes'))
-	addOptionToSelect("false", "showReadingPaneDropdown", $.i18n.prop('md_showReadingPaneNo'))
+	addOptionToSelect("true", "showReadingPaneDropdown", $.i18n.prop('md_showReadingPaneYes'));
+	addOptionToSelect("false", "showReadingPaneDropdown", $.i18n.prop('md_showReadingPaneNo'));
 	
-	addOptionToSelect("true", "overwritePostsDropdown", $.i18n.prop('md_overwritePostsYes'))
-	addOptionToSelect("false", "overwritePostsDropdown", $.i18n.prop('md_overwritePostsNo'))
+	addOptionToSelect("true", "overwritePostsDropdown", $.i18n.prop('md_overwritePostsYes'));
+	addOptionToSelect("false", "overwritePostsDropdown", $.i18n.prop('md_overwritePostsNo'));
 	
 	addOptionToSelect("true", "overwriteConvosDropdown", $.i18n.prop('md_overwriteConvosYes'));
 	addOptionToSelect("false", "overwriteConvosDropdown", $.i18n.prop('md_overwriteConvosNo'));	
 }
 
 /**
- * Sends values from the form to the server to update the Metadata
+ * Displays a periodic message in the message area, to indicate that a file is
+ * still uploading. Works with both post and convo files; no error checking done
+ * on the param, since it would have been checked earlier in the calling
+ * function.
+ * 
+ * First checks the appropriate flag (convoFileUploading or postFileUploading)
+ * to see if the upload is still occurring; if so, a message is displayed, and
+ * setTimeout() is used to call this function again in a few seconds (controlled
+ * by FILE_UPLOADING_INTERVAL).
+ * 
+ * @param fileType
+ *            Type of file being uploaded, either post or convo
  */
-function updateServer() {
-	metadataObject.baseMediaPath = $('#baseMediaPath').val();
-	metadataObject.blog = $('#blogNameInput').val();
-	metadataObject.mainTumblrUser = $('#mainUser').val();
-	metadataObject.mainTumblrUserAvatarUrl = $('#mainUserAvatarUrl').val();
-	metadataObject.sortOrder = $('#sortOrderDropdown').val();
-	metadataObject.conversationSortOrder = $('#conversationSortOrderDropdown').val();
-	metadataObject.sortColumn = $('#sortByDropdown').val();
-	metadataObject.conversationSortColumn = $('#conversationSortColumnDropdown').val();
-	metadataObject.filter = $('#filterDropdown').val();
-	metadataObject.favFilter = $('#favsDropdown').val();
-	metadataObject.pageLength = $('#pageLengthDropdown').val();
-	metadataObject.showReadingPane = $('#showReadingPaneDropdown').val();
-	metadataObject.overwritePostData = $('#overwritePostsDropdown').val();
-	metadataObject.overwriteConvoData = $('#overwriteConvosDropdown').val();
-	metadataObject.conversationDisplayStyle = $('#conversationDisplayDropdown').val();
-	metadataObject.imageExportPath = $('#imageExportPath').val();
-	metadataObject.theme = $('#themesDropdown').val();
-	
-	$.ajax({
-		url: '/api/metadata/' + metadataObject.id,
-		method: 'PUT',
-		data: JSON.stringify(metadataObject),
-		contentType: 'application/json',
-		success: function(data, textStatus, xhr) {
-			createAnInfoMessage($.i18n.prop('md_submit_success'));
-		},
-		error: function(xhr, textStatus, errorThrown) {
-			creaeAnErrorMessage($.i18n.prop('md_submit_failure'));
-		}
-	});	
+function stillUploadingMessage(fileType) {
+    if (fileType === "post") {
+        if (postFileUploading === false) {
+            return;
+        }
+
+        createAnInfoMessage($.i18n
+                .prop('md_uploadfile_stilluploading', "Posts"));
+        setTimeout(function() {
+            stillUploadingMessage("post");
+        }, FILE_UPLOADING_INTERVAL);
+
+        return;
+    }
+
+    if (convoFileUploading === false) {
+        return;
+    }
+
+    createAnInfoMessage($.i18n.prop('md_uploadfile_stilluploading',
+            "Conversations"));
+    setTimeout(function() {
+        stillUploadingMessage("convo");
+    }, FILE_UPLOADING_INTERVAL);
 }
 
 /**
@@ -466,10 +310,10 @@ function updateServer() {
  */
 function uploadFile(fileType, postUploadForm) {
 	var url;
-	if (fileType == "post") {
+	if (fileType === "post") {
 		url = '/postDataUpload/' + blogName;
 		postFileUploading = true;
-	} else if (fileType == "convo") {
+	} else if (fileType === "convo") {
 		url = '/conversationDataUpload/' + blogName;
 		convoFileUploading = true;
 	} else {
@@ -505,7 +349,7 @@ function uploadFile(fileType, postUploadForm) {
 			return myXhr;
 		},
 		success : function(data, textStatus) {
-			if (fileType == "post") {
+			if (fileType === "post") {
 				postFileUploading = false;
 				$('#postUploadSubmitButton').show();
 			} else {
@@ -515,7 +359,7 @@ function uploadFile(fileType, postUploadForm) {
 			createAnInfoMessage($.i18n.prop('md_uploadfile_success'));
 		},
 		error : function(xhr, textStatus, errorThrown) {
-			if (fileType == "post") {
+			if (fileType === "post") {
 				postFileUploading = false;
 			} else {
 				convoFileUploading = false;
@@ -527,41 +371,172 @@ function uploadFile(fileType, postUploadForm) {
 }
 
 /**
- * Displays a periodic message in the message area, to indicate that a file is
- * still uploading. Works with both post and convo files; no error checking done
- * on the param, since it would have been checked earlier in the calling
- * function.
- * 
- * First checks the appropriate flag (convoFileUploading or postFileUploading)
- * to see if the upload is still occurring; if so, a message is displayed, and
- * setTimeout() is used to call this function again in a few seconds (controlled
- * by FILE_UPLOADING_INTERVAL).
- * 
- * @param fileType
- *            Type of file being uploaded, either post or convo
+ * Download the static data to populate drop-downs; download metadata to
+ * populate the form, set up event handlers
  */
-function stillUploadingMessage(fileType) {
-	if (fileType == "post") {
-		if (postFileUploading == false) {
-			return;
-		}
+$(document).ready(function () {
+    setUIWidgets();
 
-		createAnInfoMessage($.i18n
-				.prop('md_uploadfile_stilluploading', "Posts"));
-		setTimeout(function() {
-			stillUploadingMessage("post");
-		}, FILE_UPLOADING_INTERVAL);
-
-		return;
-	}
-
-	if (convoFileUploading == false) {
-		return;
-	}
-
-	createAnInfoMessage($.i18n.prop('md_uploadfile_stilluploading',
-			"Conversations"));
-	setTimeout(function() {
-		stillUploadingMessage("convo");
-	}, FILE_UPLOADING_INTERVAL);
-}
+    $.ajax({
+        url: "/api/metadata/staticListData",
+        method: "GET",
+        data: ""
+    }).then(function(data) {
+        fillDropdownsWithValues(data);
+        
+        $.ajax({
+            url: "/api/metadata/byBlog/" + blogName,
+            data: ""
+        }).then(function(data) {
+            metadataObject = data;
+            $('#baseMediaPath').val(metadataObject.baseMediaPath);
+            $('#blogNameInput').val(metadataObject.blog);
+            $('#sortOrderDropdown').val(metadataObject.sortOrder).selectmenu('refresh');
+            $('#conversationSortOrderDropdown').val(metadataObject.conversationSortOrder).selectmenu('refresh');
+            $('#sortByDropdown').val(metadataObject.sortColumn).selectmenu('refresh');
+            $('#conversationSortColumnDropdown').val(metadataObject.conversationSortColumn).selectmenu('refresh');
+            $('#filterDropdown').val(metadataObject.filter).selectmenu('refresh');
+            $('#favsDropdown').val(metadataObject.favFilter).selectmenu('refresh');
+            $('#pageLengthDropdown').val(metadataObject.pageLength).selectmenu('refresh');
+            $('#conversationDisplayDropdown').val(metadataObject.conversationDisplayStyle).selectmenu('refresh');
+            $('#themesDropdown').val(metadataObject.theme).selectmenu('refresh');
+            $('#mainUser').val(metadataObject.mainTumblrUser);
+            $('#mainUserAvatarUrl').val(metadataObject.mainTumblrUserAvatarUrl);
+            $('#imageExportPath').val(metadataObject.exportImagesFilePath);
+            if(metadataObject.showReadingPane === "true") {
+                $('#showReadingPaneDropdown').val('true').selectmenu('refresh');
+            } else {
+                $('#showReadingPaneDropdown').val('false').selectmenu('refresh');
+            }
+            if(metadataObject.overwritePostData) {
+                $('#overwritePostsDropdown').val('true').selectmenu('refresh');
+            } else {
+                $('#overwritePostsDropdown').val('false').selectmenu('refresh');
+            }
+            if(metadataObject.overwriteConvoData) {
+                $('#overwriteConvosDropdown').val('true').selectmenu('refresh');
+            } else {
+                $('#overwriteConvosDropdown').val('false').selectmenu('refresh');
+            }
+            
+            if(metadataObject.isDefault) {
+                $('#setDefaultBlogButton').hide();
+            } else {
+                $('#blogIsDefaultMessage').hide();
+                $('#setDefaultBlogButton').click(function() {
+                    $.ajax({
+                        url: '/api/metadata/' + metadataObject.id + '/markAsDefault',
+                        method: 'PUT'
+                    }).then(function(data) {
+                        location.reload();
+                    });
+                });
+            }
+                
+        });
+        
+        $('#headerBlogSelect').selectmenu("disable");               
+    });
+    
+    $.ajax({
+        url: '/api/metadata',
+        method: 'GET',
+        data: ''
+    }).then(function(data) {
+        if(data.length === 1) {
+            $('#deleteBlogButton').hide();
+        } else {
+            $('#deleteBlogButton').click(function() {
+                $.ajax({
+                    url: '/api/metadata/' + metadataObject.id,
+                    method: 'DELETE',
+                    success: function(data, textStatus, hxr) {
+                        window.location = "/metadata";
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        createAnErrorMessage($.i18n.prop('md_deleteBlog_errorMessage'));
+                    }
+                });
+            });         
+        }
+    });
+    
+    $('#markAllPostsReadButton').click(function() {
+        $.ajax({
+            url: '/admintools/posts/' + metadataObject.blog + '/markAllRead',
+            type: 'GET',
+            success: function(data, textStatus, xhr) {
+                createAnInfoMessage($.i18n.prop('md_admintools_markAllReadSuccess'));
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                createAnErrorMessage($.i18n.prop('md_admintools_markAllReadFailure'));
+            }
+        });
+    });
+    
+    $('#markAllPostsUnreadButton').click(function() {
+        $.ajax({
+            url: '/admintools/posts/' + metadataObject.blog + '/markAllUnread',
+            type: 'GET',
+            success: function(data, textStatus, xhr) {
+                createAnInfoMessage($.i18n.prop('md_admintools_markAllUnreadSuccess'));
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                createAnErrorMessage($.i18n.prop('md_admintools_markAllUnreadFailure'));
+            }
+        });
+    });
+    
+    $('#cleanImagesButton').click(function() {
+        $.ajax({
+            url: '/admintools/posts/' + metadataObject.blog + '/cleanImagesOnHD',
+            type: 'GET',
+            success: function(data, textStatus, xhr) {
+                createAnInfoMessage($.i18n.prop('md_admintools_cleanImagesSuccess'));
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                createAnErrorMessage($.i18n.prop('md_admintools_cleanImagesFailure'));
+            }
+        });
+    });
+    
+    $('#importImagesButton').click(function() {
+        if($('#importImagesPath').val().length < 1) {
+            createAnErrorMessage($.i18n.prop('md_admintools_importImagesBadPath'));
+            return;
+        }
+        
+        $.ajax({
+            url: '/admintools/posts/' + metadataObject.blog + '/importImages',
+            type: 'POST',
+            data: $('#importImagesPath').val(),
+            async: false,
+            contentType: 'text/plain',
+            success: function(data, textStatus, xhr) {
+                createAnInfoMessage($.i18n.prop('md_admintools_importImagesSuccess'));
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                createAnErrorMessage($.i18n.prop('md_admintools_importImagesFailure'));
+            }
+        });
+    });
+    
+    $('#postUploadSubmitButton').click(function() {
+        $('#postUploadSubmitButton').hide();
+        uploadFile("post", "postUploadForm");
+        
+        return false;
+    });
+    
+    $('#convoUploadSubmitButton').click(function() {
+        $('#convoUploadSubmitButton').hide();
+        uploadFile("convo", "convoUploadForm");
+        
+        return false;
+    });
+    
+    $('.autoUpdateSetting').change(function() {
+        updateServer();
+    });
+    
+});

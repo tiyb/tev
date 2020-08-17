@@ -16,6 +16,87 @@ $.i18n.properties({
 	mode: 'both'
 });
 
+/**
+ * Send updated metadata to the server
+ */
+function updateMDAPI() {
+    $.ajax({
+        url: '/api/metadata/' + metadata.id,
+        type: 'PUT',
+        data: JSON.stringify(metadata),
+        contentType: 'application/json',
+        error: function(xhr, textStatus, errorThrown) {
+            createAnErrorMessage($.i18n.prop('index_errorsubmittingdata'));
+        }
+    }); 
+}
+
+/**
+ * Used to sort the table, based on metadata and/or user selection
+ */
+function sortTable() {
+    conversationTable = $('#conversationTable').DataTable();
+    
+    var sortOrder;
+    var sortColumn;
+    
+    if(metadata.conversationSortOrder === "Ascending") {
+        sortOrder = "asc";
+    } else {
+        sortOrder = "desc";
+    }
+    
+    switch(metadata.conversationSortColumn) {
+    case "participantName":
+        sortColumn = PARTICIPANT_COLUMN_NO;
+        break;
+    case "numMessages":
+        sortColumn = NUMMESSAGES_COLUMN_NO;
+        break;
+    default:
+        sortColumn = PARTICIPANT_COLUMN_NO;
+    }
+    
+    conversationTable.order([sortColumn, sortOrder]).draw();
+}
+
+/**
+ * Update server metadata with updated sort order (based on user selection)
+ * 
+ * @param column
+ *            The ID of the column to be sorted
+ * @param order
+ *            The sort order (ascending or descending)
+ */
+function updateSortOrderInMD(column, order) {
+    switch(column) {
+    case PARTICIPANT_COLUMN_NO:
+        metadata.conversationSortColumn = "participantName";
+        break;
+    case NUMMESSAGES_COLUMN_NO:
+        metadata.conversationSortColumn = "numMessages";
+        break;
+    default:
+        metadata.sortColumn = "participantName";
+        break;
+    }
+    
+    if(order === "asc") {
+        metadata.conversationSortOrder = "Ascending";
+    } else {
+        metadata.conversationSortOrder = "Descending";
+    }
+    
+    updateMDAPI();
+}
+
+/**
+ * Sets up any Themeroller widgets that need to be pre-set
+ */
+function setUIWidgets() {
+    $("input[type='radio']").checkboxradio();
+}
+
 $(document).ready(function() {
 	setUIWidgets();
 	
@@ -32,7 +113,7 @@ $(document).ready(function() {
 		} else {
 			$('#showPopupsSelected').prop('checked', true).checkboxradio("refresh");
 		}
-		if(metadata.conversationDisplayStyle == "cloud") {
+		if(metadata.conversationDisplayStyle === "cloud") {
 			$('#showCloudSelected').prop('checked', true).checkboxradio("refresh");
 			$('#conversationWordCloudContainerContainer').show();
 			$('#conversationTableContainer').hide();
@@ -49,20 +130,23 @@ $(document).ready(function() {
 		}).then(function(data) {
 			var words = [];
 			
-			data.forEach(element => words.push({
-				text: element.participant, 
-				weight: element.numMessages, 
-				handlers: {
-					click: function(item) {
-						if(metadata.showReadingPane) {
-							$('#contentDisplayReadingPane').show();
-							$('#displayPaneIFrame').prop('src', "/conversationViewer?participant=" + item.target.textContent + "&blog=" + metadata.blog, "viewer");
-						} else {
-							window.open("/conversationViewer?participant=" + item.target.textContent + "&blog=" + metadata.blog, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
-						}
-					}
-				}
-			}));
+			data.forEach(function(element) {
+			    var itemObject = {
+			      text: element.participant,
+			      weight: element.numMessages,
+			      handlers: {
+			         click: function(item) {
+                        if(metadata.showReadingPane) {
+                            $('#contentDisplayReadingPane').show();
+                            $('#displayPaneIFrame').prop('src', "/conversationViewer?participant=" + item.target.textContent + "&blog=" + metadata.blog, "viewer");
+                        } else {
+                            window.open("/conversationViewer?participant=" + item.target.textContent + "&blog=" + metadata.blog, "viewer", "menubar=no,status=no,toolbar=no,height=700,width=1000");
+                        }
+			         }
+			      }
+			    };
+			    words.push(itemObject);
+			});
 			
 			$('#conversationWordCloudContainer').jQCloud(words, {width:900,height:500,fontSize:{from:0.01,to:0.002},autoResize:false,removeOverflowing:true});
 			
@@ -135,7 +219,7 @@ $(document).ready(function() {
 	});
 
 	$('input[type=radio][name=showReadingPaneRadio]').change(function() {
-		if(this.id == "showReadingPaneSelected") {
+		if(this.id === "showReadingPaneSelected") {
 			metadata.showReadingPane = true;
 		} else {
 			$('#contentDisplayReadingPane').hide();
@@ -146,7 +230,7 @@ $(document).ready(function() {
 	});
 	
 	$('input[type=radio][name=chooseDisplayStyle]').change(function() {
-		if(this.id == "showCloudSelected") {
+		if(this.id === "showCloudSelected") {
 			metadata.conversationDisplayStyle = "cloud";
 			$('#conversationWordCloudContainerContainer').show();
 			$('#conversationTableContainer').hide();			
@@ -172,84 +256,3 @@ $(document).ready(function() {
 		}
 	});
 });
-
-/**
- * Used to sort the table, based on metadata and/or user selection
- */
-function sortTable() {
-	conversationTable = $('#conversationTable').DataTable();
-	
-	var sortOrder;
-	var sortColumn;
-	
-	if(metadata.conversationSortOrder == "Ascending") {
-		sortOrder = "asc";
-	} else {
-		sortOrder = "desc";
-	}
-	
-	switch(metadata.conversationSortColumn) {
-	case "participantName":
-		sortColumn = PARTICIPANT_COLUMN_NO;
-		break;
-	case "numMessages":
-		sortColumn = NUMMESSAGES_COLUMN_NO;
-		break;
-	default:
-		sortColumn = PARTICIPANT_COLUMN_NO;
-	}
-	
-	conversationTable.order([sortColumn, sortOrder]).draw();
-}
-
-/**
- * Update server metadata with updated sort order (based on user selection)
- * 
- * @param column
- *            The ID of the column to be sorted
- * @param order
- *            The sort order (ascending or descending)
- */
-function updateSortOrderInMD(column, order) {
-	switch(column) {
-	case PARTICIPANT_COLUMN_NO:
-		metadata.conversationSortColumn = "participantName";
-		break;
-	case NUMMESSAGES_COLUMN_NO:
-		metadata.conversationSortColumn = "numMessages";
-		break;
-	default:
-		metadata.sortColumn = "participantName";
-		break;
-	}
-	
-	if(order == "asc") {
-		metadata.conversationSortOrder = "Ascending";
-	} else {
-		metadata.conversationSortOrder = "Descending";
-	}
-	
-	updateMDAPI();
-}
-
-/**
- * Send updated metadata to the server
- */
-function updateMDAPI() {
-	$.ajax({
-		url: '/api/metadata/' + metadata.id,
-		type: 'PUT',
-		data: JSON.stringify(metadata),
-		contentType: 'application/json',
-		error: function(xhr, textStatus, errorThrown) {
-			createAnErrorMessage($.i18n.prop('index_errorsubmittingdata'));
-		}
-	});	
-}
-
-/**
- * Sets up any Themeroller widgets that need to be pre-set
- */
-function setUIWidgets() {
-	$("input[type='radio']").checkboxradio();
-}
