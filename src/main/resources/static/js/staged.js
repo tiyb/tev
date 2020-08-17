@@ -6,6 +6,10 @@ $.i18n.properties({
 
 var metadataObject;
 
+function buildClickableItem(text) {
+    return "<div class='clickableTableValue'>" + text + "</div>";
+}
+
 $(document).ready(function() {
 	var stagedPostTable = $('#stagedPostsTable').DataTable({
 		"language": {
@@ -53,7 +57,7 @@ $(document).ready(function() {
 					dataSrc: ""
 				}).then(function(postData) {
 					var downloadImageButton;
-					if(postData.type == "photo") {
+					if(postData.type === "photo") {
 						downloadImageButton = "<button class='downloadImagesButton ui-button ui-widget ui-corner-all'>" + $.i18n.prop('staging_downloadImagesButtonText') + "</button>";
 					} else {
 						downloadImageButton = "";
@@ -87,7 +91,7 @@ $(document).ready(function() {
 				var imagesExportPath = metadataObject.exportImagesFilePath;
 				
 				imagesExportPath = prompt($.i18n.prop('staging_imageExort_prompt'), imagesExportPath);
-				if((imagesExportPath == null) || (imagesExportPath.length < 1)) {
+				if((imagesExportPath === null) || (imagesExportPath.length < 1)) {
 					createAnErrorMessage($.i18n.prop('staging_imageExort_error'));
 					return;
 				}
@@ -106,7 +110,7 @@ $(document).ready(function() {
 					}
 				});
 				
-				if(metadataObject.exportImagesFilePath != imagesExportPath) {
+				if(metadataObject.exportImagesFilePath !== imagesExportPath) {
 					metadataObject.exportImagesFilePath = imagesExportPath;
 					
 					$.ajax({
@@ -140,7 +144,3 @@ $(document).ready(function() {
 		});
 	});
 });
-
-function buildClickableItem(text) {
-	return "<div class='clickableTableValue'>" + text + "</div>";
-}

@@ -10,8 +10,8 @@
  *            translationFunction is null)
  */
 function addOptionToSelect(optionValue, selectName, optionText) {
-	var optionData = "<option value='" + optionValue + "'>" + optionText
-			+ "</option>";
+	var optionData = "<option value='" + optionValue + "'>" + optionText +
+			"</option>";
 	$(optionData).appendTo("#" + selectName);
 }
 

@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.tiyb</groupId>
 	<artifactId>tev</artifactId>
-	<version>v10.3.8</version>
+	<version>v10.3.9</version>
 	<name>tev</name>
 	<description>Tumblr Export Viewer</description>
 
@@ -130,6 +130,34 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+			 <groupId>com.cj.jshintmojo</groupId>
+			 <artifactId>jshint-maven-plugin</artifactId>
+			 <version>1.6.0</version>
+			 <executions>
+			     <execution>
+			         <goals>
+			             <goal>lint</goal>
+			         </goals>
+			     </execution>
+			 </executions>
+			 <configuration>
+			     <version>2.4.3</version>
+			     <configFile>src/main/resources/jshint.conf.js</configFile>
+			     <directories>
+			         <directory>src/main/resources/static/js</directory>
+			     </directories>
+			     <excludes>
+			         <exclude>src/main/resources/static/js/i18n/messages.properties</exclude>
+			         <exclude>src/main/resources/static/js/jqcloud.min.js</exclude>
+                     <exclude>src/main/resources/static/js/jquery-ui.min.js</exclude>
+                     <exclude>src/main/resources/static/js/datatables.min.js</exclude>
+			     </excludes>
+			     <reporter>jslint</reporter>
+			     <reportFile>target/jshint.xml</reportFile>
+			     <failOnError>true</failOnError>
+			 </configuration>
 			</plugin>
 		</plugins>
 	</build>

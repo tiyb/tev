@@ -19,10 +19,10 @@ $(document).ready(function() {
 			var videoURL500 = result500[1];
 
 			window.open(videoURL);
-			if (videoURL != videoURL250) {
+			if (videoURL !== videoURL250) {
 				window.open(videoURL250);
 			}
-			if ((videoURL != videoURL500) && (videoURL250 != videoURL500)) {
+			if ((videoURL !== videoURL500) && (videoURL250 !== videoURL500)) {
 				window.open(videoURL500);
 			}
 		});

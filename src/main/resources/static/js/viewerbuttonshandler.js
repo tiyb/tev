@@ -67,7 +67,7 @@ $(document).ready(function() {
 			window.close();
 		});
 		
-		if(postData.type == "video") {
+		if(postData.type === "video") {
 			$('#stageForDownloadButton').hide();
 		} else {
 			$.ajax({
@@ -76,7 +76,7 @@ $(document).ready(function() {
 			}).then(function(data) {
 				var stagedPost = false;
 				data.forEach(function(element) {
-					if(element == postId) {
+					if(element === postId) {
 						stagedPost = true;
 					}
 				});

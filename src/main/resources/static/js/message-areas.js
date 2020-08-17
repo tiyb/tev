@@ -7,14 +7,14 @@ var TIMEOUT_VALUE = 10000;
  * messages. They are not shown unless and until they are needed.
  */
 $(document).ready(function() {
-	var messageAreas = "<div class='ui-widget' id='infoMessageContent' style='display:none;'>"
-		+ "<div class='ui-state-highlight ui-corner-all' id='infoMessageText'>"
-		+ "</div>"
-		+ "</div>"
-		+ "<div class='ui-widget' id='errorMessageContent' style='display:none;'>"
-		+ "<div class='ui-state-error ui-corner-all' id='errorMessageText'>"
-		+ "</div>"
-		+ "</div>";
+	var messageAreas = "<div class='ui-widget' id='infoMessageContent' style='display:none;'>" +
+		"<div class='ui-state-highlight ui-corner-all' id='infoMessageText'>" +
+		"</div>" +
+		"</div>" +
+		"<div class='ui-widget' id='errorMessageContent' style='display:none;'>" +
+		"<div class='ui-state-error ui-corner-all' id='errorMessageText'>" +
+		"</div>" +
+		"</div>";
 
 	$(messageAreas).appendTo('#messageAreas');
 });

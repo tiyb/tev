@@ -18,37 +18,26 @@ var metadata;
 var htData;
 
 /**
- * Initializes the page; gets metadata, gets the Hashtag data, and loads it all
- * into the page
+ * Returns a "hashtagspan" for the given text
+ * 
+ * @param textToShow
+ *            Text to show in the span
+ * @returns Span with the appropriate class, showing the text
  */
-$(document).ready(function() {
-	setupUIWidgets();
-	
-	$.ajax({
-		url: '/api/metadata/byBlog/' + getCurrentBlogName(),
-		dataSrc: ''
-	}).then(function(data) {
-		metadata = data;
-		
-		initRadios();
-		
-		$.ajax({
-			url: metadata.showHashtagsForAllBlogs ? "/api/hashtags" : "api/hashtags/" + blogName,
-			dataSrc: ""
-		}).then(function (htResponseData) {
-			htData = htResponseData.map(function(val) {
-				return val['tag'];
-			});
-			
-			var tagsTable = initializeTableUI();
-			loadDataIntoTable(htResponseData, tagsTable);
-			addRemoveBtnClickHandlers(tagsTable);
-			setupAutoComplete();
-		});
-	});
-	
-	addRadioChangeHandler();	
-});
+function buildClickableSpan(textToShow) {
+    return "<span class='hashtagspan'>" + textToShow + "</span>";
+}
+
+/**
+ * Returns a "noclickhashtagspan" for the given text
+ * 
+ * @param textToShow
+ *            Text to show in the span
+ * @returns Span with the appropriate class, showing the text
+ */
+function buildNonclickableSpan(textToShow) {
+    return "<span class='noclickhashtagspan'>" + textToShow + "</span>";
+}
 
 /**
  * Initializes radio buttons on the page, based on whether the metadata
@@ -117,10 +106,10 @@ function loadDataIntoTable(hashtagArray, tableObject) {
 		if (element.blog.includes(", ")) {
 			tagCell = buildNonclickableSpan(element.tag);
 		} else {
-			var tagCell = buildClickableSpan(element.tag);
-			deleteBtnCell = "<button class='removeBtn ui-button ui-widget ui-corner-all'>"
-					+ $.i18n.prop('htviewer_table_removeBtn')
-					+ "</button>";
+			tagCell = buildClickableSpan(element.tag);
+			deleteBtnCell = "<button class='removeBtn ui-button ui-widget ui-corner-all'>" +
+					$.i18n.prop('htviewer_table_removeBtn') +
+					"</button>";
 		}
 
 		tableObject.row.add([ tagCell, blogCell, countCell, deleteBtnCell ]).draw();
@@ -219,33 +208,11 @@ function setupAutoComplete() {
 }
 
 /**
- * Returns a "hashtagspan" for the given text
- * 
- * @param textToShow
- *            Text to show in the span
- * @returns Span with the appropriate class, showing the text
- */
-function buildClickableSpan(textToShow) {
-	return "<span class='hashtagspan'>" + textToShow + "</span>";
-}
-
-/**
- * Returns a "noclickhashtagspan" for the given text
- * 
- * @param textToShow
- *            Text to show in the span
- * @returns Span with the appropriate class, showing the text
- */
-function buildNonclickableSpan(textToShow) {
-	return "<span class='noclickhashtagspan'>" + textToShow + "</span>";
-}
-
-/**
  * Add change handlers to the Radio buttons
  */
 function addRadioChangeHandler() {
 	$('input[type=radio][name=showBlogsRadios]').change(function() {
-		if(this.id == "showAllBlogsRadio") {
+		if(this.id === "showAllBlogsRadio") {
 			metadata.showHashtagsForAllBlogs = true;
 		} else {
 			metadata.showHashtagsForAllBlogs = false;
@@ -254,3 +221,36 @@ function addRadioChangeHandler() {
 		updateMDAPI();
 	});	
 }
+
+/**
+ * Initializes the page; gets metadata, gets the Hashtag data, and loads it all
+ * into the page
+ */
+$(document).ready(function() {
+    setupUIWidgets();
+    
+    $.ajax({
+        url: '/api/metadata/byBlog/' + getCurrentBlogName(),
+        dataSrc: ''
+    }).then(function(data) {
+        metadata = data;
+        
+        initRadios();
+        
+        $.ajax({
+            url: metadata.showHashtagsForAllBlogs ? "/api/hashtags" : "api/hashtags/" + blogName,
+            dataSrc: ""
+        }).then(function (htResponseData) {
+            htData = htResponseData.map(function(val) {
+                return val.tag;
+            });
+            
+            var tagsTable = initializeTableUI();
+            loadDataIntoTable(htResponseData, tagsTable);
+            addRemoveBtnClickHandlers(tagsTable);
+            setupAutoComplete();
+        });
+    });
+    
+    addRadioChangeHandler();    
+});
