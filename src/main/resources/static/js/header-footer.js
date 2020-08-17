@@ -22,6 +22,20 @@ function addLinkToHeader(spanName, linkText, linkUrl, isSelected) {
 }
 
 /**
+ * Adds a param to the URL to navigate to a different blog.
+ *
+ * <i>Should</i> be using URLSearchParams, or at the very least considering other query params,
+ * but taking this more hack-y approach instea because HtmlUnit doesn't work with URLSearchParams.
+ */
+function changeViewedBlog() {
+    var newBlogName = $('#headerBlogSelect').val();
+    
+    var newURL = window.location.href.split('?')[0];
+    newURL += "?tempBlogName=" + newBlogName;
+    window.location.assign(newURL);
+}
+
+/**
  * Loads the header and footer HTML from the server, and then builds the
  * links/text in the header based on the URL of the current page. (i.e. links
  * for every page other than the current one, which is given a span with the
@@ -101,17 +115,3 @@ $(document).ready(function() {
 	$('#footer').load("/footer");
 	
 });
-
-/**
- * Adds a param to the URL to navigate to a different blog.
- *
- * <i>Should</i> be using URLSearchParams, or at the very least considering other query params,
- * but taking this more hack-y approach instea because HtmlUnit doesn't work with URLSearchParams.
- */
-function changeViewedBlog() {
-	var newBlogName = $('#headerBlogSelect').val();
-	
-	var newURL = window.location.href.split('?')[0];
-	newURL += "?tempBlogName=" + newBlogName;
-	window.location.assign(newURL);
-}
