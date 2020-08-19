@@ -172,7 +172,7 @@ function updateMDAPI() {
             createAnErrorMessage($.i18n.prop('index_errorsubmittingdata'));
         }
     }).then(function(data) {
-        createAnInfoMessage($.i18n.prop('htviewer_metadataupdate_success', hashtag.tag));
+        createAnInfoMessage($.i18n.prop('htviewer_metadataupdate_success', hashtag));
         window.location.reload();
     }); 
 }

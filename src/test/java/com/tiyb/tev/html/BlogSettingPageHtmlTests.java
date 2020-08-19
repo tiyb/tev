@@ -21,6 +21,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlButtonInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlParagraph;
 import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
+import com.gargoylesoftware.htmlunit.javascript.host.event.Event;
 import com.tiyb.tev.datamodel.Metadata;
 
 public class BlogSettingPageHtmlTests extends HtmlTestingClass {
@@ -104,7 +105,10 @@ public class BlogSettingPageHtmlTests extends HtmlTestingClass {
         assertThat(blogNameInput.getText()).isEqualTo(MAIN_BLOG_NAME);
         blogNameInput.focus();
         blogNameInput.setText("blah");
-        baseMediaPathInput.focus();
+        mainPage.tabToNextElement();
+        //baseMediaPathInput.focus();
+        waitForScript();
+        blogNameInput.click();
         waitForScript();
         logger.info("changed blog name");
         
