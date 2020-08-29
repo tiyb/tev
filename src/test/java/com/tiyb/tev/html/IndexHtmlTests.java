@@ -42,7 +42,7 @@ import com.tiyb.tev.datamodel.Post;
 public class IndexHtmlTests extends HtmlTestingClass {
 
     private static final String POST_TABLE = "postTable";
-
+    
     /**
      * The main table holding posts; used in numerous tests.
      */
