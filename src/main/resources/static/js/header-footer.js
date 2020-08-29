@@ -30,8 +30,9 @@ function addLinkToHeader(spanName, linkText, linkUrl, isSelected) {
 function changeViewedBlog() {
     var newBlogName = $('#headerBlogSelect').val();
     
-    var newURL = window.location.href.split('?')[0];
-    newURL += "?tempBlogName=" + newBlogName;
+    var urlParams = new URLSearchParams(window.location.search);
+    urlParams.set("tempBlogName", newBlogName);
+    var newURL = window.location.href.split('?')[0] + "?" + urlParams;
     window.location.assign(newURL);
 }
 
