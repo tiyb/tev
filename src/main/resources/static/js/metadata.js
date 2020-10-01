@@ -9,6 +9,8 @@ $.i18n.properties({
 var convoFileUploading = false;
 var postFileUploading = true;
 
+var mdReadyExecuted = false;
+
 var FILE_UPLOADING_INTERVAL = 4500;
 
 /**
@@ -379,6 +381,10 @@ function uploadFile(fileType, postUploadForm) {
  * populate the form, set up event handlers
  */
 $(document).ready(function () {
+    if (mdReadyExecuted === true) {
+        return;
+    }
+    
     setUIWidgets();
 
     $.ajax({
@@ -540,9 +546,13 @@ $(document).ready(function () {
         return false;
     });
     
-    $('.autoUpdateSetting').change(function() {
+    alert("about to set change handler");
+    $(".autoUpdateSetting").change(function() {
         alert("change event fired"); // TODO remove
-        updateServer();
+        //updateServer();
         alert("finished calling updateServer"); // TODO remove
     });
+    alert("change handler was set");
+    
+    mdReadyExecuted = true;
 });

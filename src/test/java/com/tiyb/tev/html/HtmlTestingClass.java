@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
+import java.util.logging.Level;
 
 import org.junit.After;
 import org.junit.Before;
@@ -89,6 +90,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
         webClient.setIncorrectnessListener(new SilentHtmlIncorrectnessListener());
         webClient.setRefreshHandler(new ImmediateRefreshHandler());
         webClient.addRequestHeader(HttpHeader.ACCEPT_LANGUAGE, "en");
+        java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(Level.SEVERE);
     }
 
     /**
