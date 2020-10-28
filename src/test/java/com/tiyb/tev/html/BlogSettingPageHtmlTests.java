@@ -172,16 +172,16 @@ public class BlogSettingPageHtmlTests extends HtmlTestingClass {
      * <li>TODO num items to show</li>
      * <li>TODO reading pane</li>
      * <li>TODO overwrite posts</li>
-     * <li>TODO export path</li>
+     * <li>export path</li>
      * <li>TODO theme</li>
      * </ul>
      */
     @Test
     public void postViewSettings() {
-//        setTextboxValue("baseMediaPath", "blah");
-//        checkMDStringValue("BaseMediaPath", "blah", MAIN_BLOG_NAME);
-//        setTextboxValue("baseMediaPath", "");
-//        checkMDStringValue("BaseMediaPath", "", MAIN_BLOG_NAME);
+        setTextboxValue("baseMediaPath", "blah");
+        checkMDStringValue("BaseMediaPath", "blah", MAIN_BLOG_NAME);
+        setTextboxValue("baseMediaPath", "");
+        checkMDStringValue("BaseMediaPath", "", MAIN_BLOG_NAME);
         
         Metadata md;
         

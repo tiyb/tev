@@ -33,7 +33,7 @@ function updateServer() {
     metadataObject.overwritePostData = $('#overwritePostsDropdown').val();
     metadataObject.overwriteConvoData = $('#overwriteConvosDropdown').val();
     metadataObject.conversationDisplayStyle = $('#conversationDisplayDropdown').val();
-    metadataObject.imageExportPath = $('#imageExportPath').val();
+    metadataObject.exportImagesFilePath = $('#imageExportPath').val();
     metadataObject.theme = $('#themesDropdown').val();
     
     $.ajax({
