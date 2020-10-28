@@ -1,7 +1,5 @@
 package com.tiyb.tev.html;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
@@ -18,16 +16,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.HttpHeader;
 import com.gargoylesoftware.htmlunit.ImmediateRefreshHandler;
+import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebWindow;
-import com.gargoylesoftware.htmlunit.html.DomNode;
-import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.FrameWindow;
-import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.SilentJavaScriptErrorListener;
 import com.tiyb.tev.TevTestingClass;
@@ -87,7 +82,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
         webClient.getOptions().setJavaScriptEnabled(true);
         webClient.setCssErrorHandler(new SilentCssErrorHandler());
         webClient.setJavaScriptErrorListener(new SilentJavaScriptErrorListener());
-        webClient.setIncorrectnessListener(new SilentHtmlIncorrectnessListener());
+        // TODO webClient.setIncorrectnessListener(new SilentHtmlIncorrectnessListener());
         webClient.setRefreshHandler(new ImmediateRefreshHandler());
         webClient.addRequestHeader(HttpHeader.ACCEPT_LANGUAGE, "en");
         java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(Level.SEVERE);

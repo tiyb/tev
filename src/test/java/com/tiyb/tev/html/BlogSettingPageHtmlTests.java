@@ -3,7 +3,10 @@ package com.tiyb.tev.html;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -17,14 +20,32 @@ import org.springframework.beans.factory.annotation.Value;
 import com.gargoylesoftware.htmlunit.AlertHandler;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.Page;
+import com.gargoylesoftware.htmlunit.html.DomNode;
+import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlButtonInput;
+import com.gargoylesoftware.htmlunit.html.HtmlDivision;
+import com.gargoylesoftware.htmlunit.html.HtmlOption;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlParagraph;
+import com.gargoylesoftware.htmlunit.html.HtmlSelect;
+import com.gargoylesoftware.htmlunit.html.HtmlSpan;
 import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
+import com.gargoylesoftware.htmlunit.javascript.host.dom.NodeList;
 import com.gargoylesoftware.htmlunit.javascript.host.event.Event;
 import com.tiyb.tev.datamodel.Metadata;
 
+/**
+ * Test cases for the settings page for a given blog. For "performance" reasons
+ * (so that Unit tests don't take forever to execute), functions are typically
+ * grouped together into one test, however, in cases where the page would have
+ * to be refreshed anyway, a separate case is created.
+ * 
+ * @author tiyb
+ *
+ */
 public class BlogSettingPageHtmlTests extends HtmlTestingClass {
+
+    private static final String DELETE_BLOG_BUTTON = "deleteBlogButton";
 
     private static final String SET_DEFAULT_BLOG_BUTTON = "setDefaultBlogButton";
 
@@ -45,6 +66,7 @@ public class BlogSettingPageHtmlTests extends HtmlTestingClass {
         restInitMainBlogSettings(Optional.of(mainBlogMediaFolder.getRoot().getAbsolutePath()));
         restInitAdditionalBlog(SECOND_BLOG_NAME);
 
+        // TODO remove this alert handler
         webClient.setAlertHandler(new AlertHandler() {
 
             @Override
@@ -58,19 +80,17 @@ public class BlogSettingPageHtmlTests extends HtmlTestingClass {
     }
 
     /**
-     * Tests for the very high-level blog settings
+     * Tests settings around the main blog
      * 
      * <ol>
      * <li>Checks that the correct messaging about default or non-default shows up,
      * along with the "make default blog" button only showing up when the blog is
      * <i>not</i> the default</li>
      * <li>Makes a non-default blog the default, then back, asserting that metadata is changed appropriately</li>
-     * <li>Changes the blog name</li>
-     * <li>TODO delete the blog</li>
      * </ol>
      */
     @Test
-    public void mainBlogSettings() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
+    public void setDefaultBlog() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         HtmlParagraph mainBlogMessage = mainPage.getHtmlElementById(BLOG_IS_DEFAULT_MESSAGE);
         assertThat(mainBlogMessage.isDisplayed()).isTrue();
         assertThat(mainBlogMessage.asText()).isEqualToNormalizingWhitespace(blogIsDefaultMessage);
@@ -98,51 +118,141 @@ public class BlogSettingPageHtmlTests extends HtmlTestingClass {
         assertThat(md.getIsDefault()).isTrue();
         md = getMDFromServer(Optional.of(SECOND_BLOG_NAME));
         assertThat(md.getIsDefault()).isFalse();
+    }
+    
+    /**
+     * Tests deleting the blog
+     */
+    @Test
+    public void deleteBlog() throws IOException {
+        HtmlButtonInput deleteButton = mainPage.getHtmlElementById(DELETE_BLOG_BUTTON);
+        mainPage = deleteButton.click();
+        waitForScript();
         
-        logger.info("about to change blog name");
+        Metadata[] allMDObjects = getAllMDObjects();
+        assertThat(allMDObjects.length).isEqualTo(1);
+    }
+    
+    /**
+     * Tests changing the blog name (and changing it back)
+     */
+    @Test
+    public void changeBlogName() {
         HtmlTextInput blogNameInput = mainPage.getHtmlElementById("blogNameInput");
-        HtmlTextInput baseMediaPathInput = mainPage.getHtmlElementById("baseMediaPath");
         assertThat(blogNameInput.getText()).isEqualTo(MAIN_BLOG_NAME);
-        logger.info(mainPage.asXml());
-        //blogNameInput.focus();
         blogNameInput.setText("blah");
-        waitForScript();
-        //blogNameInput.setValueAttribute("blah");
-        mainPage.setFocusedElement(baseMediaPathInput);
-        waitForScript();
         blogNameInput.fireEvent(Event.TYPE_CHANGE);
         waitForScript();
-        logger.info("changed blog name");
         
-        md = getMDFromServerNotDefault(Optional.of("blah"));
+        Metadata md = getMDFromServerNotDefault(Optional.of("blah"));
         assertThat(md).isNotNull();
         Metadata[] allMDObjects = getAllMDObjects();
         assertThat(allMDObjects.length).isEqualTo(2);
         
         blogNameInput.focus();
         blogNameInput.setText(MAIN_BLOG_NAME);
-        baseMediaPathInput.focus();
+        blogNameInput.fireEvent(Event.TYPE_CHANGE);
         waitForScript();
         
         md = getMDFromServerNotDefault(Optional.of(MAIN_BLOG_NAME));
         assertThat(md).isNotNull();
         allMDObjects = getAllMDObjects();
-        assertThat(allMDObjects.length).isEqualTo(2);
+        assertThat(allMDObjects.length).isEqualTo(2);        
     }
 
-//    @Test
-//    public void postViewSettings() {
-//        // TODO base media path
-//        // TODO filter
-//        // TODO sort order
-//        // TODO show favs
-//        // TODO num items to show
-//        // TODO reading pane
-//        // TODO overwrite posts
-//        // TODO export path
-//        // TODO theme
-//        assertThat(true).isEqualTo(false);
-//    }
+    /**
+     * Tests settings around post viewing. The following settings are tested, one by
+     * one:
+     * 
+     * <ul>
+     * <li>base media path</li>
+     * <li>filter</li>
+     * <li>TODO sort order</li>
+     * <li>TODO show favs</li>
+     * <li>TODO num items to show</li>
+     * <li>TODO reading pane</li>
+     * <li>TODO overwrite posts</li>
+     * <li>TODO export path</li>
+     * <li>TODO theme</li>
+     * </ul>
+     */
+    @Test
+    public void postViewSettings() {
+//        setTextboxValue("baseMediaPath", "blah");
+//        checkMDStringValue("BaseMediaPath", "blah", MAIN_BLOG_NAME);
+//        setTextboxValue("baseMediaPath", "");
+//        checkMDStringValue("BaseMediaPath", "", MAIN_BLOG_NAME);
+        
+        Metadata md;
+        
+        
+//        setDropdownValue("filterDropdown", "Filter Read Posts");
+//        checkMDStringValue("Filter", "Filter Read Posts", MAIN_BLOG_NAME);
+//        setDropdownValue("filterDropdown", "Do not Filter");
+//        checkMDStringValue("Filter", "Do not Filter", MAIN_BLOG_NAME);
+        
+        setTextboxValue("imageExportPath", "export path");
+        checkMDStringValue("ExportImagesFilePath", "export path", MAIN_BLOG_NAME);
+        setTextboxValue("imageExportPath", "");
+        checkMDStringValue("ExportImagesFilePath", "", MAIN_BLOG_NAME);
+    }
+    
+    /**
+     * Helper function to set the value of an HTML input box, and wait for
+     * events/scripts to complete
+     * 
+     * @param inputId  ID of the HTML input
+     * @param newValue New value to put in the input
+     */
+    private void setTextboxValue(String inputId, String newValue) {
+        HtmlTextInput input = mainPage.getHtmlElementById(inputId);
+        input.setText(newValue);
+        input.fireEvent(Event.TYPE_CHANGE);
+        waitForScript();
+    }
+    
+    /**
+     * Helper function to set the value of an HTML drop-down, and wait for
+     * events/scripts to complete
+     * 
+     * @param inputId  ID of the HTML input
+     * @param newValue New value to put in the input
+     */
+    private void setDropdownValue(String inputId, String newValue) {
+        String js = String.format("$('#%s').val('%s').selectmenu('refresh').trigger('selectmenuselect');", inputId,
+                newValue);
+        mainPage.executeJavaScript(js);
+        HtmlSelect select = mainPage.getHtmlElementById(inputId);
+        select.fireEvent(Event.TYPE_CHANGE);
+        waitForScript();
+//        HtmlSelect select = mainPage.getHtmlElementById(inputId);
+//        HtmlOption option = select.getOptionByValue(newValue);
+//        select.setSelectedAttribute(option, true);
+//        select.fireEvent(Event.TYPE_CHANGE);
+//        waitForScript();
+    }
+    
+    /**
+     * Helper method to check that the metadata for a given blog has the right value
+     * in one of its string values
+     * 
+     * @param fieldName     Name of the propety to check (without the "get" prefix)
+     * @param expectedValue The value that should be in that property
+     * @param blogName      Name of the blog for which the metadata should be
+     *                      retrieved
+     */
+    public void checkMDStringValue(String fieldName, String expectedValue, String blogName) {
+        try {
+            Metadata md = getMDFromServer(Optional.of(blogName));
+            Method mdMethod = Metadata.class.getMethod("get" + fieldName);
+            String returnValue = (String) mdMethod.invoke(md);
+
+            assertThat(returnValue).isEqualTo(expectedValue);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            assertThat(true).isFalse();
+        }
+    }
 
 //    @Test
 //    public void conversationSettings() {

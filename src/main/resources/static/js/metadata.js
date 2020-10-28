@@ -17,7 +17,7 @@ var FILE_UPLOADING_INTERVAL = 4500;
  * Sends values from the form to the server to update the Metadata
  */
 function updateServer() {
-    alert("entering update server function"); // TODO
+    alert("update server called");
     metadataObject.baseMediaPath = $('#baseMediaPath').val();
     metadataObject.blog = $('#blogNameInput').val();
     metadataObject.mainTumblrUser = $('#mainUser').val();
@@ -42,15 +42,12 @@ function updateServer() {
         data: JSON.stringify(metadataObject),
         contentType: 'application/json',
         success: function(data, textStatus, xhr) {
-            alert("server updated successfully"); // TODO
             createAnInfoMessage($.i18n.prop('md_submit_success'));
         },
         error: function(xhr, textStatus, errorThrown) {
-            alert("server not updated successfully"); // TODO
             creaeAnErrorMessage($.i18n.prop('md_submit_failure'));
         }
     }); 
-    alert("leaving update server function"); // TODO
 }
 
 /**
@@ -60,7 +57,7 @@ function updateServer() {
  * instantly refresh.
  */
 function setUIWidgets() {
-    $('#filterDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#filterDropdown').selectmenu({change: function(event,ui) {alert("called change func"); updateServer();}}); // TODO
     $('#sortByDropdown').selectmenu({change: function(event,ui) {updateServer();}});
     $('#sortOrderDropdown').selectmenu({change: function(event,ui) {updateServer();}});
     $('#favsDropdown').selectmenu({change: function(event,ui) {updateServer();}});
@@ -546,13 +543,9 @@ $(document).ready(function () {
         return false;
     });
     
-    alert("about to set change handler");
     $(".autoUpdateSetting").change(function() {
-        alert("change event fired"); // TODO remove
-        //updateServer();
-        alert("finished calling updateServer"); // TODO remove
+        updateServer();
     });
-    alert("change handler was set");
     
     mdReadyExecuted = true;
 });
