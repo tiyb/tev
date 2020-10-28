@@ -17,7 +17,6 @@ var FILE_UPLOADING_INTERVAL = 4500;
  * Sends values from the form to the server to update the Metadata
  */
 function updateServer() {
-    alert("update server called");
     metadataObject.baseMediaPath = $('#baseMediaPath').val();
     metadataObject.blog = $('#blogNameInput').val();
     metadataObject.mainTumblrUser = $('#mainUser').val();
@@ -55,23 +54,41 @@ function updateServer() {
  * select menus), and sets their change event to automatically update the
  * server. Special case is the Themes drop-down, which causes the page to
  * instantly refresh.
+ *
+ * Code sets <i>both</i> calls the selectmenu() method to set the 'change' property
+ * <i>and</i> sets the JS 'selectmenuselect' handler, to the same code, because 
+ * otherwise HtmlUnit tests don't seem to work.'
  */
 function setUIWidgets() {
-    $('#filterDropdown').selectmenu({change: function(event,ui) {alert("called change func"); updateServer();}}); // TODO
+    $('#filterDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#filterDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
     $('#sortByDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#sortByDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
     $('#sortOrderDropdown').selectmenu({change: function(event,ui) {updateServer();}});
     $('#favsDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#favsDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
     $('#pageLengthDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#pageLengthDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
     $('#showReadingPaneDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#showReadingPaneDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
     $('#overwritePostsDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#overwritePostsDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
     $('#overwriteConvosDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#overwriteConvosDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
     $('#conversationDisplayDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#conversationDisplayDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
     $('#conversationSortColumnDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#conversationSortColumnDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
     $('#conversationSortOrderDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#conversationSortOrderDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
     $('#themesDropdown').selectmenu({change: function(event,ui) {
         updateServer();
         setTimeout(function() {parent.location.reload();}, 1500);
     }});
+    $('#themesDropdown').on('selectmenuselect', function(event,ui) {
+        updateServer();
+        setTimeout(function() {parent.location.reload();}, 1500);
+    });    
 }
 
 /**

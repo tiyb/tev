@@ -125,6 +125,11 @@ public abstract class HtmlTestingClass extends TevTestingClass {
                         message, ConversationMessage.class);
             }
         }
+        
+        Metadata md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
+        md.setMainTumblrUser(MAIN_BLOG_NAME);
+        md.setMainTumblrUserAvatarUrl("http://mainblog/avatar");
+        updateMD(md);
     }
 
     /**

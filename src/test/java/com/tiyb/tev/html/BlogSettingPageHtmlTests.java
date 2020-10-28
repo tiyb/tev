@@ -65,6 +65,7 @@ public class BlogSettingPageHtmlTests extends HtmlTestingClass {
     public void setupSite() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         restInitMainBlogSettings(Optional.of(mainBlogMediaFolder.getRoot().getAbsolutePath()));
         restInitAdditionalBlog(SECOND_BLOG_NAME);
+        restInitConvosForMainBlog();
 
         // TODO remove this alert handler
         webClient.setAlertHandler(new AlertHandler() {
@@ -73,9 +74,9 @@ public class BlogSettingPageHtmlTests extends HtmlTestingClass {
             public void handleAlert(Page page, String message) {
                 logger.info("JS ALERT: " + message);
             }
-            
+
         });
-        
+
         mainPage = getSettingsPage(MAIN_BLOG_NAME);
     }
 
@@ -86,7 +87,8 @@ public class BlogSettingPageHtmlTests extends HtmlTestingClass {
      * <li>Checks that the correct messaging about default or non-default shows up,
      * along with the "make default blog" button only showing up when the blog is
      * <i>not</i> the default</li>
-     * <li>Makes a non-default blog the default, then back, asserting that metadata is changed appropriately</li>
+     * <li>Makes a non-default blog the default, then back, asserting that metadata
+     * is changed appropriately</li>
      * </ol>
      */
     @Test
@@ -101,7 +103,7 @@ public class BlogSettingPageHtmlTests extends HtmlTestingClass {
         assertThat(mainBlogMessage.isDisplayed()).isFalse();
         makeDefaultButton = alternateBlogSettingsPage.getHtmlElementById(SET_DEFAULT_BLOG_BUTTON);
         assertThat(makeDefaultButton.isDisplayed()).isTrue();
-        
+
         makeDefaultButton.click();
         waitForScript();
         Metadata md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
@@ -113,13 +115,13 @@ public class BlogSettingPageHtmlTests extends HtmlTestingClass {
         assertThat(makeDefaultButton.isDisplayed()).isTrue();
         makeDefaultButton.click();
         waitForScript();
-        
+
         md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
         assertThat(md.getIsDefault()).isTrue();
         md = getMDFromServer(Optional.of(SECOND_BLOG_NAME));
         assertThat(md.getIsDefault()).isFalse();
     }
-    
+
     /**
      * Tests deleting the blog
      */
@@ -128,11 +130,11 @@ public class BlogSettingPageHtmlTests extends HtmlTestingClass {
         HtmlButtonInput deleteButton = mainPage.getHtmlElementById(DELETE_BLOG_BUTTON);
         mainPage = deleteButton.click();
         waitForScript();
-        
+
         Metadata[] allMDObjects = getAllMDObjects();
         assertThat(allMDObjects.length).isEqualTo(1);
     }
-    
+
     /**
      * Tests changing the blog name (and changing it back)
      */
@@ -143,38 +145,38 @@ public class BlogSettingPageHtmlTests extends HtmlTestingClass {
         blogNameInput.setText("blah");
         blogNameInput.fireEvent(Event.TYPE_CHANGE);
         waitForScript();
-        
+
         Metadata md = getMDFromServerNotDefault(Optional.of("blah"));
         assertThat(md).isNotNull();
         Metadata[] allMDObjects = getAllMDObjects();
         assertThat(allMDObjects.length).isEqualTo(2);
-        
+
         blogNameInput.focus();
         blogNameInput.setText(MAIN_BLOG_NAME);
         blogNameInput.fireEvent(Event.TYPE_CHANGE);
         waitForScript();
-        
+
         md = getMDFromServerNotDefault(Optional.of(MAIN_BLOG_NAME));
         assertThat(md).isNotNull();
         allMDObjects = getAllMDObjects();
-        assertThat(allMDObjects.length).isEqualTo(2);        
+        assertThat(allMDObjects.length).isEqualTo(2);
     }
 
     /**
      * Tests settings around post viewing. The following settings are tested, one by
      * one:
      * 
-     * <ul>
+     * <ol>
      * <li>base media path</li>
      * <li>filter</li>
-     * <li>TODO sort order</li>
-     * <li>TODO show favs</li>
-     * <li>TODO num items to show</li>
-     * <li>TODO reading pane</li>
-     * <li>TODO overwrite posts</li>
+     * <li>sort order</li>
+     * <li>show favs</li>
+     * <li>num items to show</li>
+     * <li>reading pane</li>
+     * <li>overwrite posts</li>
      * <li>export path</li>
-     * <li>TODO theme</li>
-     * </ul>
+     * <li>theme</li>
+     * </ol>
      */
     @Test
     public void postViewSettings() {
@@ -182,92 +184,84 @@ public class BlogSettingPageHtmlTests extends HtmlTestingClass {
         checkMDStringValue("BaseMediaPath", "blah", MAIN_BLOG_NAME);
         setTextboxValue("baseMediaPath", "");
         checkMDStringValue("BaseMediaPath", "", MAIN_BLOG_NAME);
-        
-        Metadata md;
-        
-        
-//        setDropdownValue("filterDropdown", "Filter Read Posts");
-//        checkMDStringValue("Filter", "Filter Read Posts", MAIN_BLOG_NAME);
-//        setDropdownValue("filterDropdown", "Do not Filter");
-//        checkMDStringValue("Filter", "Do not Filter", MAIN_BLOG_NAME);
-        
+
+        setDropdownValue("filterDropdown", "Filter Read Posts");
+        checkMDStringValue("Filter", "Filter Read Posts", MAIN_BLOG_NAME);
+        setDropdownValue("filterDropdown", "Do not Filter");
+        checkMDStringValue("Filter", "Do not Filter", MAIN_BLOG_NAME);
+
+        setDropdownValue("sortByDropdown", "State");
+        checkMDStringValue("SortColumn", "State", MAIN_BLOG_NAME);
+        setDropdownValue("sortByDropdown", "ID");
+        checkMDStringValue("SortColumn", "ID", MAIN_BLOG_NAME);
+
+        setDropdownValue("favsDropdown", "Show Non Favourites");
+        checkMDStringValue("FavFilter", "Show Non Favourites", MAIN_BLOG_NAME);
+        setDropdownValue("favsDropdown", "Show Everything");
+        checkMDStringValue("FavFilter", "Show Everything", MAIN_BLOG_NAME);
+
+        setDropdownValue("pageLengthDropdown", "100");
+        checkMDIntValue("PageLength", 100, MAIN_BLOG_NAME);
+        setDropdownValue("pageLengthDropdown", "10");
+        checkMDIntValue("PageLength", 10, MAIN_BLOG_NAME);
+
+        setDropdownValue("showReadingPaneDropdown", "true");
+        checkMDBoolValue("ShowReadingPane", true, MAIN_BLOG_NAME);
+        setDropdownValue("showReadingPaneDropdown", "false");
+        checkMDBoolValue("ShowReadingPane", false, MAIN_BLOG_NAME);
+
+        setDropdownValue("overwritePostsDropdown", "true");
+        checkMDBoolValue("OverwritePostData", true, MAIN_BLOG_NAME);
+        setDropdownValue("overwritePostsDropdown", "false");
+        checkMDBoolValue("OverwritePostData", false, MAIN_BLOG_NAME);
+
         setTextboxValue("imageExportPath", "export path");
         checkMDStringValue("ExportImagesFilePath", "export path", MAIN_BLOG_NAME);
         setTextboxValue("imageExportPath", "");
         checkMDStringValue("ExportImagesFilePath", "", MAIN_BLOG_NAME);
-    }
-    
-    /**
-     * Helper function to set the value of an HTML input box, and wait for
-     * events/scripts to complete
-     * 
-     * @param inputId  ID of the HTML input
-     * @param newValue New value to put in the input
-     */
-    private void setTextboxValue(String inputId, String newValue) {
-        HtmlTextInput input = mainPage.getHtmlElementById(inputId);
-        input.setText(newValue);
-        input.fireEvent(Event.TYPE_CHANGE);
-        waitForScript();
-    }
-    
-    /**
-     * Helper function to set the value of an HTML drop-down, and wait for
-     * events/scripts to complete
-     * 
-     * @param inputId  ID of the HTML input
-     * @param newValue New value to put in the input
-     */
-    private void setDropdownValue(String inputId, String newValue) {
-        String js = String.format("$('#%s').val('%s').selectmenu('refresh').trigger('selectmenuselect');", inputId,
-                newValue);
-        mainPage.executeJavaScript(js);
-        HtmlSelect select = mainPage.getHtmlElementById(inputId);
-        select.fireEvent(Event.TYPE_CHANGE);
-        waitForScript();
-//        HtmlSelect select = mainPage.getHtmlElementById(inputId);
-//        HtmlOption option = select.getOptionByValue(newValue);
-//        select.setSelectedAttribute(option, true);
-//        select.fireEvent(Event.TYPE_CHANGE);
-//        waitForScript();
-    }
-    
-    /**
-     * Helper method to check that the metadata for a given blog has the right value
-     * in one of its string values
-     * 
-     * @param fieldName     Name of the propety to check (without the "get" prefix)
-     * @param expectedValue The value that should be in that property
-     * @param blogName      Name of the blog for which the metadata should be
-     *                      retrieved
-     */
-    public void checkMDStringValue(String fieldName, String expectedValue, String blogName) {
-        try {
-            Metadata md = getMDFromServer(Optional.of(blogName));
-            Method mdMethod = Metadata.class.getMethod("get" + fieldName);
-            String returnValue = (String) mdMethod.invoke(md);
 
-            assertThat(returnValue).isEqualTo(expectedValue);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException e) {
-            assertThat(true).isFalse();
-        }
+        setDropdownValue("themesDropdown", "flick");
+        checkMDStringValue("Theme", "flick", MAIN_BLOG_NAME);
     }
 
-//    @Test
-//    public void conversationSettings() {
-//        // TODO verify user name and avatar show up
-//        // TODO conversation display style
-//        // TODO conversation sorting
-//        // TODO overwrite convos
-//        assertThat(true).isEqualTo(false);
-//    }
+    /**
+     * Tests settings around conversation viewing. The following settings are tested, one by one:
+     * 
+     * <ol>
+     * <li>verify user name and avatar show up</li>
+     * <li>conversation display style</li>
+     * <li>conversation sorting</li>
+     * <li>overwrite convos</li>
+     * </ol>
+     */
+    @Test
+    public void conversationSettings() {
+        HtmlTextInput tumblrUserName = mainPage.getHtmlElementById("mainUser");
+        assertThat(tumblrUserName.getText()).isEqualTo(MAIN_BLOG_NAME);
+        HtmlTextInput mainAvatar = mainPage.getHtmlElementById("mainUserAvatarUrl");
+        assertThat(mainAvatar.getText()).isEqualTo("http://mainblog/avatar");
+        
+        setDropdownValue("conversationDisplayDropdown", "cloud");
+        checkMDStringValue("ConversationDisplayStyle", "cloud", MAIN_BLOG_NAME);
+        setDropdownValue("conversationDisplayDropdown", "table");
+        checkMDStringValue("ConversationDisplayStyle", "table", MAIN_BLOG_NAME);
+        
+        setDropdownValue("conversationSortColumnDropdown", "participantName");
+        checkMDStringValue("ConversationSortColumn", "participantName", MAIN_BLOG_NAME);
+        setDropdownValue("conversationSortColumnDropdown", "numMessages");
+        checkMDStringValue("ConversationSortColumn", "numMessages", MAIN_BLOG_NAME);
+        
+        setDropdownValue("overwriteConvosDropdown", "true");
+        checkMDBoolValue("OverwriteConvoData", true, MAIN_BLOG_NAME);
+        setDropdownValue("overwriteConvosDropdown", "false");
+        checkMDBoolValue("OverwriteConvoData", false, MAIN_BLOG_NAME);
+    }
 
 //    @Test
 //    public void uploads() {
 //        // TODO upload posts
 //        // TODO upload convos
-//        assertThat(true).isEqualTo(false);
+//        assertThat(true).isEqualTo(true);
 //    }
 
 //    @Test
@@ -276,7 +270,7 @@ public class BlogSettingPageHtmlTests extends HtmlTestingClass {
 //        // TODO mark all posts unread
 //        // TODO clean up images
 //        // TODO import images
-//        assertThat(true).isEqualTo(false);
+//        assertThat(true).isEqualTo(true);
 //    }
 
     /**
@@ -290,6 +284,99 @@ public class BlogSettingPageHtmlTests extends HtmlTestingClass {
         HtmlPage page = webClient.getPage(baseUri() + "/metadata/" + blogName);
         waitForScript();
         return page;
+    }
+
+    /**
+     * Helper function to set the value of an HTML input box, and wait for
+     * events/scripts to complete
+     * 
+     * @param inputId  ID of the HTML input
+     * @param newValue New value to put in the input
+     */
+    private void setTextboxValue(String inputId, String newValue) {
+        HtmlTextInput input = mainPage.getHtmlElementById(inputId);
+        input.setText(newValue);
+        input.fireEvent(Event.TYPE_CHANGE);
+        waitForScript();
+    }
+
+    /**
+     * Helper function to set the value of an HTML drop-down, and wait for
+     * events/scripts to complete
+     * 
+     * @param inputId  ID of the HTML input
+     * @param newValue New value to put in the input
+     */
+    private void setDropdownValue(String inputId, String newValue) {
+        HtmlSelect select = mainPage.getHtmlElementById(inputId);
+        HtmlOption option = select.getOptionByValue(newValue);
+        select.setSelectedAttribute(option, true);
+        select.fireEvent("selectmenuselect");
+        waitForScript();
+    }
+
+    /**
+     * Helper method to check that the metadata for a given blog has the right value
+     * in one of its string values
+     * 
+     * @param fieldName     Name of the property to check (without the "get" prefix)
+     * @param expectedValue The value that should be in that property
+     * @param blogName      Name of the blog for which the metadata should be
+     *                      retrieved
+     */
+    private void checkMDStringValue(String fieldName, String expectedValue, String blogName) {
+        try {
+            Metadata md = getMDFromServer(Optional.of(blogName));
+            Method mdMethod = Metadata.class.getMethod("get" + fieldName);
+            String returnValue = (String) mdMethod.invoke(md);
+
+            assertThat(returnValue).isEqualTo(expectedValue);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            assertThat(true).isFalse();
+        }
+    }
+
+    /**
+     * Helper method to check that the metadata for a given blog has the right value
+     * in one of its int values
+     * 
+     * @param fieldName     Name of the property to check (without the "get" prefix)
+     * @param expectedValue The value that should be in that property
+     * @param blogName      Name of the blog for which the metadata should be
+     *                      retrieved
+     */
+    private void checkMDIntValue(String fieldName, Integer expectedValue, String blogName) {
+        try {
+            Metadata md = getMDFromServer(Optional.of(blogName));
+            Method mdMethod = Metadata.class.getMethod("get" + fieldName);
+            Integer returnValue = (Integer) mdMethod.invoke(md);
+            assertThat(returnValue).isEqualTo(expectedValue);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            assertThat(true).isFalse();
+        }
+    }
+
+    /**
+     * Helper method to check that the metadata for a given blog has the right value
+     * in one of its bool values
+     * 
+     * @param fieldName     Name of the property to check (without the "get" prefix)
+     * @param expectedValue The value that should be in that property
+     * @param blogName      Name of the blog for which the metadata should be
+     *                      retrieved
+     */
+    private void checkMDBoolValue(String fieldName, Boolean expectedValue, String blogName) {
+        try {
+            Metadata md = getMDFromServer(Optional.of(blogName));
+            Method mdMethod = Metadata.class.getMethod("get" + fieldName);
+            Boolean returnValue = (Boolean) mdMethod.invoke(md);
+            assertThat(returnValue).isEqualTo(expectedValue);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            assertThat(true).isFalse();
+        }
     }
 
 }
