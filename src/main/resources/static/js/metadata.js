@@ -14,6 +14,24 @@ var mdReadyExecuted = false;
 var FILE_UPLOADING_INTERVAL = 4500;
 
 /**
+ * Sends an AJAX request to the server with the updated metadata
+ */
+function sendMDData() {
+    $.ajax({
+        url: '/api/metadata/' + metadataObject.id,
+        method: 'PUT',
+        data: JSON.stringify(metadataObject),
+        contentType: 'application/json',
+        success: function(data, textStatus, xhr) {
+            createAnInfoMessage($.i18n.prop('md_submit_success'));
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            creaeAnErrorMessage($.i18n.prop('md_submit_failure'));
+        }
+    });     
+}
+
+/**
  * Sends values from the form to the server to update the Metadata
  */
 function updateServer() {
@@ -33,20 +51,9 @@ function updateServer() {
     metadataObject.overwriteConvoData = $('#overwriteConvosDropdown').val();
     metadataObject.conversationDisplayStyle = $('#conversationDisplayDropdown').val();
     metadataObject.exportImagesFilePath = $('#imageExportPath').val();
-    metadataObject.theme = $('#themesDropdown').val();
+    metadataObject.theme = $('#themesDropdown').val();  
     
-    $.ajax({
-        url: '/api/metadata/' + metadataObject.id,
-        method: 'PUT',
-        data: JSON.stringify(metadataObject),
-        contentType: 'application/json',
-        success: function(data, textStatus, xhr) {
-            createAnInfoMessage($.i18n.prop('md_submit_success'));
-        },
-        error: function(xhr, textStatus, errorThrown) {
-            creaeAnErrorMessage($.i18n.prop('md_submit_failure'));
-        }
-    }); 
+    sendMDData();  
 }
 
 /**

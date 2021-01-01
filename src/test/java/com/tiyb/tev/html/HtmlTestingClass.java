@@ -18,7 +18,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.gargoylesoftware.htmlunit.HttpHeader;
 import com.gargoylesoftware.htmlunit.ImmediateRefreshHandler;
-import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebWindow;
@@ -82,7 +81,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
         webClient.getOptions().setJavaScriptEnabled(true);
         webClient.setCssErrorHandler(new SilentCssErrorHandler());
         webClient.setJavaScriptErrorListener(new SilentJavaScriptErrorListener());
-        // TODO webClient.setIncorrectnessListener(new SilentHtmlIncorrectnessListener());
+        webClient.setIncorrectnessListener(new SilentHtmlIncorrectnessListener());
         webClient.setRefreshHandler(new ImmediateRefreshHandler());
         webClient.addRequestHeader(HttpHeader.ACCEPT_LANGUAGE, "en");
         java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(Level.SEVERE);
@@ -289,29 +288,44 @@ public abstract class HtmlTestingClass extends TevTestingClass {
      * @param baseMediaPath (Optional) path to use for media for this blog
      */
     protected void restInitMainBlogSettings(Optional<String> baseMediaPath) {
-        Metadata md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
-        md.setBlog(MAIN_BLOG_NAME);
-        md.setOverwritePostData(true);
-        md.setOverwriteConvoData(true);
-        md.setMainTumblrUser(MAIN_BLOG_NAME);
-        md.setIsDefault(true);
-        md.setConversationDisplayStyle("table");
-        md.setConversationSortColumn("numMessages");
-        md.setConversationSortOrder("Descending");
-        md.setFavFilter("Show Everything");
-        md.setFilter("Do Not Filter");
-        md.setPageLength(10);
-        md.setShowHashtagsForAllBlogs(true);
-        md.setShowReadingPane(false);
-        md.setSortColumn("ID");
-        md.setSortOrder("Descending");
-        md.setTheme(Metadata.DEFAULT_THEME); 
-        md.setShowReadingPane(false);
+        Metadata mainBlogMD = null;
+        Metadata[] blogs = getAllMDObjects();
+        if(blogs.length > 1) {
+            for(Metadata m : blogs) {
+                if((m.getBlog().equals(MAIN_BLOG_NAME)) || (m.getBlog() == null)) {
+                    mainBlogMD = m;
+                } else {
+                    String deleteUri = String.format("%s/api/metadata/%d", baseUri(), m.getId());
+                    restTemplate.delete(deleteUri);
+                }
+            }
+        } else {
+            mainBlogMD = blogs[0];
+        }
+        
+        mainBlogMD.setBlog(MAIN_BLOG_NAME);
+        mainBlogMD.setOverwritePostData(true);
+        mainBlogMD.setOverwriteConvoData(true);
+        mainBlogMD.setMainTumblrUser(MAIN_BLOG_NAME);
+        mainBlogMD.setIsDefault(true);
+        mainBlogMD.setConversationDisplayStyle("table");
+        mainBlogMD.setConversationSortColumn("numMessages");
+        mainBlogMD.setConversationSortOrder("Descending");
+        mainBlogMD.setFavFilter("Show Everything");
+        mainBlogMD.setFilter("Do Not Filter");
+        mainBlogMD.setPageLength(10);
+        mainBlogMD.setShowHashtagsForAllBlogs(true);
+        mainBlogMD.setShowReadingPane(false);
+        mainBlogMD.setSortColumn("ID");
+        mainBlogMD.setSortOrder("Descending");
+        mainBlogMD.setTheme(Metadata.DEFAULT_THEME); 
+        mainBlogMD.setShowReadingPane(false);
+        mainBlogMD.setExportImagesFilePath("");
         if (baseMediaPath.isPresent()) {
-            md.setBaseMediaPath(baseMediaPath.get());
+            mainBlogMD.setBaseMediaPath(baseMediaPath.get());
         }
 
-        updateMD(md);
+        updateMD(mainBlogMD);
     }
 
     /**
@@ -320,8 +334,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
      * @param blogName Name of the blog for which to initialize
      */
     protected void restInitAdditionalBlog(String blogName) {
-        Metadata md = restTemplate.getForObject(
-                String.format("%s/api/metadata/byBlog/%s/orDefault", baseUri(), blogName), Metadata.class);
+        Metadata md = getMDFromServer(Optional.of(blogName));
         md.setBlog(blogName);
         md.setIsDefault(false);
         md.setOverwritePostData(true);
@@ -385,6 +398,18 @@ public abstract class HtmlTestingClass extends TevTestingClass {
      */
     protected Post getPostFromRest(String blogName, String postID) {
         return restTemplate.getForObject(String.format("%s/api/posts/%s/%s", baseUri(), blogName, postID), Post.class);
+    }
+    
+    /**
+     * Retrieves all posts for a given blog
+     * 
+     * @param blogName Name of the blog for which posts should be retrieved
+     * @return Array of Post objects
+     */
+    protected Post[] getAllPostsFromRest(String blogName) {
+        ResponseEntity<Post[]> responseEntity = restTemplate
+                .getForEntity(String.format("%s/api/posts/%s", baseUri(), blogName), Post[].class);
+        return responseEntity.getBody();
     }
 
     /**

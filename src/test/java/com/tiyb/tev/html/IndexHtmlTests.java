@@ -100,7 +100,6 @@ public class IndexHtmlTests extends HtmlTestingClass {
     public void setupWC() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         restInitDataForMainBlog(Optional.empty());
         restInitDataForSecondBlog();
-        // restInitAdditionalBlog(SECOND_BLOG_NAME);
 
         mainPage = webClient.getPage(baseUri());
         waitForScript();

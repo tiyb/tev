@@ -1,4 +1,4 @@
-package com.tiyb.tev.html;
+package com.tiyb.tev.html.settings;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,6 +22,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlButtonInput;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.tiyb.tev.datamodel.Metadata;
+import com.tiyb.tev.html.HtmlTestingClass;
 
 /**
  * Unit tests for the "main" settings page (i.e. the one that lists all blogs,

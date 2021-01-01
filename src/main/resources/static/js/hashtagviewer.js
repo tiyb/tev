@@ -170,10 +170,11 @@ function updateMDAPI() {
         contentType: 'application/json',
         error: function(xhr, textStatus, errorThrown) {
             createAnErrorMessage($.i18n.prop('index_errorsubmittingdata'));
+        },
+        success: function(data, textStatus, xhr) {
+            createAnInfoMessage($.i18n.prop('htviewer_metadataupdate_success', hashtag));
+            window.location.reload();
         }
-    }).then(function(data) {
-        createAnInfoMessage($.i18n.prop('htviewer_metadataupdate_success', hashtag));
-        window.location.reload();
     }); 
 }
 

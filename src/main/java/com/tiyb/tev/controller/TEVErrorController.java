@@ -97,7 +97,11 @@ public class TEVErrorController implements ErrorController {
      */
     private void updateModelWithBlogName(final Model model) {
         final Metadata m = mdController.getDefaultMetadata();
-        model.addAttribute(TEVUIController.MODEL_ATTRIBUTE_BLOGNAME, m.getBlog());
+        if (m == null) {
+            model.addAttribute(TEVUIController.MODEL_ATTRIBUTE_BLOGNAME, "");
+        } else {
+            model.addAttribute(TEVUIController.MODEL_ATTRIBUTE_BLOGNAME, m.getBlog());
+        }
     }
 
     /**
