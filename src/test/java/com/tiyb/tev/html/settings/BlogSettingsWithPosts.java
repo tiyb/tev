@@ -10,14 +10,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
-import com.gargoylesoftware.htmlunit.AlertHandler;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
+import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
 import com.tiyb.tev.datamodel.Post;
 
 /**
@@ -29,10 +26,11 @@ import com.tiyb.tev.datamodel.Post;
  */
 public class BlogSettingsWithPosts extends SettingsTester {
 
-    private Logger logger = LoggerFactory.getLogger(BlogSettingPageHtmlTests.class);
-
     @Rule
     public TemporaryFolder mainBlogMediaFolder = new TemporaryFolder();
+    
+    @Rule
+    public TemporaryFolder tempImageImportFolder = new TemporaryFolder();
 
     @Value("${metadata.defaultBlog.message}")
     private String blogIsDefaultMessage;
@@ -41,17 +39,7 @@ public class BlogSettingsWithPosts extends SettingsTester {
 
     @Before
     public void setupSite() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-        restInitMainBlogSettings(Optional.of(mainBlogMediaFolder.getRoot().getAbsolutePath()));
-
-        // TODO remove this alert handler
-        webClient.setAlertHandler(new AlertHandler() {
-
-            @Override
-            public void handleAlert(Page page, String message) {
-                logger.info("JS ALERT: " + message);
-            }
-
-        });
+        restInitDataForMainBlog(Optional.of(mainBlogMediaFolder.getRoot().getAbsolutePath()));
 
         mainPage = getSettingsPage(MAIN_BLOG_NAME);
     }
@@ -62,8 +50,6 @@ public class BlogSettingsWithPosts extends SettingsTester {
      * <ol>
      * <li>mark all posts read</li>
      * <li>mark all posts unread</li>
-     * <li>TODO clean up images</li>
-     * <li>TODO import images</li>
      * </ol>
      */
     @Test
@@ -72,6 +58,7 @@ public class BlogSettingsWithPosts extends SettingsTester {
         for (Post post : posts) {
             assertThat(post.getIsRead()).isFalse();
         }
+        
         HtmlSubmitInput markAllReadButton = mainPage.getHtmlElementById("markAllPostsReadButton");
         mainPage = markAllReadButton.click();
         waitForScript();
@@ -87,7 +74,28 @@ public class BlogSettingsWithPosts extends SettingsTester {
         for (Post post : posts) {
             assertThat(post.getIsRead()).isFalse();
         }
-
+    }
+    
+    @Test
+    public void cleanImages() throws IOException {
+        mainBlogMediaFolder.newFile("blah.txt");
+        HtmlSubmitInput cleanImagesBtn = mainPage.getHtmlElementById("cleanImagesButton");
+        mainPage = cleanImagesBtn.click();
+        waitForScript();
+        assertThat(mainBlogMediaFolder.getRoot().list().length).isEqualTo(0);
     }
 
+    @Test
+    public void importImages() throws IOException {
+        tempImageImportFolder.newFile("180784644740_0.gif");
+        tempImageImportFolder.newFile("180254465582_0.gif");
+        tempImageImportFolder.newFile("180254465582_1.gif");
+        
+        HtmlTextInput tempImagePathInput = mainPage.getHtmlElementById("importImagesPath");
+        tempImagePathInput.setText(tempImageImportFolder.getRoot().getAbsolutePath());
+        HtmlSubmitInput importImagesBtn = mainPage.getHtmlElementById("importImagesButton");
+        mainPage = importImagesBtn.click();
+        waitForScript();
+        assertThat(mainBlogMediaFolder.getRoot().list().length).isEqualTo(3);
+    }
 }
