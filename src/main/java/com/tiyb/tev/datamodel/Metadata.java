@@ -122,13 +122,7 @@ public class Metadata implements Serializable {
     private String filter;
 
     /**
-     * <p>
      * Name of the Tumblr user for this blog; should always be the same as {@link #blog}.
-     * </p>
-     *
-     * <p>
-     * TODO might remove this at some point, or otherwise reconcile the two members.
-     * </p>
      */
     private String mainTumblrUser;
 
@@ -190,13 +184,7 @@ public class Metadata implements Serializable {
     private String theme;
 
     /**
-     * <p>
      * Name of the blog. Almost always the same as {@link #mainTumblrUser}.
-     * </p>
-     *
-     * <p>
-     * TODO these two fields should be reconciled.
-     * </p>
      */
     private String blog;
 
