@@ -110,6 +110,7 @@
 				<configuration>
 					<show>private</show>
 					<reportOutputDirectory>${basedir}/docs</reportOutputDirectory>
+					<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
 				</configuration>
 			</plugin>
 			<plugin>
