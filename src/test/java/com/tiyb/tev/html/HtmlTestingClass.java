@@ -71,7 +71,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
      */
     @Before
     public void setupWebClient() {
-        webClient = new WebClient(); //BrowserVersion.CHROME
+        webClient = new WebClient(); // BrowserVersion.CHROME
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         webClient.getOptions().setPopupBlockerEnabled(false);
         webClient.getOptions().setRedirectEnabled(true);
@@ -124,7 +124,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
                         message, ConversationMessage.class);
             }
         }
-        
+
         Metadata md = getMDFromServer(Optional.of(MAIN_BLOG_NAME));
         md.setMainTumblrUser(MAIN_BLOG_NAME);
         md.setMainTumblrUserAvatarUrl("http://mainblog/avatar");
@@ -290,9 +290,9 @@ public abstract class HtmlTestingClass extends TevTestingClass {
     protected void restInitMainBlogSettings(Optional<String> baseMediaPath) {
         Metadata mainBlogMD = null;
         Metadata[] blogs = getAllMDObjects();
-        if(blogs.length > 1) {
-            for(Metadata m : blogs) {
-                if((m.getBlog().equals(MAIN_BLOG_NAME)) || (m.getBlog() == null)) {
+        if (blogs.length > 1) {
+            for (Metadata m : blogs) {
+                if ((m.getBlog().equals(MAIN_BLOG_NAME)) || (m.getBlog() == null)) {
                     mainBlogMD = m;
                 } else {
                     String deleteUri = String.format("%s/api/metadata/%d", baseUri(), m.getId());
@@ -302,7 +302,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
         } else {
             mainBlogMD = blogs[0];
         }
-        
+
         mainBlogMD.setBlog(MAIN_BLOG_NAME);
         mainBlogMD.setOverwritePostData(true);
         mainBlogMD.setOverwriteConvoData(true);
@@ -318,14 +318,20 @@ public abstract class HtmlTestingClass extends TevTestingClass {
         mainBlogMD.setShowReadingPane(false);
         mainBlogMD.setSortColumn("ID");
         mainBlogMD.setSortOrder("Descending");
-        mainBlogMD.setTheme(Metadata.DEFAULT_THEME); 
+        mainBlogMD.setTheme(Metadata.DEFAULT_THEME);
         mainBlogMD.setShowReadingPane(false);
         mainBlogMD.setExportImagesFilePath("");
         if (baseMediaPath.isPresent()) {
             mainBlogMD.setBaseMediaPath(baseMediaPath.get());
+        } else {
+            mainBlogMD.setBaseMediaPath("");
         }
 
         updateMD(mainBlogMD);
+        
+        // delete posts and conversations, if any
+        deleteConversationsForBlogFromRest(MAIN_BLOG_NAME);
+        deletePostDataForBlog(MAIN_BLOG_NAME);
     }
 
     /**
@@ -399,7 +405,7 @@ public abstract class HtmlTestingClass extends TevTestingClass {
     protected Post getPostFromRest(String blogName, String postID) {
         return restTemplate.getForObject(String.format("%s/api/posts/%s/%s", baseUri(), blogName, postID), Post.class);
     }
-    
+
     /**
      * Retrieves all posts for a given blog
      * 
@@ -410,6 +416,30 @@ public abstract class HtmlTestingClass extends TevTestingClass {
         ResponseEntity<Post[]> responseEntity = restTemplate
                 .getForEntity(String.format("%s/api/posts/%s", baseUri(), blogName), Post[].class);
         return responseEntity.getBody();
+    }
+
+    /**
+     * Retrieves all conversations for a given blog
+     * 
+     * @param blogName Name of the blog for which convos should be retrieved
+     * @return Array of Conversation objects
+     */
+    protected Conversation[] getAllConversationsFromRest(String blogName) {
+        ResponseEntity<Conversation[]> responseEntity = restTemplate
+                .getForEntity(String.format("%s/api/conversations/%s", baseUri(), blogName), Conversation[].class);
+        return responseEntity.getBody();
+    }
+
+    /**
+     * Deletes all conversations for a given blog. Not bothering to delete messages,
+     * since the tests don't call for it.
+     * 
+     * @param blogName Name of the blog for which conversations should be deleted.
+     */
+    protected void deleteConversationsForBlogFromRest(String blogName) {
+        String url = String.format("%s/api/conversations/%s", baseUri(), blogName);
+
+        restTemplate.delete(url);
     }
 
     /**

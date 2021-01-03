@@ -2,6 +2,7 @@ package com.tiyb.tev.html.settings;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Optional;
@@ -9,11 +10,16 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.ResourceUtils;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.html.HtmlFileInput;
+import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
 import com.gargoylesoftware.htmlunit.javascript.host.event.Event;
+import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.Metadata;
+import com.tiyb.tev.datamodel.Post;
 
 /**
  * Test cases for the settings page for a given blog. In most cases, settings
@@ -134,12 +140,39 @@ public class BlogSettingPageHtmlTests extends SettingsTester {
     }
 
     /**
-     * TODO upload posts 
-     * TODO upload convos
+     * Tests the UI's ability to upload files; first posts, then conversations.
+     * 
+     * @throws IOException
      */
     @Test
-    public void uploads() {
-        assertThat(true).isEqualTo(true);
+    public void uploads() throws IOException {
+        Post[] allPosts = getAllPostsFromRest(MAIN_BLOG_NAME);
+        assertThat(allPosts).isEmpty();
+
+        File xmlInputFile = ResourceUtils.getFile(MAIN_INPUT_XML_FILE);
+        HtmlFileInput postUploadFileInput = mainPage.getHtmlElementById("postUploadFileInput");
+        postUploadFileInput.setValueAttribute(xmlInputFile.getAbsolutePath());
+        HtmlSubmitInput postUploadButton = mainPage.getHtmlElementById("postUploadSubmitButton");
+        mainPage = postUploadButton.click();
+        waitForScript();
+
+        allPosts = getAllPostsFromRest(MAIN_BLOG_NAME);
+        assertThat(allPosts).isNotEmpty();
+        assertThat(allPosts.length).isEqualTo(postsForUploading.size());
+
+        Conversation[] allConvos = getAllConversationsFromRest(MAIN_BLOG_NAME);
+        assertThat(allConvos).isEmpty();
+
+        xmlInputFile = ResourceUtils.getFile(MAIN_CONVO_XML_FILE);
+        HtmlFileInput convoUploadFileInput = mainPage.getHtmlElementById("convoUploadFileInput");
+        convoUploadFileInput.setValueAttribute(xmlInputFile.getAbsolutePath());
+        HtmlSubmitInput convoUploadButton = mainPage.getHtmlElementById("convoUploadSubmitButton");
+        mainPage = convoUploadButton.click();
+        waitForScript();
+
+        allConvos = getAllConversationsFromRest(MAIN_BLOG_NAME);
+        assertThat(allConvos).isNotEmpty();
+        assertThat(allConvos.length).isEqualTo(conversationsToUpload.size());
     }
 
 }

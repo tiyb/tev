@@ -43,9 +43,9 @@ import com.tiyb.tev.xml.ConversationXmlReader;
 @AutoConfigureMockMvc
 public abstract class TevTestingClass {
 
-    private final static String MAIN_INPUT_XML_FILE = "classpath:XML/test-post-xml.xml";
-    private final static String SECONDARY_INPUT_XML_FILE = "classpath:XML/test-post-secondblog.xml";
-    private final static String MAIN_CONVO_XML_FILE = "classpath:XML/test-messages-xml.xml";
+    protected final static String MAIN_INPUT_XML_FILE = "classpath:XML/test-post-xml.xml";
+    protected final static String SECONDARY_INPUT_XML_FILE = "classpath:XML/test-post-secondblog.xml";
+    protected final static String MAIN_CONVO_XML_FILE = "classpath:XML/test-messages-xml.xml";
 
     protected final static String MAIN_BLOG_NAME = "mainblog";
     protected final static String SECOND_BLOG_NAME = "secondblog";
