@@ -84,10 +84,10 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Set up JDK 8
+      - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: 1.11
       - name: Cache Maven Packages
         uses: actions/cache@v1
         with:
