@@ -26,10 +26,11 @@ import com.tiyb.tev.exception.UnableToDeleteMetadataException;
 import com.tiyb.tev.repository.MetadataRepository;
 
 /**
- * REST controller for working with the application's Metadata -- it's settings. Settings are kept
- * on a blog-by-blog basis. Whenever a Metadata object is encountered that doesn't have a valid
- * <b>theme</b> set, the default is applied; not having a theme is a fatal bug for the application,
- * so extra care is taken to guard agaisnt that eventuality.
+ * REST controller for working with the application's Metadata -- it's settings.
+ * Settings are kept on a blog-by-blog basis. Whenever a Metadata object is
+ * encountered that doesn't have a valid <b>theme</b> set, the default is
+ * applied; not having a theme is a fatal bug for the application, so extra care
+ * is taken to guard agaisnt that eventuality.
  *
  * @author tiyb
  */
@@ -40,8 +41,8 @@ public class TEVMetadataRestController {
     /**
      * List of all post types available from Tumblr/TEV
      */
-    public static final List<String> POST_TYPES =
-            new ArrayList<String>(Arrays.asList("answer", "link", "photo", "regular", "video"));
+    public static final List<String> POST_TYPES = new ArrayList<String>(
+            Arrays.asList("answer", "link", "photo", "regular", "video"));
 
     private Logger logger = LoggerFactory.getLogger(TEVMetadataRestController.class);
 
@@ -64,9 +65,10 @@ public class TEVMetadataRestController {
     private TEVConvoRestController convoController;
 
     /**
-     * GET to return all Types stored in the system. This implementation is <i>very</i> hard-coded,
-     * because there are only a specific number of types actually supported by Tumblr. The
-     * {@link #POST_TYPES} member is public, but this API is still useful for JavaScript uses.
+     * GET to return all Types stored in the system. This implementation is
+     * <i>very</i> hard-coded, because there are only a specific number of types
+     * actually supported by Tumblr. The {@link #POST_TYPES} member is public, but
+     * this API is still useful for JavaScript uses.
      *
      * @return {@link java.util.List List} of type strings
      */
@@ -76,9 +78,9 @@ public class TEVMetadataRestController {
     }
 
     /**
-     * Helper function to determine if a "type" is valid or not, per Tumblr/TEV list of types.
-     * Though it is only used within this class, it was made public just in case other code ever
-     * needs it.
+     * Helper function to determine if a "type" is valid or not, per Tumblr/TEV list
+     * of types. Though it is only used within this class, it was made public just
+     * in case other code ever needs it.
      *
      * @param typeName       Name of the type to be validated
      * @param validTypeNames List of all of the valid types in the system
@@ -95,18 +97,21 @@ public class TEVMetadataRestController {
      *
      * <p>
      * If there is no data in the database, a default object is returned based on
-     * {@link com.tiyb.tev.datamodel.Metadata#newDefaultMetadata() Metadata#newDefaultMetadata()}.
+     * {@link com.tiyb.tev.datamodel.Metadata#newDefaultMetadata()
+     * Metadata#newDefaultMetadata()}.
      * </p>
      *
-     * @return The {@link com.tiyb.tev.datamodel.Metadata Metadata} object stored in the database,
-     *         or an empty object if the table has no data.
+     * @return The {@link com.tiyb.tev.datamodel.Metadata Metadata} object stored in
+     *         the database, or an empty object if the table has no data.
      */
     @GetMapping("/metadata")
     public List<Metadata> getAllMetadata() {
         final List<Metadata> list = metadataRepo.findAll();
 
         if (list.size() < 1) {
-            list.add(Metadata.newDefaultMetadata());
+            Metadata md = Metadata.newDefaultMetadata();
+            md = metadataRepo.save(md);
+            list.add(md);
             return list;
         }
 
@@ -123,8 +128,8 @@ public class TEVMetadataRestController {
      * GET to return the metadata for a particular blog based on the Metadata ID.
      *
      * @param id The ID of the MD to return
-     * @return {@link com.tiyb.tev.datamodel.Metadata Metadata} object containing the settings for
-     *         the blog in question
+     * @return {@link com.tiyb.tev.datamodel.Metadata Metadata} object containing
+     *         the settings for the blog in question
      */
     @GetMapping("/metadata/{id}")
     public Metadata getMetadataByID(@PathVariable("id") final Integer id) {
@@ -143,8 +148,8 @@ public class TEVMetadataRestController {
     }
 
     /**
-     * PUT to mark a blog as the default blog by setting <code>isDefault</code> to true for its MD,
-     * and false to all other MDs.
+     * PUT to mark a blog as the default blog by setting <code>isDefault</code> to
+     * true for its MD, and false to all other MDs.
      *
      * @param id ID of the Metadata objec to be marked as the default
      * @return The updated Metadata object
@@ -169,9 +174,9 @@ public class TEVMetadataRestController {
     }
 
     /**
-     * Gets the default Metadata object. If none is set as the default, the first is set as the
-     * default (and saved), then returned. If no MD exists at <i>all,</i> one is created and saved
-     * and returned.
+     * Gets the default Metadata object. If none is set as the default, the first is
+     * set as the default (and saved), then returned. If no MD exists at <i>all,</i>
+     * one is created and saved and returned.
      *
      * @return The default MD object
      */
@@ -181,8 +186,8 @@ public class TEVMetadataRestController {
     }
 
     /**
-     * Helper API for just getting the default blog name -- i.e. getting the default MD, and
-     * returning that MD's blog property.
+     * Helper API for just getting the default blog name -- i.e. getting the default
+     * MD, and returning that MD's blog property.
      *
      * @return String of the blog's name
      */
@@ -208,12 +213,13 @@ public class TEVMetadataRestController {
     }
 
     /**
-     * Specialized method to return the Metadata for a given blog, <i>or</i> the default Metadata
-     * object (which is also inserted into the DB, with the given blog name), if it doesn't yet
-     * exist.
+     * Specialized method to return the Metadata for a given blog, <i>or</i> the
+     * default Metadata object (which is also inserted into the DB, with the given
+     * blog name), if it doesn't yet exist.
      *
      * @param blog Name of the blog to be returned
-     * @return Metadata for the blog, or the default MD object if it didn't originally exist
+     * @return Metadata for the blog, or the default MD object if it didn't
+     *         originally exist
      */
     @GetMapping("/metadata/byBlog/{blog}/orDefault")
     public Metadata getMetadataForBlogOrDefault(@PathVariable("blog") final String blog) {
@@ -234,8 +240,8 @@ public class TEVMetadataRestController {
     }
 
     /**
-     * GET to return static data used to populate drop-down lists, for the user to set things like
-     * preferred sort order, filters, etc.
+     * GET to return static data used to populate drop-down lists, for the user to
+     * set things like preferred sort order, filters, etc.
      *
      * @return object containing the different lists of strings available
      */
@@ -272,8 +278,8 @@ public class TEVMetadataRestController {
     }
 
     /**
-     * PUT to update metadata details in the database. Assertions have been added around ensuring
-     * proper themes are saved.
+     * PUT to update metadata details in the database. Assertions have been added
+     * around ensuring proper themes are saved.
      *
      * @param id              The ID of the MD being saved
      * @param metadataDetails The data to be updated in the DB
@@ -289,20 +295,22 @@ public class TEVMetadataRestController {
     }
 
     /**
-     * Removes a Metadata object (and therefore the blog, and all of its settings) from the DB.
+     * Removes a Metadata object (and therefore the blog, and all of its settings)
+     * from the DB.
      *
      * <ol>
-     * <li>Validates that the MD being deleted exists, and isn't the only MD in the system</li>
+     * <li>Validates that the MD being deleted exists, and isn't the only MD in the
+     * system</li>
      * <li>Removes all conversation messages / conversations</li>
      * <li>Removes all posts</li>
      * <li>Removes the Metadata itself</li>
-     * <li>Ensures there is at least one MD object left in the system marked as 'default' or marks
-     * the first one as default otherwise</li>
+     * <li>Ensures there is at least one MD object left in the system marked as
+     * 'default' or marks the first one as default otherwise</li>
      * </ol>
      *
      * @param id Metadata to be removed
-     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with the response
-     *         details
+     * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with
+     *         the response details
      */
     @DeleteMapping("/metadata/{id}")
     public ResponseEntity<?> deleteMetadata(@PathVariable("id") final Integer id) {
@@ -348,8 +356,8 @@ public class TEVMetadataRestController {
     }
 
     /**
-     * Package-private method to delete all MD objects in the DB. Never used by TEV; only used by
-     * JUnit test cases.
+     * Package-private method to delete all MD objects in the DB. Never used by TEV;
+     * only used by JUnit test cases.
      */
     void deleteAllMD() {
         metadataRepo.deleteAll();

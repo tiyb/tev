@@ -12,14 +12,15 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * <p>
- * Encapsulates the data for any Tumblr post. This entity has the main post details, and other
- * entities (Answer, Link, Photo, Regular, and Video) have the posts' content. TEV uses the post
- * type quite a bit, so constants are defined here that are used in application logic.
+ * Encapsulates the data for any Tumblr post. This entity has the main post
+ * details, and other entities (Answer, Link, Photo, Regular, and Video) have
+ * the posts' content. TEV uses the post type quite a bit, so constants are
+ * defined here that are used in application logic.
  * </p>
  *
  * <p>
- * Unless otherwise specified, all members are read in from the Tumblr export XML, rather than being
- * set by TEV itself.
+ * Unless otherwise specified, all members are read in from the Tumblr export
+ * XML, rather than being set by TEV itself.
  * </p>
  *
  * @author tiyb
@@ -29,41 +30,46 @@ import org.apache.commons.lang3.StringUtils;
 public class Post implements Serializable {
 
     /**
-     * The 'regular' post type; used in logic in the application, as well as for XML generation
+     * The 'regular' post type; used in logic in the application, as well as for XML
+     * generation
      */
     public static final String POST_TYPE_REGULAR = "regular";
 
     /**
-     * The 'link' post type; used in logic in the application, as well as for XML generation
+     * The 'link' post type; used in logic in the application, as well as for XML
+     * generation
      */
     public static final String POST_TYPE_LINK = "link";
 
     /**
-     * The 'answer' post type; used in logic in the application, as well as for XML generation
+     * The 'answer' post type; used in logic in the application, as well as for XML
+     * generation
      */
     public static final String POST_TYPE_ANSWER = "answer";
 
     /**
-     * The 'photo' post type; used in logic in the application, as well as for XML generation
+     * The 'photo' post type; used in logic in the application, as well as for XML
+     * generation
      */
     public static final String POST_TYPE_PHOTO = "photo";
 
     /**
-     * The 'video' post type; used in logic in the application, as well as for XML generation
+     * The 'video' post type; used in logic in the application, as well as for XML
+     * generation
      */
     public static final String POST_TYPE_VIDEO = "video";
 
     /**
-     * Used in the {@link javax.persistence.Column Column} annotation for any fields which store a
-     * large amount of text.
+     * Used in the {@link javax.persistence.Column Column} annotation for any fields
+     * which store a large amount of text.
      */
     public static final int LONG_FIELD_SIZE = 50000;
 
     private static final long serialVersionUID = -7988281852593439595L;
 
     /**
-     * Unique ID of the post, as specified by Tumblr. (TEV doesn't have post creation capabilities,
-     * so Tumblr's ID is always used.)
+     * Unique ID of the post, as specified by Tumblr. (TEV doesn't have post
+     * creation capabilities, so Tumblr's ID is always used.)
      */
     @Id
     private String id;
@@ -96,18 +102,20 @@ public class Post implements Serializable {
     private Long unixtimestamp;
 
     /**
-     * Unique 'reblog key' for this post. Tumblr uses these keys to identify all reposts of a given
-     * post within the site.
+     * Unique 'reblog key' for this post. Tumblr uses these keys to identify all
+     * reposts of a given post within the site.
      */
     private String reblogKey;
 
     /**
-     * 'Slug' for the post; typically the first few characters of the post's content.
+     * 'Slug' for the post; typically the first few characters of the post's
+     * content.
      */
     private String slug;
 
     /**
-     * Whether this post is a re-blog of another post (true) or a unique post (false).
+     * Whether this post is a re-blog of another post (true) or a unique post
+     * (false).
      */
     private Boolean isReblog;
 
@@ -118,13 +126,14 @@ public class Post implements Serializable {
 
     /**
      * Type of post; one of {@link #POST_TYPE_ANSWER}, {@link Post#POST_TYPE_LINK},
-     * {@link #POST_TYPE_REGULAR}, {@link #POST_TYPE_PHOTO}, or {@link #POST_TYPE_VIDEO}.
+     * {@link #POST_TYPE_REGULAR}, {@link #POST_TYPE_PHOTO}, or
+     * {@link #POST_TYPE_VIDEO}.
      */
     private String type;
 
     /**
-     * Whether this post has been read/viewed in TEV. Set by TEV, rather than being read from the
-     * XML.
+     * Whether this post has been read/viewed in TEV. Set by TEV, rather than being
+     * read from the XML.
      */
     private Boolean isRead = false;
 
@@ -136,8 +145,8 @@ public class Post implements Serializable {
     private String tags = StringUtils.EMPTY;
 
     /**
-     * Whether this post has been marked a 'favourite' in TEV. Set by TEV, rather than being read
-     * from the XML.
+     * Whether this post has been marked a 'favourite' in TEV. Set by TEV, rather
+     * than being read from the XML.
      */
     private Boolean isFavourite = false;
 
@@ -157,8 +166,61 @@ public class Post implements Serializable {
     private Integer width;
 
     /**
-     * Helper method for updating this object with properties from another copy of the object. ID
-     * and type are ignored, they're left as-is.
+     * Constructor for creating a fully loaded Post
+     * 
+     * @param id            ID
+     * @param url           URL
+     * @param urlWithSlug   URL with slug
+     * @param dateGmt       Date in GMT format
+     * @param date          String containing a date (never validated or used as a
+     *                      date)
+     * @param unixtimestamp Unix timestamp
+     * @param reblogKey     Reblog Key
+     * @param slug          Slug
+     * @param isReblog      Whether this is a reblog
+     * @param tumblelog     Name of the blog
+     * @param type          Type of post
+     * @param isRead        Whether the post is read (in TEV) or not
+     * @param tags          String containing a comma-separated list of tags
+     * @param isFavourite   Whether this post is marked as a favourite (in TEV)
+     * @param state         State of the post (published, draft, ...)
+     * @param height        Height (not always used)
+     * @param width         Width (not always used)
+     */
+    @SuppressWarnings("checkstyle:parameternumber")
+    public Post(final String id, final String url, final String urlWithSlug, final String dateGmt, final String date,
+            final Long unixtimestamp, final String reblogKey, final String slug, final Boolean isReblog,
+            final String tumblelog, final String type, final Boolean isRead, final String tags,
+            final Boolean isFavourite, final String state, final Integer height, final Integer width) {
+        this.id = id;
+        this.url = url;
+        this.urlWithSlug = urlWithSlug;
+        this.dateGmt = dateGmt;
+        this.date = date;
+        this.unixtimestamp = unixtimestamp;
+        this.reblogKey = reblogKey;
+        this.slug = slug;
+        this.isReblog = isReblog;
+        this.tumblelog = tumblelog;
+        this.type = type;
+        this.isRead = isRead;
+        this.tags = tags;
+        this.isFavourite = isFavourite;
+        this.state = state;
+        this.height = height;
+        this.width = width;
+    }
+
+    /**
+     * Empty Constructor for Post
+     */
+    public Post() {
+
+    }
+
+    /**
+     * Helper method for updating this object with properties from another copy of
+     * the object. ID and type are ignored, they're left as-is.
      *
      * @param newDataObject Object from which to copy the properties.
      */

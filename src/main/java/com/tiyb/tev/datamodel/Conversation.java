@@ -57,6 +57,26 @@ public class Conversation implements Serializable {
     private String blog;
 
     /**
+     * Constructor to pre-load the object. The <code>hideConversation</code>
+     * property is defaulted to false.
+     * 
+     * @param participant          Participant in the convo (not the main blog)
+     * @param participantAvatarUrl Avatar of the participant in the conversation
+     * @param participantId        ID of the participant in the conversation
+     * @param blog                 Name of the main blog (not the participant)
+     * @param numMessages          Number of messages for the conversation
+     */
+    public Conversation(final String participant, final String participantAvatarUrl, final String participantId,
+            final String blog, final Integer numMessages) {
+        this.hideConversation = false;
+        this.numMessages = numMessages;
+        this.participant = participant;
+        this.participantAvatarUrl = participantAvatarUrl;
+        this.participantId = participantId;
+        this.blog = blog;
+    }
+
+    /**
      * Default constructor, ensures that new conversations are initially hidden
      */
     public Conversation() {
@@ -64,8 +84,8 @@ public class Conversation implements Serializable {
     }
 
     /**
-     * Helper function for updating all of the object's properties with values from a new object. ID
-     * is ignored.
+     * Helper function for updating all of the object's properties with values from
+     * a new object. ID is ignored.
      *
      * @param newData The new object from which to take the values
      */

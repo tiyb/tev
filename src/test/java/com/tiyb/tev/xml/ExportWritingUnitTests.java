@@ -3,35 +3,26 @@ package com.tiyb.tev.xml;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.ResourceUtils;
 
+import com.tiyb.tev.TevTestingClass;
 import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.controller.TEVPostRestController;
-import com.tiyb.tev.datamodel.Metadata;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-public class ExportWritingUnitTests {
+public class ExportWritingUnitTests extends TevTestingClass {
 
     @Autowired
     private TEVPostRestController postController;
@@ -60,57 +51,46 @@ public class ExportWritingUnitTests {
     private static String SINGLEPHOTO_POST_ID = "180784644740";
     private static String MULTIPLEPHOTO_POST_ID = "180254465582";
 
-    private static String MAIN_BLOG_NAME = "mainblog";
-
     @Before
     public void setupData() throws FileNotFoundException {
-        File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-xml.xml");
-        InputStream xmlFile = new FileInputStream(rawXmlFile);
-
-        Metadata md = mdController.getMetadataForBlogOrDefault(MAIN_BLOG_NAME);
-        md.setOverwritePostData(true);
-        md.setIsDefault(true);
-        md.setBlog(MAIN_BLOG_NAME);
-        md = mdController.updateMetadata(md.getId(), md);
-
-        BlogXmlReader.parseDocument(xmlFile, postController, MAIN_BLOG_NAME);
+        initDataForMainBlog(mdController, postController, Optional.empty());
     }
 
     @Test
-    public void testExportOfRegular() throws IOException {
-        testSinglePostResponse(regularXML, REGULAR_POST_ID);
+    public void exportRegular() throws IOException {
+        checkSinglePostResponse(regularXML, REGULAR_POST_ID);
     }
 
     @Test
-    public void testExportOfAnswer() throws IOException {
-        testSinglePostResponse(answerXML, ANSWER_POST_ID);
+    public void exportAnswer() throws IOException {
+        checkSinglePostResponse(answerXML, ANSWER_POST_ID);
     }
 
     @Test
-    public void testExportOfLink() throws IOException {
-        testSinglePostResponse(linkXML, LINK_POST_ID);
+    public void exportLink() throws IOException {
+        checkSinglePostResponse(linkXML, LINK_POST_ID);
     }
 
     @Test
-    public void testExportOfPhoto() throws IOException {
-        testSinglePostResponse(singlePhotoXML, SINGLEPHOTO_POST_ID);
+    public void exportPhoto() throws IOException {
+        checkSinglePostResponse(singlePhotoXML, SINGLEPHOTO_POST_ID);
     }
 
     @Test
-    public void testExportOfPhotoMultiple() throws IOException {
-        testSinglePostResponse(this.multiplePhotoXML, MULTIPLEPHOTO_POST_ID);
+    public void exportMultiplePhotos() throws IOException {
+        checkSinglePostResponse(this.multiplePhotoXML, MULTIPLEPHOTO_POST_ID);
     }
 
     private String getExpectedResponse(Resource resource) throws IOException {
         File expectedResponseFile = resource.getFile();
-        List<String> expectedResponseStrings =
-                Files.readAllLines(expectedResponseFile.toPath(), StandardCharsets.UTF_8);
+        List<String> expectedResponseStrings = Files.readAllLines(expectedResponseFile.toPath(),
+                StandardCharsets.UTF_8);
         String expectedResponseString = String.join(StringUtils.EMPTY, expectedResponseStrings);
 
         return expectedResponseString;
     }
 
-    private void testSinglePostResponse(Resource resource, String postID) throws IOException {
+    private void checkSinglePostResponse(Resource resource, String postID) throws IOException {
         String expectedAnswer = getExpectedResponse(resource);
 
         List<String> postIDs = new ArrayList<String>();

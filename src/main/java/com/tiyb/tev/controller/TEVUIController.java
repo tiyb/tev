@@ -294,7 +294,7 @@ public class TEVUIController {
      * @param blogName The name of the current blog
      */
     private void addBlogNameJSToModel(final Model model, final String blogName) {
-        model.addAttribute(MODEL_ATTRIBUTE_BLOGNAMEJS, String.format("var blogName = \"%s\"", blogName));
+        model.addAttribute(MODEL_ATTRIBUTE_BLOGNAMEJS, String.format("var blogName = \"%s\";", blogName));
     }
 
     /**
@@ -369,7 +369,7 @@ public class TEVUIController {
         if (blog.equals(defaultBlogName)) {
             return "redirect:/conversations";
         } else {
-            return String.format("redirect:/conversations" + TEMPBLOGNAME_PARAM + "=%s", blog);
+            return String.format("redirect:/conversations?%s=%s", TEMPBLOGNAME_PARAM, blog);
         }
     }
 

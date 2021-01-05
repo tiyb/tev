@@ -9,7 +9,8 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 /**
- * Encapsulates the data needed for a Tumblr "Regular" style of post (just a normal text post)
+ * Encapsulates the data needed for a Tumblr "Regular" style of post (just a
+ * normal text post)
  *
  * @author tiyb
  */
@@ -38,8 +39,28 @@ public class Regular implements Serializable, TEVCommonItems<Regular> {
     private String body;
 
     /**
-     * Helper method to update the data in this object with properties from another copy of the
-     * object. ID ignored.
+     * Constructor with params
+     * 
+     * @param postId Id of parent post
+     * @param title  Title of regular post
+     * @param body   Body of retular post
+     */
+    public Regular(final String postId, final String title, final String body) {
+        this.postId = postId;
+        this.title = title;
+        this.body = body;
+    }
+
+    /**
+     * Empty/default constructor
+     */
+    public Regular() {
+
+    }
+
+    /**
+     * Helper method to update the data in this object with properties from another
+     * copy of the object. ID ignored.
      *
      * @param newDetails Object from which to copy the properties
      */

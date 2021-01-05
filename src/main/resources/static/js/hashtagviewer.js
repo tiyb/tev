@@ -2,9 +2,9 @@
  * Load i18n data
  */
 $.i18n.properties({
-	name: 'messages',
-	path: '/js/i18n/',
-	mode: 'both'
+    name: 'messages',
+    path: '/js/i18n/',
+    mode: 'both'
 });
 
 /**
@@ -16,6 +16,11 @@ var metadata;
  * Holds the list of hashtags (names only), for use in autocomplete
  */
 var htData;
+
+/**
+ * Holds the list of hashtag objects
+ */
+var htObjects;
 
 /**
  * Returns a "hashtagspan" for the given text
@@ -44,12 +49,11 @@ function buildNonclickableSpan(textToShow) {
  * indicates that all blogs should be shown, or just the current
  */
 function initRadios() {
-	if (metadata.showHashtagsForAllBlogs) {
-		$('#showAllBlogsRadio').prop('checked', true).checkboxradio("refresh");
-	} else {
-		$('#showDefaultBlogRadio').prop('checked', true).checkboxradio(
-				"refresh");
-	}
+    if (metadata.showHashtagsForAllBlogs === true) {
+        $('#showAllBlogsRadio').prop('checked', true).checkboxradio("refresh");
+    } else {
+        $('#showDefaultBlogRadio').prop('checked', true).checkboxradio("refresh");
+    }
 }
 
 /**
@@ -58,33 +62,33 @@ function initRadios() {
  * @returns DataTable object
  */
 function initializeTableUI() {
-	return $('#tagsTable').DataTable( {
-		language: {
-			emptyTable: 	  $.i18n.prop('index_posttable_emptytable'),
-		    info:           $.i18n.prop('index_posttable_info'),
-		    infoEmpty:      $.i18n.prop('index_posttable_infoempty'),
-		    infoFiltered:   $.i18n.prop('index_posttable_infofiltered'),
-		    lengthMenu:     $.i18n.prop('index_posttable_lengthmenu'),
-		    loadingRecords: $.i18n.prop('index_posttable_loadingrecords'),
-		    processing:     $.i18n.prop('index_posttable_processing'),
-		    search:         $.i18n.prop('index_posttable_search'),
-		    zeroRecords:    $.i18n.prop('index_posttable_zerorecords'),
-		    paginate: {
-		        first:      $.i18n.prop('index_posttable_paginate_first'),
-		        last:       $.i18n.prop('index_posttable_paginate_last'),
-		        next:       $.i18n.prop('index_posttable_paginate_next'),
-		        previous:   $.i18n.prop('index_posttable_paginate_previous')
-		    },
-		    aria: {
-		        sortAscending:  $.i18n.prop('index_posttable_aria_sortasc'),
-		        sortDescending: $.i18n.prop('index_posttable_aria_sortdesc')
-		    }		
-	    },
-		scrollCollapse: true,
-		paging: false,
-	    autoWidth: false,
-		orderCellsTop: true
-	});
+    return $('#tagsTable').DataTable( {
+        language: {
+            emptyTable:     $.i18n.prop('index_posttable_emptytable'),
+            info:           $.i18n.prop('index_posttable_info'),
+            infoEmpty:      $.i18n.prop('index_posttable_infoempty'),
+            infoFiltered:   $.i18n.prop('index_posttable_infofiltered'),
+            lengthMenu:     $.i18n.prop('index_posttable_lengthmenu'),
+            loadingRecords: $.i18n.prop('index_posttable_loadingrecords'),
+            processing:     $.i18n.prop('index_posttable_processing'),
+            search:         $.i18n.prop('index_posttable_search'),
+            zeroRecords:    $.i18n.prop('index_posttable_zerorecords'),
+            paginate: {
+                first:      $.i18n.prop('index_posttable_paginate_first'),
+                last:       $.i18n.prop('index_posttable_paginate_last'),
+                next:       $.i18n.prop('index_posttable_paginate_next'),
+                previous:   $.i18n.prop('index_posttable_paginate_previous')
+            },
+            aria: {
+                sortAscending:  $.i18n.prop('index_posttable_aria_sortasc'),
+                sortDescending: $.i18n.prop('index_posttable_aria_sortdesc')
+            }       
+        },
+        scrollCollapse: true,
+        paging: false,
+        autoWidth: false,
+        orderCellsTop: true
+    });
 }
 
 /**
@@ -98,22 +102,22 @@ function initializeTableUI() {
  *            Table into which the data should be loaded
  */
 function loadDataIntoTable(hashtagArray, tableObject) {
-	hashtagArray.forEach(function(element) {
-		var tagCell = "";
-		var blogCell = element.blog;
-		var countCell = element.count;
-		var deleteBtnCell = "";
-		if (element.blog.includes(", ")) {
-			tagCell = buildNonclickableSpan(element.tag);
-		} else {
-			tagCell = buildClickableSpan(element.tag);
-			deleteBtnCell = "<button class='removeBtn ui-button ui-widget ui-corner-all'>" +
-					$.i18n.prop('htviewer_table_removeBtn') +
-					"</button>";
-		}
+    hashtagArray.forEach(function(element) {
+        var tagCell = "";
+        var blogCell = element.blog;
+        var countCell = element.count;
+        var deleteBtnCell = "";
+        if (element.blog.includes(", ")) {
+            tagCell = buildNonclickableSpan(element.tag);
+        } else {
+            tagCell = buildClickableSpan(element.tag);
+            deleteBtnCell = "<button class='removeBtn ui-button ui-widget ui-corner-all'>" +
+                    $.i18n.prop('htviewer_table_removeBtn') +
+                    "</button>";
+        }
 
-		tableObject.row.add([ tagCell, blogCell, countCell, deleteBtnCell ]).draw();
-	});
+        tableObject.row.add([ tagCell, blogCell, countCell, deleteBtnCell ]).draw();
+    });
 }
 
 /**
@@ -124,46 +128,54 @@ function loadDataIntoTable(hashtagArray, tableObject) {
  *            DataTable in which the button exists
  */
 function addRemoveBtnClickHandlers(tableObject) {
-	$('#tagsTable tbody').on('click', 'button.removeBtn', function() {
-		var htObject = tableObject.row($(this).parents('tr')).data();
-		var hashtag = {
-			tag: $(htObject[0]).text(),
-			blog: htObject[1],
-			count: htObject[2]
-		};
-		
-		var url = "/api/hashtags";
-		
-		$.ajax({
-			url: url,
-			data: JSON.stringify(hashtag),
-			contentType: 'application/json',
-			type: "DELETE",
-			error: function(xhr,textStatus,errorThrown) {
-				createAnErrorMessage($.i18n.prop('htviewer_deleteht_error', hashtag.tag));
-			}
-		}).then(function(data) {
-			createAnInfoMessage($.i18n.prop('htviewer_deleteht_success', hashtag.tag));
-			window.location.reload();
-		});
-	});	
+    $('#tagsTable tbody').on('click', 'button.removeBtn', function() {
+        var htObject = tableObject.row($(this).parents('tr')).data();
+        var htText = $(htObject[0]).text();
+        var htID = -1;
+        
+        for (i = 0; i < htObjects.length; i++) {
+            if (htObjects[i].tag === htText) {
+                htID = htObjects[i].id;
+                break;
+            }
+        }
+        if (htID === -1) {
+            createAnErrorMessage($.i18n.prop('htviewer_deleteht_error', htText));
+            return;
+        }
+        
+        var url = "/api/hashtags/" + htID;
+        
+        $.ajax({
+            url: url,
+            type: "DELETE",
+            error: function(xhr,textStatus,errorThrown) {
+                createAnErrorMessage($.i18n.prop('htviewer_deleteht_error', htText));
+            }
+        }).then(function(data) {
+            createAnInfoMessage($.i18n.prop('htviewer_deleteht_success', htText));
+            window.location.reload();
+        });
+    }); 
 }
 
 /**
  * Send updated metadata to the server
  */
 function updateMDAPI() {
-	$.ajax({
-		url: '/api/metadata/' + metadata.id,
-		type: 'PUT',
-		data: JSON.stringify(metadata),
-		contentType: 'application/json',
-		error: function(xhr, textStatus, errorThrown) {
-			createAnErrorMessage($.i18n.prop('index_errorsubmittingdata'));
-		}
-	}).then(function(data) {
-		window.location.reload();
-	});	
+    $.ajax({
+        url: '/api/metadata/' + metadata.id,
+        type: 'PUT',
+        data: JSON.stringify(metadata),
+        contentType: 'application/json',
+        error: function(xhr, textStatus, errorThrown) {
+            createAnErrorMessage($.i18n.prop('index_errorsubmittingdata'));
+        },
+        success: function(data, textStatus, xhr) {
+            createAnInfoMessage($.i18n.prop('htviewer_metadataupdate_success', hashtag));
+            window.location.reload();
+        }
+    }); 
 }
 
 /**
@@ -171,7 +183,7 @@ function updateMDAPI() {
  * used
  */
 function setupUIWidgets() {
-	$("input[type='radio']").checkboxradio();
+    $("input[type='radio']").checkboxradio();
 }
 
 /**
@@ -182,44 +194,44 @@ function setupUIWidgets() {
  * change anything.
  */
 function setupAutoComplete() {
-	$('#newTagTextBox').autocomplete({
-		source: htData,
-		change: function(event, ui) {
-			var newHT = $('#newTagTextBox').val();
-			if(htData.includes(newHT)) {
-				createAnInfoMessage($.i18n.prop('htviewer_newht_exists', newHT));
-				return;
-			}
-			
-			$.ajax({
-				url: '/api/hashtags/',
-				type: 'POST',
-				data: newHT,
-				contentType: 'text/plain',
-				error: function(xhr,textStatus,errorThrown) {
-					createAnErrorMessage($.i18n.prop('htviewer_newht_error', newHT));
-				}
-			}).then(function(data) {
-				createAnInfoMessage($.i18n.prop('htviewer_newht_success', newHT));
-				window.location.reload();
-			});
-		}
-	});
+    $('#newTagTextBox').autocomplete({
+        source: htData,
+        change: function(event, ui) {
+            var newHT = $('#newTagTextBox').val();
+            if(htData.includes(newHT)) {
+                createAnInfoMessage($.i18n.prop('htviewer_newht_exists', newHT));
+                return;
+            }
+            
+            $.ajax({
+                url: '/api/hashtags/',
+                type: 'POST',
+                data: newHT,
+                contentType: 'text/plain',
+                error: function(xhr,textStatus,errorThrown) {
+                    createAnErrorMessage($.i18n.prop('htviewer_newht_error', newHT));
+                }
+            }).then(function(data) {
+                createAnInfoMessage($.i18n.prop('htviewer_newht_success', newHT));
+                window.location.reload();
+            });
+        }
+    });
 }
 
 /**
  * Add change handlers to the Radio buttons
  */
 function addRadioChangeHandler() {
-	$('input[type=radio][name=showBlogsRadios]').change(function() {
-		if(this.id === "showAllBlogsRadio") {
-			metadata.showHashtagsForAllBlogs = true;
-		} else {
-			metadata.showHashtagsForAllBlogs = false;
-		}
-		
-		updateMDAPI();
-	});	
+    $('input[type=radio][name=showBlogsRadios]').change(function() {
+        if(this.id === "showAllBlogsRadio") {
+            metadata.showHashtagsForAllBlogs = true;
+        } else {
+            metadata.showHashtagsForAllBlogs = false;
+        }
+        
+        updateMDAPI();
+    }); 
 }
 
 /**
@@ -237,10 +249,13 @@ $(document).ready(function() {
         
         initRadios();
         
+        var theUrl = metadata.showHashtagsForAllBlogs ? "/api/hashtags" : "api/hashtags/" + blogName;
+        
         $.ajax({
-            url: metadata.showHashtagsForAllBlogs ? "/api/hashtags" : "api/hashtags/" + blogName,
+            url: theUrl,
             dataSrc: ""
         }).then(function (htResponseData) {
+            htObjects = htResponseData;
             htData = htResponseData.map(function(val) {
                 return val.tag;
             });

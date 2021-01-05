@@ -8,16 +8,14 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 
+import com.tiyb.tev.TevTestingClass;
 import com.tiyb.tev.controller.TEVAdminToolsController;
 import com.tiyb.tev.controller.TEVMetadataRestController;
 import com.tiyb.tev.controller.TEVPostRestController;
@@ -34,21 +32,19 @@ import com.tiyb.tev.exception.XMLParsingException;
 
 /**
  * <p>
- * Unit Tests for the <code>BlogXmlReader</code> class. Since that class not only parses the XML
- * document but also inserts the data into the DB (via the REST controller), these Unit Tests verify
- * the end result -- that the data is properly inserted into the DB.
+ * Unit Tests for the <code>BlogXmlReader</code> class. Since that class not
+ * only parses the XML document but also inserts the data into the DB (via the
+ * REST controller), these Unit Tests verify the end result -- that the data is
+ * properly inserted into the DB.
  * </p>
  *
  * <p>
- * A <code>test-post-xml</code> XML input document is used for input data for most unit tests, while
- * <code>test-post-extended-xml</code> is used for one particular test, to verify that additive
- * inserts are working properly.
+ * A <code>test-post-xml</code> XML input document is used for input data for
+ * most unit tests, while <code>test-post-extended-xml</code> is used for one
+ * particular test, to verify that additive inserts are working properly.
  * </p>
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-public class PostXmlParsingUnitTest {
+public class PostXmlParsingUnitTest extends TevTestingClass {
 
     @Autowired
     private TEVPostRestController postController;
@@ -72,8 +68,6 @@ public class PostXmlParsingUnitTest {
     private static final int EXTENDED_NUM_POSTS = 10;
     private static final int EXTENDED_NUM_REG_POSTS = 5;
 
-    private static final String MAIN_BLOG_NAME = "mainblog";
-
     private static final List<Hashtag> INITIAL_HASHTAGS = Arrays.asList(new Hashtag("tag1", 4, MAIN_BLOG_NAME),
             new Hashtag("tag2", 4, MAIN_BLOG_NAME), new Hashtag("tag3", 1, MAIN_BLOG_NAME),
             new Hashtag("tag4", 1, MAIN_BLOG_NAME), new Hashtag("tag5", 1, MAIN_BLOG_NAME),
@@ -93,29 +87,22 @@ public class PostXmlParsingUnitTest {
             new Hashtag("tag14", 1, MAIN_BLOG_NAME), new Hashtag("tag15", 1, MAIN_BLOG_NAME));
 
     /**
-     * Called before each unit test to properly reset the data back to an original state of having
-     * loaded the test XML document.
+     * Called before each unit test to properly reset the data back to an original
+     * state of having loaded the test XML document.
      *
      * @throws FileNotFoundException
      */
     @Before
     public void setupData() throws FileNotFoundException {
-        Metadata md = mdController.getMetadataForBlogOrDefault(MAIN_BLOG_NAME);
-        md.setOverwritePostData(true);
-        md.setBlog(MAIN_BLOG_NAME);
-        md = mdController.updateMetadata(md.getId(), md);
-        mdController.markBlogAsDefault(md.getId());
-
-        File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-xml.xml");
-        InputStream xmlFile = new FileInputStream(rawXmlFile);
-        BlogXmlReader.parseDocument(xmlFile, postController, MAIN_BLOG_NAME);
+        initDataForMainBlog(mdController, postController, Optional.empty());
     }
 
     /**
-     * Simple check that all posts have been loaded; details are checked in other unit tests
+     * Simple check that all posts have been loaded; details are checked in other
+     * unit tests
      */
     @Test
-    public void testAllPosts() {
+    public void allPosts() {
         List<Post> posts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
         assertThat(posts).isNotNull();
         assertThat(posts.size()).isEqualTo(ORIGINAL_NUM_POSTS);
@@ -147,16 +134,16 @@ public class PostXmlParsingUnitTest {
      * TEVPostRestController#getPostsByType(String)}
      */
     @Test(expected = InvalidTypeException.class)
-    public void testInvalidPostType() {
+    public void invalidPostType() {
         adminController.getPostsByBlogByType(MAIN_BLOG_NAME, "blah");
     }
 
     /**
-     * Verify that test Answers in the input XML have been properly inserted into the DB (there is
-     * one)
+     * Verify that test Answers in the input XML have been properly inserted into
+     * the DB (there is one)
      */
     @Test
-    public void testAnswer() {
+    public void answer() {
         Post post = postController.getPostForBlogById(MAIN_BLOG_NAME, answerPostID);
         assertThat(post).isNotNull();
         assertThat(post.getDate()).isEqualTo("Thu, 22 Nov 2018 03:26:25");
@@ -183,11 +170,11 @@ public class PostXmlParsingUnitTest {
     }
 
     /**
-     * Verify that test Links in the input XML have been properly inserted into the DB (there is
-     * one)
+     * Verify that test Links in the input XML have been properly inserted into the
+     * DB (there is one)
      */
     @Test
-    public void testLink() {
+    public void link() {
         Post post = postController.getPostForBlogById(MAIN_BLOG_NAME, linkPostID);
         assertThat(post).isNotNull();
         assertThat(post.getDate()).isEqualTo("Mon, 19 Nov 2018 01:09:08");
@@ -215,11 +202,11 @@ public class PostXmlParsingUnitTest {
     }
 
     /**
-     * Verify that test Regulars in the input XML have been properly inserted into the DB (there is
-     * one)
+     * Verify that test Regulars in the input XML have been properly inserted into
+     * the DB (there is one)
      */
     @Test
-    public void testRegular() {
+    public void regular() {
         Post post = postController.getPostForBlogById(MAIN_BLOG_NAME, regularPostID);
         assertThat(post).isNotNull();
         assertThat(post.getDate()).isEqualTo("Fri, 07 Dec 2018 11:48:43");
@@ -248,34 +235,35 @@ public class PostXmlParsingUnitTest {
     }
 
     /**
-     * Holdover from when non-published posts used to be skipped by the import process; import
-     * process now imports non-published posts, but the test was left in anyway.
+     * Holdover from when non-published posts used to be skipped by the import
+     * process; import process now imports non-published posts, but the test was
+     * left in anyway.
      */
     @Test
-    public void testIgnoredDraft() {
+    public void ignoredDraft() {
         Post post = postController.getPostForBlogById(MAIN_BLOG_NAME, draftRegularPostID);
 
         assertThat(post).isNotNull();
     }
 
     /**
-     * The import process used to skip non-published posts, but has been updated to accept all
-     * types. This test <i>used</i> to test that non-published posts were skipped, which is no
-     * longer relevant; it was kept nonetheless.
+     * The import process used to skip non-published posts, but has been updated to
+     * accept all types. This test <i>used</i> to test that non-published posts were
+     * skipped, which is no longer relevant; it was kept nonetheless.
      */
     @Test
-    public void testIgnoredQueued() {
+    public void ignoredQueued() {
         Post post = postController.getPostForBlogById(MAIN_BLOG_NAME, queuedRegularPostID);
 
         assertThat(post).isNotNull();
     }
 
     /**
-     * Verify that test Videos in the input XML have been properly inserted into the DB (there is
-     * one)
+     * Verify that test Videos in the input XML have been properly inserted into the
+     * DB (there is one)
      */
     @Test
-    public void testVideo() {
+    public void video() {
         Post post = postController.getPostForBlogById(MAIN_BLOG_NAME, videoPostID);
         assertThat(post).isNotNull();
         assertThat(post.getDate()).isEqualTo("Tue, 04 Dec 2018 01:09:21");
@@ -307,11 +295,11 @@ public class PostXmlParsingUnitTest {
     }
 
     /**
-     * Verify that test Photos in the input XML have been properly inserted into the DB (there are
-     * three, spread across two posts)
+     * Verify that test Photos in the input XML have been properly inserted into the
+     * DB (there are three, spread across two posts)
      */
     @Test
-    public void testPhotos() {
+    public void photos() {
         Post post = postController.getPostForBlogById(MAIN_BLOG_NAME, firstPhotoPostID);
         assertThat(post).isNotNull();
         assertThat(post.getDate()).isEqualTo("Tue, 04 Dec 2018 02:17:52");
@@ -386,32 +374,35 @@ public class PostXmlParsingUnitTest {
 
     /**
      * <p>
-     * Verifies that parsing XML input files with the "overwrite posts" flag turned OFF will
-     * properly read in new posts, while ignoring existing posts. Also tests that a post is properly
-     * reset if the state/date changes. Performs the following steps:
+     * Verifies that parsing XML input files with the "overwrite posts" flag turned
+     * OFF will properly read in new posts, while ignoring existing posts. Also
+     * tests that a post is properly reset if the state/date changes. Performs the
+     * following steps:
      * </p>
      *
      * <ol>
-     * <li>Get all posts, and verify that they're there (not strictly necessary, since this is
-     * covered by other unit tests)</li>
+     * <li>Get all posts, and verify that they're there (not strictly necessary,
+     * since this is covered by other unit tests)</li>
      * <li>Marks each existing post read</li>
      * <li>Updates the "overwrite post data" flag to false</li>
-     * <li>Loads in the additive XML file, which has all of the data from the original XML file plus
-     * an extra post</li>
+     * <li>Loads in the additive XML file, which has all of the data from the
+     * original XML file plus an extra post</li>
      * <li>Asserts that the correct number of posts is in the DB</li>
-     * <li>Asserts that there are two Regulars in the DB (the original XML file had one and the
-     * additive file had a second one)</li>
-     * <li>Asserts that the newly added Regular has all of its information properly inserted</li>
+     * <li>Asserts that there are two Regulars in the DB (the original XML file had
+     * one and the additive file had a second one)</li>
+     * <li>Asserts that the newly added Regular has all of its information properly
+     * inserted</li>
      * <li>Goes through each of the posts that were originally inserted in the
-     * <code>setupData()</code> method and verifies that they're still there -- and that they're
-     * still marked as read. (They were supposed to be ignored; if they were improperly imported
-     * into the system, they'd have been marked as unread.)</li>
+     * <code>setupData()</code> method and verifies that they're still there -- and
+     * that they're still marked as read. (They were supposed to be ignored; if they
+     * were improperly imported into the system, they'd have been marked as
+     * unread.)</li>
      * </ol>
      *
      * @throws FileNotFoundException
      */
     @Test
-    public void testAddingPosts() throws FileNotFoundException {
+    public void addPosts() throws FileNotFoundException {
         List<Post> posts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
         assertThat(posts.size()).isEqualTo(ORIGINAL_NUM_POSTS);
 
@@ -475,10 +466,11 @@ public class PostXmlParsingUnitTest {
     }
 
     /**
-     * Tests that the initial load of posts generated the right number and count of hashtags
+     * Tests that the initial load of posts generated the right number and count of
+     * hashtags
      */
     @Test
-    public void testInitialHashtags() {
+    public void initialHashtags() {
         List<Hashtag> hashtags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
         assertThat(hashtags).isNotNull();
         assertThat(hashtags.size()).isEqualTo(INITIAL_HASHTAGS.size());
@@ -487,7 +479,8 @@ public class PostXmlParsingUnitTest {
     }
 
     /**
-     * Helper function for testing that the tags coming from the API equal the <i>expected</i> tags
+     * Helper function for testing that the tags coming from the API equal the
+     * <i>expected</i> tags
      *
      * @param tagsFromAPI The tags returned from the Post API
      * @param masterList  The set of expected tags
@@ -513,7 +506,7 @@ public class PostXmlParsingUnitTest {
      * @throws FileNotFoundException
      */
     @Test(expected = XMLParsingException.class)
-    public void testBadXmlUpload() throws FileNotFoundException {
+    public void badXmlUpload() throws FileNotFoundException {
         File rawXmlFile = ResourceUtils.getFile("classpath:XML/test-post-badxml.txt");
         InputStream xmlFile = new FileInputStream(rawXmlFile);
 
@@ -524,7 +517,7 @@ public class PostXmlParsingUnitTest {
      * Simple check that all hashtags have been loaded
      */
     @Test
-    public void testHashtagInitialLoad() {
+    public void hashtagInitialLoad() {
         List<Hashtag> tags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
 
         assertThat(tags).isNotNull();
@@ -535,7 +528,7 @@ public class PostXmlParsingUnitTest {
      * Test adding a new hashtag, after the initial load
      */
     @Test
-    public void testAddHashtag() {
+    public void addHashtag() {
         postController.getHashtagController().createHashtagForBlog(MAIN_BLOG_NAME, "tag16");
 
         List<Hashtag> tags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);
@@ -548,7 +541,7 @@ public class PostXmlParsingUnitTest {
      * Test adding a hashtag that already exists in the system
      */
     @Test
-    public void testAddExistingHashtag() {
+    public void addExistingHashtag() {
         postController.getHashtagController().createHashtagForBlog("tag1", MAIN_BLOG_NAME);
 
         List<Hashtag> tags = postController.getHashtagController().getAllHashtagsForBlog(MAIN_BLOG_NAME);

@@ -84,8 +84,47 @@ public class Video implements Serializable, TEVCommonItems<Video> {
     private String videoPlayer250;
 
     /**
-     * Helper function to update the object's properties with properties from another copy of the
-     * object. Post ID ignored.
+     * Constructor to pre-load object
+     * 
+     * @param postId         ID of parent post
+     * @param contentType    Content Type of vid
+     * @param extension      Extension of vid file
+     * @param width          Width of vid
+     * @param height         Height of vid
+     * @param duration       Duration of vid
+     * @param revision       Revision
+     * @param videoCaption   Caption for vid post
+     * @param videoPlayer    Vid player content
+     * @param videoPlayer500 500 size vid player content
+     * @param videoPlayer250 250 size vid player content
+     */
+    @SuppressWarnings("checkstyle:parameternumber")
+    public Video(final String postId, final String contentType, final String extension, final Integer width,
+            final Integer height, final Integer duration, final String revision, final String videoCaption,
+            final String videoPlayer, final String videoPlayer500, final String videoPlayer250) {
+            this.postId = postId;
+            this.contentType = contentType;
+            this.extension = extension;
+            this.width = width;
+            this.height = height;
+            this.duration = duration;
+            this.revision = revision;
+            this.videoCaption = videoCaption;
+            this.videoPlayer = videoPlayer;
+            this.videoPlayer500 = videoPlayer500;
+            this.videoPlayer250 = videoPlayer250;
+    }
+
+    /**
+     * Default/empty constructor
+     */
+    public Video() {
+
+    }
+
+    /**
+     * Helper function to update the object's properties with properties from
+     * another copy of the object. Post ID ignored.
      *
      * @param newDetails Object from which to copy the properties
      */

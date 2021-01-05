@@ -9,7 +9,94 @@ $.i18n.properties({
 var convoFileUploading = false;
 var postFileUploading = true;
 
+var mdReadyExecuted = false;
+
 var FILE_UPLOADING_INTERVAL = 4500;
+
+/**
+ * Sends an AJAX request to the server with the updated metadata
+ */
+function sendMDData() {
+    $.ajax({
+        url: '/api/metadata/' + metadataObject.id,
+        method: 'PUT',
+        data: JSON.stringify(metadataObject),
+        contentType: 'application/json',
+        success: function(data, textStatus, xhr) {
+            createAnInfoMessage($.i18n.prop('md_submit_success'));
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            creaeAnErrorMessage($.i18n.prop('md_submit_failure'));
+        }
+    });     
+}
+
+/**
+ * Sends values from the form to the server to update the Metadata
+ */
+function updateServer() {
+    metadataObject.baseMediaPath = $('#baseMediaPath').val();
+    metadataObject.blog = $('#blogNameInput').val();
+    metadataObject.mainTumblrUser = $('#mainUser').val();
+    metadataObject.mainTumblrUserAvatarUrl = $('#mainUserAvatarUrl').val();
+    metadataObject.sortOrder = $('#sortOrderDropdown').val();
+    metadataObject.conversationSortOrder = $('#conversationSortOrderDropdown').val();
+    metadataObject.sortColumn = $('#sortByDropdown').val();
+    metadataObject.conversationSortColumn = $('#conversationSortColumnDropdown').val();
+    metadataObject.filter = $('#filterDropdown').val();
+    metadataObject.favFilter = $('#favsDropdown').val();
+    metadataObject.pageLength = $('#pageLengthDropdown').val();
+    metadataObject.showReadingPane = $('#showReadingPaneDropdown').val();
+    metadataObject.overwritePostData = $('#overwritePostsDropdown').val();
+    metadataObject.overwriteConvoData = $('#overwriteConvosDropdown').val();
+    metadataObject.conversationDisplayStyle = $('#conversationDisplayDropdown').val();
+    metadataObject.exportImagesFilePath = $('#imageExportPath').val();
+    metadataObject.theme = $('#themesDropdown').val();  
+    
+    sendMDData();  
+}
+
+/**
+ * Sets any Themeroller widgets that need to be instantiated (in this case, just
+ * select menus), and sets their change event to automatically update the
+ * server. Special case is the Themes drop-down, which causes the page to
+ * instantly refresh.
+ *
+ * Code sets <i>both</i> calls the selectmenu() method to set the 'change' property
+ * <i>and</i> sets the JS 'selectmenuselect' handler, to the same code, because 
+ * otherwise HtmlUnit tests don't seem to work.'
+ */
+function setUIWidgets() {
+    $('#filterDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#filterDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
+    $('#sortByDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#sortByDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
+    $('#sortOrderDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#favsDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#favsDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
+    $('#pageLengthDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#pageLengthDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
+    $('#showReadingPaneDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#showReadingPaneDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
+    $('#overwritePostsDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#overwritePostsDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
+    $('#overwriteConvosDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#overwriteConvosDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
+    $('#conversationDisplayDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#conversationDisplayDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
+    $('#conversationSortColumnDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#conversationSortColumnDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
+    $('#conversationSortOrderDropdown').selectmenu({change: function(event,ui) {updateServer();}});
+    $('#conversationSortOrderDropdown').on('selectmenuselect', function(event,ui) {updateServer();});    
+    $('#themesDropdown').selectmenu({change: function(event,ui) {
+        updateServer();
+        setTimeout(function() {parent.location.reload();}, 1500);
+    }});
+    $('#themesDropdown').on('selectmenuselect', function(event,ui) {
+        updateServer();
+        setTimeout(function() {parent.location.reload();}, 1500);
+    });    
+}
 
 /**
  * Returns a translated name for a column
@@ -154,66 +241,6 @@ function getTranslatedConversationStyle(conversationStyle) {
  */
 function getTranslatedTheme(themeID) {
 	return $.i18n.prop('md_themes_' + themeID);
-}
-
-/**
- * Sends values from the form to the server to update the Metadata
- */
-function updateServer() {
-    metadataObject.baseMediaPath = $('#baseMediaPath').val();
-    metadataObject.blog = $('#blogNameInput').val();
-    metadataObject.mainTumblrUser = $('#mainUser').val();
-    metadataObject.mainTumblrUserAvatarUrl = $('#mainUserAvatarUrl').val();
-    metadataObject.sortOrder = $('#sortOrderDropdown').val();
-    metadataObject.conversationSortOrder = $('#conversationSortOrderDropdown').val();
-    metadataObject.sortColumn = $('#sortByDropdown').val();
-    metadataObject.conversationSortColumn = $('#conversationSortColumnDropdown').val();
-    metadataObject.filter = $('#filterDropdown').val();
-    metadataObject.favFilter = $('#favsDropdown').val();
-    metadataObject.pageLength = $('#pageLengthDropdown').val();
-    metadataObject.showReadingPane = $('#showReadingPaneDropdown').val();
-    metadataObject.overwritePostData = $('#overwritePostsDropdown').val();
-    metadataObject.overwriteConvoData = $('#overwriteConvosDropdown').val();
-    metadataObject.conversationDisplayStyle = $('#conversationDisplayDropdown').val();
-    metadataObject.imageExportPath = $('#imageExportPath').val();
-    metadataObject.theme = $('#themesDropdown').val();
-    
-    $.ajax({
-        url: '/api/metadata/' + metadataObject.id,
-        method: 'PUT',
-        data: JSON.stringify(metadataObject),
-        contentType: 'application/json',
-        success: function(data, textStatus, xhr) {
-            createAnInfoMessage($.i18n.prop('md_submit_success'));
-        },
-        error: function(xhr, textStatus, errorThrown) {
-            creaeAnErrorMessage($.i18n.prop('md_submit_failure'));
-        }
-    }); 
-}
-
-/**
- * Sets any Themeroller widgets that need to be instantiated (in this case, just
- * select menus), and sets their change event to automatically update the
- * server. Special case is the Themes drop-down, which causes the page to
- * instantly refresh.
- */
-function setUIWidgets() {
-	$('#filterDropdown').selectmenu({change: function(event,ui) {updateServer();}});
-	$('#sortByDropdown').selectmenu({change: function(event,ui) {updateServer();}});
-	$('#sortOrderDropdown').selectmenu({change: function(event,ui) {updateServer();}});
-	$('#favsDropdown').selectmenu({change: function(event,ui) {updateServer();}});
-	$('#pageLengthDropdown').selectmenu({change: function(event,ui) {updateServer();}});
-	$('#showReadingPaneDropdown').selectmenu({change: function(event,ui) {updateServer();}});
-	$('#overwritePostsDropdown').selectmenu({change: function(event,ui) {updateServer();}});
-	$('#overwriteConvosDropdown').selectmenu({change: function(event,ui) {updateServer();}});
-	$('#conversationDisplayDropdown').selectmenu({change: function(event,ui) {updateServer();}});
-	$('#conversationSortColumnDropdown').selectmenu({change: function(event,ui) {updateServer();}});
-	$('#conversationSortOrderDropdown').selectmenu({change: function(event,ui) {updateServer();}});
-	$('#themesDropdown').selectmenu({change: function(event,ui) {
-		updateServer();
-		setTimeout(function() {parent.location.reload();}, 1500);
-	}});
 }
 
 /**
@@ -375,6 +402,10 @@ function uploadFile(fileType, postUploadForm) {
  * populate the form, set up event handlers
  */
 $(document).ready(function () {
+    if (mdReadyExecuted === true) {
+        return;
+    }
+    
     setUIWidgets();
 
     $.ajax({
@@ -428,14 +459,14 @@ $(document).ready(function () {
                         url: '/api/metadata/' + metadataObject.id + '/markAsDefault',
                         method: 'PUT'
                     }).then(function(data) {
+                        createAnInfoMessage($.i18n.prop('md_submit_success'));
                         location.reload();
                     });
                 });
             }
-                
         });
         
-        $('#headerBlogSelect').selectmenu("disable");               
+        $('#headerBlogSelect').selectmenu("disable");   
     });
     
     $.ajax({
@@ -451,6 +482,7 @@ $(document).ready(function () {
                     url: '/api/metadata/' + metadataObject.id,
                     method: 'DELETE',
                     success: function(data, textStatus, hxr) {
+                        createAnInfoMessage($.i18n.prop('md_submit_success'));
                         window.location = "/metadata";
                     },
                     error: function(xhr, textStatus, errorThrown) {
@@ -535,8 +567,9 @@ $(document).ready(function () {
         return false;
     });
     
-    $('.autoUpdateSetting').change(function() {
+    $(".autoUpdateSetting").change(function() {
         updateServer();
     });
     
+    mdReadyExecuted = true;
 });

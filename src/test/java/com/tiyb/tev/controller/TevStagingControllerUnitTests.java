@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +22,23 @@ import org.springframework.test.context.junit4.SpringRunner;
 @AutoConfigureMockMvc
 public class TevStagingControllerUnitTests {
 
-	@Autowired
+	private static final String BLOGNAME = "blogname";
+    @Autowired
 	private TEVStagingController controller;
+    
+    @Before
+    public void setup() {
+        controller.deleteAllStagedPostsForBlog(BLOGNAME);
+    }
 
 	/**
 	 * tests creation of a staged post
 	 */
 	@Test
-	public void testCreatingPostForStaging() {
-		controller.createStagedPostForBlog("blogname", "1");
+	public void createPostForStaging() {
+		controller.createStagedPostForBlog(BLOGNAME, "1");
 
-		List<String> posts = controller.getAllPostsForBlog("blogname");
+		List<String> posts = controller.getAllPostsForBlog(BLOGNAME);
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(1);
 		assertThat(posts.get(0)).isEqualTo("1");
@@ -41,11 +48,11 @@ public class TevStagingControllerUnitTests {
 	 * Tests creation of multiple staged posts
 	 */
 	@Test
-	public void testCreatingMultiplePostsForStaging() {
-		controller.createStagedPostForBlog("blogname", "1");
-		controller.createStagedPostForBlog("blogname", "2");
+	public void createMultiplePostsForStaging() {
+		controller.createStagedPostForBlog(BLOGNAME, "1");
+		controller.createStagedPostForBlog(BLOGNAME, "2");
 
-		List<String> posts = controller.getAllPostsForBlog("blogname");
+		List<String> posts = controller.getAllPostsForBlog(BLOGNAME);
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(2);
 		assertThat(posts.get(0)).isEqualTo("1");
@@ -56,13 +63,13 @@ public class TevStagingControllerUnitTests {
 	 * Tests deletion of a staged post
 	 */
 	@Test
-	public void testDeletingAStagedost() {
-		controller.createStagedPostForBlog("blogname", "1");
-		controller.createStagedPostForBlog("blogname", "2");
+	public void deleteAStagedPost() {
+		controller.createStagedPostForBlog(BLOGNAME, "1");
+		controller.createStagedPostForBlog(BLOGNAME, "2");
 
-		controller.deleteStagedPostForBlog("blogname", "2");
+		controller.deleteStagedPostForBlog(BLOGNAME, "2");
 
-		List<String> posts = controller.getAllPostsForBlog("blogname");
+		List<String> posts = controller.getAllPostsForBlog(BLOGNAME);
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(1);
 		assertThat(posts.get(0)).isEqualTo("1");
@@ -72,13 +79,13 @@ public class TevStagingControllerUnitTests {
 	 * Tests deletion of all staged posts
 	 */
 	@Test
-	public void testDeletingAllStagedPosts() {
-		controller.createStagedPostForBlog("blogname", "1");
-		controller.createStagedPostForBlog("blogname", "2");
+	public void deleteAllStagedPosts() {
+		controller.createStagedPostForBlog(BLOGNAME, "1");
+		controller.createStagedPostForBlog(BLOGNAME, "2");
 
-		controller.deleteAllStagedPostsForBlog("blogname");
+		controller.deleteAllStagedPostsForBlog(BLOGNAME);
 
-		List<String> posts = controller.getAllPostsForBlog("blogname");
+		List<String> posts = controller.getAllPostsForBlog(BLOGNAME);
 		assertThat(posts).isNotNull();
 		assertThat(posts.size()).isEqualTo(0);
 	}

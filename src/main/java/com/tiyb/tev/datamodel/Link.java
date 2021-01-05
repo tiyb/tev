@@ -47,8 +47,30 @@ public class Link implements Serializable, TEVCommonItems<Link> {
     private String description;
 
     /**
-     * Helper method used to update this object's properties with another copy of the object. Post
-     * ID ignored.
+     * Pre-loading constructor
+     * 
+     * @param postId      ID of parent post
+     * @param text        Text for link
+     * @param url         URL for link
+     * @param description Description of link
+     */
+    public Link(final String postId, final String text, final String url, final String description) {
+        this.postId = postId;
+        this.text = text;
+        this.url = url;
+        this.description = description;
+    }
+
+    /**
+     * Empty/default constructor
+     */
+    public Link() {
+
+    }
+
+    /**
+     * Helper method used to update this object's properties with another copy of
+     * the object. Post ID ignored.
      *
      * @param newDetails Object from which to copy the properties
      */
