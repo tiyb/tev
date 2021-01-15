@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -12,9 +11,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 
-import com.tiyb.tev.TevTestingClass;
 import com.tiyb.tev.datamodel.Post;
+import com.tiyb.tev.html.HtmlTestingClass;
 
 /**
  * Unit test cases for testing admin functions of the application.
@@ -22,14 +22,10 @@ import com.tiyb.tev.datamodel.Post;
  * @author tiyb
  *
  */
-public class TevAdminToolsUnitTests extends TevTestingClass {
+public class TevAdminToolsUnitTests extends HtmlTestingClass {
 
     @Autowired
-    private TEVMetadataRestController mdRestController;
-    @Autowired
-    private TEVAdminToolsController adminRestController;
-    @Autowired
-    private TEVPostRestController postController;
+    private TestRestTemplate restTemplate;
 
     /**
      * Don't know what the Rule annotation does, but this is a temporary folder
@@ -52,7 +48,7 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
     @Before
     public void setupData() throws FileNotFoundException {
         Optional<String> baseMediaPath = Optional.of(tempMDImageFolder.getRoot().getAbsolutePath());
-        initDataForMainBlog(mdRestController, postController, baseMediaPath);
+        restInitDataForMainBlog(baseMediaPath);
     }
 
     /**
@@ -64,7 +60,8 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
     public void cleanExtraImages() throws IOException {
         tempMDImageFolder.newFile("blah.txt");
 
-        adminRestController.cleanImagesOnHDForBlog(MAIN_BLOG_NAME);
+        restTemplate.getForEntity(String.format("%s/admintools/posts/%s/cleanImagesOnHD", baseUri(), MAIN_BLOG_NAME),
+                String.class);
 
         assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(0);
     }
@@ -81,7 +78,8 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
         tempMDImageFolder.newFile("180254465582_0.gif");
         tempMDImageFolder.newFile("180254465582_1.gif");
 
-        adminRestController.cleanImagesOnHDForBlog(MAIN_BLOG_NAME);
+        restTemplate.getForEntity(String.format("%s/admintools/posts/%s/cleanImagesOnHD", baseUri(), MAIN_BLOG_NAME),
+                String.class);
 
         assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
     }
@@ -101,7 +99,8 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
         tempMDImageFolder.newFile("180254465582_2.gif");
         tempMDImageFolder.newFile("180254465582_3.gif");
 
-        adminRestController.cleanImagesOnHDForBlog(MAIN_BLOG_NAME);
+        restTemplate.getForEntity(String.format("%s/admintools/posts/%s/cleanImagesOnHD", baseUri(), MAIN_BLOG_NAME),
+                String.class);
 
         assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
     }
@@ -115,7 +114,8 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
     public void importExtraImages() throws IOException {
         tempInputImageFolder.newFile("blah.txt");
 
-        adminRestController.importImagesForBlog(MAIN_BLOG_NAME, tempInputImageFolder.getRoot().getAbsolutePath());
+        restTemplate.postForObject(String.format("%s/admintools/posts/%s/importImages", baseUri(), MAIN_BLOG_NAME),
+                tempInputImageFolder.getRoot().getAbsolutePath(), String.class);
 
         assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(0);
     }
@@ -131,7 +131,8 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
         tempInputImageFolder.newFile("180254465582_0.gif");
         tempInputImageFolder.newFile("180254465582_1.gif");
 
-        adminRestController.importImagesForBlog(MAIN_BLOG_NAME, tempInputImageFolder.getRoot().getAbsolutePath());
+        restTemplate.postForObject(String.format("%s/admintools/posts/%s/importImages", baseUri(), MAIN_BLOG_NAME),
+                tempInputImageFolder.getRoot().getAbsolutePath(), String.class);
 
         assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
     }
@@ -150,7 +151,8 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
         tempInputImageFolder.newFile("180254465582_2.gif");
         tempInputImageFolder.newFile("180254465582_3.gif");
 
-        adminRestController.importImagesForBlog(MAIN_BLOG_NAME, tempInputImageFolder.getRoot().getAbsolutePath());
+        restTemplate.postForObject(String.format("%s/admintools/posts/%s/importImages", baseUri(), MAIN_BLOG_NAME),
+                tempInputImageFolder.getRoot().getAbsolutePath(), String.class);
 
         assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
     }
@@ -169,7 +171,8 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
         tempInputImageFolder.newFile("180254465582_2.gif");
         tempInputImageFolder.newFile("180254465582_3.gif");
 
-        adminRestController.importImagesForBlog(MAIN_BLOG_NAME, tempInputImageFolder.getRoot().getAbsolutePath());
+        restTemplate.postForObject(String.format("%s/admintools/posts/%s/importImages", baseUri(), MAIN_BLOG_NAME),
+                tempInputImageFolder.getRoot().getAbsolutePath(), String.class);
 
         assertThat(tempMDImageFolder.getRoot().list().length).isEqualTo(3);
     }
@@ -179,24 +182,25 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
      */
     @Test
     public void markAllPostsRead() {
-        List<Post> allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
-        assertThat(allPosts).isNotNull();
+        Post[] allPosts = getAllPostsFromRest(MAIN_BLOG_NAME);
+        assertThat(allPosts).isNotEmpty();
 
         for (Post p : allPosts) {
             p.setIsRead(false);
-            postController.updatePostForBlog(p.getTumblelog(), p.getId(), p);
+            restTemplate.put(String.format("%s/api/posts/%s/%s", baseUri(), MAIN_BLOG_NAME, p.getId()), p);
         }
 
-        allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
-        assertThat(allPosts).isNotNull();
+        allPosts = getAllPostsFromRest(MAIN_BLOG_NAME);
+        assertThat(allPosts).isNotEmpty();
         for (Post p : allPosts) {
             assertThat(p.getIsRead()).isEqualTo(false);
         }
 
-        adminRestController.markAllPostsReadForBlog(MAIN_BLOG_NAME);
+        restTemplate.getForEntity(String.format("%s/admintools/posts/%s/markAllRead", baseUri(), MAIN_BLOG_NAME),
+                String.class);
 
-        allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
-        assertThat(allPosts).isNotNull();
+        allPosts = getAllPostsFromRest(MAIN_BLOG_NAME);
+        assertThat(allPosts).isNotEmpty();
         for (Post p : allPosts) {
             assertThat(p.getIsRead()).isEqualTo(true);
         }
@@ -207,24 +211,25 @@ public class TevAdminToolsUnitTests extends TevTestingClass {
      */
     @Test
     public void markAllPostsUnread() {
-        List<Post> allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
-        assertThat(allPosts).isNotNull();
+        Post[] allPosts = getAllPostsFromRest(MAIN_BLOG_NAME);
+        assertThat(allPosts).isNotEmpty();
 
         for (Post p : allPosts) {
             p.setIsRead(true);
-            postController.updatePostForBlog(p.getTumblelog(), p.getId(), p);
+            restTemplate.put(String.format("%s/api/posts/%s/%s", baseUri(), MAIN_BLOG_NAME, p.getId()), p);
         }
 
-        allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
-        assertThat(allPosts).isNotNull();
+        allPosts = getAllPostsFromRest(MAIN_BLOG_NAME);
+        assertThat(allPosts).isNotEmpty();
         for (Post p : allPosts) {
             assertThat(p.getIsRead()).isEqualTo(true);
         }
 
-        adminRestController.markAllPostsUnreadForBlog(MAIN_BLOG_NAME);
+        restTemplate.getForEntity(String.format("%s/admintools/posts/%s/markAllUnread", baseUri(), MAIN_BLOG_NAME),
+                String.class);
 
-        allPosts = postController.getAllPostsForBlog(MAIN_BLOG_NAME);
-        assertThat(allPosts).isNotNull();
+        allPosts = getAllPostsFromRest(MAIN_BLOG_NAME);
+        assertThat(allPosts).isNotEmpty();
         for (Post p : allPosts) {
             assertThat(p.getIsRead()).isEqualTo(false);
         }
