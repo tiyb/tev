@@ -2,6 +2,8 @@ package com.tiyb.tev.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,8 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestClientException;
 
 import com.tiyb.tev.datamodel.Hashtag;
 import com.tiyb.tev.exception.ExistingTagException;
@@ -569,9 +572,13 @@ public class TevHTRestControllerUnitTests extends HtmlTestingClass {
      * Tests that a hashtag can't be inserted into the "no blog" namespace if it's
      * already been created for a blog, via REST
      */
-    @Test(expected = RestClientException.class)
-    public void htCantCreateBlankWhenExistsRest() {
+    @Test
+    public void htCantCreateBlankWhenExistsRest() throws URISyntaxException {
         restTemplate.postForObject(String.format("%s/api/hashtags/%s", baseUri(), MAIN_BLOG_NAME), FIRST_TAG_VALUE, Hashtag.class);
-        restTemplate.postForObject(String.format("%s/api/hashtags/", baseUri()), FIRST_TAG_VALUE, Hashtag.class);
+                
+        URI uri = new URI(String.format("%s/api/hashtags/", baseUri()));
+        RequestEntity<String> requestEntity = RequestEntity.post(uri).body(FIRST_TAG_VALUE);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 }
