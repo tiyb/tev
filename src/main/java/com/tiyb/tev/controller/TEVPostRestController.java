@@ -164,7 +164,7 @@ public class TEVPostRestController {
      * @param postId The ID of the post to be marked read
      * @return The modified Post
      */
-    @PutMapping("/posts/{blog}/{id}/markRead")
+    @GetMapping("/posts/{blog}/{id}/markRead")
     public Post markPostReadForBlog(@PathVariable("blog") final String blog, @PathVariable("id") final String postId) {
         Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
 
@@ -184,7 +184,7 @@ public class TEVPostRestController {
      * @param postId The ID of the post to be marked as a favourite
      * @return The modified Post
      */
-    @PutMapping("/posts/{blog}/{id}/markFavourite")
+    @GetMapping("/posts/{blog}/{id}/markFavourite")
     public Post markPostFavouriteForBlog(@PathVariable("blog") final String blog,
             @PathVariable("id") final String postId) {
         Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
@@ -205,7 +205,7 @@ public class TEVPostRestController {
      * @param postId The ID of the post to be marked unread
      * @return The modified Post
      */
-    @PutMapping("/posts/{blog}/{id}/markUnread")
+    @GetMapping("/posts/{blog}/{id}/markUnread")
     public Post markPostUnreadForBlog(@PathVariable("blog") final String blog,
             @PathVariable("id") final String postId) {
         Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
@@ -226,7 +226,7 @@ public class TEVPostRestController {
      * @param postId The ID of the post to be marked as not a favourite
      * @return The modified Post
      */
-    @PutMapping("/posts/{blog}/{id}/markNonFavourite")
+    @GetMapping("/posts/{blog}/{id}/markNonFavourite")
     public Post markPostNonFavouriteForBlog(@PathVariable("blog") final String blog,
             @PathVariable("id") final String postId) {
         Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));

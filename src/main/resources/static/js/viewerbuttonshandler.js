@@ -34,7 +34,7 @@ $(document).ready(function() {
 			$.ajax({
 				url: url,
 				dataSrc: "",
-				type: "PUT"
+				type: "GET"
 			}).then(function(data) {
 				opener.location.reload();
 				window.close();
@@ -52,7 +52,7 @@ $(document).ready(function() {
 			$.ajax({
 				url: url,
 				dataSrc: "",
-				type: "PUT"
+				type: "GET"
 			}).then(function(data) {
 				location.reload();
 			});

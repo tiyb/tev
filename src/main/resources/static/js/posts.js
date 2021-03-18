@@ -390,7 +390,7 @@ $(document).ready(function() {
                     postTable.draw();
                     $.ajax({
                         url: "/api/posts/" + metadata.blog + "/" + postID + "/markRead",
-                        type: "PUT"
+                        type: "GET"
                     });
                     if(metadata.showReadingPane) {
                         $('#contentDisplayReadingPane').show();
@@ -419,7 +419,7 @@ $(document).ready(function() {
             var postID = data.id;
             $.ajax({
                 url: "/api/posts/" + metadata.blog + "/" + postID + "/markUnread",
-                type: "PUT"
+                type: "GET"
             });
             $(this).parent().parent('tr').children('td:last-child').html($.i18n.prop('index_posttable_isNotreadIndicator'));
             $('#displayPaneIFrame').height($('#contentDisplayTable').height());
@@ -432,7 +432,7 @@ $(document).ready(function() {
             var postID = data.id;
             $.ajax({
                 url: "/api/posts/" + metadata.blog + "/" + postID + "/markFavourite",
-                type: "PUT"
+                type: "GET"
             });
             $(this).parents('tr').children('td:nth-child(' + (FAV_COLUMN_NO + 1) + ')').html($.i18n.prop('index_posttable_isFavourite'));
             $('#displayPaneIFrame').height($('#contentDisplayTable').height());
@@ -445,7 +445,7 @@ $(document).ready(function() {
             var postID = data.id;
             $.ajax({
                 url: "/api/posts/" + metadata.blog + "/" + postID + "/markNonFavourite",
-                type: "PUT"
+                type: "GET"
             });
             $(this).parents('tr').children('td:nth-child(' + (FAV_COLUMN_NO + 1) + ')').html($.i18n.prop('index_posttable_isNotFavourite'));
             $('#displayPaneIFrame').height($('#contentDisplayTable').height());
