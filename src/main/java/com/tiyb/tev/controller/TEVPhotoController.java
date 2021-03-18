@@ -199,13 +199,9 @@ public class TEVPhotoController {
      */
     @DeleteMapping("/posts/{blog}/photos")
     public ResponseEntity<?> deleteAllPhotosForBlog(@PathVariable("blog") final String blog) {
-        final List<Post> posts = postRepo.findByTumblelogAndType(blog, Post.POST_TYPE_PHOTO);
-
-        for (Post post : posts) {
-            final List<Photo> photos = photoRepo.findByPostId(post.getId());
-            for (Photo photo : photos) {
-                photoRepo.delete(photo);
-            }
+        final List<Photo> photos = getAllPhotosForBlog(blog);
+        for (Photo p : photos) {
+            photoRepo.delete(p);
         }
 
         return ResponseEntity.ok().build();

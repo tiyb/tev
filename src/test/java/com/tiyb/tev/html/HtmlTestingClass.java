@@ -49,7 +49,7 @@ import com.tiyb.tev.datamodel.Video;
 @TestPropertySource("classpath:static/js/i18n/messages.properties")
 public abstract class HtmlTestingClass extends TevTestingClass {
 
-    private final static int WAIT_TIME_FOR_JS = 60000;
+    private final static int WAIT_TIME_FOR_JS = 10000;
 
     @Autowired
     private TestRestTemplate restTemplate;
