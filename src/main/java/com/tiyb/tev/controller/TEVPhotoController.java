@@ -1,12 +1,17 @@
 package com.tiyb.tev.controller;
 
-import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -95,17 +100,36 @@ public class TEVPhotoController {
         final List<Photo> photos = photoRepo.findByPostIdOrderByOffset(postId);
         boolean response = true;
 
+        
         for (int i = 0; i < photos.size(); i++) {
             final Photo photo = photos.get(i);
-            final String url = photo.getUrl1280();
-            final String ext = url.substring(url.lastIndexOf('.'));
+            final String photoUrlString = photo.getUrl1280();
+            final String ext = photoUrlString.substring(photoUrlString.lastIndexOf('.'));
             try {
-                final BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
-                final FileOutputStream out =
-                        new FileOutputStream(String.format("%s%s_%d%s", imageDirectory, photo.getPostId(), i, ext));
+                final HttpURLConnection containerUrlConn = (HttpURLConnection) (new URL(photoUrlString)
+                        .openConnection());
+                containerUrlConn.setRequestProperty("REFERER", "https://www.tumblr.com/dashboard");
+                containerUrlConn.connect();
+                
+                final InputStream containerInputStream = containerUrlConn.getInputStream();
+                final String htmlContent = new BufferedReader(
+                        new InputStreamReader(containerInputStream, StandardCharsets.UTF_8)).lines()
+                                .collect(Collectors.joining("\n"));
+                
+                String tumblrUrl = htmlContent.substring(htmlContent.lastIndexOf("<img"));
+                tumblrUrl = tumblrUrl.substring(tumblrUrl.indexOf("src=\"") + "src=\"".length());
+                tumblrUrl = tumblrUrl.substring(0, tumblrUrl.indexOf("\""));
+                
+                final HttpURLConnection imageUrlConn = (HttpURLConnection) (new URL(tumblrUrl).openConnection());
+                imageUrlConn.setRequestProperty("REFERER", photoUrlString);
+                imageUrlConn.connect();
+                final InputStream imageInputStream = imageUrlConn.getInputStream();
+                
+                final FileOutputStream out = new FileOutputStream(
+                        String.format("%s%s_%d%s", imageDirectory, photo.getPostId(), i, ext));
                 final byte[] dataBuffer = new byte[BYTE_BUFFER_LENGTH];
                 int bytesRead;
-                while ((bytesRead = in.read(dataBuffer, 0, BYTE_BUFFER_LENGTH)) != -1) {
+                while ((bytesRead = imageInputStream.read(dataBuffer, 0, BYTE_BUFFER_LENGTH)) != -1) {
                     out.write(dataBuffer, 0, bytesRead);
                 }
                 out.close();
@@ -113,6 +137,7 @@ public class TEVPhotoController {
                 response = false;
             }
         }
+
         return response;
     }
 

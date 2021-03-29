@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.tiyb.tev.controller.helper.PhotoViewerAbstractor;
 import com.tiyb.tev.datamodel.Answer;
 import com.tiyb.tev.datamodel.Conversation;
 import com.tiyb.tev.datamodel.ConversationMessage;
@@ -194,8 +195,9 @@ public class TEVUIController {
     private TEVStagingController stagingController;
 
     /**
-     * Returns the main (or index) page, at either / or /index. Checks first to see whether any
-     * metadata has been created; if not, redirects to the settings page.
+     * Returns the main (or index) page, at either / or /index. Checks first to see
+     * whether any metadata has been created; if not, redirects to the settings
+     * page.
      *
      * @param model     not used
      * @param blogParam Specifies a blog to use, if other than the default
@@ -218,9 +220,9 @@ public class TEVUIController {
     }
 
     /**
-     * Returns the page for showing a list of message conversations, at /conversations. Retrieves
-     * metadata and conversations, which are added to the model, before returning the location of
-     * the conversations viewer.
+     * Returns the page for showing a list of message conversations, at
+     * /conversations. Retrieves metadata and conversations, which are added to the
+     * model, before returning the location of the conversations viewer.
      *
      * @param model     not used
      * @param blogParam Specifies a blog to use, if other than the default
@@ -245,9 +247,9 @@ public class TEVUIController {
     }
 
     /**
-     * Returns the a page for maintaining the application's metadata, at /metadata. If no blogs have
-     * been created (i.e. if there are no Metadata objects in the DB), the model is updated with
-     * this info, so the client can create one.
+     * Returns the a page for maintaining the application's metadata, at /metadata.
+     * If no blogs have been created (i.e. if there are no Metadata objects in the
+     * DB), the model is updated with this info, so the client can create one.
      *
      * @param model not used
      * @return name of the template to be used to render the page
@@ -284,11 +286,11 @@ public class TEVUIController {
     }
 
     /**
-     * Helper function to add an attribute to the Model for a client-side bit of JS code for setting
-     * a variable with the blog's name. This <i>should</i> have been as simple as setting an
-     * attribute with the blog's name and then setting the JS code in the Thymeleaf page, but for
-     * some reason the initial developer couldn't figure out a way to get single quotes into the
-     * generated string...
+     * Helper function to add an attribute to the Model for a client-side bit of JS
+     * code for setting a variable with the blog's name. This <i>should</i> have
+     * been as simple as setting an attribute with the blog's name and then setting
+     * the JS code in the Thymeleaf page, but for some reason the initial developer
+     * couldn't figure out a way to get single quotes into the generated string...
      *
      * @param model    The Model to which the JS code should be added
      * @param blogName The name of the current blog
@@ -298,10 +300,11 @@ public class TEVUIController {
     }
 
     /**
-     * Helper function to add an attribute to the Model for a client-side bit of JS code for setting
-     * a variable with the post's ID. This <i>should</i> have been as simple as setting an attribute
-     * with the value and then setting the JS code in the Thymeleaf page, but for some reason the
-     * initial developer couldn't figure out a way to get single quotes into the generated string...
+     * Helper function to add an attribute to the Model for a client-side bit of JS
+     * code for setting a variable with the post's ID. This <i>should</i> have been
+     * as simple as setting an attribute with the value and then setting the JS code
+     * in the Thymeleaf page, but for some reason the initial developer couldn't
+     * figure out a way to get single quotes into the generated string...
      *
      * @param model  The Model to which the JS code should be added
      * @param postID The ID of the current post
@@ -311,10 +314,10 @@ public class TEVUIController {
     }
 
     /**
-     * Handles file uploads, for reading in the Tumblr Post XML Export for a given blog. Actual
-     * logic is handled by the <code>parseDocument()</code> method; this method simply calls that
-     * class and then (upon success) redirects to the index. Failure redirects to the "bad XML"
-     * error page.
+     * Handles file uploads, for reading in the Tumblr Post XML Export for a given
+     * blog. Actual logic is handled by the <code>parseDocument()</code> method;
+     * this method simply calls that class and then (upon success) redirects to the
+     * index. Failure redirects to the "bad XML" error page.
      *
      * @param blog               The blog for which post data should be uploaded
      * @param file               The Tumblr XML file to be read
@@ -340,9 +343,10 @@ public class TEVUIController {
     }
 
     /**
-     * Handles file uploads for reading in Tumblr messaging XML extract. Actual logic is handled by
-     * the <code>parseDocument()</code> method; this method simply calls that class and then (upon
-     * success) redirects to the index. Failure redirects to the "bad XML" error page.
+     * Handles file uploads for reading in Tumblr messaging XML extract. Actual
+     * logic is handled by the <code>parseDocument()</code> method; this method
+     * simply calls that class and then (upon success) redirects to the index.
+     * Failure redirects to the "bad XML" error page.
      *
      * @param blog               Blog for which conversation should be uploaded
      * @param file               the XML file to be parsed
@@ -375,21 +379,22 @@ public class TEVUIController {
 
     /**
      * <p>
-     * This request is used to populate the viewer. It first determines the correct viewer to show
-     * (Regular, Photo, etc.), populates the {@link org.springframework.ui.Model Model} (since the
-     * pages are rendered by Thymeleaf on the server rather than jQuery on the client), then returns
-     * the correct template to show that type of post.
+     * This request is used to populate the viewer. It first determines the correct
+     * viewer to show (Regular, Photo, etc.), populates the
+     * {@link org.springframework.ui.Model Model} (since the pages are rendered by
+     * Thymeleaf on the server rather than jQuery on the client), then returns the
+     * correct template to show that type of post.
      * </p>
      *
      * <p>
-     * {@link #pullOutTagValues(String)} is leveraged for getting a nicer view of the tags in the
-     * post.
+     * {@link #pullOutTagValues(String)} is leveraged for getting a nicer view of
+     * the tags in the post.
      * </p>
      *
      * @param blog   The blog for which this post should be retrieved
      * @param postID The ID of the post to be viewed (regardless of type)
-     * @param model  The model to be populated with post data, for use by Thymeleaf in the HTML
-     *               template
+     * @param model  The model to be populated with post data, for use by Thymeleaf
+     *               in the HTML template
      * @return The name of the template to use for rendering the output
      */
     @RequestMapping(value = { "/postViewer/{blog}" }, method = RequestMethod.GET)
@@ -398,6 +403,7 @@ public class TEVUIController {
         final Post post = postController.getPostForBlogById(blog, postID);
         model.addAttribute(MODEL_ATTRIBUTE_POST, post);
         addBlogNameJSToModel(model, blog);
+        model.addAttribute(MODEL_ATTRIBUTE_BLOGNAME, blog);
         addPostIdJSToModel(model, postID);
         model.addAttribute(MODEL_ATTRIBUTE_TAGS, pullOutTagValues(post.getTags()));
         final List<String> availableTypes = mdController.getAllTypes();
@@ -429,13 +435,13 @@ public class TEVUIController {
             model.addAttribute(MODEL_ATTRIBUTE_ANSWER, ans);
             return "viewers/answer";
         case Post.POST_TYPE_PHOTO:
-            final List<String> images = new ArrayList<String>();
-            final List<Photo> photos =
-                    postController.getPhotoController().getPhotoForBlogById(post.getTumblelog(), postID);
+            final List<PhotoViewerAbstractor> images = new ArrayList<PhotoViewerAbstractor>();
+            final List<Photo> photos = postController.getPhotoController().getPhotoForBlogById(post.getTumblelog(),
+                    postID);
             for (int i = 0; i < photos.size(); i++) {
                 final Photo photo = photos.get(i);
                 final String ext = photo.getUrl1280().substring(photo.getUrl1280().lastIndexOf('.'));
-                images.add(String.format("%s_%d%s", postID, i, ext));
+                images.add(new PhotoViewerAbstractor(String.format("%s_%d%s", postID, i, ext), photo.getUrl1280()));
             }
             model.addAttribute(MODEL_ATTRIBUTE_PHOTOS, images);
             model.addAttribute(MODEL_ATTRIBUTE_CAPTION, photos.get(0).getCaption());
@@ -454,10 +460,10 @@ public class TEVUIController {
     /**
      * This request is used to populate the hashtag viewer.
      *
-     * @param model     The model to be populated with post data, for use by Thymeleaf in the HTML
-     *                  template
-     * @param blogParam Optional: the name of the blog for which this page should be rendered,
-     *                  regardless of the default
+     * @param model     The model to be populated with post data, for use by
+     *                  Thymeleaf in the HTML template
+     * @param blogParam Optional: the name of the blog for which this page should be
+     *                  rendered, regardless of the default
      * @return The name of the template to use for rendering the output
      */
     @RequestMapping(value = { "/hashtagViewer" }, method = RequestMethod.GET)
@@ -475,8 +481,8 @@ public class TEVUIController {
     /**
      * This request is used to view the XML for export purposes.
      *
-     * @param model     The model to be populated with post data, for use by Thymeleaf (in this
-     *                  case, just theme information)
+     * @param model     The model to be populated with post data, for use by
+     *                  Thymeleaf (in this case, just theme information)
      * @param blogParam Blog to use, if other than the default
      * @return The name of the template to use for rendering the output
      */
@@ -495,7 +501,8 @@ public class TEVUIController {
     /**
      * This request is to show the Staged Post viewer
      *
-     * @param model     The model to be populated with a list of IDs, for use by Thymeleaf
+     * @param model     The model to be populated with a list of IDs, for use by
+     *                  Thymeleaf
      * @param blogParam Blog to use, if other than the default
      * @return The name of the template to use for rendering the output
      */
@@ -526,8 +533,8 @@ public class TEVUIController {
         addBlogNameJSToModel(model, blog);
         final Conversation convo = convoController.getConversationForBlogByParticipant(md.getBlog(), participantName);
         model.addAttribute(MODEL_ATTRIBUTE_CONVERSATION, convo);
-        final List<ConversationMessage> messages =
-                convoController.getConvoMsgForBlogByConvoID(convo.getBlog(), convo.getId());
+        final List<ConversationMessage> messages = convoController.getConvoMsgForBlogByConvoID(convo.getBlog(),
+                convo.getId());
         model.addAttribute(MODEL_ATTRIBUTE_MESSAGES, messages);
 
         model.addAttribute(MODEL_ATTRIBUTE_BLOGNAME, blog);
@@ -537,18 +544,20 @@ public class TEVUIController {
     }
 
     /**
-     * Returns a binary image, for use in the viewer. HTML pages can't directly access local images
-     * or videos, so this has to be done via the "server."
+     * Returns a binary image, for use in the viewer. HTML pages can't directly
+     * access local images or videos, so this has to be done via the "server."
      *
+     * @param blog      Name of the blog being viewed
      * @param imageName Name of the image to be retrieved
      * @param model     not used
      * @return Byte stream of the file, as loaded from the file system
      */
-    @RequestMapping(value = { "/viewerMedia/{imageName}" }, method = RequestMethod.GET, produces = {
+    @RequestMapping(value = { "/viewerMedia/{blogName}/{imageName}" }, method = RequestMethod.GET, produces = {
             MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_PNG_VALUE })
-    public @ResponseBody byte[] getMedia(@PathVariable(MODEL_ATTRIBUTE_IMAGENAME) final String imageName,
-            final Model model) {
-        final String fullName = String.format("%s/%s", mdController.getDefaultMetadata().getBaseMediaPath(), imageName);
+    public @ResponseBody byte[] getMedia(@PathVariable("blogName") final String blog,
+            @PathVariable(MODEL_ATTRIBUTE_IMAGENAME) final String imageName, final Model model) {
+        final Metadata md = mdController.getMetadataForBlog(blog);
+        final String fullName = String.format("%s/%s", md.getBaseMediaPath(), imageName);
 
         final File file = new File(fullName);
         try {
@@ -560,16 +569,20 @@ public class TEVUIController {
     }
 
     /**
-     * Returns a binary video, for use in the viewer. HTML pages can't directly access local images
-     * or videos, so this has to be done via the "server."
+     * Returns a binary video, for use in the viewer. HTML pages can't directly
+     * access local images or videos, so this has to be done via the "server."
      *
      * @param response HTTP Response object
      * @param request  HTTP Request object
      */
-    @RequestMapping(value = { "/viewerVideo/{videoName}" }, method = RequestMethod.GET, produces = { "video/mp4" })
+    @RequestMapping(value = { "/viewerVideo/{blogName}/{videoName}" }, method = RequestMethod.GET, produces = {
+            "video/mp4" })
     public void getVideo(final HttpServletResponse response, final HttpServletRequest request) {
-        final String fullName = String.format("%s/%s", mdController.getDefaultMetadata().getBaseMediaPath(),
-                request.getRequestURI().substring(request.getRequestURI().lastIndexOf('/')));
+        final String videoName = request.getRequestURI().substring(request.getRequestURI().lastIndexOf('/') + 1);
+        String blogName = request.getRequestURI().substring(1, request.getRequestURI().lastIndexOf('/'));
+        blogName = blogName.substring(blogName.lastIndexOf('/') + 1);
+        final Metadata md = mdController.getMetadataForBlog(blogName);
+        final String fullName = String.format("%s/%s", md.getBaseMediaPath(), videoName);
 
         response.setContentType("video/mp4");
         response.setHeader("Pragma", "no-cache");
@@ -592,8 +605,9 @@ public class TEVUIController {
     }
 
     /**
-     * Used to request the XML export, for any posts that have been "staged" for export. Returns the
-     * data as a string, with the intent that it is displayed in the browser.
+     * Used to request the XML export, for any posts that have been "staged" for
+     * export. Returns the data as a string, with the intent that it is displayed in
+     * the browser.
      *
      * @param blog     The blog for which staged downloads should be retrieved
      * @param response The HTTP Response object (used for setting headers)
@@ -623,8 +637,8 @@ public class TEVUIController {
     }
 
     /**
-     * Retrieves the application version number from the application's POM, adds it to the model,
-     * then returns the "footer" page.
+     * Retrieves the application version number from the application's POM, adds it
+     * to the model, then returns the "footer" page.
      *
      * @param model For setting the application version, used by Thymeleaf
      * @return name of the template to be used to render the page
@@ -672,8 +686,8 @@ public class TEVUIController {
     }
 
     /**
-     * Helper method that pulls out the tags into spans. This kind of ties processing together with
-     * UI, but... whatever.
+     * Helper method that pulls out the tags into spans. This kind of ties
+     * processing together with UI, but... whatever.
      *
      * @param csvTags String containing the hashtags, separated by commas
      * @return String, containing HTML span tags containing the hashtags

@@ -12,7 +12,7 @@
 <div class="contentContainer">
 <div id="buttonsDiv"></div>
 <video controls="controls" preload="auto" th:height="${video.height}" th:width="${video.width}">
-	<source th:src="'/viewerVideo/' +  ${video.postId} + '.' + ${video.extension}" th:type="${video.contentType}" />
+	<source th:src="'/viewerVideo/' + ${blogName} + '/' +  ${video.postId} + '.' + ${video.extension}" th:type="${video.contentType}" />
 </video>
 <div id="regularContentContainer" th:utext="${video.videoCaption}"></div>
 </div>

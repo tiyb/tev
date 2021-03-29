@@ -12,7 +12,7 @@
 <div class="contentContainer">
 <div id="buttonsDiv"></div>
 <p th:each="photo : ${photos}">
-	<img th:src="'/viewerMedia/' + ${photo}" />
+	<img th:src="'/viewerMedia/' + ${blogName} + '/' + ${photo.photoName}" th:alt="${photo.photoOriginalUrl}" />
 </p>
 <div id="regularContentContainer" th:utext="${caption}"></div>
 </div>
